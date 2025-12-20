@@ -34,7 +34,7 @@ export async function POST(
           duration
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (fetchError || !appointment) {
@@ -76,7 +76,7 @@ export async function POST(
         cancelled_by: 'client',
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (updateError) {
       console.error('Error cancelling appointment:', updateError);
@@ -93,7 +93,7 @@ export async function POST(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          appointmentId: params.id,
+          appointmentId: id,
           type: 'cancellation',
         }),
       });

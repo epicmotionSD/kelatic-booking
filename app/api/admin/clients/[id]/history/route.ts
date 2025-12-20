@@ -20,7 +20,7 @@ export async function GET(
         stylist:profiles!appointments_stylist_id_fkey(first_name, last_name),
         payments(total_amount, status)
       `)
-      .eq('client_id', params.id)
+      .eq('client_id', id)
       .order('start_time', { ascending: false })
       .limit(20);
 

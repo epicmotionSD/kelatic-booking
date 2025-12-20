@@ -18,7 +18,7 @@ export async function GET(
         ),
         stylist_schedules(*)
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('role', 'stylist')
       .single();
 
@@ -54,7 +54,7 @@ export async function PUT(
         instagram_handle: body.instagram_handle,
         commission_rate: body.commission_rate,
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -92,7 +92,7 @@ export async function PATCH(
     const { data: stylist, error } = await supabase
       .from('profiles')
       .update(updates)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 

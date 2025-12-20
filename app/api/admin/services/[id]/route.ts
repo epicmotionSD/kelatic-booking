@@ -46,7 +46,7 @@ export async function PUT(
         deposit_required: body.deposit_required,
         deposit_amount: body.deposit_amount,
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -84,7 +84,7 @@ export async function PATCH(
     const { data: service, error } = await supabase
       .from('services')
       .update(updates)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -112,14 +112,14 @@ export async function DELETE(
     const { count } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
-      .eq('service_id', params.id);
+      .eq('service_id', id);
 
     if (count && count > 0) {
       // Soft delete - deactivate instead
       await supabase
         .from('services')
         .update({ is_active: false })
-        .eq('id', params.id);
+        .eq('id', id);
 
       return NextResponse.json({ 
         message: 'Service deactivated (has existing appointments)',
@@ -131,7 +131,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('services')
       .delete()
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       return NextResponse.json({ error: 'Failed to delete service' }, { status: 500 });

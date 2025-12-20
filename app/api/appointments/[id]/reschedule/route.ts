@@ -52,7 +52,7 @@ export async function POST(
           duration
         )
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (fetchError || !appointment) {
@@ -107,7 +107,7 @@ export async function POST(
       .from('appointments')
       .select('id')
       .eq('stylist_id', appointment.stylist_id)
-      .neq('id', params.id)
+      .neq('id', id)
       .lt('start_time', newEndTime.toISOString())
       .gt('end_time', newStartTime.toISOString())
       .not('status', 'in', '("cancelled","no_show")')
@@ -178,7 +178,7 @@ export async function POST(
         end_time: newEndTime.toISOString(),
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -197,7 +197,7 @@ export async function POST(
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          appointmentId: params.id,
+          appointmentId: id,
           oldStartTime,
           newStartTime: newStartTime.toISOString(),
         }),

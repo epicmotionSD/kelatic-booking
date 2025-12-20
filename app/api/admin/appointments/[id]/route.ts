@@ -19,7 +19,7 @@ export async function GET(
         payments(*),
         appointment_addons(*, services(*))
       `)
-      .eq('id', params.id)
+      .eq('id', id)
       .single();
 
     if (error) {
@@ -71,7 +71,7 @@ export async function PATCH(
     const { data: appointment, error } = await supabase
       .from('appointments')
       .update(updates)
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single();
 
@@ -99,7 +99,7 @@ export async function DELETE(
     const { error } = await supabase
       .from('appointments')
       .update({ status: 'cancelled' })
-      .eq('id', params.id);
+      .eq('id', id);
 
     if (error) {
       return NextResponse.json({ error: 'Failed to cancel appointment' }, { status: 500 });
