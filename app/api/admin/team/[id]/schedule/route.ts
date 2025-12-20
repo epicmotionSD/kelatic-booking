@@ -25,11 +25,11 @@ const numberToDay: Record<number, string> = {
 // GET /api/admin/team/[id]/schedule - Get stylist schedule
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createAdminClient();
-    const { id } = params;
+    const { id } = await params;
 
     // Verify stylist exists
     const { data: stylist } = await supabase
@@ -128,11 +128,11 @@ export async function GET(
 // PUT /api/admin/team/[id]/schedule - Update stylist schedule
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createAdminClient();
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     const { weeklySchedule, blockedDates } = body;

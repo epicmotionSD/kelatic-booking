@@ -4,9 +4,10 @@ import { createClient } from '@/lib/supabase/server';
 // POST - Reschedule an appointment
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const { new_start_time } = await request.json();
 
     if (!new_start_time) {

@@ -4,11 +4,11 @@ import { createAdminClient } from '@/lib/supabase/client';
 // GET /api/admin/team/[id] - Get single team member
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createAdminClient();
-    const { id } = params;
+    const { id } = await params;
 
     const { data: member, error } = await supabase
       .from('profiles')
@@ -69,11 +69,11 @@ export async function GET(
 // PUT /api/admin/team/[id] - Update team member
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createAdminClient();
-    const { id } = params;
+    const { id } = await params;
     const body = await request.json();
 
     const {
@@ -148,11 +148,11 @@ export async function PUT(
 // DELETE /api/admin/team/[id] - Soft delete (deactivate) team member
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = createAdminClient();
-    const { id } = params;
+    const { id } = await params;
 
     // Check for upcoming appointments
     const { count: upcomingAppts } = await supabase

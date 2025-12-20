@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  experimental: {
-    serverComponentsExternalPackages: ['@sendgrid/mail', 'twilio'],
-  },
+  serverExternalPackages: ['@sendgrid/mail', 'twilio'],
   images: {
     domains: ['images.unsplash.com', 'ui-avatars.com'],
   },
