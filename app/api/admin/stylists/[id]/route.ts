@@ -1,0 +1,106 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createAdminClient } from '@/lib/supabase/client';
+
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const supabase = createAdminClient();
+
+    const { data: stylist, error } = await supabase
+      .from('profiles')
+      .select(`
+        *,
+        stylist_services(
+          services(*)
+        ),
+        stylist_schedules(*)
+      `)
+      .eq('id', params.id)
+      .eq('role', 'stylist')
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: 'Stylist not found' }, { status: 404 });
+    }
+
+    return NextResponse.json({ stylist });
+  } catch (error) {
+    console.error('Error fetching stylist:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const body = await request.json();
+    const supabase = createAdminClient();
+
+    const { data: stylist, error } = await supabase
+      .from('profiles')
+      .update({
+        first_name: body.first_name,
+        last_name: body.last_name,
+        email: body.email?.toLowerCase(),
+        phone: body.phone,
+        bio: body.bio,
+        specialties: body.specialties,
+        instagram_handle: body.instagram_handle,
+        commission_rate: body.commission_rate,
+      })
+      .eq('id', params.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating stylist:', error);
+      return NextResponse.json({ error: 'Failed to update stylist' }, { status: 500 });
+    }
+
+    return NextResponse.json({ stylist });
+  } catch (error) {
+    console.error('Update stylist error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const body = await request.json();
+    const supabase = createAdminClient();
+
+    const updates: any = {};
+
+    if (body.is_active !== undefined) {
+      updates.is_active = body.is_active;
+    }
+
+    if (body.avatar_url !== undefined) {
+      updates.avatar_url = body.avatar_url;
+    }
+
+    const { data: stylist, error } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', params.id)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error patching stylist:', error);
+      return NextResponse.json({ error: 'Failed to update stylist' }, { status: 500 });
+    }
+
+    return NextResponse.json({ stylist });
+  } catch (error) {
+    console.error('Patch stylist error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
