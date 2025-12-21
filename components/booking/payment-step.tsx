@@ -11,9 +11,18 @@ import {
 import { formatCurrency } from '@/lib/stripe';
 import type { BookingData } from '@/app/(public)/book/page';
 
-const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
-  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-  : null;
+// Initialize Stripe only on client side
+let stripePromise: Promise<any> | null = null;
+
+const getStripePromise = () => {
+  if (typeof window === 'undefined') {
+    return null; // Don't initialize on server
+  }
+  if (!stripePromise && process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY);
+  }
+  return stripePromise;
+};
 
 interface PaymentStepProps {
   bookingData: BookingData;
@@ -34,7 +43,9 @@ export function PaymentStep({ bookingData, onComplete, onBack }: PaymentStepProp
     return null; // Don't render anything while redirecting
   }
 
-  if (!stripePromise) {
+  const currentStripePromise = getStripePromise();
+
+  if (!currentStripePromise) {
     return (
       <div className="text-center py-8">
         <div className="text-red-600 mb-4">
@@ -64,7 +75,7 @@ export function PaymentStep({ bookingData, onComplete, onBack }: PaymentStepProp
       </p>
 
       <Elements
-        stripe={stripePromise}
+        stripe={currentStripePromise}
         options={{
           clientSecret: bookingData.paymentIntentClientSecret,
           appearance: {
