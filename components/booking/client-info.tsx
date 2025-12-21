@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { formatCurrency } from '@/lib/stripe';
-import type { BookingData } from '@/app/(public)/book/page';
+import type { BookingData } from '@/app/page';
 
 interface ClientInfoProps {
   bookingData: BookingData;
