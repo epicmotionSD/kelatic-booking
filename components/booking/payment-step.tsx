@@ -11,9 +11,9 @@ import {
 import { formatCurrency } from '@/lib/stripe';
 import type { BookingData } from '@/app/(public)/book/page';
 
-const stripePromise = loadStripe(
-  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
-);
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null;
 
 interface PaymentStepProps {
   bookingData: BookingData;
@@ -22,10 +22,38 @@ interface PaymentStepProps {
 }
 
 export function PaymentStep({ bookingData, onComplete, onBack }: PaymentStepProps) {
+  // Handle no payment required case with useEffect to avoid infinite re-renders
+  useEffect(() => {
+    if (!bookingData.paymentIntentClientSecret) {
+      // No payment required, shouldn't reach here but handle gracefully
+      onComplete();
+    }
+  }, [bookingData.paymentIntentClientSecret, onComplete]);
+
   if (!bookingData.paymentIntentClientSecret) {
-    // No payment required, shouldn't reach here but handle gracefully
-    onComplete();
-    return null;
+    return null; // Don't render anything while redirecting
+  }
+
+  if (!stripePromise) {
+    return (
+      <div className="text-center py-8">
+        <div className="text-red-600 mb-4">
+          <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          </svg>
+        </div>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">Payment System Unavailable</h3>
+        <p className="text-gray-500 mb-4">
+          We're experiencing technical difficulties with our payment system. Please try again later or contact us for assistance.
+        </p>
+        <button
+          onClick={onBack}
+          className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+        >
+          Go Back
+        </button>
+      </div>
+    );
   }
 
   return (
