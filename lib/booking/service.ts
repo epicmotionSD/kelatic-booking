@@ -1,5 +1,6 @@
 import { createServerSupabaseClient, createAdminClient } from '../supabase/client';
-import { createPaymentIntent, toCents } from '../stripe';
+import { createPaymentIntent } from '../stripe';
+import { toCents } from '../currency';
 import type {
   Appointment,
   AppointmentWithDetails,

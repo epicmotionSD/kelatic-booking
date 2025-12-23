@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatCurrency } from '@/lib/stripe';
+import { formatCurrency } from '@/lib/currency';
 
 interface ReportData {
   period: string;

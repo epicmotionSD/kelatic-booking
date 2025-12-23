@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatCurrency } from '@/lib/stripe';
+import { formatCurrency } from '@/lib/currency';
 import type { Service, ServiceCategory } from '@/types/database';
 
 const CATEGORY_LABELS: Record<ServiceCategory, string> = {

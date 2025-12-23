@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatCurrency } from '@/lib/stripe';
+import { formatCurrency } from '@/lib/currency';
 
 interface Client {
   id: string;

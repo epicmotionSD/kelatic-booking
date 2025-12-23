@@ -1,10 +1,23 @@
 import Stripe from 'stripe';
 
-// Server-side Stripe client
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-02-24.acacia',
-  typescript: true,
-});
+// Lazy initialization of server-side Stripe client
+let stripeInstance: Stripe | null = null;
+
+const getStripeClient = (): Stripe => {
+  if (!stripeInstance) {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      throw new Error('STRIPE_SECRET_KEY environment variable is required');
+    }
+    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2025-02-24.acacia',
+      typescript: true,
+    });
+  }
+  return stripeInstance;
+};
+
+// Export the lazy-initialized client
+export const stripe = getStripeClient();
 
 // ============================================
 // PAYMENT INTENTS
@@ -177,26 +190,4 @@ export function constructWebhookEvent(
     signature,
     process.env.STRIPE_WEBHOOK_SECRET!
   );
-}
-
-// ============================================
-// UTILITIES
-// ============================================
-
-// Convert dollars to cents for Stripe
-export function toCents(dollars: number): number {
-  return Math.round(dollars * 100);
-}
-
-// Convert cents to dollars for display
-export function toDollars(cents: number): number {
-  return cents / 100;
-}
-
-// Format currency for display
-export function formatCurrency(cents: number): string {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-  }).format(toDollars(cents));
 }

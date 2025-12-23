@@ -1,6 +1,6 @@
 'use client';
 
-import { formatCurrency } from '@/lib/stripe';
+import { formatCurrency } from '@/lib/currency';
 import type { BookingData } from '@/app/page';
 
 interface ConfirmationProps {

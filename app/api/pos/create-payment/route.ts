@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createTerminalPaymentIntent, toCents } from '@/lib/stripe';
+import { createTerminalPaymentIntent } from '@/lib/stripe';
+import { toCents } from '@/lib/currency';
 import { createAdminClient } from '@/lib/supabase/client';
 
 export async function POST(request: NextRequest) {

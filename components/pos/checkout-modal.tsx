@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatCurrency, toCents } from '@/lib/stripe';
+import { formatCurrency, toCents } from '@/lib/currency';
 import type { AppointmentWithDetails } from '@/types/database';
 
 interface CheckoutModalProps {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { formatCurrency } from '@/lib/stripe';
+import { formatCurrency } from '@/lib/currency';
 import { CheckoutModal } from '@/components/pos/checkout-modal';
 import { ReaderStatus } from '@/components/pos/reader-status';
 import type { AppointmentWithDetails } from '@/types/database';

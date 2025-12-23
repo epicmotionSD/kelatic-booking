@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { formatCurrency } from '@/lib/stripe';
+import { formatCurrency } from '@/lib/currency';
 import type { BookingData } from '@/app/page';
 
 interface ClientInfoProps {

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/client';
-import { createPaymentIntent, toCents } from '@/lib/stripe';
+import { createPaymentIntent } from '@/lib/stripe';
+import { toCents } from '@/lib/currency';
 
 // Helper to send confirmation notifications
 async function sendConfirmationNotifications(appointmentId: string) {

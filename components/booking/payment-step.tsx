@@ -8,7 +8,7 @@ import {
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { formatCurrency } from '@/lib/stripe';
+import { formatCurrency } from '@/lib/currency';
 import type { BookingData } from '@/app/page';
 
 // Initialize Stripe only on client side
