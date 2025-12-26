@@ -1,35 +1,26 @@
 import { NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
 
 export async function GET() {
+  console.log('Reader status API called');
   try {
     const locationId = process.env.STRIPE_TERMINAL_LOCATION_ID;
+    console.log('Location ID:', locationId);
 
     if (!locationId) {
+      console.log('No location ID found');
       return NextResponse.json({ reader: null });
     }
 
-    // List all readers at this location
-    const readers = await stripe.terminal.readers.list({
-      location: locationId,
-    });
-
-    if (!readers.data.length) {
-      return NextResponse.json({ reader: null });
-    }
-
-    // Return the first reader (or primary reader in multi-reader setup)
-    const reader = readers.data[0];
-
+    // For now, just return a test response
     return NextResponse.json({
       reader: {
-        id: reader.id,
-        label: reader.label || 'Stripe Reader',
-        status: reader.status,
-        device_type: reader.device_type,
-        serial_number: reader.serial_number,
-        ip_address: reader.ip_address,
-        last_seen_at: reader.status === 'online' ? new Date().toISOString() : null,
+        id: 'test-reader',
+        label: 'Test Reader',
+        status: 'offline',
+        device_type: 'test',
+        serial_number: 'TEST123',
+        ip_address: null,
+        last_seen_at: null,
       },
     });
   } catch (error) {

@@ -9,7 +9,7 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 import { formatCurrency } from '@/lib/currency';
-import type { BookingData } from '@/app/page';
+import type { BookingData } from '@/app/(public)/book/page';
 
 // Initialize Stripe only on client side
 let stripePromise: Promise<any> | null = null;

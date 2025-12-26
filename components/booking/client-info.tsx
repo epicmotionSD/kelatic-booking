@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { formatCurrency } from '@/lib/currency';
-import type { BookingData } from '@/app/page';
+import type { BookingData } from '@/app/(public)/book/page';
 
 interface ClientInfoProps {
   bookingData: BookingData;

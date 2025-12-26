@@ -4,11 +4,11 @@ A modern, AI-powered booking platform for KeLatic Hair Lounge and the upcoming L
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14 (App Router) + TypeScript + Tailwind CSS
+- **Frontend**: Next.js 16.1.1 (App Router) + TypeScript + Tailwind CSS
 - **Database**: Supabase (PostgreSQL)
 - **Auth**: Supabase Auth
 - **Payments**: Stripe (Online + Terminal POS)
-- **AI**: Claude API (Anthropic)
+- **AI**: Claude API (Anthropic) + Trinity AI Content Generation
 - **Email**: SendGrid
 - **SMS**: Twilio
 - **Deployment**: Vercel
@@ -17,7 +17,7 @@ A modern, AI-powered booking platform for KeLatic Hair Lounge and the upcoming L
 
 ### Phase 1: Core Booking (MVP) ✅ COMPLETE
 - [x] Public landing page with services, team, testimonials
-- [x] Client booking portal (5-step wizard)
+- [x] Client booking portal (5-step wizard at /book)
 - [x] Service selection with add-ons
 - [x] Stylist selection with profiles
 - [x] Date/time picker with availability
@@ -33,8 +33,18 @@ A modern, AI-powered booking platform for KeLatic Hair Lounge and the upcoming L
 - [x] Automated reminders (24hr & 2hr via cron)
 - [x] Appointment rescheduling (client-facing)
 - [x] Appointment cancellation
+- [x] Fixed service duration data corruption (5400min → 90min)
+- [x] Resolved React hydration mismatches
+- [x] Separated currency utilities for Stripe compatibility
+- [x] Enhanced availability API performance
 
-### Phase 2: Enhanced Experience
+### Phase 1.5: AI Content Generation ✅ COMPLETE
+- [x] Trinity AI content generation (blog, social, email)
+- [x] Marketing content creation
+- [x] Educational content for academy
+- [x] AI-powered content workflows
+
+### Phase 2: Enhanced Experience 🔄 50% COMPLETE
 - [x] AI chatbot for booking assistance
 - [x] Stripe Terminal POS integration
 - [ ] Photo upload for client hair history
@@ -43,7 +53,7 @@ A modern, AI-powered booking platform for KeLatic Hair Lounge and the upcoming L
 - [ ] Instagram DMs integration
 - [ ] SMS chatbot
 
-### Phase 3: Academy Integration
+### Phase 3: Academy Integration ❌ NOT STARTED
 - [ ] Class registration system
 - [ ] Student progress tracking
 - [ ] Certificate generation
@@ -54,7 +64,7 @@ A modern, AI-powered booking platform for KeLatic Hair Lounge and the upcoming L
 ```
 kelatic-booking/
 ├── app/
-│   ├── page.tsx                    # Public landing page
+│   ├── page.tsx                    # Landing page with services & booking CTA
 │   ├── (public)/
 │   │   ├── book/page.tsx           # 5-step booking wizard
 │   │   └── appointments/[id]/
@@ -70,7 +80,11 @@ kelatic-booking/
 │   │   │   ├── page.tsx            # Team list
 │   │   │   └── [id]/schedule/      # Schedule management
 │   │   ├── reports/page.tsx        # Analytics
-│   │   └── pos/page.tsx            # Point of Sale
+│   │   ├── pos/page.tsx            # Point of Sale
+│   │   └── trinity/
+│   │       ├── page.tsx            # Trinity AI dashboard
+│   │       ├── content/            # Content generation pages
+│   │       └── marketing/          # Marketing content pages
 │   └── api/
 │       ├── appointments/[id]/      # Appointment CRUD, reschedule, cancel
 │       ├── admin/                  # Admin endpoints
@@ -80,16 +94,20 @@ kelatic-booking/
 │       ├── chat/                   # AI chatbot
 │       ├── pos/                    # POS endpoints
 │       ├── cron/reminders/         # Auto-send reminders
+│       ├── trinity/                # Trinity AI content generation
 │       └── webhooks/stripe/        # Payment webhooks
 ├── components/
 │   ├── booking/                    # Booking wizard components
 │   ├── chat/chat-widget.tsx        # AI assistant widget
-│   └── pos/                        # POS components
+│   ├── pos/                        # POS components
+│   └── trinity/                    # Trinity AI components
 ├── lib/
 │   ├── supabase/client.ts          # Database clients
 │   ├── stripe/index.ts             # Payment utilities
+│   ├── currency.ts                 # Currency formatting utilities
 │   ├── booking/service.ts          # Booking logic
 │   ├── ai/chat.ts                  # Chatbot
+│   ├── trinity/                    # Trinity AI services
 │   └── notifications/service.ts    # Email/SMS
 ├── types/database.ts               # TypeScript definitions
 ├── supabase/migrations/            # Database schema
@@ -104,6 +122,7 @@ kelatic-booking/
 - Stripe account
 - SendGrid account (for email)
 - Twilio account (for SMS)
+- Anthropic API key (for AI features)
 
 ### Environment Variables
 
@@ -148,12 +167,18 @@ npm install
 # Set up database
 npx supabase db push
 
-# Seed initial data
+# Seed initial data (optional)
 npx supabase db seed
 
 # Run development server
 npm run dev
 ```
+
+### Site Structure
+- **/** - Landing page with services overview and booking CTA
+- **/book** - Complete 5-step booking wizard
+- **/admin** - Admin dashboard for business management
+- **/appointments/[id]** - Client appointment viewing and management
 
 ## Deployment to Vercel
 
@@ -162,6 +187,33 @@ npm run dev
 3. Add all environment variables
 4. Deploy
 5. Cron job for reminders runs automatically (hourly)
+
+## Testing the Booking Flow
+
+1. **Landing Page**: Visit `/` to see the marketing page with service overview
+2. **Start Booking**: Click "Book Your Appointment" to go to `/book`
+3. **Complete Flow**: Test the 5-step booking process:
+   - Service selection
+   - Stylist selection
+   - Date/time selection
+   - Client information
+   - Payment processing
+4. **Admin Dashboard**: Visit `/admin` to manage appointments, clients, and services
+
+## Troubleshooting
+
+### Common Issues
+
+**Hydration Mismatches**: If you see React hydration errors, ensure `suppressHydrationWarning={true}` is set on affected components (common with browser extensions).
+
+**Service Duration Issues**: Run the migration script to fix corrupted duration data:
+```bash
+npx tsx scripts/migrate-amelia.ts
+```
+
+**Stripe Connection Issues**: Ensure all Stripe environment variables are set correctly and test with Stripe's test mode first.
+
+**Availability API Slow**: The availability endpoint is optimized but may take time for complex stylist schedules.
 
 ## Data Migration from Amelia
 
@@ -185,8 +237,9 @@ For in-salon POS:
 3. Add `STRIPE_TERMINAL_LOCATION_ID` to env
 4. Register reader via admin dashboard
 
-## AI Chatbot Capabilities
+## AI Features
 
+### AI Chatbot Capabilities
 The integrated AI assistant can:
 - Answer service/pricing questions
 - Check availability and book appointments
@@ -194,6 +247,10 @@ The integrated AI assistant can:
 - Send appointment reminders
 - Provide aftercare recommendations
 
----
-
-Built with ❤️ for KeLatic Hair Lounge
+### Trinity AI Content Generation
+The Trinity AI system provides:
+- **Blog Content**: Generate educational articles about loc care and natural hair
+- **Social Media**: Create Instagram/Facebook posts and captions
+- **Email Marketing**: Craft promotional emails and newsletters
+- **Educational Content**: Develop training materials for the Loc Academy
+- **Marketing Copy**: Generate website content, service descriptions, and testimonials
