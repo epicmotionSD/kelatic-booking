@@ -50,7 +50,7 @@ export async function GET() {
   } catch (error) {
     console.error('Reader status error:', error);
     return NextResponse.json(
-      { error: 'Failed to get reader status', reader: null },
+      { error: error.message || 'Unknown error', reader: null },
       { status: 500 }
     );
   }
