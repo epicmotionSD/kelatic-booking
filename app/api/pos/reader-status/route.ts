@@ -5,12 +5,17 @@ export async function GET() {
   console.log('Reader status API called');
   try {
     const locationId = process.env.STRIPE_TERMINAL_LOCATION_ID;
-    console.log('Location ID:', locationId);
+    console.log('Location ID from env:', locationId);
+    console.log('All env vars starting with STRIPE:', Object.keys(process.env).filter(key => key.startsWith('STRIPE')).join(', '));
 
     if (!locationId) {
-      console.log('No location ID found');
-      return NextResponse.json({ reader: null });
+      console.log('No location ID found in environment');
+      return NextResponse.json({ reader: null, debug: { locationId: null, availableEnvVars: Object.keys(process.env).filter(key => key.startsWith('STRIPE')) } });
     }
+
+    // First, let's check what locations exist
+    const locations = await stripe.terminal.locations.list({ limit: 10 });
+    console.log('Available locations:', locations.data.map(loc => ({ id: loc.id, display_name: loc.display_name })));
 
     // Get readers for this location
     const readers = await stripe.terminal.readers.list({
