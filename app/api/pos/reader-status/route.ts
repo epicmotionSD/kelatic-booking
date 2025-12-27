@@ -35,7 +35,7 @@ export async function GET() {
         device_type: onlineReader.device_type,
         serial_number: onlineReader.serial_number,
         ip_address: onlineReader.ip_address,
-        last_seen_at: onlineReader.last_seen_at,
+        location: onlineReader.location,
       },
     });
   } catch (error) {
