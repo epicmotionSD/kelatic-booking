@@ -19,13 +19,17 @@ export async function GET() {
     });
 
     console.log('Found readers:', readers.data.length);
+    console.log('Readers data:', JSON.stringify(readers.data, null, 2));
 
     if (readers.data.length === 0) {
+      console.log('No readers found for location:', locationId);
       return NextResponse.json({ reader: null });
     }
 
     // Return the first online reader, or the first reader if none are online
     const onlineReader = readers.data.find(reader => reader.status === 'online') || readers.data[0];
+
+    console.log('Selected reader:', JSON.stringify(onlineReader, null, 2));
 
     return NextResponse.json({
       reader: {
