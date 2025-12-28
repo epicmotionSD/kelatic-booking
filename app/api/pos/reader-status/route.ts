@@ -49,8 +49,9 @@ export async function GET() {
     });
   } catch (error) {
     console.error('Reader status error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: error.message || 'Unknown error', reader: null },
+      { error: errorMessage, reader: null },
       { status: 500 }
     );
   }
