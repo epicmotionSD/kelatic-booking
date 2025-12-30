@@ -1,6 +1,14 @@
+
 import { createBrowserClient } from '@supabase/ssr';
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
-import { cookies } from 'next/headers';
+
+// Only import 'next/headers' in server-side helpers
+let cookies: any = undefined;
+if (typeof window === 'undefined') {
+  // @ts-ignore
+  cookies = require('next/headers').cookies;
+}
+
 
 // Client-side Supabase client
 export function createClient() {
@@ -12,8 +20,8 @@ export function createClient() {
 
 // Server-side Supabase client (for Server Components, Route Handlers, Server Actions)
 export async function createServerSupabaseClient() {
+  if (!cookies) throw new Error('next/headers.cookies is only available on the server');
   const cookieStore = await cookies();
-  
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
