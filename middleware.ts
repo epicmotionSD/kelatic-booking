@@ -14,7 +14,7 @@ export async function middleware(request: NextRequest) {
       data: { user },
     } = await supabase.auth.getUser();
     const allowedAdmins = ['kelatic@gmail.com', 'shawnsonnier04@gmail.com'];
-    if (!user || !allowedAdmins.includes(user.email)) {
+    if (!user || !user.email || !allowedAdmins.includes(user.email)) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
