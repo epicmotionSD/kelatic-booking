@@ -160,6 +160,16 @@ export default function AdminLayout({
               <p className="text-sm text-white truncate">Admin User</p>
               <p className="text-xs text-gray-500 truncate">admin@kelatic.com</p>
             </div>
+            <button
+              className="ml-2 text-xs text-red-500 hover:underline"
+              onClick={async () => {
+                const supabase = (await import('@/lib/supabase/client')).createClient();
+                await supabase.auth.signOut();
+                window.location.href = '/login';
+              }}
+            >
+              Logout
+            </button>
           </div>
         </div>
       </aside>
