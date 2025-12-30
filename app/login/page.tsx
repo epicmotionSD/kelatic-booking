@@ -8,6 +8,24 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+    async function handleResetPassword(e: React.FormEvent) {
+      e.preventDefault();
+      setResetLoading(true);
+      setError("");
+      setResetSent(false);
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + "/reset-password"
+      });
+      setResetLoading(false);
+      if (error) {
+        setError(error.message);
+      } else {
+        setResetSent(true);
+      }
+    }
   const router = useRouter();
 
   async function handleLogin(e: React.FormEvent) {
@@ -48,12 +66,21 @@ export default function LoginPage() {
           required
         />
         {error && <div className="text-red-500 mb-4 text-sm">{error}</div>}
+        {resetSent && <div className="text-green-600 mb-4 text-sm">Password reset email sent!</div>}
         <button
           type="submit"
-          className="w-full bg-purple-600 text-white py-2 rounded font-semibold hover:bg-purple-700 transition"
+          className="w-full bg-purple-600 text-white py-2 rounded font-semibold hover:bg-purple-700 transition mb-2"
           disabled={loading}
         >
           {loading ? "Logging in..." : "Login"}
+        </button>
+        <button
+          type="button"
+          className="w-full text-purple-600 underline text-sm mb-2"
+          onClick={handleResetPassword}
+          disabled={resetLoading || !email}
+        >
+          {resetLoading ? "Sending reset email..." : "Forgot password?"}
         </button>
       </form>
     </div>
