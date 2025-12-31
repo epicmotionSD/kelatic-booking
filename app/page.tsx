@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { ChatWidget } from '@/components/chat/chat-widget';
 import {
   Calendar,
   Star,
@@ -583,6 +584,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* AI Chat Widget */}
+      <ChatWidget />
 
       {/* Footer */}
       <footer className="py-16 bg-black border-t border-white/5">
