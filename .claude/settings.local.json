@@ -17,7 +17,13 @@
       "Bash(timeout /t 5 /nobreak)",
       "Bash(taskkill:*)",
       "Bash(netstat:*)",
-      "Bash(cmd //c \"taskkill /PID 27396 /F\")"
+      "Bash(cmd //c \"taskkill /PID 27396 /F\")",
+      "Bash(npm install:*)",
+      "Bash(dir /s /b \"c:\\\\Users\\\\shawn\\\\Downloads\\\\kelatic-booking\\\\lib\")",
+      "Bash(clip)",
+      "Bash(set /p=\"UPDATE profiles SET is_barber = true WHERE first_name = ''London'';\")",
+      "Bash(powershell -command \"Set-Clipboard -Value \"\"UPDATE profiles SET is_barber = true WHERE first_name = ''London'';\"\"\")",
+      "Bash(git restore:*)"
     ]
   }
 }

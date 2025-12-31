@@ -17,7 +17,7 @@ export const blogPosts: BlogPost[] = [
     excerpt: 'Thinking about starting your loc journey? Here\'s everything Houston residents need to know about starter locs, from choosing the right method to what to expect in those crucial first months.',
     category: 'care',
     author: 'The Loc Gawd',
-    publishedAt: '2024-12-15',
+    publishedAt: '2025-01-15',
     readTime: 8,
     featured: true,
     content: `
@@ -91,7 +91,7 @@ Book a consultation at Kelatic Hair Lounge in Houston, and let's create the foun
     excerpt: 'One of the most common questions we get at Kelatic: how often should I retwist? The answer isn\'t one-size-fits-all. Here\'s what Houston\'s humidity and your hair type mean for your maintenance schedule.',
     category: 'care',
     author: 'The Loc Gawd',
-    publishedAt: '2024-12-10',
+    publishedAt: '2025-01-10',
     readTime: 6,
     content: `
 "How often should I retwist?" is probably the question I hear most at Kelatic Hair Lounge. And honestly? There's no universal answer. Your ideal retwist schedule depends on several factors, and here in Houston, our unique climate plays a significant role.
@@ -176,7 +176,7 @@ Ready to establish your perfect maintenance schedule? Book a consultation at Kel
     excerpt: 'The wrong products can cause buildup, slow locking, and damage your locs. Here\'s the definitive guide to loc-friendly products from a Houston loctician.',
     category: 'tips',
     author: 'The Loc Gawd',
-    publishedAt: '2024-12-05',
+    publishedAt: '2025-01-05',
     readTime: 7,
     content: `
 One of the biggest mistakes I see in my Houston salon is clients using the wrong products on their locs. That buildup? Those slow-locking sections? Often, it's a product problem. Let's break down exactly what your locs need - and what they definitely don't.
@@ -295,7 +295,7 @@ Questions about your current routine? Book a consultation at Kelatic Hair Lounge
     excerpt: 'Locs have been worn for thousands of years across cultures worldwide. Understanding this history deepens our appreciation for this powerful expression of identity.',
     category: 'history',
     author: 'The Loc Gawd',
-    publishedAt: '2024-11-28',
+    publishedAt: '2025-01-01',
     readTime: 9,
     content: `
 When you choose to wear locs, you're connecting to a tradition that spans continents and millennia. This isn't just a hairstyle - it's a statement, a spiritual practice, and a link to ancestors who wore their hair the same way. Let's explore the rich history behind your crown.
@@ -382,7 +382,7 @@ At Kelatic Hair Lounge, we honor this history with every loc we cultivate. Book 
     excerpt: 'From professional settings to special events, here are versatile loc styles that prove your locs can do anything. Get inspired for your next appointment.',
     category: 'style',
     author: 'The Loc Gawd',
-    publishedAt: '2024-11-20',
+    publishedAt: '2024-12-28',
     readTime: 5,
     content: `
 One of the best things about locs is their versatility. Gone are the days when locked hair meant limited styling options. Your locs can be transformed for any occasion, from corporate meetings to weddings to casual weekends. Here are ten stunning styles to inspire your next look.
@@ -480,7 +480,7 @@ Book a styling appointment and let's create something beautiful together.
     excerpt: 'Can you swim with locs? Absolutely! Here\'s how to protect your locs from chlorine and saltwater while still enjoying the pool, beach, and Houston\'s water attractions.',
     category: 'tips',
     author: 'The Loc Gawd',
-    publishedAt: '2024-11-15',
+    publishedAt: '2024-12-21',
     readTime: 6,
     content: `
 Houston summers are no joke, and sometimes you just need to cool off in a pool or take a trip to Galveston. But can you swim with locs? Absolutely! With proper preparation and aftercare, your locs can handle the water. Here's everything you need to know.
@@ -599,7 +599,7 @@ Enjoy the water!
     excerpt: 'Noticing thinning locs? You\'re not alone. Learn the common causes of loc thinning and what you can do to prevent and address it before it\'s too late.',
     category: 'care',
     author: 'The Loc Gawd',
-    publishedAt: '2024-11-08',
+    publishedAt: '2024-12-14',
     readTime: 7,
     content: `
 If you've noticed your locs are getting thinner - especially at the roots or in certain areas - you're not alone. Loc thinning is one of the most common concerns I address at Kelatic Hair Lounge. The good news? In many cases, it's preventable and treatable. Let's explore why it happens and what you can do.
@@ -736,7 +736,7 @@ Your locs are worth protecting. Let's keep them healthy for years to come.
     excerpt: 'There\'s a difference between a general hairstylist and a specialized loctician. Here\'s why that expertise matters for the health and longevity of your locs.',
     category: 'tips',
     author: 'The Loc Gawd',
-    publishedAt: '2024-11-01',
+    publishedAt: '2024-12-07',
     readTime: 6,
     content: `
 "My cousin's friend does locs on the side." "The stylist at the salon down the street said she could maintain my locs." I hear versions of this all the time, usually after something has gone wrong. Here's the truth: there's a significant difference between a hairstylist who "does locs" and a trained, experienced loctician.

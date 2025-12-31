@@ -42,14 +42,12 @@ export default function BlogPage() {
       <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <span className="text-black font-black">K</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-sm">KELATIC</span>
-                <span className="text-[9px] tracking-widest text-amber-400">LOC CHOP</span>
-              </div>
+            <Link href="/" className="flex items-center">
+              <img
+                src="/logo.png"
+                alt="Kelatic Hair Lounge"
+                className="h-12 w-auto"
+              />
             </Link>
             <Link
               href="/"

@@ -60,10 +60,19 @@ export default function BlogPostPage() {
       <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/blog" className="flex items-center gap-2 text-white/70 hover:text-amber-400 transition-colors">
-              <ArrowLeft className="w-4 h-4" />
-              <span className="text-sm font-medium">Back to Blog</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link href="/" className="flex items-center">
+                <img
+                  src="/logo.png"
+                  alt="Kelatic Hair Lounge"
+                  className="h-10 w-auto"
+                />
+              </Link>
+              <Link href="/blog" className="flex items-center gap-2 text-white/70 hover:text-amber-400 transition-colors">
+                <ArrowLeft className="w-4 h-4" />
+                <span className="text-sm font-medium">Back to Blog</span>
+              </Link>
+            </div>
             <button
               onClick={handleShare}
               className="flex items-center gap-2 text-sm text-white/50 hover:text-amber-400 transition-colors"
