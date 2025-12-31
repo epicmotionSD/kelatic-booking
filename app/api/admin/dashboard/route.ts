@@ -32,7 +32,7 @@ export async function GET() {
       .select('total_amount')
       .gte('created_at', todayStart.toISOString())
       .lt('created_at', todayEnd.toISOString())
-      .eq('status', 'succeeded');
+      .eq('status', 'paid');
 
     const todayRevenue = todayPayments?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
 
@@ -42,7 +42,7 @@ export async function GET() {
       .select('total_amount')
       .gte('created_at', weekStart.toISOString())
       .lt('created_at', todayEnd.toISOString())
-      .eq('status', 'succeeded');
+      .eq('status', 'paid');
 
     const weekRevenue = weekPayments?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
 

@@ -69,12 +69,12 @@ export default function StylistsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Stylists</h1>
-          <p className="text-gray-500">Manage your team</p>
+          <h1 className="text-2xl font-bold text-white">Stylists</h1>
+          <p className="text-white/50">Manage your team</p>
         </div>
         <button
           onClick={() => openModal()}
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 w-fit"
+          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -86,12 +86,12 @@ export default function StylistsPage() {
       {/* Stylists Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
         </div>
       ) : stylists.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-12 text-center">
           <svg
-            className="w-12 h-12 mx-auto text-gray-300 mb-4"
+            className="w-12 h-12 mx-auto text-white/20 mb-4"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -103,10 +103,10 @@ export default function StylistsPage() {
               d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
             />
           </svg>
-          <p className="text-gray-500 mb-4">No stylists yet</p>
+          <p className="text-white/50 mb-4">No stylists yet</p>
           <button
             onClick={() => openModal()}
-            className="text-purple-600 hover:text-purple-700"
+            className="text-amber-400 hover:text-amber-300"
           >
             Add your first stylist →
           </button>
@@ -116,12 +116,12 @@ export default function StylistsPage() {
           {stylists.map((stylist) => (
             <div
               key={stylist.id}
-              className={`bg-white rounded-xl border border-gray-200 overflow-hidden ${
+              className={`bg-white/5 backdrop-blur rounded-xl border border-white/10 overflow-hidden ${
                 !stylist.is_active ? 'opacity-60' : ''
               }`}
             >
               {/* Header */}
-              <div className="p-6 border-b border-gray-100">
+              <div className="p-6 border-b border-white/10">
                 <div className="flex items-start gap-4">
                   {stylist.avatar_url ? (
                     <img
@@ -130,8 +130,8 @@ export default function StylistsPage() {
                       className="w-16 h-16 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center">
-                      <span className="text-purple-600 font-semibold text-xl">
+                    <div className="w-16 h-16 bg-amber-400/10 rounded-full flex items-center justify-center">
+                      <span className="text-amber-400 font-semibold text-xl">
                         {stylist.first_name[0]}
                         {stylist.last_name[0]}
                       </span>
@@ -139,17 +139,17 @@ export default function StylistsPage() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-white">
                         {stylist.first_name} {stylist.last_name}
                       </h3>
                       {!stylist.is_active && (
-                        <span className="px-2 py-1 bg-gray-100 text-gray-500 text-xs rounded-full">
+                        <span className="px-2 py-1 bg-white/10 text-white/50 text-xs rounded-full">
                           Inactive
                         </span>
                       )}
                     </div>
                     {stylist.instagram_handle && (
-                      <p className="text-sm text-purple-600">
+                      <p className="text-sm text-amber-400">
                         @{stylist.instagram_handle}
                       </p>
                     )}
@@ -158,7 +158,7 @@ export default function StylistsPage() {
                         {stylist.specialties.slice(0, 3).map((s) => (
                           <span
                             key={s}
-                            className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded"
+                            className="px-2 py-0.5 bg-white/10 text-white/60 text-xs rounded"
                           >
                             {s}
                           </span>
@@ -170,18 +170,18 @@ export default function StylistsPage() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 divide-x divide-gray-100 border-b border-gray-100">
+              <div className="grid grid-cols-2 divide-x divide-white/10 border-b border-white/10">
                 <div className="p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-white">
                     {stylist.services_count}
                   </p>
-                  <p className="text-xs text-gray-500">Services</p>
+                  <p className="text-xs text-white/50">Services</p>
                 </div>
                 <div className="p-4 text-center">
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-2xl font-bold text-white">
                     {stylist.appointments_this_week}
                   </p>
-                  <p className="text-xs text-gray-500">This Week</p>
+                  <p className="text-xs text-white/50">This Week</p>
                 </div>
               </div>
 
@@ -189,22 +189,22 @@ export default function StylistsPage() {
               <div className="p-4 flex gap-2">
                 <button
                   onClick={() => openModal(stylist)}
-                  className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                  className="flex-1 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10"
                 >
                   Edit
                 </button>
                 <Link
-                  href={`/admin/stylists/${stylist.id}/schedule`}
-                  className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm text-center"
+                  href={`/admin/team/${stylist.id}/schedule`}
+                  className="flex-1 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm text-center border border-white/10"
                 >
                   Schedule
                 </Link>
                 <button
                   onClick={() => handleToggleActive(stylist)}
-                  className={`px-3 py-2 rounded-lg text-sm transition-colors ${
+                  className={`px-3 py-2 rounded-xl text-sm transition-colors ${
                     stylist.is_active
-                      ? 'bg-red-100 text-red-600 hover:bg-red-200'
-                      : 'bg-green-100 text-green-600 hover:bg-green-200'
+                      ? 'bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/30'
+                      : 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/30'
                   }`}
                 >
                   {stylist.is_active ? 'Deactivate' : 'Activate'}
@@ -292,13 +292,13 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-zinc-900 border border-white/10 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-white">
             {stylist ? 'Edit Stylist' : 'Add Stylist'}
           </h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button onClick={onClose} className="text-white/40 hover:text-white">
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -308,7 +308,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 First Name
               </label>
               <input
@@ -317,12 +317,12 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, first_name: e.target.value })
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 Last Name
               </label>
               <input
@@ -331,14 +331,14 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, last_name: e.target.value })
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Email
             </label>
             <input
@@ -347,13 +347,13 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Phone
             </label>
             <input
@@ -362,16 +362,16 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Instagram Handle
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">
                 @
               </span>
               <input
@@ -380,27 +380,27 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, instagram_handle: e.target.value })
                 }
-                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                className="w-full pl-8 pr-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
                 placeholder="username"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Bio
             </label>
             <textarea
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
               placeholder="Brief description..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Specialties
             </label>
             <input
@@ -409,13 +409,13 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, specialties: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
               placeholder="Locs, Braids, Color (comma-separated)"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Commission Rate (%)
             </label>
             <input
@@ -426,12 +426,12 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, commission_rate: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
             />
           </div>
 
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-lg text-sm">
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-sm">
               {error}
             </div>
           )}
@@ -440,14 +440,14 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="flex-1 py-2 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+              className="flex-1 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Save Stylist'}
             </button>

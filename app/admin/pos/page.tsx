@@ -67,13 +67,13 @@ export default function POSPage() {
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
-      confirmed: 'bg-blue-100 text-blue-800',
-      in_progress: 'bg-yellow-100 text-yellow-800',
-      completed: 'bg-green-100 text-green-800',
-      cancelled: 'bg-red-100 text-red-800',
-      no_show: 'bg-gray-100 text-gray-800',
+      confirmed: 'bg-blue-500/20 text-blue-400',
+      in_progress: 'bg-amber-500/20 text-amber-400',
+      completed: 'bg-green-500/20 text-green-400',
+      cancelled: 'bg-red-500/20 text-red-400',
+      no_show: 'bg-white/10 text-white/50',
     };
-    return styles[status] || 'bg-gray-100 text-gray-800';
+    return styles[status] || 'bg-white/10 text-white/50';
   };
 
   const formatTime = (isoString: string) => {
@@ -85,13 +85,13 @@ export default function POSPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-950">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+      <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Point of Sale</h1>
-            <p className="text-sm text-gray-500">
+            <h1 className="text-2xl font-bold text-white">Point of Sale</h1>
+            <p className="text-sm text-white/50">
               {new Date().toLocaleDateString('en-US', {
                 weekday: 'long',
                 month: 'long',
@@ -114,10 +114,10 @@ export default function POSPage() {
             <button
               key={tab.key}
               onClick={() => setFilter(tab.key as typeof filter)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-xl font-medium transition-all ${
                 filter === tab.key
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
+                  : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
               }`}
             >
               {tab.label}
@@ -128,22 +128,22 @@ export default function POSPage() {
         {/* Appointments Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
           </div>
         ) : filteredAppointments.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl">
-            <p className="text-gray-500">No appointments found</p>
+          <div className="text-center py-12 bg-white/5 backdrop-blur rounded-xl border border-white/10">
+            <p className="text-white/50">No appointments found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredAppointments.map((apt) => (
               <div
                 key={apt.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden"
+                className="bg-white/5 backdrop-blur rounded-xl border border-white/10 overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-                  <span className="font-medium text-gray-900">
+                <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                  <span className="font-medium text-white">
                     {formatTime(apt.start_time)}
                   </span>
                   <span
@@ -159,21 +159,21 @@ export default function POSPage() {
                 <div className="p-4">
                   {/* Client Info */}
                   <div className="mb-3">
-                    <p className="font-semibold text-gray-900">
+                    <p className="font-semibold text-white">
                       {apt.is_walk_in
                         ? apt.walk_in_name || 'Walk-in'
                         : `${apt.client?.first_name} ${apt.client?.last_name}`}
                     </p>
                     {apt.client?.phone && (
-                      <p className="text-sm text-gray-500">{apt.client.phone}</p>
+                      <p className="text-sm text-white/50">{apt.client.phone}</p>
                     )}
                   </div>
 
                   {/* Service Info */}
                   <div className="mb-3">
-                    <p className="text-sm text-gray-700">{apt.service?.name}</p>
+                    <p className="text-sm text-white">{apt.service?.name}</p>
                     {apt.addons && apt.addons.length > 0 && (
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-white/50">
                         + {apt.addons.map((a) => a.service?.name).join(', ')}
                       </p>
                     )}
@@ -181,7 +181,7 @@ export default function POSPage() {
 
                   {/* Stylist */}
                   <div className="mb-4">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-white/50">
                       with {apt.stylist?.first_name}
                     </p>
                   </div>
@@ -189,18 +189,18 @@ export default function POSPage() {
                   {/* Price & Actions */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-lg font-bold text-gray-900">
+                      <p className="text-lg font-bold text-amber-400">
                         {formatCurrency((apt.final_price || apt.quoted_price) * 100)}
                       </p>
                       {apt.payments?.some((p) => p.is_deposit && p.status === 'paid') && (
-                        <p className="text-xs text-green-600">Deposit paid</p>
+                        <p className="text-xs text-green-400">Deposit paid</p>
                       )}
                     </div>
 
                     {apt.status !== 'completed' && apt.status !== 'cancelled' && (
                       <button
                         onClick={() => handleCheckout(apt)}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                        className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/30 transition-all"
                       >
                         Checkout
                       </button>
@@ -216,7 +216,7 @@ export default function POSPage() {
         <div className="fixed bottom-6 right-6">
           <button
             onClick={() => setIsWalkInOpen(true)}
-            className="px-6 py-3 bg-gray-900 text-white rounded-full font-medium shadow-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
+            className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-semibold shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all flex items-center gap-2"
           >
             <svg
               className="w-5 h-5"

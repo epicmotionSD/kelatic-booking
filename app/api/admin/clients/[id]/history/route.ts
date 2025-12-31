@@ -31,7 +31,7 @@ export async function GET(
 
     const formattedAppointments = appointments?.map((apt: any) => {
       const successfulPayments = apt.payments?.filter(
-        (p: any) => p.status === 'succeeded'
+        (p: any) => p.status === 'paid'
       );
       const totalPaid = successfulPayments?.reduce(
         (sum: number, p: any) => sum + p.total_amount,

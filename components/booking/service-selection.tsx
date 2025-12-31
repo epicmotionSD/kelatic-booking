@@ -114,23 +114,23 @@ export function ServiceSelection({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
       </div>
     );
   }
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Select a Service</h2>
+      <h2 className="text-xl font-bold text-white mb-6">Select a Service</h2>
 
       {/* Category Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-4 mb-6 -mx-4 px-4">
         <button
           onClick={() => setActiveCategory('all')}
-          className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+          className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
             activeCategory === 'all'
-              ? 'bg-purple-600 text-white'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
+              : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
           }`}
         >
           All Services
@@ -139,10 +139,10 @@ export function ServiceSelection({
           <button
             key={category}
             onClick={() => setActiveCategory(category)}
-            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeCategory === category
-                ? 'bg-purple-600 text-white'
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
+                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
             }`}
           >
             {CATEGORY_LABELS[category]}
@@ -158,33 +158,33 @@ export function ServiceSelection({
             onClick={() => handleServiceSelect(service)}
             className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
               selected?.id === service.id
-                ? 'border-purple-600 bg-purple-50'
-                : 'border-gray-200 bg-white hover:border-purple-300'
+                ? 'border-amber-400 bg-amber-400/10'
+                : 'border-white/10 bg-white/5 hover:border-amber-400/50 hover:bg-white/10'
             }`}
           >
             <div className="flex justify-between items-start">
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-gray-900">{service.name}</h3>
+                  <h3 className="font-semibold text-white">{service.name}</h3>
                   {service.deposit_required && (
-                    <span className="px-2 py-0.5 bg-amber-100 text-amber-700 text-xs rounded-full">
+                    <span className="px-2 py-0.5 bg-amber-400/20 text-amber-400 text-xs rounded-full border border-amber-400/30">
                       Deposit Required
                     </span>
                   )}
                 </div>
                 {service.description && (
-                  <p className="text-sm text-gray-500 mt-1">{service.description}</p>
+                  <p className="text-sm text-white/50 mt-1">{service.description}</p>
                 )}
-                <p className="text-sm text-gray-500 mt-2">
+                <p className="text-sm text-white/40 mt-2">
                   {service.duration} minutes
                 </p>
               </div>
               <div className="text-right ml-4">
-                <p className="font-bold text-gray-900">
+                <p className="font-bold text-amber-400">
                   {formatCurrency(service.base_price * 100)}
                 </p>
                 {service.deposit_required && service.deposit_amount && (
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-white/40">
                     {formatCurrency(service.deposit_amount * 100)} deposit
                   </p>
                 )}
@@ -193,10 +193,10 @@ export function ServiceSelection({
 
             {/* Selection indicator */}
             <div
-              className={`mt-3 flex items-center justify-center py-2 rounded-lg transition-colors ${
+              className={`mt-3 flex items-center justify-center py-2 rounded-lg transition-all ${
                 selected?.id === service.id
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-600'
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold'
+                  : 'bg-white/5 text-white/60'
               }`}
             >
               {selected?.id === service.id ? (
@@ -217,7 +217,7 @@ export function ServiceSelection({
       {/* Add-ons Section */}
       {showAddons && selected && addonServices.length > 0 && (
         <div className="mt-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <h3 className="text-lg font-semibold text-white mb-4">
             Add a Treatment (Optional)
           </h3>
           <div className="space-y-2">
@@ -229,30 +229,30 @@ export function ServiceSelection({
                   onClick={() => toggleAddon(addon)}
                   className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
                     isSelected
-                      ? 'border-purple-600 bg-purple-50'
-                      : 'border-gray-200 bg-white hover:border-purple-300'
+                      ? 'border-amber-400 bg-amber-400/10'
+                      : 'border-white/10 bg-white/5 hover:border-amber-400/50'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                         isSelected
-                          ? 'border-purple-600 bg-purple-600'
-                          : 'border-gray-300'
+                          ? 'border-amber-400 bg-amber-400'
+                          : 'border-white/30'
                       }`}
                     >
                       {isSelected && (
-                        <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                         </svg>
                       )}
                     </div>
                     <div className="text-left">
-                      <p className="font-medium text-gray-900">{addon.name}</p>
-                      <p className="text-sm text-gray-500">+{addon.duration} min</p>
+                      <p className="font-medium text-white">{addon.name}</p>
+                      <p className="text-sm text-white/50">+{addon.duration} min</p>
                     </div>
                   </div>
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-amber-400">
                     +{formatCurrency(addon.base_price * 100)}
                   </p>
                 </button>
@@ -264,25 +264,25 @@ export function ServiceSelection({
 
       {/* Summary & Continue */}
       {selected && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
+        <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10 p-4 shadow-lg">
           <div className="max-w-3xl mx-auto">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="font-medium text-gray-900">{selected.name}</p>
+                <p className="font-medium text-white">{selected.name}</p>
                 {addons.length > 0 && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-white/50">
                     + {addons.map((a) => a.name).join(', ')}
                   </p>
                 )}
-                <p className="text-sm text-gray-500">{totalDuration} minutes</p>
+                <p className="text-sm text-white/40">{totalDuration} minutes</p>
               </div>
-              <p className="text-xl font-bold text-gray-900">
+              <p className="text-xl font-bold text-amber-400">
                 {formatCurrency(totalPrice * 100)}
               </p>
             </div>
             <button
               onClick={handleContinue}
-              className="w-full py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors"
+              className="w-full py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
             >
               Continue
             </button>

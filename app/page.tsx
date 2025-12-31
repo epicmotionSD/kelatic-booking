@@ -17,6 +17,7 @@ import {
   Award,
   Menu,
   X,
+  Play,
 } from 'lucide-react';
 
 interface Service {
@@ -67,7 +68,6 @@ export default function LandingPage() {
     }
   };
 
-  // Mock data for display
   const featuredServices = services.length > 0 ? services : [
     { id: '1', name: 'Loc Retwist', category: 'locs', base_price: 85, duration: 90, description: 'Maintain your locs with our expert retwist service' },
     { id: '2', name: 'Knotless Braids', category: 'braids', base_price: 220, duration: 300, description: 'Beautiful, lightweight knotless braids' },
@@ -91,31 +91,31 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-black text-white">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
+          <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-purple-800 rounded-xl flex items-center justify-center">
-                <span className="text-white font-bold text-lg">K</span>
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <span className="text-black font-black text-xl">K</span>
               </div>
-              <div>
-                <span className="text-xl font-bold text-gray-900">KeLatic</span>
-                <span className="hidden sm:inline text-xs text-purple-600 ml-1 font-medium">THE LOC GAWD</span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-black tracking-tight">KELATIC</span>
+                <span className="text-[10px] tracking-[0.3em] text-amber-400 font-medium">THE LOC GAWD</span>
               </div>
             </Link>
 
             {/* Desktop Nav */}
-            <div className="hidden md:flex items-center gap-8">
-              <a href="#services" className="text-gray-600 hover:text-purple-600 transition-colors">Services</a>
-              <a href="#stylists" className="text-gray-600 hover:text-purple-600 transition-colors">Our Team</a>
-              <a href="#academy" className="text-gray-600 hover:text-purple-600 transition-colors">Academy</a>
-              <a href="#contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</a>
+            <div className="hidden md:flex items-center gap-10">
+              <a href="#services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</a>
+              <a href="#team" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Team</a>
+              <a href="#academy" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Academy</a>
+              <a href="#contact" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Contact</a>
               <Link
                 href="/book"
-                className="px-5 py-2 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition-colors"
+                className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
               >
                 Book Now
               </Link>
@@ -125,7 +125,7 @@ export default function LandingPage() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-gray-600"
+              className="md:hidden p-2 text-white"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -135,15 +135,15 @@ export default function LandingPage() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white border-t border-gray-100 py-4">
-            <div className="flex flex-col gap-4 px-4">
-              <a href="#services" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">Services</a>
-              <a href="#stylists" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">Our Team</a>
-              <a href="#academy" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">Academy</a>
-              <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">Contact</a>
+          <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 py-6">
+            <div className="flex flex-col gap-4 px-6">
+              <a href="#services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Services</a>
+              <a href="#team" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Team</a>
+              <a href="#academy" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Academy</a>
+              <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Contact</a>
               <Link
                 href="/book"
-                className="px-5 py-3 bg-purple-600 text-white rounded-full font-medium text-center"
+                className="mt-4 px-6 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-center"
               >
                 Book Now
               </Link>
@@ -153,101 +153,123 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-16 md:pt-32 md:pb-24 bg-gradient-to-br from-purple-50 via-white to-purple-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" />
-                Houston's Premier Loc & Natural Hair Salon
+      <section className="min-h-screen pt-20 relative overflow-hidden">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-black" />
+        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-amber-500/10 to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
+          <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
+            {/* Left Content */}
+            <div className="space-y-8">
+              {/* Badge */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur border border-white/10 rounded-full">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-sm text-white/80">Now Booking in Houston</span>
               </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6">
-                Loc In With{' '}
-                <span className="text-purple-600">The Loc Gawd</span>
-              </h1>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                Experience expert loc care, stunning braids, and natural hair services
-                in a welcoming environment. Where every crown is celebrated.
-              </p>
+
+              {/* Heading */}
+              <div className="space-y-4">
+                <h1 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tight">
+                  LOC IN
+                  <br />
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500">
+                    WITH THE
+                  </span>
+                  <br />
+                  LOC GAWD
+                </h1>
+                <p className="text-xl text-white/60 max-w-md leading-relaxed">
+                  Houston&apos;s premier destination for locs, braids, and natural hair. Where every crown gets the royal treatment.
+                </p>
+              </div>
+
+              {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/book"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-purple-600 text-white rounded-full font-semibold text-lg hover:bg-purple-700 transition-all hover:shadow-lg hover:shadow-purple-200"
+                  className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-amber-500/30 transition-all hover:scale-105"
                 >
                   <Calendar className="w-5 h-5" />
                   Book Appointment
+                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
                 <a
-                  href="https://www.youtube.com/@kelatic"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-full font-semibold text-lg hover:border-red-200 hover:text-red-600 transition-colors"
+                  href="#video"
+                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/5 backdrop-blur border border-white/20 rounded-full font-semibold text-lg hover:bg-white/10 transition-all"
                 >
-                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
+                  <Play className="w-5 h-5" />
                   Watch Our Work
                 </a>
               </div>
 
               {/* Stats */}
-              <div className="flex items-center gap-8 mt-12 pt-8 border-t border-gray-200">
-                <div>
-                  <div className="text-3xl font-bold text-purple-600">15+</div>
-                  <div className="text-sm text-gray-500">Years Experience</div>
+              <div className="flex items-center gap-8 pt-8">
+                <div className="text-center">
+                  <div className="text-4xl font-black text-amber-400">15+</div>
+                  <div className="text-sm text-white/50">Years</div>
                 </div>
-                <div>
-                  <div className="text-3xl font-bold text-purple-600">5000+</div>
-                  <div className="text-sm text-gray-500">Happy Clients</div>
+                <div className="w-px h-12 bg-white/20" />
+                <div className="text-center">
+                  <div className="text-4xl font-black text-amber-400">5K+</div>
+                  <div className="text-sm text-white/50">Clients</div>
                 </div>
-                <div>
-                  <div className="flex items-center gap-1 text-3xl font-bold text-purple-600">
-                    4.9 <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
+                <div className="w-px h-12 bg-white/20" />
+                <div className="text-center">
+                  <div className="flex items-center gap-1 text-4xl font-black text-amber-400">
+                    4.9 <Star className="w-7 h-7 fill-amber-400" />
                   </div>
-                  <div className="text-sm text-gray-500">Average Rating</div>
+                  <div className="text-sm text-white/50">Rating</div>
                 </div>
               </div>
             </div>
 
-            {/* Hero Image with YouTube Video */}
-            <div className="relative">
-              <div className="aspect-[9/16] max-h-[500px] bg-black rounded-3xl overflow-hidden shadow-2xl">
-                <iframe
-                  className="w-full h-full"
-                  src="https://www.youtube.com/embed/b9kadh1jTD4"
-                  title="KeLatic Hair Lounge"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-              {/* Floating Cards with Animation */}
-              <div className="absolute -left-4 top-1/4 bg-white rounded-xl shadow-lg p-4 hidden lg:block animate-[float_3s_ease-in-out_infinite]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-green-600" />
+            {/* Right - Hero Visual */}
+            <div className="relative hidden lg:block">
+              <div className="relative">
+                {/* Main image placeholder */}
+                <div className="aspect-[3/4] rounded-3xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 overflow-hidden relative">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-40 h-40 rounded-full bg-gradient-to-br from-amber-400/20 to-yellow-500/20 flex items-center justify-center backdrop-blur-sm border border-amber-400/30">
+                      <span className="text-6xl font-black text-amber-400">K</span>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">Open Today</div>
-                    <div className="text-xs text-gray-500">9:00 AM - 6:00 PM</div>
+                  {/* Gradient overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                </div>
+
+                {/* Floating elements */}
+                <div className="absolute -left-8 top-1/4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl animate-float">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-green-400" />
+                    </div>
+                    <div>
+                      <div className="font-bold">Open Today</div>
+                      <div className="text-sm text-white/50">9AM - 6PM</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="absolute -right-4 bottom-1/3 bg-white rounded-xl shadow-lg p-4 hidden lg:block animate-[float_3s_ease-in-out_infinite_0.5s]">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Star className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-900">Top Rated</div>
-                    <div className="text-xs text-gray-500">500+ 5-star reviews</div>
+
+                <div className="absolute -right-8 top-1/2 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl animate-[float_3s_ease-in-out_infinite_0.5s]">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
+                      <Star className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div>
+                      <div className="font-bold">Top Rated</div>
+                      <div className="text-sm text-white/50">500+ Reviews</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              {/* Wednesday Special Tag */}
-              <div className="absolute -right-2 top-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 rounded-full px-4 py-2 shadow-lg hidden lg:block animate-[float_3s_ease-in-out_infinite_1s]">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="font-bold">$75 Wednesdays!</span>
+
+                {/* Wednesday special */}
+                <div className="absolute -right-4 top-8 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full px-5 py-2.5 shadow-xl shadow-amber-500/30 animate-[float_3s_ease-in-out_infinite_1s]">
+                  <div className="flex items-center gap-2 font-bold">
+                    <Sparkles className="w-4 h-4" />
+                    $75 Wednesdays!
+                  </div>
                 </div>
               </div>
             </div>
@@ -255,120 +277,131 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Services Section */}
-      <section id="services" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      {/* Video Section */}
+      <section id="video" className="py-24 bg-zinc-950">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Our Services</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              From starter locs to intricate braids, we offer a full range of services
-              to keep your crown looking its best.
-            </p>
+            <h2 className="text-3xl md:text-4xl font-black mb-4">See The Work</h2>
+            <p className="text-white/50 text-lg">Watch the transformation</p>
+          </div>
+          <div className="aspect-[9/16] max-w-md mx-auto rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10 border border-white/10">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/b9kadh1jTD4"
+              title="KeLatic Hair Lounge"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section id="services" className="py-24 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
+            <div>
+              <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">What We Offer</span>
+              <h2 className="text-4xl md:text-5xl font-black mt-2">Our Services</h2>
+            </div>
+            <Link
+              href="/book"
+              className="inline-flex items-center gap-2 text-amber-400 font-semibold hover:gap-3 transition-all"
+            >
+              View All Services <ChevronRight className="w-5 h-5" />
+            </Link>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {featuredServices.map((service) => (
               <div
                 key={service.id}
-                className="group bg-white border border-gray-200 rounded-2xl p-6 hover:border-purple-200 hover:shadow-lg transition-all"
+                className="group relative bg-zinc-900/50 backdrop-blur border border-white/5 rounded-2xl p-6 hover:border-amber-400/50 hover:bg-zinc-900 transition-all duration-300"
               >
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-600 transition-colors">
-                  <Sparkles className="w-6 h-6 text-purple-600 group-hover:text-white transition-colors" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{service.name}</h3>
-                <p className="text-gray-600 mb-4 line-clamp-2">{service.description}</p>
-                <div className="flex items-center justify-between">
-                  <div className="text-purple-600 font-semibold">${service.base_price}</div>
-                  <div className="text-sm text-gray-500 flex items-center gap-1">
-                    <Clock className="w-4 h-4" />
-                    {Math.floor(service.duration / 60)}h {service.duration % 60 > 0 ? `${service.duration % 60}m` : ''}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-400/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative">
+                  <div className="w-14 h-14 bg-amber-400/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-amber-400/20 transition-colors">
+                    <Sparkles className="w-7 h-7 text-amber-400" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-2">{service.name}</h3>
+                  <p className="text-white/50 mb-5 line-clamp-2">{service.description}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-2xl font-black text-amber-400">${service.base_price}</span>
+                    <span className="text-sm text-white/40 flex items-center gap-1">
+                      <Clock className="w-4 h-4" />
+                      {Math.floor(service.duration / 60)}h {service.duration % 60 > 0 ? `${service.duration % 60}m` : ''}
+                    </span>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          <div className="text-center mt-10">
+          <div className="text-center mt-12">
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-full font-medium hover:bg-purple-700 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
             >
-              View All Services & Book
-              <ChevronRight className="w-4 h-4" />
+              Book Your Service
+              <ChevronRight className="w-5 h-5" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Why Choose Us */}
-      <section id="about" className="py-20 bg-purple-50">
+      <section className="py-24 bg-zinc-950 border-y border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Choose KeLatic?</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              We're not just a salon – we're a community dedicated to healthy hair and self-expression.
-            </p>
+          <div className="text-center mb-16">
+            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Why Kelatic</span>
+            <h2 className="text-4xl md:text-5xl font-black mt-2">The Difference</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-purple-600" />
+            {[
+              { icon: Award, title: 'Expert Stylists', desc: '15+ years mastering locs and natural hair' },
+              { icon: Heart, title: 'Healthy Hair', desc: 'Premium products that nourish your crown' },
+              { icon: Shield, title: 'Clean & Safe', desc: 'Sanitized tools, welcoming environment' },
+              { icon: Calendar, title: 'Easy Booking', desc: 'Book online 24/7, instant confirmation' },
+            ].map((item, idx) => (
+              <div key={idx} className="text-center group">
+                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-amber-400/10 to-transparent rounded-2xl flex items-center justify-center mb-6 group-hover:from-amber-400/20 transition-colors">
+                  <item.icon className="w-10 h-10 text-amber-400" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
+                <p className="text-white/50">{item.desc}</p>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Expert Stylists</h3>
-              <p className="text-gray-600">Trained professionals with years of experience in natural hair care</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">
-                <Heart className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Healthy Hair First</h3>
-              <p className="text-gray-600">We prioritize the health of your hair with quality products</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Clean & Safe</h3>
-              <p className="text-gray-600">Sanitized tools and a comfortable, welcoming environment</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Easy Booking</h3>
-              <p className="text-gray-600">Book online 24/7 with instant confirmation</p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Stylists Section */}
-      <section id="stylists" className="py-20 bg-white">
+      {/* Team Section */}
+      <section id="team" className="py-24 bg-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Our talented stylists are passionate about helping you look and feel your best.
-            </p>
+          <div className="text-center mb-16">
+            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">The Squad</span>
+            <h2 className="text-4xl md:text-5xl font-black mt-2">Meet The Team</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {featuredStylists.map((stylist) => (
               <div key={stylist.id} className="group">
-                <div className="aspect-[3/4] bg-gradient-to-br from-purple-200 to-purple-400 rounded-2xl mb-4 overflow-hidden relative">
+                <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/5 overflow-hidden relative mb-5 group-hover:border-amber-400/30 transition-colors">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-24 h-24 bg-white/30 rounded-full flex items-center justify-center backdrop-blur text-white text-3xl font-bold">
-                      {stylist.first_name.charAt(0)}{stylist.last_name ? stylist.last_name.charAt(0) : ''}
+                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-white/10">
+                      <span className="text-4xl font-black text-white/80">
+                        {stylist.first_name.charAt(0)}{stylist.last_name ? stylist.last_name.charAt(0) : ''}
+                      </span>
                     </div>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
                     {stylist.instagram_handle && (
                       <a
                         href={`https://instagram.com/${stylist.instagram_handle}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-white hover:text-purple-200 transition-colors"
+                        className="flex items-center gap-2 text-white hover:text-amber-400 transition-colors"
                       >
                         <Instagram className="w-5 h-5" />
                         @{stylist.instagram_handle}
@@ -376,47 +409,37 @@ export default function LandingPage() {
                     )}
                   </div>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-1">
+                <h3 className="text-xl font-bold mb-1">
                   {stylist.first_name} {stylist.last_name}
                 </h3>
                 {stylist.specialties && (
-                  <p className="text-purple-600 text-sm mb-2">{stylist.specialties.join(' • ')}</p>
+                  <p className="text-amber-400 text-sm mb-2">{stylist.specialties.join(' • ')}</p>
                 )}
-                <p className="text-gray-600 text-sm line-clamp-2">{stylist.bio}</p>
+                <p className="text-white/50 text-sm line-clamp-2">{stylist.bio}</p>
               </div>
             ))}
-          </div>
-
-          <div className="text-center mt-10">
-            <Link
-              href="/book"
-              className="inline-flex items-center gap-2 px-6 py-3 border-2 border-purple-600 text-purple-600 rounded-full font-medium hover:bg-purple-600 hover:text-white transition-colors"
-            >
-              Book With Your Favorite Stylist
-              <ChevronRight className="w-4 h-4" />
-            </Link>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-gray-900 text-white">
+      <section className="py-24 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">What Our Clients Say</h2>
-            <p className="text-lg text-gray-400">Join thousands of satisfied clients</p>
+          <div className="text-center mb-16">
+            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Reviews</span>
+            <h2 className="text-4xl md:text-5xl font-black mt-2">Client Love</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {testimonials.map((testimonial, idx) => (
-              <div key={idx} className="bg-gray-800 rounded-2xl p-6">
+              <div key={idx} className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-400/30 transition-colors">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-4 line-clamp-4">&ldquo;{testimonial.text}&rdquo;</p>
-                <div className="font-medium">{testimonial.name}</div>
+                <p className="text-white/70 mb-5 line-clamp-4">&ldquo;{testimonial.text}&rdquo;</p>
+                <div className="font-bold text-amber-400">{testimonial.name}</div>
               </div>
             ))}
           </div>
@@ -424,76 +447,58 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-purple-600 to-purple-800 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Transform Your Look?</h2>
-          <p className="text-lg text-purple-100 mb-8">
-            Book your appointment today and experience the KeLatic difference.
+      <section className="py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-yellow-500" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMnM1LjM3MyAxMiAxMiAxMiAxMi01LjM3MyAxMi0xMi01LjM3My0xMi0xMi0xMnptMCAxOGMtMy4zMTQgMC02LTIuNjg2LTYtNnMyLjY4Ni02IDYtNiA2IDIuNjg2IDYgNi0yLjY4NiA2LTYgNnoiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAzIi8+PC9nPjwvc3ZnPg==')] opacity-30" />
+
+        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-4xl md:text-6xl font-black text-black mb-6">Ready to Level Up?</h2>
+          <p className="text-xl text-black/70 mb-10 max-w-2xl mx-auto">
+            Book your appointment today and experience why Houston trusts Kelatic with their crown.
           </p>
           <Link
             href="/book"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-600 rounded-full font-semibold text-lg hover:bg-purple-50 transition-colors shadow-lg"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-black text-white rounded-full font-bold text-lg hover:bg-zinc-900 transition-all hover:scale-105 shadow-2xl"
           >
-            <Calendar className="w-5 h-5" />
+            <Calendar className="w-6 h-6" />
             Book Your Appointment
           </Link>
         </div>
       </section>
 
-      {/* Loc Academy Section */}
-      <section id="academy" className="py-20 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
+      {/* Academy Section */}
+      <section id="academy" className="py-24 bg-black relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm font-medium mb-6 border border-purple-500/30">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400/10 border border-amber-400/30 rounded-full text-amber-400 text-sm font-medium mb-6">
                 <Sparkles className="w-4 h-4" />
                 Coming January 5th, 2025
               </div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <h2 className="text-4xl md:text-5xl font-black mb-6">
                 Loc Academy
               </h2>
-              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
-                Learn the art of locs from The Loc Gawd himself. Our comprehensive training program
-                will teach you everything from starter locs to advanced styling techniques.
+              <p className="text-xl text-white/60 mb-8 leading-relaxed">
+                Learn from The Loc Gawd. Master the art of locs from starter to advanced techniques.
               </p>
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-300">Hands-on training with real clients</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-300">Certificate upon completion</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-300">Business & marketing guidance</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-300">Small class sizes for personalized attention</span>
-                </li>
+              <ul className="space-y-4 mb-10">
+                {['Hands-on training with real clients', 'Certificate upon completion', 'Business & marketing guidance', 'Small class sizes'].map((item, idx) => (
+                  <li key={idx} className="flex items-center gap-3">
+                    <div className="w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0">
+                      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-white/70">{item}</span>
+                  </li>
+                ))}
               </ul>
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="mailto:kelatic@gmail.com?subject=Loc Academy Interest"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-purple-600 text-white rounded-full font-semibold text-lg hover:bg-purple-500 transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
                 >
                   <Mail className="w-5 h-5" />
                   Get Notified
@@ -502,25 +507,25 @@ export default function LandingPage() {
                   href="https://www.instagram.com/kelatic"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-white/30 text-white rounded-full font-semibold text-lg hover:bg-white/10 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition-colors"
                 >
                   <Instagram className="w-5 h-5" />
-                  Follow for Updates
+                  Follow Updates
                 </a>
               </div>
             </div>
-            <div className="relative">
-              <div className="aspect-square bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-3xl border border-purple-500/30 flex items-center justify-center">
-                <div className="text-center p-8">
-                  <div className="w-24 h-24 mx-auto mb-6 bg-purple-600 rounded-2xl flex items-center justify-center">
-                    <Award className="w-12 h-12 text-white" />
+
+            <div className="relative hidden lg:block">
+              <div className="aspect-square rounded-3xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="w-28 h-28 mx-auto bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-amber-500/30">
+                    <Award className="w-14 h-14 text-black" />
                   </div>
-                  <h3 className="text-2xl font-bold mb-2">Become a Certified Loctician</h3>
-                  <p className="text-purple-300">Start your journey in the loc industry</p>
+                  <h3 className="text-2xl font-black mb-2">Get Certified</h3>
+                  <p className="text-white/50">Start your loc career</p>
                 </div>
               </div>
-              {/* Floating elements */}
-              <div className="absolute -top-4 -right-4 bg-purple-600 text-white rounded-full px-4 py-2 font-bold animate-float">
+              <div className="absolute -top-4 -right-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full px-5 py-2 font-bold shadow-xl animate-float">
                 Limited Spots!
               </div>
             </div>
@@ -529,157 +534,103 @@ export default function LandingPage() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-20 bg-white">
+      <section id="contact" className="py-24 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-16">
             <div>
-              <h2 className="text-3xl font-bold text-gray-900 mb-6">Visit Us</h2>
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900">Location</div>
-                    <div className="text-gray-600">9430 Richmond Ave, Houston, TX 77063</div>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900">Phone</div>
-                    <a href="tel:+17134854000" className="text-gray-600 hover:text-purple-600">(713) 485-4000</a>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900">Email</div>
-                    <a href="mailto:kelatic@gmail.com" className="text-gray-600 hover:text-purple-600">kelatic@gmail.com</a>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Instagram className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="font-medium text-gray-900">Instagram</div>
-                    <a href="https://instagram.com/kelatic" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-purple-600">@kelatic</a>
-                  </div>
-                </div>
+              <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Location</span>
+              <h2 className="text-4xl md:text-5xl font-black mt-2 mb-10">Visit Us</h2>
+
+              <div className="space-y-6">
+                {[
+                  { icon: MapPin, label: 'Address', value: '9430 Richmond Ave, Houston, TX 77063', href: 'https://maps.google.com/?q=9430+Richmond+Ave+Houston+TX+77063' },
+                  { icon: Phone, label: 'Phone', value: '(713) 485-4000', href: 'tel:+17134854000' },
+                  { icon: Mail, label: 'Email', value: 'kelatic@gmail.com', href: 'mailto:kelatic@gmail.com' },
+                  { icon: Instagram, label: 'Instagram', value: '@kelatic', href: 'https://instagram.com/kelatic' },
+                ].map((item, idx) => (
+                  <a key={idx} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined} className="flex items-center gap-4 group">
+                    <div className="w-14 h-14 bg-amber-400/10 rounded-xl flex items-center justify-center group-hover:bg-amber-400/20 transition-colors">
+                      <item.icon className="w-6 h-6 text-amber-400" />
+                    </div>
+                    <div>
+                      <div className="text-sm text-white/40">{item.label}</div>
+                      <div className="font-medium group-hover:text-amber-400 transition-colors">{item.value}</div>
+                    </div>
+                  </a>
+                ))}
               </div>
 
-              {/* Hours */}
-              <div className="mt-8">
-                <h3 className="font-semibold text-gray-900 mb-4">Hours</h3>
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Monday - Friday</span>
-                    <span className="text-gray-900">9:00 AM - 6:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Saturday</span>
-                    <span className="text-gray-900">9:00 AM - 5:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Sunday</span>
-                    <span className="text-gray-900">Closed</span>
-                  </div>
+              <div className="mt-10 pt-10 border-t border-white/10">
+                <h3 className="font-bold mb-4">Hours</h3>
+                <div className="space-y-2 text-white/60">
+                  <div className="flex justify-between"><span>Monday - Friday</span><span className="text-white">9AM - 6PM</span></div>
+                  <div className="flex justify-between"><span>Saturday</span><span className="text-white">9AM - 5PM</span></div>
+                  <div className="flex justify-between"><span>Sunday</span><span className="text-white/40">Closed</span></div>
                 </div>
               </div>
             </div>
 
-            {/* Map Placeholder */}
-            <div className="bg-gray-100 rounded-2xl h-80 md:h-auto flex items-center justify-center">
-              <div className="text-center p-8">
-                <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                <p className="text-gray-500">Map integration available</p>
-                <a
-                  href="https://maps.google.com/?q=9430+Richmond+Ave+Houston+TX+77063"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-600 hover:text-purple-700 font-medium mt-2 inline-block"
-                >
-                  Get Directions →
-                </a>
-              </div>
+            <div className="rounded-2xl overflow-hidden border border-white/10 h-96 lg:h-auto">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3464.4891234567!2d-95.5264!3d29.7294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8640c3c0c0c0c0c0%3A0x0!2s9430%20Richmond%20Ave%2C%20Houston%2C%20TX%2077063!5e0!3m2!1sen!2sus!4v1704000000000"
+                className="w-full h-full min-h-96 border-0 grayscale"
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="KeLatic Hair Lounge Location"
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
+      <footer className="py-16 bg-black border-t border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-10 h-10 bg-purple-600 rounded-xl flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">K</span>
+          <div className="grid md:grid-cols-4 gap-12">
+            <div className="md:col-span-2">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center">
+                  <span className="text-black font-black text-xl">K</span>
                 </div>
-                <span className="text-xl font-bold">KeLatic</span>
+                <div className="flex flex-col">
+                  <span className="text-2xl font-black">KELATIC</span>
+                  <span className="text-[10px] tracking-[0.3em] text-amber-400">THE LOC GAWD</span>
+                </div>
               </div>
-              <p className="text-gray-400 text-sm">
-                Houston's premier destination for loc care, braids, and natural hair services.
+              <p className="text-white/50 max-w-sm">
+                Houston&apos;s premier destination for locs, braids, and natural hair. Where every crown gets the royal treatment.
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Quick Links</h4>
-              <div className="space-y-2 text-sm">
-                <a href="#services" className="block text-gray-400 hover:text-white transition-colors">Services</a>
-                <a href="#stylists" className="block text-gray-400 hover:text-white transition-colors">Our Team</a>
-                <a href="#about" className="block text-gray-400 hover:text-white transition-colors">About Us</a>
-                <Link href="/book" className="block text-gray-400 hover:text-white transition-colors">Book Now</Link>
+              <h4 className="font-bold mb-6">Quick Links</h4>
+              <div className="space-y-3">
+                <a href="#services" className="block text-white/50 hover:text-amber-400 transition-colors">Services</a>
+                <a href="#team" className="block text-white/50 hover:text-amber-400 transition-colors">Team</a>
+                <a href="#academy" className="block text-white/50 hover:text-amber-400 transition-colors">Academy</a>
+                <Link href="/book" className="block text-white/50 hover:text-amber-400 transition-colors">Book Now</Link>
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Services</h4>
-              <div className="space-y-2 text-sm">
-                <Link href="/book" className="block text-gray-400 hover:text-white transition-colors">Loc Services</Link>
-                <Link href="/book" className="block text-gray-400 hover:text-white transition-colors">Braids</Link>
-                <Link href="/book" className="block text-gray-400 hover:text-white transition-colors">Natural Hair</Link>
-                <Link href="/book" className="block text-gray-400 hover:text-white transition-colors">Silk Press</Link>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Connect</h4>
-              <div className="flex items-center gap-4">
-                <a
-                  href="https://instagram.com/kelatic"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-purple-600 transition-colors"
-                  aria-label="Follow us on Instagram"
-                >
+              <h4 className="font-bold mb-6">Connect</h4>
+              <div className="flex items-center gap-3">
+                <a href="https://instagram.com/kelatic" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
                   <Instagram className="w-5 h-5" />
                 </a>
-                <a
-                  href="tel:+17134854000"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-purple-600 transition-colors"
-                  aria-label="Call us"
-                >
+                <a href="tel:+17134854000" aria-label="Call us" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
                   <Phone className="w-5 h-5" />
                 </a>
-                <a
-                  href="mailto:kelatic@gmail.com"
-                  className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center hover:bg-purple-600 transition-colors"
-                  aria-label="Email us"
-                >
+                <a href="mailto:kelatic@gmail.com" aria-label="Email us" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
                   <Mail className="w-5 h-5" />
                 </a>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-            <p>© {new Date().getFullYear()} KeLatic Hair Lounge. All rights reserved.</p>
+          <div className="border-t border-white/5 mt-12 pt-8 text-center text-white/30 text-sm">
+            <p>© {new Date().getFullYear()} Kelatic Hair Lounge. All rights reserved.</p>
           </div>
         </div>
       </footer>

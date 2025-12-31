@@ -1,7 +1,5 @@
 'use client';
 
-// Force redeploy - 2025-12-20
-
 import { useState } from 'react';
 import NotificationBell from './NotificationBell';
 import Link from 'next/link';
@@ -101,33 +99,36 @@ export default function AdminLayout({
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-950">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-gray-900 transform transition-transform lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-black border-r border-white/10 transform transition-transform lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-gray-800">
+        <div className="h-16 flex items-center px-6 border-b border-white/10">
           <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold">K</span>
+            <div className="w-9 h-9 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <span className="text-black font-black text-sm">K</span>
             </div>
-            <span className="text-white font-semibold">KeLatic Admin</span>
+            <div className="flex flex-col">
+              <span className="text-white font-bold text-sm">KELATIC</span>
+              <span className="text-[9px] tracking-widest text-amber-400">ADMIN</span>
+            </div>
           </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="p-4 space-y-1">
+        <nav className="p-3 space-y-1">
           {NAV_ITEMS.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -138,31 +139,31 @@ export default function AdminLayout({
                 key={item.href}
                 href={item.href}
                 onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all ${
                   isActive
-                    ? 'bg-purple-600 text-white'
-                    : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold shadow-lg shadow-amber-500/20'
+                    : 'text-white/60 hover:bg-white/5 hover:text-white'
                 }`}
               >
                 {item.icon}
-                <span>{item.label}</span>
+                <span className="text-sm">{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
         {/* User */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-800">
-          <div className="flex items-center gap-3 px-4 py-2">
-            <div className="w-8 h-8 bg-gray-700 rounded-full flex items-center justify-center">
-              <span className="text-sm text-gray-300">A</span>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+          <div className="flex items-center gap-3 px-3 py-2">
+            <div className="w-9 h-9 bg-gradient-to-br from-amber-400/20 to-transparent rounded-full flex items-center justify-center border border-amber-400/30">
+              <span className="text-sm text-amber-400 font-bold">A</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-white truncate">Admin User</p>
-              <p className="text-xs text-gray-500 truncate">admin@kelatic.com</p>
+              <p className="text-sm text-white font-medium truncate">Admin</p>
+              <p className="text-xs text-white/40 truncate">kelatic@gmail.com</p>
             </div>
             <button
-              className="ml-2 text-xs text-red-500 hover:underline"
+              className="text-xs text-red-400 hover:text-red-300 transition-colors"
               onClick={async () => {
                 const supabase = (await import('@/lib/supabase/client')).createClient();
                 await supabase.auth.signOut();
@@ -178,11 +179,11 @@ export default function AdminLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center px-4 lg:px-8 sticky top-0 z-30">
+        <header className="h-16 bg-black/50 backdrop-blur-xl border-b border-white/10 flex items-center px-4 lg:px-8 sticky top-0 z-30">
           {/* Mobile menu button */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 -ml-2 text-gray-600 lg:hidden"
+            className="p-2 -ml-2 text-white/60 hover:text-white lg:hidden"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -195,11 +196,11 @@ export default function AdminLayout({
           {/* Quick actions */}
           <div className="flex items-center gap-4">
             <Link
-              href="/book"
+              href="/"
               target="_blank"
-              className="text-sm text-gray-600 hover:text-gray-900 hidden sm:block"
+              className="text-sm text-white/50 hover:text-amber-400 transition-colors hidden sm:block"
             >
-              View Booking Page →
+              View Site →
             </Link>
             <NotificationBell />
           </div>

@@ -18,12 +18,12 @@ interface Appointment {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-100 text-amber-700',
-  confirmed: 'bg-green-100 text-green-700',
-  in_progress: 'bg-blue-100 text-blue-700',
-  completed: 'bg-gray-100 text-gray-700',
-  cancelled: 'bg-red-100 text-red-700',
-  no_show: 'bg-red-100 text-red-700',
+  pending: 'bg-amber-500/20 text-amber-400',
+  confirmed: 'bg-green-500/20 text-green-400',
+  in_progress: 'bg-blue-500/20 text-blue-400',
+  completed: 'bg-white/10 text-white/60',
+  cancelled: 'bg-red-500/20 text-red-400',
+  no_show: 'bg-red-500/20 text-red-400',
 };
 
 export default function AppointmentsPage() {
@@ -108,12 +108,12 @@ export default function AppointmentsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Appointments</h1>
-          <p className="text-gray-500">{formatDate(filters.date)}</p>
+          <h1 className="text-2xl font-bold text-white">Appointments</h1>
+          <p className="text-white/50">{formatDate(filters.date)}</p>
         </div>
         <Link
           href="/admin/appointments/new"
-          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 w-fit"
+          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -123,11 +123,11 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+      <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-4 mb-6">
         <div className="flex flex-wrap gap-4">
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Date
             </label>
             <input
@@ -136,13 +136,13 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, date: e.target.value })
               }
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Status
             </label>
             <select
@@ -150,7 +150,7 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
@@ -164,7 +164,7 @@ export default function AppointmentsPage() {
 
           {/* Stylist */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Stylist
             </label>
             <select
@@ -172,7 +172,7 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, stylist: e.target.value })
               }
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
             >
               <option value="all">All Stylists</option>
               {stylists.map((s) => (
@@ -190,7 +190,7 @@ export default function AppointmentsPage() {
                 const today = new Date().toISOString().split('T')[0];
                 setFilters({ ...filters, date: today });
               }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors border border-white/10"
             >
               Today
             </button>
@@ -200,7 +200,7 @@ export default function AppointmentsPage() {
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 setFilters({ ...filters, date: tomorrow.toISOString().split('T')[0] });
               }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-4 py-2 bg-white/10 text-white rounded-xl hover:bg-white/20 transition-colors border border-white/10"
             >
               Tomorrow
             </button>
@@ -209,15 +209,15 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Appointments List */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
           </div>
         ) : appointments.length === 0 ? (
           <div className="text-center py-12">
             <svg
-              className="w-12 h-12 mx-auto text-gray-300 mb-4"
+              className="w-12 h-12 mx-auto text-white/20 mb-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -229,10 +229,10 @@ export default function AppointmentsPage() {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <p className="text-gray-500">No appointments found</p>
+            <p className="text-white/50">No appointments found</p>
             <Link
               href="/admin/appointments/new"
-              className="text-purple-600 hover:text-purple-700 mt-2 inline-block"
+              className="text-amber-400 hover:text-amber-300 mt-2 inline-block"
             >
               Create one →
             </Link>
@@ -241,67 +241,67 @@ export default function AppointmentsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <tr className="bg-white/5 border-b border-white/10">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Time
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Client
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Service
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Stylist
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="text-right px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-white/10">
                 {appointments.map((apt) => (
-                  <tr key={apt.id} className="hover:bg-gray-50">
+                  <tr key={apt.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-white">
                         {formatTime(apt.start_time)}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-white/50">
                         - {formatTime(apt.end_time)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-white">
                         {apt.client_name || 'Walk-in'}
                       </div>
                       {apt.client_phone && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-white/50">
                           {apt.client_phone}
                         </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-white">
                         {apt.service_name}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-white">
                         {apt.stylist_name}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-white">
                         {formatCurrency(apt.quoted_price * 100)}
                       </div>
                       {apt.deposit_paid > 0 && (
-                        <div className="text-xs text-green-600">
+                        <div className="text-xs text-green-400">
                           {formatCurrency(apt.deposit_paid * 100)} deposit
                         </div>
                       )}
@@ -309,7 +309,7 @@ export default function AppointmentsPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          STATUS_COLORS[apt.status] || 'bg-gray-100 text-gray-700'
+                          STATUS_COLORS[apt.status] || 'bg-white/10 text-white/60'
                         }`}
                       >
                         {apt.status.replace('_', ' ')}
@@ -320,7 +320,7 @@ export default function AppointmentsPage() {
                         {apt.status === 'pending' && (
                           <button
                             onClick={() => updateStatus(apt.id, 'confirmed')}
-                            className="text-green-600 hover:text-green-700 text-sm"
+                            className="text-green-400 hover:text-green-300 text-sm"
                           >
                             Confirm
                           </button>
@@ -328,7 +328,7 @@ export default function AppointmentsPage() {
                         {apt.status === 'confirmed' && (
                           <button
                             onClick={() => updateStatus(apt.id, 'in_progress')}
-                            className="text-blue-600 hover:text-blue-700 text-sm"
+                            className="text-blue-400 hover:text-blue-300 text-sm"
                           >
                             Start
                           </button>
@@ -336,14 +336,14 @@ export default function AppointmentsPage() {
                         {apt.status === 'in_progress' && (
                           <Link
                             href={`/admin/pos?appointment=${apt.id}`}
-                            className="text-green-600 hover:text-green-700 text-sm"
+                            className="text-green-400 hover:text-green-300 text-sm"
                           >
                             Checkout
                           </Link>
                         )}
                         <Link
                           href={`/admin/appointments/${apt.id}`}
-                          className="text-gray-600 hover:text-gray-900"
+                          className="text-white/50 hover:text-white"
                         >
                           <svg
                             className="w-5 h-5"

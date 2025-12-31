@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     const appointments = appointmentsRaw?.map((apt: any) => {
       const depositPayment = apt.payments?.find(
-        (p: any) => p.is_deposit && p.status === 'succeeded'
+        (p: any) => p.is_deposit && p.status === 'paid'
       );
 
       return {

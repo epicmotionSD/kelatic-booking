@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { ServiceSelection } from '@/components/booking/service-selection';
 import { StylistSelection } from '@/components/booking/stylist-selection';
 import { DateTimeSelection } from '@/components/booking/datetime-selection';
@@ -84,18 +85,30 @@ export default function BookingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-950 text-white">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-3xl mx-auto px-4 py-6">
-          <h1 className="text-2xl font-bold text-gray-900">Book an Appointment</h1>
-          <p className="text-gray-500 mt-1">KeLatic Hair Lounge</p>
+      <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+        <div className="max-w-3xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
+                <span className="text-black font-black">K</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-sm">KELATIC</span>
+                <span className="text-[9px] tracking-widest text-amber-400">BOOKING</span>
+              </div>
+            </Link>
+            <Link href="/" className="text-sm text-white/50 hover:text-amber-400 transition-colors">
+              ← Back to site
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Progress Bar */}
       {currentStep !== 'confirmation' && (
-        <div className="bg-white border-b border-gray-200">
+        <div className="bg-black/30 border-b border-white/5">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               {STEPS.slice(0, -1).map((step, index) => {
@@ -113,12 +126,12 @@ export default function BookingPage() {
                       }`}
                     >
                       <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                           isActive
-                            ? 'bg-purple-600 text-white'
+                            ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/30'
                             : isCompleted
                             ? 'bg-green-500 text-white'
-                            : 'bg-gray-200 text-gray-500'
+                            : 'bg-white/10 text-white/40'
                         }`}
                       >
                         {isCompleted ? (
@@ -131,7 +144,7 @@ export default function BookingPage() {
                       </div>
                       <span
                         className={`hidden sm:block text-sm font-medium ${
-                          isActive ? 'text-purple-600' : isCompleted ? 'text-green-600' : 'text-gray-500'
+                          isActive ? 'text-amber-400' : isCompleted ? 'text-green-400' : 'text-white/40'
                         }`}
                       >
                         {step.label}
@@ -139,8 +152,8 @@ export default function BookingPage() {
                     </button>
                     {index < STEPS.length - 2 && (
                       <div
-                        className={`w-8 sm:w-16 h-0.5 mx-2 ${
-                          index < currentStepIndex ? 'bg-green-500' : 'bg-gray-200'
+                        className={`w-8 sm:w-16 h-0.5 mx-2 rounded-full ${
+                          index < currentStepIndex ? 'bg-green-500' : 'bg-white/10'
                         }`}
                       />
                     )}
@@ -185,8 +198,8 @@ export default function BookingPage() {
             selectedDate={bookingData.date}
             selectedSlot={bookingData.timeSlot}
             onSelect={(date, slot) => {
-              updateBookingData({ 
-                date, 
+              updateBookingData({
+                date,
                 timeSlot: slot,
                 // If "any available" was selected, now we know the actual stylist
                 stylist: bookingData.anyAvailableStylist ? null : bookingData.stylist,
@@ -201,7 +214,7 @@ export default function BookingPage() {
           <ClientInfo
             bookingData={bookingData}
             onSubmit={async (clientInfo, result) => {
-              updateBookingData({ 
+              updateBookingData({
                 clientInfo,
                 appointmentId: result.appointmentId,
                 paymentIntentClientSecret: result.paymentIntentClientSecret,
@@ -226,10 +239,10 @@ export default function BookingPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-auto">
-        <div className="max-w-3xl mx-auto px-4 py-6 text-center text-sm text-gray-500">
-          <p>Questions? Call us at (555) 123-4567</p>
-          <p className="mt-1">123 Main Street, Your City, ST 12345</p>
+      <footer className="bg-black/30 border-t border-white/5 mt-auto">
+        <div className="max-w-3xl mx-auto px-4 py-6 text-center text-sm text-white/40">
+          <p>Questions? Call us at <a href="tel:+17134854000" className="text-amber-400 hover:text-amber-300">(713) 485-4000</a></p>
+          <p className="mt-1">9430 Richmond Ave, Houston, TX 77063</p>
         </div>
       </footer>
     </div>

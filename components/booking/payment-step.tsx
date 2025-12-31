@@ -48,18 +48,18 @@ export function PaymentStep({ bookingData, onComplete, onBack }: PaymentStepProp
   if (!currentStripePromise) {
     return (
       <div className="text-center py-8">
-        <div className="text-red-600 mb-4">
+        <div className="text-red-400 mb-4">
           <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
           </svg>
         </div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">Payment System Unavailable</h3>
-        <p className="text-gray-500 mb-4">
+        <h3 className="text-lg font-medium text-white mb-2">Payment System Unavailable</h3>
+        <p className="text-white/50 mb-4">
           We're experiencing technical difficulties with our payment system. Please try again later or contact us for assistance.
         </p>
         <button
           onClick={onBack}
-          className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+          className="bg-white/10 text-white px-4 py-2 rounded-xl hover:bg-white/20 transition-colors border border-white/10"
         >
           Go Back
         </button>
@@ -69,8 +69,8 @@ export function PaymentStep({ bookingData, onComplete, onBack }: PaymentStepProp
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-gray-900 mb-2">Secure Your Appointment</h2>
-      <p className="text-gray-500 mb-6">
+      <h2 className="text-xl font-bold text-white mb-2">Secure Your Appointment</h2>
+      <p className="text-white/50 mb-6">
         Pay your {formatCurrency((bookingData.service?.deposit_amount || 0) * 100)} deposit to confirm
       </p>
 
@@ -79,10 +79,37 @@ export function PaymentStep({ bookingData, onComplete, onBack }: PaymentStepProp
         options={{
           clientSecret: bookingData.paymentIntentClientSecret,
           appearance: {
-            theme: 'stripe',
+            theme: 'night',
             variables: {
-              colorPrimary: '#9333ea',
-              borderRadius: '8px',
+              colorPrimary: '#fbbf24',
+              colorBackground: '#18181b',
+              colorText: '#ffffff',
+              colorTextSecondary: '#a1a1aa',
+              colorDanger: '#ef4444',
+              fontFamily: 'system-ui, sans-serif',
+              borderRadius: '12px',
+              spacingUnit: '4px',
+            },
+            rules: {
+              '.Input': {
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              },
+              '.Input:focus': {
+                border: '1px solid rgba(251, 191, 36, 0.5)',
+                boxShadow: '0 0 0 1px rgba(251, 191, 36, 0.5)',
+              },
+              '.Tab': {
+                backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                border: '1px solid rgba(255, 255, 255, 0.1)',
+              },
+              '.Tab--selected': {
+                backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                border: '1px solid rgba(251, 191, 36, 0.5)',
+              },
+              '.Label': {
+                color: 'rgba(255, 255, 255, 0.7)',
+              },
             },
           },
         }}
@@ -142,20 +169,20 @@ function PaymentForm({ bookingData, onComplete, onBack }: PaymentFormProps) {
   return (
     <form onSubmit={handleSubmit}>
       {/* Payment Summary */}
-      <div className="bg-purple-50 rounded-xl p-4 mb-6">
+      <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl p-4 mb-6">
         <div className="flex justify-between items-center">
           <div>
-            <p className="font-medium text-gray-900">{bookingData.service?.name}</p>
-            <p className="text-sm text-gray-600">Deposit to secure appointment</p>
+            <p className="font-medium text-white">{bookingData.service?.name}</p>
+            <p className="text-sm text-white/60">Deposit to secure appointment</p>
           </div>
-          <p className="text-xl font-bold text-gray-900">
+          <p className="text-xl font-bold text-amber-400">
             {formatCurrency(depositAmount * 100)}
           </p>
         </div>
       </div>
 
       {/* Stripe Payment Element */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6">
+      <div className="bg-zinc-900 rounded-xl border border-white/10 p-4 mb-6">
         <PaymentElement
           options={{
             layout: 'tabs',
@@ -165,14 +192,14 @@ function PaymentForm({ bookingData, onComplete, onBack }: PaymentFormProps) {
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 text-red-700 p-4 rounded-lg mb-6">
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl mb-6">
           {error}
         </div>
       )}
 
       {/* Security Note */}
-      <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex items-center gap-2 text-sm text-white/50 mb-6">
+        <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
         </svg>
         <span>Payments are secure and encrypted</span>
@@ -184,18 +211,18 @@ function PaymentForm({ bookingData, onComplete, onBack }: PaymentFormProps) {
           type="button"
           onClick={onBack}
           disabled={loading}
-          className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-xl font-semibold hover:bg-gray-200 transition-colors disabled:opacity-50"
+          className="flex-1 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-colors disabled:opacity-50"
         >
           Back
         </button>
         <button
           type="submit"
           disabled={!stripe || loading}
-          className="flex-1 py-3 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+          className="flex-1 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
-              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white" />
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black" />
               Processing...
             </>
           ) : (
@@ -205,7 +232,7 @@ function PaymentForm({ bookingData, onComplete, onBack }: PaymentFormProps) {
       </div>
 
       {/* Cancellation Reminder */}
-      <p className="text-xs text-gray-500 text-center mt-4">
+      <p className="text-xs text-white/40 text-center mt-4">
         Deposits are non-refundable. You can reschedule with 24+ hours notice.
       </p>
     </form>

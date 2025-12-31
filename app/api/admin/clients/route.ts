@@ -18,7 +18,13 @@ export async function GET() {
         last_visit_at,
         hair_type,
         texture,
-        allergies
+        allergies,
+        birthday,
+        zip_code,
+        preferred_contact,
+        sms_opt_in,
+        marketing_opt_in,
+        referral_source
       `)
       .eq('role', 'client')
       .order('last_visit_at', { ascending: false, nullsFirst: false });
@@ -46,7 +52,7 @@ export async function GET() {
       .from('payments')
       .select('appointments!inner(client_id), total_amount')
       .in('appointments.client_id', clientIds)
-      .eq('status', 'succeeded');
+      .eq('status', 'paid');
 
     // Calculate stats per client
     const visitCounts: Record<string, number> = {};
@@ -81,15 +87,19 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const supabase = createAdminClient();
 
-    // Check if email already exists
-    const { data: existing } = await supabase
-      .from('profiles')
-      .select('id')
-      .eq('email', body.email.toLowerCase())
-      .single();
+    const email = body.email?.toLowerCase()?.trim() || null;
 
-    if (existing) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
+    // Check if email already exists (only if email provided)
+    if (email) {
+      const { data: existing } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', email)
+        .single();
+
+      if (existing) {
+        return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
+      }
     }
 
     const { data: client, error } = await supabase
@@ -97,14 +107,23 @@ export async function POST(request: NextRequest) {
       .insert({
         first_name: body.first_name,
         last_name: body.last_name,
-        email: body.email.toLowerCase(),
-        phone: body.phone,
+        email: email,
+        phone: body.phone || null,
         role: 'client',
-        hair_type: body.hair_type,
-        texture: body.texture,
-        scalp_sensitivity: body.scalp_sensitivity,
-        allergies: body.allergies,
-        preferred_products: body.preferred_products,
+        hair_type: body.hair_type || null,
+        texture: body.texture || null,
+        scalp_sensitivity: body.scalp_sensitivity || null,
+        allergies: body.allergies || null,
+        preferred_products: body.preferred_products || null,
+        notes: body.notes || null,
+        // New fields
+        birthday: body.birthday || null,
+        zip_code: body.zip_code || null,
+        preferred_contact: body.preferred_contact || 'both',
+        sms_opt_in: body.sms_opt_in ?? true,
+        marketing_opt_in: body.marketing_opt_in ?? false,
+        referral_source: body.referral_source || null,
+        preferred_times: body.preferred_times || null,
       })
       .select()
       .single();
