@@ -124,15 +124,13 @@ export default function AdminLayout({
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-white/10">
-          <Link href="/admin" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <span className="text-black font-black text-sm">K</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-white font-bold text-sm">KELATIC</span>
-              <span className="text-[9px] tracking-widest text-amber-400">ADMIN</span>
-            </div>
+        <div className="h-16 flex items-center px-4 border-b border-white/10">
+          <Link href="/admin" className="flex items-center">
+            <img
+              src="/logo.png"
+              alt="Kelatic"
+              className="h-10 w-auto"
+            />
           </Link>
         </div>
 

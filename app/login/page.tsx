@@ -90,10 +90,12 @@ function LoginForm() {
 
       <div className="relative z-10 w-full max-w-md px-4">
         {/* Logo */}
-        <Link href="/" className="flex items-center justify-center gap-3 mb-8">
-          <div className="w-14 h-14 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center shadow-xl shadow-amber-500/20">
-            <span className="text-black font-black text-2xl">K</span>
-          </div>
+        <Link href="/" className="flex items-center justify-center mb-8">
+          <img
+            src="/logo.png"
+            alt="Kelatic Hair Lounge"
+            className="h-16 w-auto"
+          />
         </Link>
 
         <form

@@ -99,14 +99,12 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <span className="text-black font-black text-xl">K</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-black tracking-tight">KELATIC</span>
-                <span className="text-[10px] tracking-[0.3em] text-amber-400 font-medium">THE LOC GAWD</span>
-              </div>
+            <Link href="/" className="flex items-center">
+              <img
+                src="/logo.png"
+                alt="Kelatic Hair Lounge"
+                className="h-14 w-auto"
+              />
             </Link>
 
             {/* Desktop Nav */}
@@ -587,14 +585,12 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-12">
             <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center">
-                  <span className="text-black font-black text-xl">K</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-2xl font-black">KELATIC</span>
-                  <span className="text-[10px] tracking-[0.3em] text-amber-400">THE LOC GAWD</span>
-                </div>
+              <div className="mb-6">
+                <img
+                  src="/logo.png"
+                  alt="Kelatic Hair Lounge"
+                  className="h-16 w-auto"
+                />
               </div>
               <p className="text-white/50 max-w-sm">
                 Houston&apos;s premier loc specialists. Expert loc installation, maintenance, and styling.

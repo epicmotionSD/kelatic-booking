@@ -72,11 +72,13 @@ export default function StylistLayout({
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
             <Link href="/stylist" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center">
-                <span className="text-black font-black text-lg">K</span>
-              </div>
+              <img
+                src="/logo.png"
+                alt="Kelatic"
+                className="h-10 w-auto"
+              />
               <div className="hidden sm:block">
-                <span className="font-bold">Stylist Portal</span>
+                <span className="font-bold text-amber-400">Stylist Portal</span>
               </div>
             </Link>
 
