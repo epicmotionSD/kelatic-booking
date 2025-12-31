@@ -203,7 +203,6 @@ export default function AdminLayout({
             </Link>
             <NotificationBell />
           </div>
-// ...existing code...
         </header>
 
         {/* Page content */}
