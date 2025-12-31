@@ -24,6 +24,8 @@ export default function StylistsPage() {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingStylist, setEditingStylist] = useState<Stylist | null>(null);
+  const [inviting, setInviting] = useState<string | null>(null);
+  const [inviteMessage, setInviteMessage] = useState<{ id: string; message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     fetchStylists();
@@ -61,6 +63,43 @@ export default function StylistsPage() {
       fetchStylists();
     } catch (error) {
       console.error('Failed to toggle stylist:', error);
+    }
+  }
+
+  async function handleInvite(stylist: Stylist) {
+    setInviting(stylist.id);
+    setInviteMessage(null);
+    try {
+      const res = await fetch('/api/admin/stylists/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stylist_id: stylist.id, email: stylist.email }),
+      });
+      const data = await res.json();
+
+      if (res.ok) {
+        setInviteMessage({
+          id: stylist.id,
+          message: data.message || 'Invite sent!',
+          type: 'success',
+        });
+      } else {
+        setInviteMessage({
+          id: stylist.id,
+          message: data.error || 'Failed to send invite',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      setInviteMessage({
+        id: stylist.id,
+        message: 'Failed to send invite',
+        type: 'error',
+      });
+    } finally {
+      setInviting(null);
+      // Clear message after 5 seconds
+      setTimeout(() => setInviteMessage(null), 5000);
     }
   }
 
@@ -185,20 +224,34 @@ export default function StylistsPage() {
                 </div>
               </div>
 
+              {/* Invite Message */}
+              {inviteMessage?.id === stylist.id && (
+                <div
+                  className={`mx-4 mb-2 px-3 py-2 rounded-xl text-sm ${
+                    inviteMessage.type === 'success'
+                      ? 'bg-green-500/10 text-green-400 border border-green-500/30'
+                      : 'bg-red-500/10 text-red-400 border border-red-500/30'
+                  }`}
+                >
+                  {inviteMessage.message}
+                </div>
+              )}
+
               {/* Actions */}
-              <div className="p-4 flex gap-2">
+              <div className="p-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => openModal(stylist)}
                   className="flex-1 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10"
                 >
                   Edit
                 </button>
-                <Link
-                  href={`/admin/team/${stylist.id}/schedule`}
-                  className="flex-1 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm text-center border border-white/10"
+                <button
+                  onClick={() => handleInvite(stylist)}
+                  disabled={inviting === stylist.id}
+                  className="flex-1 py-2 bg-amber-500/10 text-amber-400 rounded-xl hover:bg-amber-500/20 transition-colors text-sm border border-amber-500/30 disabled:opacity-50"
                 >
-                  Schedule
-                </Link>
+                  {inviting === stylist.id ? 'Sending...' : 'Invite'}
+                </button>
                 <button
                   onClick={() => handleToggleActive(stylist)}
                   className={`px-3 py-2 rounded-xl text-sm transition-colors ${
