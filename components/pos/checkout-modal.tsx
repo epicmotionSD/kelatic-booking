@@ -85,13 +85,16 @@ export function CheckoutModal({
           body: JSON.stringify({ paymentIntentId }),
         });
 
+        const processData = await processRes.json();
+
         if (!processRes.ok) {
-          const errorData = await processRes.json();
-          throw new Error(errorData.error || 'Payment failed');
+          throw new Error(processData.error || 'Payment failed');
         }
 
-        // Poll for completion
-        setProcessingMessage('Processing payment...');
+        console.log('Payment sent to reader:', processData);
+
+        // Poll for completion - wait for customer to tap/insert card
+        setProcessingMessage('Waiting for customer to pay on reader...');
         await pollPaymentStatus(paymentIntentId);
 
       } else {
@@ -136,19 +139,25 @@ export function CheckoutModal({
 
     while (attempts < maxAttempts) {
       const res = await fetch(`/api/pos/payment-status?id=${paymentIntentId}`);
-      const { status } = await res.json();
+      const data = await res.json();
+      const { status } = data;
+
+      console.log(`Poll attempt ${attempts + 1}: status = ${status}`, data);
 
       if (status === 'succeeded') {
         return;
-      } else if (status === 'canceled' || status === 'requires_payment_method') {
-        throw new Error('Payment was declined or canceled');
+      } else if (status === 'canceled') {
+        throw new Error('Payment was canceled');
+      } else if (status === 'requires_payment_method' && attempts > 5) {
+        // Only fail after a few attempts - reader might not have picked it up yet
+        throw new Error('Payment was declined or card not read');
       }
 
       await new Promise((resolve) => setTimeout(resolve, 2000));
       attempts++;
     }
 
-    throw new Error('Payment timed out');
+    throw new Error('Payment timed out - please check Stripe dashboard');
   }
 
   async function cancelReaderAction() {
