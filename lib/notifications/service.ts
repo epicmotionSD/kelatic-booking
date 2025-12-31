@@ -14,9 +14,12 @@ const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_T
 
 const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'bookings@kelatic.com';
 const FROM_PHONE = process.env.TWILIO_PHONE_NUMBER || '';
-const SALON_NAME = 'KeLatic Hair Lounge';
-const SALON_PHONE = '(713) 555-1234';
-const SALON_ADDRESS = '123 Main Street, Houston, TX 77001';
+const SALON_NAME = 'Kelatic Hair Lounge';
+const SALON_PHONE = '(713) 485-4000';
+const SALON_ADDRESS = '9430 Richmond Ave, Houston, TX 77063';
+const LOGO_URL = `${process.env.NEXT_PUBLIC_APP_URL || 'https://kelatic.com'}/logo.png`;
+const BRAND_COLOR = '#f59e0b'; // Amber/Gold
+const BRAND_GRADIENT = 'linear-gradient(135deg, #f59e0b 0%, #eab308 100%)';
 
 export interface AppointmentDetails {
   id: string;
@@ -78,64 +81,70 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-          <!-- Header -->
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+          <!-- Header with Logo -->
           <tr>
-            <td style="background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%); padding: 40px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Appointment Confirmed! ✨</h1>
-              <p style="margin: 10px 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">${SALON_NAME}</p>
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${BRAND_COLOR};">
+              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 60px; width: auto;" />
+            </td>
+          </tr>
+          <!-- Title Banner -->
+          <tr>
+            <td style="background: ${BRAND_GRADIENT}; padding: 30px; text-align: center;">
+              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">Appointment Confirmed!</h1>
+              <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">We're excited to see you</p>
             </td>
           </tr>
           
           <!-- Content -->
           <tr>
             <td style="padding: 40px;">
-              <p style="margin: 0 0 20px; color: #333; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
-              <p style="margin: 0 0 30px; color: #666; font-size: 16px; line-height: 1.6;">Your appointment has been confirmed! We're excited to see you. Here are your booking details:</p>
-              
+              <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
+              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">Your appointment has been confirmed! We're excited to see you. Here are your booking details:</p>
+
               <!-- Appointment Card -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #faf5ff; border-radius: 12px; padding: 24px; margin-bottom: 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
                 <tr>
                   <td>
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td style="padding-bottom: 16px; border-bottom: 1px solid #e9d5ff;">
-                          <p style="margin: 0; color: #9333ea; font-size: 14px; font-weight: 600; text-transform: uppercase;">Service</p>
-                          <p style="margin: 4px 0 0; color: #333; font-size: 18px; font-weight: 600;">${appointment.service_name}</p>
+                        <td style="padding-bottom: 16px; border-bottom: 1px solid #52525b;">
+                          <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Service</p>
+                          <p style="margin: 4px 0 0; color: #ffffff; font-size: 18px; font-weight: 600;">${appointment.service_name}</p>
                           ${addOnsHtml}
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding: 16px 0; border-bottom: 1px solid #e9d5ff;">
+                        <td style="padding: 16px 0; border-bottom: 1px solid #52525b;">
                           <table width="100%">
                             <tr>
                               <td width="50%">
-                                <p style="margin: 0; color: #9333ea; font-size: 14px; font-weight: 600; text-transform: uppercase;">Date</p>
-                                <p style="margin: 4px 0 0; color: #333; font-size: 16px;">${formatDate(appointment.appointment_date)}</p>
+                                <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Date</p>
+                                <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatDate(appointment.appointment_date)}</p>
                               </td>
                               <td width="50%">
-                                <p style="margin: 0; color: #9333ea; font-size: 14px; font-weight: 600; text-transform: uppercase;">Time</p>
-                                <p style="margin: 4px 0 0; color: #333; font-size: 16px;">${formatTime(appointment.appointment_time)}</p>
+                                <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Time</p>
+                                <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatTime(appointment.appointment_time)}</p>
                               </td>
                             </tr>
                           </table>
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding: 16px 0; border-bottom: 1px solid #e9d5ff;">
+                        <td style="padding: 16px 0; border-bottom: 1px solid #52525b;">
                           <table width="100%">
                             <tr>
                               <td width="50%">
-                                <p style="margin: 0; color: #9333ea; font-size: 14px; font-weight: 600; text-transform: uppercase;">Stylist</p>
-                                <p style="margin: 4px 0 0; color: #333; font-size: 16px;">${appointment.stylist_name}</p>
+                                <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Stylist</p>
+                                <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${appointment.stylist_name}</p>
                               </td>
                               <td width="50%">
-                                <p style="margin: 0; color: #9333ea; font-size: 14px; font-weight: 600; text-transform: uppercase;">Duration</p>
-                                <p style="margin: 4px 0 0; color: #333; font-size: 16px;">${formatDuration(appointment.service_duration)}</p>
+                                <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Duration</p>
+                                <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatDuration(appointment.service_duration)}</p>
                               </td>
                             </tr>
                           </table>
@@ -143,8 +152,8 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
                       </tr>
                       <tr>
                         <td style="padding-top: 16px;">
-                          <p style="margin: 0; color: #9333ea; font-size: 14px; font-weight: 600; text-transform: uppercase;">Total</p>
-                          <p style="margin: 4px 0 0; color: #333; font-size: 24px; font-weight: 700;">$${appointment.total_amount.toFixed(2)}</p>
+                          <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Total</p>
+                          <p style="margin: 4px 0 0; color: ${BRAND_COLOR}; font-size: 24px; font-weight: 700;">$${appointment.total_amount.toFixed(2)}</p>
                         </td>
                       </tr>
                     </table>
@@ -156,19 +165,19 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 8px; color: #333; font-size: 16px; font-weight: 600;">📍 Location</p>
-                    <p style="margin: 0; color: #666; font-size: 14px;">${SALON_ADDRESS}</p>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(SALON_ADDRESS)}" style="color: #9333ea; font-size: 14px; text-decoration: none;">Get Directions →</a>
+                    <p style="margin: 0 0 8px; color: #ffffff; font-size: 16px; font-weight: 600;">📍 Location</p>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
+                    <a href="https://maps.google.com/?q=${encodeURIComponent(SALON_ADDRESS)}" style="color: ${BRAND_COLOR}; font-size: 14px; text-decoration: none;">Get Directions →</a>
                   </td>
                 </tr>
               </table>
-              
+
               <!-- Important Info -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fff7ed; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: rgba(245, 158, 11, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(245, 158, 11, 0.3);">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 12px; color: #c2410c; font-size: 16px; font-weight: 600;">⚡ Important Reminders</p>
-                    <ul style="margin: 0; padding-left: 20px; color: #666; font-size: 14px; line-height: 1.8;">
+                    <p style="margin: 0 0 12px; color: ${BRAND_COLOR}; font-size: 16px; font-weight: 600;">⚡ Important Reminders</p>
+                    <ul style="margin: 0; padding-left: 20px; color: #a1a1aa; font-size: 14px; line-height: 1.8;">
                       <li>Please arrive 10-15 minutes early</li>
                       <li>Come with clean, product-free hair unless otherwise instructed</li>
                       <li>If you need to reschedule, please give us at least 24 hours notice</li>
@@ -177,30 +186,31 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
                   </td>
                 </tr>
               </table>
-              
+
               <!-- Buttons -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom: 20px;">
-                    <a href="${process.env.NEXT_PUBLIC_APP_URL}/appointments/${appointment.id}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">View Appointment</a>
+                    <a href="${process.env.NEXT_PUBLIC_APP_URL}/appointments/${appointment.id}" style="display: inline-block; padding: 14px 32px; background: ${BRAND_GRADIENT}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">View Appointment</a>
                   </td>
                 </tr>
                 <tr>
                   <td align="center">
-                    <p style="margin: 0; color: #666; font-size: 14px;">Need to make changes? <a href="${process.env.NEXT_PUBLIC_APP_URL}/appointments/${appointment.id}/reschedule" style="color: #9333ea; text-decoration: none;">Reschedule</a> or call us at <a href="tel:${SALON_PHONE.replace(/[^0-9]/g, '')}" style="color: #9333ea; text-decoration: none;">${SALON_PHONE}</a></p>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">Need to make changes? <a href="${process.env.NEXT_PUBLIC_APP_URL}/appointments/${appointment.id}/reschedule" style="color: ${BRAND_COLOR}; text-decoration: none;">Reschedule</a> or call us at <a href="tel:${SALON_PHONE.replace(/[^0-9]/g, '')}" style="color: ${BRAND_COLOR}; text-decoration: none;">${SALON_PHONE}</a></p>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          
+
           <!-- Footer -->
           <tr>
-            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-              <p style="margin: 0 0 10px; color: #333; font-size: 16px; font-weight: 600;">${SALON_NAME}</p>
-              <p style="margin: 0 0 5px; color: #666; font-size: 14px;">${SALON_ADDRESS}</p>
-              <p style="margin: 0 0 15px; color: #666; font-size: 14px;">${SALON_PHONE}</p>
-              <p style="margin: 0; color: #999; font-size: 12px;">© ${new Date().getFullYear()} ${SALON_NAME}. All rights reserved.</p>
+            <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
+              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 40px; width: auto; margin-bottom: 15px;" />
+              <p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
+              <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${SALON_PHONE}</p>
+              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${SALON_NAME}. All rights reserved.</p>
+              <p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">Houston's Premier Loc Specialists</p>
             </td>
           </tr>
         </table>
@@ -214,7 +224,7 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
 
 function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: number): string {
   const timeLabel = hoursUntil === 24 ? 'tomorrow' : 'today';
-  
+
   return `
 <!DOCTYPE html>
 <html>
@@ -222,42 +232,48 @@ function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: numbe
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-          <!-- Header -->
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+          <!-- Header with Logo -->
           <tr>
-            <td style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); padding: 40px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Appointment Reminder ⏰</h1>
-              <p style="margin: 10px 0 0; color: rgba(255,255,255,0.9); font-size: 16px;">Your appointment is ${timeLabel}!</p>
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${BRAND_COLOR};">
+              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 60px; width: auto;" />
             </td>
           </tr>
-          
+          <!-- Title Banner -->
+          <tr>
+            <td style="background: ${BRAND_GRADIENT}; padding: 30px; text-align: center;">
+              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">Appointment Reminder ⏰</h1>
+              <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">Your appointment is ${timeLabel}!</p>
+            </td>
+          </tr>
+
           <!-- Content -->
           <tr>
             <td style="padding: 40px;">
-              <p style="margin: 0 0 20px; color: #333; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
-              <p style="margin: 0 0 30px; color: #666; font-size: 16px; line-height: 1.6;">This is a friendly reminder about your upcoming appointment at ${SALON_NAME}.</p>
-              
+              <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
+              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">This is a friendly reminder about your upcoming appointment at ${SALON_NAME}.</p>
+
               <!-- Appointment Summary -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fffbeb; border-radius: 12px; padding: 24px; margin-bottom: 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 8px; color: #333; font-size: 20px; font-weight: 600;">${appointment.service_name}</p>
-                    <p style="margin: 0 0 4px; color: #666; font-size: 16px;">📅 ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}</p>
-                    <p style="margin: 0; color: #666; font-size: 16px;">💇 with ${appointment.stylist_name}</p>
+                    <p style="margin: 0 0 8px; color: #ffffff; font-size: 20px; font-weight: 600;">${appointment.service_name}</p>
+                    <p style="margin: 0 0 4px; color: #a1a1aa; font-size: 16px;">📅 ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}</p>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 16px;">💇 with ${appointment.stylist_name}</p>
                   </td>
                 </tr>
               </table>
-              
+
               <!-- Checklist -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: rgba(245, 158, 11, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(245, 158, 11, 0.3);">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 12px; color: #333; font-size: 16px; font-weight: 600;">✅ Pre-Appointment Checklist</p>
-                    <ul style="margin: 0; padding-left: 20px; color: #666; font-size: 14px; line-height: 2;">
+                    <p style="margin: 0 0 12px; color: ${BRAND_COLOR}; font-size: 16px; font-weight: 600;">✅ Pre-Appointment Checklist</p>
+                    <ul style="margin: 0; padding-left: 20px; color: #a1a1aa; font-size: 14px; line-height: 2;">
                       <li>Arrive 10-15 minutes early</li>
                       <li>Hair should be clean and product-free</li>
                       <li>Bring reference photos if you have a specific style in mind</li>
@@ -266,34 +282,37 @@ function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: numbe
                   </td>
                 </tr>
               </table>
-              
+
               <!-- Location -->
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 8px; color: #333; font-size: 16px; font-weight: 600;">📍 Location</p>
-                    <p style="margin: 0; color: #666; font-size: 14px;">${SALON_ADDRESS}</p>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(SALON_ADDRESS)}" style="color: #9333ea; font-size: 14px; text-decoration: none;">Get Directions →</a>
+                    <p style="margin: 0 0 8px; color: #ffffff; font-size: 16px; font-weight: 600;">📍 Location</p>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
+                    <a href="https://maps.google.com/?q=${encodeURIComponent(SALON_ADDRESS)}" style="color: ${BRAND_COLOR}; font-size: 14px; text-decoration: none;">Get Directions →</a>
                   </td>
                 </tr>
               </table>
-              
+
               <!-- CTA -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <p style="margin: 0; color: #666; font-size: 14px;">Can't make it? Please call us at <a href="tel:${SALON_PHONE.replace(/[^0-9]/g, '')}" style="color: #9333ea; text-decoration: none;">${SALON_PHONE}</a> to reschedule.</p>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">Can't make it? Please call us at <a href="tel:${SALON_PHONE.replace(/[^0-9]/g, '')}" style="color: ${BRAND_COLOR}; text-decoration: none;">${SALON_PHONE}</a> to reschedule.</p>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          
+
           <!-- Footer -->
           <tr>
-            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-              <p style="margin: 0; color: #666; font-size: 14px;">See you soon! 💜</p>
-              <p style="margin: 10px 0 0; color: #999; font-size: 12px;">${SALON_NAME} | ${SALON_PHONE}</p>
+            <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
+              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 40px; width: auto; margin-bottom: 15px;" />
+              <p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
+              <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${SALON_PHONE}</p>
+              <p style="margin: 0; color: #71717a; font-size: 12px;">See you soon! ✨</p>
+              <p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">Houston's Premier Loc Specialists</p>
             </td>
           </tr>
         </table>
@@ -313,50 +332,61 @@ function getCancellationEmailHtml(appointment: AppointmentDetails): string {
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f5f5f5; padding: 40px 20px;">
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
     <tr>
       <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-          <!-- Header -->
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+          <!-- Header with Logo -->
           <tr>
-            <td style="background-color: #6b7280; padding: 40px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Appointment Cancelled</h1>
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${BRAND_COLOR};">
+              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 60px; width: auto;" />
             </td>
           </tr>
-          
+          <!-- Title Banner -->
+          <tr>
+            <td style="background-color: #3f3f46; padding: 30px; text-align: center;">
+              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Appointment Cancelled</h1>
+              <p style="margin: 10px 0 0; color: #a1a1aa; font-size: 16px;">We hope to see you again soon</p>
+            </td>
+          </tr>
+
           <!-- Content -->
           <tr>
             <td style="padding: 40px;">
-              <p style="margin: 0 0 20px; color: #333; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
-              <p style="margin: 0 0 30px; color: #666; font-size: 16px; line-height: 1.6;">Your appointment has been cancelled as requested. We're sorry we won't be seeing you this time!</p>
-              
+              <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
+              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">Your appointment has been cancelled as requested. We're sorry we won't be seeing you this time!</p>
+
               <!-- Cancelled Appointment Info -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; border-radius: 12px; padding: 24px; margin-bottom: 30px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 4px; color: #666; font-size: 14px; text-decoration: line-through;">${appointment.service_name}</p>
-                    <p style="margin: 0; color: #666; font-size: 14px; text-decoration: line-through;">${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}</p>
+                    <p style="margin: 0 0 4px; color: #71717a; font-size: 14px; text-decoration: line-through;">${appointment.service_name}</p>
+                    <p style="margin: 0; color: #71717a; font-size: 14px; text-decoration: line-through;">${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}</p>
                   </td>
                 </tr>
               </table>
-              
+
               <!-- Rebook CTA -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom: 20px;">
-                    <p style="margin: 0 0 20px; color: #666; font-size: 16px;">We'd love to see you soon! Book a new appointment when you're ready.</p>
-                    <a href="${process.env.NEXT_PUBLIC_APP_URL}/book" style="display: inline-block; padding: 14px 32px; background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%); color: #ffffff; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">Book New Appointment</a>
+                    <p style="margin: 0 0 20px; color: #a1a1aa; font-size: 16px;">We'd love to see you soon! Book a new appointment when you're ready.</p>
+                    <a href="${process.env.NEXT_PUBLIC_APP_URL}/book" style="display: inline-block; padding: 14px 32px; background: ${BRAND_GRADIENT}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">Book New Appointment</a>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          
+
           <!-- Footer -->
           <tr>
-            <td style="background-color: #f9fafb; padding: 30px; text-align: center; border-top: 1px solid #e5e7eb;">
-              <p style="margin: 0; color: #999; font-size: 12px;">${SALON_NAME} | ${SALON_PHONE}</p>
+            <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
+              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 40px; width: auto; margin-bottom: 15px;" />
+              <p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
+              <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${SALON_PHONE}</p>
+              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${SALON_NAME}. All rights reserved.</p>
+              <p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">Houston's Premier Loc Specialists</p>
             </td>
           </tr>
         </table>
@@ -625,4 +655,181 @@ export async function notifyStylistNewBooking(
       console.error('[SMS] Failed to notify stylist:', error);
     }
   }
+}
+
+// ============================================
+// NEWSLETTER FUNCTIONS
+// ============================================
+
+export interface NewsletterContent {
+  subject: string;
+  previewText?: string;
+  headline: string;
+  content: string; // HTML content
+  ctaText?: string;
+  ctaUrl?: string;
+}
+
+function getNewsletterEmailHtml(
+  content: NewsletterContent,
+  subscriberEmail: string
+): string {
+  const unsubscribeToken = Buffer.from(subscriberEmail.toLowerCase()).toString('base64');
+  const unsubscribeUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriberEmail)}&token=${unsubscribeToken}`;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="x-apple-disable-message-reformatting">
+  ${content.previewText ? `<!--[if !mso]><!--><meta http-equiv="X-UA-Compatible" content="IE=edge"><!--<![endif]--><span style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${content.previewText}</span>` : ''}
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
+          <!-- Header with Logo -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${BRAND_COLOR};">
+              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 60px; width: auto;" />
+            </td>
+          </tr>
+
+          <!-- Headline Banner -->
+          <tr>
+            <td style="background: ${BRAND_GRADIENT}; padding: 30px; text-align: center;">
+              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">${content.headline}</h1>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <div style="color: #a1a1aa; font-size: 16px; line-height: 1.8;">
+                ${content.content}
+              </div>
+
+              ${content.ctaText && content.ctaUrl ? `
+              <!-- CTA Button -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 30px;">
+                <tr>
+                  <td align="center">
+                    <a href="${content.ctaUrl}" style="display: inline-block; padding: 16px 40px; background: ${BRAND_GRADIENT}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 700; font-size: 16px;">${content.ctaText}</a>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+            </td>
+          </tr>
+
+          <!-- Divider -->
+          <tr>
+            <td style="padding: 0 40px;">
+              <hr style="border: none; border-top: 1px solid #3f3f46; margin: 0;" />
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
+              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 40px; width: auto; margin-bottom: 15px;" />
+              <p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
+              <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">
+                <a href="tel:${SALON_PHONE.replace(/[^0-9]/g, '')}" style="color: ${BRAND_COLOR}; text-decoration: none;">${SALON_PHONE}</a>
+              </p>
+
+              <!-- Social Links -->
+              <p style="margin: 0 0 20px;">
+                <a href="https://instagram.com/kelatic" style="color: ${BRAND_COLOR}; text-decoration: none; margin: 0 10px;">Instagram</a>
+                <a href="${process.env.NEXT_PUBLIC_APP_URL}/book" style="color: ${BRAND_COLOR}; text-decoration: none; margin: 0 10px;">Book Now</a>
+              </p>
+
+              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${SALON_NAME}. All rights reserved.</p>
+              <p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">Houston's Premier Loc Specialists</p>
+
+              <!-- Unsubscribe -->
+              <p style="margin: 20px 0 0; color: #52525b; font-size: 11px;">
+                Don't want to receive these emails? <a href="${unsubscribeUrl}" style="color: #52525b; text-decoration: underline;">Unsubscribe</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
+
+export async function sendNewsletterEmail(
+  to: string,
+  content: NewsletterContent
+): Promise<{ success: boolean; messageId?: string; error?: string }> {
+  if (!process.env.SENDGRID_API_KEY) {
+    console.log('[Newsletter] SendGrid not configured, skipping email');
+    return { success: false, error: 'SendGrid not configured' };
+  }
+
+  try {
+    const [response] = await sgMail.send({
+      to,
+      from: {
+        email: FROM_EMAIL,
+        name: SALON_NAME,
+      },
+      subject: content.subject,
+      html: getNewsletterEmailHtml(content, to),
+    });
+
+    console.log(`[Newsletter] Email sent to ${to}`);
+    return {
+      success: true,
+      messageId: response.headers['x-message-id'] as string,
+    };
+  } catch (error) {
+    console.error('[Newsletter] Failed to send:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+export async function sendBulkNewsletter(
+  subscribers: Array<{ email: string; firstName?: string }>,
+  content: NewsletterContent
+): Promise<{
+  sent: number;
+  failed: number;
+  results: Array<{ email: string; success: boolean; error?: string }>;
+}> {
+  const results: Array<{ email: string; success: boolean; error?: string }> = [];
+  let sent = 0;
+  let failed = 0;
+
+  // Send emails with rate limiting (100 emails per second is SendGrid's limit)
+  for (const subscriber of subscribers) {
+    const result = await sendNewsletterEmail(subscriber.email, content);
+    results.push({
+      email: subscriber.email,
+      success: result.success,
+      error: result.error,
+    });
+
+    if (result.success) {
+      sent++;
+    } else {
+      failed++;
+    }
+
+    // Small delay to respect rate limits
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+
+  console.log(`[Newsletter] Bulk send complete: ${sent} sent, ${failed} failed`);
+  return { sent, failed, results };
 }
