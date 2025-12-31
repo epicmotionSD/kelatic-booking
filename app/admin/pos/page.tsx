@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/lib/currency';
 import { CheckoutModal } from '@/components/pos/checkout-modal';
+import { WalkInModal } from '@/components/pos/walk-in-modal';
 import { ReaderStatus } from '@/components/pos/reader-status';
 import type { AppointmentWithDetails } from '@/types/database';
 
@@ -10,6 +11,7 @@ export default function POSPage() {
   const [appointments, setAppointments] = useState<AppointmentWithDetails[]>([]);
   const [selectedAppointment, setSelectedAppointment] = useState<AppointmentWithDetails | null>(null);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isWalkInOpen, setIsWalkInOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'ready' | 'completed'>('ready');
 
@@ -39,6 +41,22 @@ export default function POSPage() {
     setIsCheckoutOpen(false);
     setSelectedAppointment(null);
     fetchTodaysAppointments(); // Refresh list
+  }
+
+  async function handleWalkInComplete(appointmentId: string) {
+    setIsWalkInOpen(false);
+    // Fetch the newly created appointment and open checkout
+    try {
+      const res = await fetch(`/api/admin/appointments/${appointmentId}`);
+      const data = await res.json();
+      if (data.appointment) {
+        setSelectedAppointment(data.appointment);
+        setIsCheckoutOpen(true);
+      }
+    } catch (error) {
+      console.error('Failed to fetch walk-in appointment:', error);
+    }
+    fetchTodaysAppointments();
   }
 
   const filteredAppointments = appointments.filter((apt) => {
@@ -197,9 +215,7 @@ export default function POSPage() {
         {/* Walk-in Button */}
         <div className="fixed bottom-6 right-6">
           <button
-            onClick={() => {
-              // TODO: Open walk-in modal
-            }}
+            onClick={() => setIsWalkInOpen(true)}
             className="px-6 py-3 bg-gray-900 text-white rounded-full font-medium shadow-lg hover:bg-gray-800 transition-colors flex items-center gap-2"
           >
             <svg
@@ -219,6 +235,13 @@ export default function POSPage() {
           </button>
         </div>
       </main>
+
+      {/* Walk-in Modal */}
+      <WalkInModal
+        isOpen={isWalkInOpen}
+        onClose={() => setIsWalkInOpen(false)}
+        onComplete={handleWalkInComplete}
+      />
 
       {/* Checkout Modal */}
       {selectedAppointment && (
