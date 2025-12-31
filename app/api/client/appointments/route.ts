@@ -62,20 +62,26 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform data
-    const formattedAppointments = appointments?.map(apt => ({
-      id: apt.id,
-      start_time: apt.start_time,
-      end_time: apt.end_time,
-      status: apt.status,
-      quoted_price: apt.quoted_price,
-      final_price: apt.final_price,
-      client_notes: apt.client_notes,
-      stylist_name: apt.stylist ? `${apt.stylist.first_name} ${apt.stylist.last_name}` : 'TBD',
-      stylist_id: apt.stylist?.id,
-      service_name: apt.service?.name || 'Service',
-      service_duration: apt.service?.duration || 60,
-      service_category: apt.service?.category,
-    })) || [];
+    const formattedAppointments = appointments?.map(apt => {
+      // Supabase returns joined data - handle both array and object cases
+      const stylist = Array.isArray(apt.stylist) ? apt.stylist[0] : apt.stylist;
+      const service = Array.isArray(apt.service) ? apt.service[0] : apt.service;
+
+      return {
+        id: apt.id,
+        start_time: apt.start_time,
+        end_time: apt.end_time,
+        status: apt.status,
+        quoted_price: apt.quoted_price,
+        final_price: apt.final_price,
+        client_notes: apt.client_notes,
+        stylist_name: stylist ? `${stylist.first_name} ${stylist.last_name}` : 'TBD',
+        stylist_id: stylist?.id,
+        service_name: service?.name || 'Service',
+        service_duration: service?.duration || 60,
+        service_category: service?.category,
+      };
+    }) || [];
 
     return NextResponse.json({
       appointments: formattedAppointments,

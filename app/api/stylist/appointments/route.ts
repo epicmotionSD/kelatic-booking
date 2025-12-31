@@ -83,25 +83,31 @@ export async function GET(request: NextRequest) {
     }
 
     // Transform data for easier frontend consumption
-    const formattedAppointments = appointments?.map(apt => ({
-      id: apt.id,
-      start_time: apt.start_time,
-      end_time: apt.end_time,
-      status: apt.status,
-      quoted_price: apt.quoted_price,
-      client_notes: apt.client_notes,
-      stylist_notes: apt.stylist_notes,
-      is_walk_in: apt.is_walk_in,
-      client_name: apt.is_walk_in
-        ? apt.walk_in_name
-        : apt.client
-          ? `${apt.client.first_name} ${apt.client.last_name}`
-          : 'Unknown',
-      client_phone: apt.is_walk_in ? apt.walk_in_phone : apt.client?.phone,
-      client_email: apt.client?.email,
-      service_name: apt.service?.name || 'Service',
-      service_duration: apt.service?.duration || 60,
-    })) || [];
+    const formattedAppointments = appointments?.map(apt => {
+      // Supabase returns joined data - handle both array and object cases
+      const client = Array.isArray(apt.client) ? apt.client[0] : apt.client;
+      const service = Array.isArray(apt.service) ? apt.service[0] : apt.service;
+
+      return {
+        id: apt.id,
+        start_time: apt.start_time,
+        end_time: apt.end_time,
+        status: apt.status,
+        quoted_price: apt.quoted_price,
+        client_notes: apt.client_notes,
+        stylist_notes: apt.stylist_notes,
+        is_walk_in: apt.is_walk_in,
+        client_name: apt.is_walk_in
+          ? apt.walk_in_name
+          : client
+            ? `${client.first_name} ${client.last_name}`
+            : 'Unknown',
+        client_phone: apt.is_walk_in ? apt.walk_in_phone : client?.phone,
+        client_email: client?.email,
+        service_name: service?.name || 'Service',
+        service_duration: service?.duration || 60,
+      };
+    }) || [];
 
     return NextResponse.json({
       appointments: formattedAppointments,
