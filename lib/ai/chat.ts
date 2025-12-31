@@ -49,7 +49,15 @@ When helping with bookings:
 4. Collect their information if they're a new client
 5. Confirm the booking details
 
-Be conversational and helpful. Use the tools available to look up real-time service info and availability. If you don't know something specific, offer to have someone from the salon follow up.`;
+Be conversational and helpful. Use the tools available to look up real-time service info and availability. If you don't know something specific, offer to have someone from the salon follow up.
+
+Formatting guidelines:
+- Keep responses concise and scannable
+- When listing services, don't repeat everything verbatim - summarize or highlight what's relevant
+- NO markdown formatting (no ##, **, etc) - this is plain text chat
+- Use simple bullet points (•) or dashes (-) for lists
+- Avoid emojis except sparingly
+- The [id:xxx] in tool results is for your internal use when booking - never show IDs to clients`;
 
 // ============================================
 // TOOLS FOR CLAUDE
@@ -170,13 +178,29 @@ async function handleToolCall(
         return 'No services found.';
       }
 
-      return services
-        .map(
-          (s) =>
-            `${s.name} (${s.category}): $${s.base_price} - ${s.duration} mins${
-              s.deposit_required ? ` (Deposit: $${s.deposit_amount})` : ''
-            }\nID: ${s.id}\n${s.description || ''}`
-        )
+      // Group services by category for cleaner output
+      const grouped: Record<string, typeof services> = {};
+      for (const s of services) {
+        if (!grouped[s.category]) grouped[s.category] = [];
+        grouped[s.category].push(s);
+      }
+
+      const categoryNames: Record<string, string> = {
+        locs: 'Locs',
+        braids: 'Braids',
+        natural: 'Natural Hair',
+        silk_press: 'Silk Press',
+        treatments: 'Treatments',
+      };
+
+      return Object.entries(grouped)
+        .map(([cat, items]) => {
+          const title = categoryNames[cat] || cat;
+          const list = items
+            .map((s) => `• ${s.name} – $${s.base_price} (${Math.round(s.duration / 60 * 10) / 10}hrs) [id:${s.id}]`)
+            .join('\n');
+          return `${title}:\n${list}`;
+        })
         .join('\n\n');
     }
 
