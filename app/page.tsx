@@ -63,7 +63,7 @@ export default function LandingPage() {
 
       if (stylistsRes.ok) {
         const data = await stylistsRes.json();
-        setStylists(data.stylists?.slice(0, 3) || []);
+        setStylists(data.stylists || []);
       }
     } catch (error) {
       console.error('Failed to fetch data:', error);
@@ -372,7 +372,7 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-5xl font-black mt-2">Meet The Team</h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {featuredStylists.map((stylist) => (
               <div key={stylist.id} className="group">
                 <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/5 overflow-hidden relative mb-5 group-hover:border-amber-400/30 transition-colors">

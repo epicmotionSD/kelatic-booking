@@ -1,10 +1,11 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
+import { Suspense } from "react";
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -12,6 +13,18 @@ export default function LoginPage() {
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const redirectTo = searchParams.get('redirect') || '/admin';
+  const loginType = searchParams.get('type') || 'admin';
+
+  const titles: Record<string, { title: string; subtitle: string }> = {
+    admin: { title: 'Admin Login', subtitle: 'Sign in to admin dashboard' },
+    stylist: { title: 'Stylist Portal', subtitle: 'View your appointments' },
+    client: { title: 'Client Login', subtitle: 'View your bookings' },
+  };
+
+  const { title, subtitle } = titles[loginType] || titles.admin;
 
   async function handleResetPassword(e: React.FormEvent) {
     e.preventDefault();
@@ -35,13 +48,37 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
     const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
     if (error) {
       setError(error.message);
-    } else {
-      router.push("/admin");
+      setLoading(false);
+      return;
     }
+
+    // For stylist/client logins, verify role
+    if (loginType === 'stylist' || loginType === 'client') {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', data.user.id)
+        .single();
+
+      if (loginType === 'stylist' && !['stylist', 'admin', 'owner'].includes(profile?.role || '')) {
+        setError('This account is not registered as a stylist');
+        await supabase.auth.signOut();
+        setLoading(false);
+        return;
+      }
+
+      if (loginType === 'client' && profile?.role !== 'client') {
+        // For admins/stylists trying to access client portal, still allow
+        // They can see it from client perspective
+      }
+    }
+
+    setLoading(false);
+    router.push(redirectTo);
   }
 
   return (
@@ -63,8 +100,8 @@ export default function LoginPage() {
           onSubmit={handleLogin}
           className="bg-zinc-900/50 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl"
         >
-          <h1 className="text-2xl font-black text-white mb-2 text-center">Welcome Back</h1>
-          <p className="text-white/50 text-center mb-8">Sign in to admin dashboard</p>
+          <h1 className="text-2xl font-black text-white mb-2 text-center">{title}</h1>
+          <p className="text-white/50 text-center mb-8">{subtitle}</p>
 
           <div className="space-y-5">
             <div>
@@ -129,5 +166,17 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400" />
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }
