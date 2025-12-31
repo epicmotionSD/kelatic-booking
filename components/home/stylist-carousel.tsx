@@ -105,7 +105,7 @@ export function StylistCarousel() {
     );
   }
 
-  // Single video - show simple layout without carousel
+  // Single video - show simple layout without carousel (matches original)
   if (videos.length === 1) {
     const video = videos[0];
     const videoId = getYouTubeId(video.youtube_url);
@@ -118,55 +118,38 @@ export function StylistCarousel() {
             <p className="text-white/50 text-lg">Watch the transformation</p>
           </div>
 
-          <div className="max-w-md mx-auto">
-            <div className="bg-zinc-900 rounded-3xl overflow-hidden border border-white/10">
-              <div className="aspect-[9/16] max-h-[500px]">
-                {videoId ? (
-                  <iframe
-                    className="w-full h-full"
-                    src={`https://www.youtube.com/embed/${videoId}`}
-                    title={video.title || 'Stylist Video'}
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                ) : (
-                  <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
-                    <span className="text-white/30">Video unavailable</span>
-                  </div>
-                )}
+          {/* Video - same as original layout */}
+          <div className="aspect-[9/16] max-w-md mx-auto rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10 border border-white/10">
+            {videoId ? (
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube.com/embed/${videoId}`}
+                title={video.title || 'Stylist Video'}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <div className="w-full h-full bg-zinc-800 flex items-center justify-center">
+                <span className="text-white/30">Video unavailable</span>
               </div>
-
-              <div className="p-6">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center border border-amber-400/30">
-                    <span className="text-lg font-bold text-amber-400">
-                      {video.stylist.first_name[0]}
-                    </span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-white">
-                      {video.stylist.first_name} {video.stylist.last_name}
-                    </h3>
-                    {video.stylist.specialties && (
-                      <p className="text-amber-400 text-sm">
-                        {video.stylist.specialties.slice(0, 2).join(' | ')}
-                      </p>
-                    )}
-                  </div>
-                </div>
-
-                {video.stylist.id && (
-                  <Link
-                    href={`/book?stylist=${video.stylist.id}`}
-                    className="w-full flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
-                  >
-                    <Calendar className="w-5 h-5" />
-                    Book with {video.stylist.first_name}
-                  </Link>
-                )}
-              </div>
-            </div>
+            )}
           </div>
+
+          {/* Stylist info below video */}
+          {video.stylist.id && (
+            <div className="max-w-md mx-auto mt-6 text-center">
+              <p className="text-white/50 mb-3">
+                Work by <span className="text-amber-400 font-semibold">{video.stylist.first_name} {video.stylist.last_name}</span>
+              </p>
+              <Link
+                href={`/book?stylist=${video.stylist.id}`}
+                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+              >
+                <Calendar className="w-5 h-5" />
+                Book with {video.stylist.first_name}
+              </Link>
+            </div>
+          )}
         </div>
       </section>
     );
