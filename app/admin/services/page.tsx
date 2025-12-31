@@ -11,6 +11,7 @@ const CATEGORY_LABELS: Record<ServiceCategory, string> = {
   silk_press: 'Silk Press',
   color: 'Color',
   treatments: 'Treatments',
+  barber: 'Barber',
   other: 'Other',
 };
 

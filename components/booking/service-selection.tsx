@@ -12,7 +12,7 @@ interface ServiceSelectionProps {
 }
 
 const CATEGORY_LABELS: Record<ServiceCategory, string> = {
-  locs: 'Locs',
+  locs: 'Loc Services',
   braids: 'Braids',
   natural: 'Natural Hair',
   silk_press: 'Silk Press',
@@ -22,16 +22,11 @@ const CATEGORY_LABELS: Record<ServiceCategory, string> = {
   other: 'Other',
 };
 
-const CATEGORY_ORDER: ServiceCategory[] = [
-  'locs',
-  'braids',
-  'natural',
-  'silk_press',
-  'color',
-  'treatments',
-  'barber',
-  'other',
-];
+// Category display order
+const CATEGORY_ORDER: ServiceCategory[] = ['locs', 'barber', 'braids', 'natural', 'silk_press', 'color', 'treatments', 'other'];
+
+// Only show locs and barber categories in public booking - Kelatic specializes in locs
+const PUBLIC_CATEGORIES: ServiceCategory[] = ['locs', 'barber'];
 
 export function ServiceSelection({
   selectedService,
@@ -62,10 +57,11 @@ export function ServiceSelection({
     }
   }
 
-  // If category filter is set, filter base services first
+  // Filter to only public categories (locs & barber) - Kelatic specializes in locs
+  // If specific category filter is set, use that; otherwise show all public categories
   const baseServices = categoryFilter
     ? services.filter((s) => s.category === categoryFilter)
-    : services;
+    : services.filter((s) => PUBLIC_CATEGORIES.includes(s.category));
 
   // Group services by category
   const servicesByCategory = baseServices.reduce((acc, service) => {
@@ -76,9 +72,9 @@ export function ServiceSelection({
     return acc;
   }, {} as Record<ServiceCategory, Service[]>);
 
-  // Get categories that have services
+  // Get categories that have services - only show public categories (locs & barber)
   const availableCategories = CATEGORY_ORDER.filter(
-    (cat) => servicesByCategory[cat]?.length > 0
+    (cat) => PUBLIC_CATEGORIES.includes(cat) && servicesByCategory[cat]?.length > 0
   );
 
   // Filter services by active category
