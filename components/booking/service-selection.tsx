@@ -8,6 +8,7 @@ interface ServiceSelectionProps {
   selectedService: Service | null;
   selectedAddons: Service[];
   onSelect: (service: Service, addons: Service[]) => void;
+  categoryFilter?: ServiceCategory; // Filter to only show services from this category
 }
 
 const CATEGORY_LABELS: Record<ServiceCategory, string> = {
@@ -17,6 +18,7 @@ const CATEGORY_LABELS: Record<ServiceCategory, string> = {
   silk_press: 'Silk Press',
   color: 'Color',
   treatments: 'Treatments',
+  barber: 'Barber',
   other: 'Other',
 };
 
@@ -27,6 +29,7 @@ const CATEGORY_ORDER: ServiceCategory[] = [
   'silk_press',
   'color',
   'treatments',
+  'barber',
   'other',
 ];
 
@@ -34,10 +37,11 @@ export function ServiceSelection({
   selectedService,
   selectedAddons,
   onSelect,
+  categoryFilter,
 }: ServiceSelectionProps) {
   const [services, setServices] = useState<Service[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeCategory, setActiveCategory] = useState<ServiceCategory | 'all'>('all');
+  const [activeCategory, setActiveCategory] = useState<ServiceCategory | 'all'>(categoryFilter || 'all');
   const [selected, setSelected] = useState<Service | null>(selectedService);
   const [addons, setAddons] = useState<Service[]>(selectedAddons);
   const [showAddons, setShowAddons] = useState(false);
@@ -58,8 +62,13 @@ export function ServiceSelection({
     }
   }
 
+  // If category filter is set, filter base services first
+  const baseServices = categoryFilter
+    ? services.filter((s) => s.category === categoryFilter)
+    : services;
+
   // Group services by category
-  const servicesByCategory = services.reduce((acc, service) => {
+  const servicesByCategory = baseServices.reduce((acc, service) => {
     if (!acc[service.category]) {
       acc[service.category] = [];
     }
@@ -75,8 +84,8 @@ export function ServiceSelection({
   // Filter services by active category
   const filteredServices =
     activeCategory === 'all'
-      ? services
-      : services.filter((s) => s.category === activeCategory);
+      ? baseServices
+      : baseServices.filter((s) => s.category === activeCategory);
 
   // Add-on services (treatments)
   const addonServices = services.filter(
@@ -121,34 +130,38 @@ export function ServiceSelection({
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-6">Select a Service</h2>
+      <h2 className="text-xl font-bold text-white mb-6">
+        {categoryFilter ? `Select a ${CATEGORY_LABELS[categoryFilter]} Service` : 'Select a Service'}
+      </h2>
 
-      {/* Category Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-4 mb-6 -mx-4 px-4">
-        <button
-          onClick={() => setActiveCategory('all')}
-          className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-            activeCategory === 'all'
-              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-              : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
-          }`}
-        >
-          All Services
-        </button>
-        {availableCategories.map((category) => (
+      {/* Category Tabs - hide when filtered to single category */}
+      {!categoryFilter && (
+        <div className="flex gap-2 overflow-x-auto pb-4 mb-6 -mx-4 px-4">
           <button
-            key={category}
-            onClick={() => setActiveCategory(category)}
+            onClick={() => setActiveCategory('all')}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-              activeCategory === category
+              activeCategory === 'all'
                 ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
                 : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
             }`}
           >
-            {CATEGORY_LABELS[category]}
+            All Services
           </button>
-        ))}
-      </div>
+          {availableCategories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
+                activeCategory === category
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
+                  : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+              }`}
+            >
+              {CATEGORY_LABELS[category]}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Service List */}
       <div className="space-y-3">

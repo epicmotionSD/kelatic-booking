@@ -9,7 +9,7 @@ import { DateTimeSelection } from '@/components/booking/datetime-selection';
 import { ClientInfo } from '@/components/booking/client-info';
 import { PaymentStep } from '@/components/booking/payment-step';
 import { Confirmation } from '@/components/booking/confirmation';
-import type { Service, Profile, TimeSlot } from '@/types/database';
+import type { Service, Profile, TimeSlot, ServiceCategory } from '@/types/database';
 
 export type BookingStep = 'service' | 'stylist' | 'datetime' | 'info' | 'payment' | 'confirmation';
 
@@ -57,6 +57,7 @@ function BookingContent() {
   const searchParams = useSearchParams();
   const preselectedStylistId = searchParams.get('stylist');
   const preselectedServiceId = searchParams.get('service');
+  const categoryFilter = searchParams.get('category') as ServiceCategory | null;
 
   const [currentStep, setCurrentStep] = useState<BookingStep>('service');
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
@@ -229,6 +230,7 @@ function BookingContent() {
           <ServiceSelection
             selectedService={bookingData.service}
             selectedAddons={bookingData.addons}
+            categoryFilter={categoryFilter || undefined}
             onSelect={(service, addons) => {
               updateBookingData({ service, addons });
               goToStep('stylist');

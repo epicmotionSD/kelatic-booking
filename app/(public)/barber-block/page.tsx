@@ -79,7 +79,7 @@ export default function BarberBlockPage() {
           </p>
           {barbers.length > 0 && (
             <Link
-              href={`/book?stylist=${barbers[0].id}`}
+              href={`/book?stylist=${barbers[0].id}&category=barber`}
               className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-red-500/30 transition-all"
             >
               <Calendar className="w-6 h-6" />
@@ -159,7 +159,7 @@ export default function BarberBlockPage() {
 
                     <div className="flex gap-3">
                       <Link
-                        href={`/book?stylist=${barber.id}`}
+                        href={`/book?stylist=${barber.id}&category=barber`}
                         className="flex-1 flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-red-500/30 transition-all"
                       >
                         <Calendar className="w-5 h-5" />

@@ -5,7 +5,7 @@ export type UserRole = 'client' | 'stylist' | 'admin' | 'owner';
 export type AppointmentStatus = 'pending' | 'confirmed' | 'in_progress' | 'completed' | 'cancelled' | 'no_show';
 export type PaymentStatus = 'pending' | 'paid' | 'partial' | 'refunded' | 'failed';
 export type PaymentMethod = 'card_online' | 'card_terminal' | 'cash' | 'other';
-export type ServiceCategory = 'locs' | 'braids' | 'natural' | 'silk_press' | 'color' | 'treatments' | 'other';
+export type ServiceCategory = 'locs' | 'braids' | 'natural' | 'silk_press' | 'color' | 'treatments' | 'barber' | 'other';
 
 // ============================================
 // CORE TYPES
