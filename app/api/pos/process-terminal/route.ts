@@ -29,10 +29,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (!readers.data.length) {
+      // Check if there are any readers at all (even offline)
+      const allReaders = await stripe.terminal.readers.list({
+        location: locationId,
+      });
+
+      if (allReaders.data.length === 0) {
+        return NextResponse.json(
+          { error: 'No readers registered for this location' },
+          { status: 400 }
+        );
+      }
+
+      const readerStatuses = allReaders.data.map(r => `${r.label || r.id}: ${r.status}`).join(', ');
       return NextResponse.json(
-        { error: 'No online readers available' },
+        { error: `No online readers. Current status: ${readerStatuses}` },
         { status: 400 }
-      );
+        );
     }
 
     // Use the first available reader (in a multi-reader setup, you'd want to select)
