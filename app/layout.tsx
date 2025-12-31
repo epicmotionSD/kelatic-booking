@@ -5,15 +5,15 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Kelatic Hair Lounge | Houston\'s Loc Experts',
-  description: 'Loc In With Houston\'s Loc Experts. Professional hair care services specializing in locs, braids, and natural hair styling. Located at 9430 Richmond Ave, Houston, TX.',
-  keywords: ['hair salon', 'locs', 'braids', 'natural hair', 'Houston', 'black hair care', 'loc maintenance', 'hair styling'],
+  title: 'Kelatic Hair Lounge | Houston\'s Loc Specialists',
+  description: 'Loc In With Houston\'s Loc Specialists. Expert loc installation, maintenance, retwists, and styling. Founded by The Loc Gawd with 15+ years experience. Located at 9430 Richmond Ave, Houston, TX.',
+  keywords: ['locs', 'loctician', 'Houston locs', 'loc retwist', 'starter locs', 'loc maintenance', 'loc specialist', 'The Loc Gawd'],
   icons: {
     icon: '/favicon.svg',
   },
   openGraph: {
-    title: 'Kelatic Hair Lounge | Houston\'s Loc Experts',
-    description: 'Professional loc care and natural hair styling in Houston, TX. Expert stylists specializing in loc maintenance, braids, and protective styles.',
+    title: 'Kelatic Hair Lounge | Houston\'s Loc Specialists',
+    description: 'Expert loc installation, maintenance, retwists, and styling in Houston, TX. Founded by The Loc Gawd with 15+ years experience.',
     type: 'website',
   },
 };

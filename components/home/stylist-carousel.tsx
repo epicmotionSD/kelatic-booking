@@ -27,7 +27,7 @@ const FALLBACK_VIDEO = {
     id: '',
     first_name: 'Destiny',
     last_name: '',
-    specialties: ['Locs', 'Natural Hair'],
+    specialties: ['Loc Styling', 'Retwists'],
   },
 };
 

@@ -72,22 +72,22 @@ export default function LandingPage() {
 
   const featuredServices = services.length > 0 ? services : [
     { id: '1', name: 'Loc Retwist', category: 'locs', base_price: 85, duration: 90, description: 'Maintain your locs with our expert retwist service' },
-    { id: '2', name: 'Knotless Braids', category: 'braids', base_price: 220, duration: 300, description: 'Beautiful, lightweight knotless braids' },
-    { id: '3', name: 'Starter Locs', category: 'locs', base_price: 200, duration: 180, description: 'Begin your loc journey with us' },
-    { id: '4', name: 'Silk Press', category: 'silk_press', base_price: 95, duration: 120, description: 'Silky smooth straightening without damage' },
-    { id: '5', name: 'Box Braids', category: 'braids', base_price: 180, duration: 240, description: 'Classic box braids, includes hair' },
-    { id: '6', name: 'Wash & Style', category: 'natural', base_price: 65, duration: 75, description: 'Shampoo, condition, and style for natural hair' },
+    { id: '2', name: 'Starter Locs', category: 'locs', base_price: 200, duration: 180, description: 'Begin your loc journey with us' },
+    { id: '3', name: 'Loc Detox', category: 'locs', base_price: 150, duration: 120, description: 'Deep cleanse and rejuvenate your locs' },
+    { id: '4', name: 'Loc Extensions', category: 'locs', base_price: 300, duration: 240, description: 'Add length and fullness to your locs' },
+    { id: '5', name: 'Loc Repair', category: 'locs', base_price: 100, duration: 90, description: 'Fix thinning, breakage, or damaged locs' },
+    { id: '6', name: 'Loc Styling', category: 'locs', base_price: 75, duration: 60, description: 'Updos, styles, and special occasion looks' },
   ];
 
   const featuredStylists = stylists.length > 0 ? stylists : [
-    { id: '1', first_name: 'Kel', last_name: '', bio: 'Master loctician with 15+ years of experience. Known as "The Loc Gawd" for expert loc work and natural hair care.', specialties: ['Locs', 'Natural Hair', 'Braids'], instagram_handle: 'kelatic' },
-    { id: '2', first_name: 'Destiny', last_name: '', bio: 'Creative stylist passionate about braids and protective styles that celebrate natural beauty.', specialties: ['Braids', 'Protective Styles', 'Extensions'], instagram_handle: '' },
-    { id: '3', first_name: 'Shoop', last_name: '', bio: 'Loc specialist with a keen eye for detail and a passion for healthy hair.', specialties: ['Locs', 'Retwists', 'Styling'], instagram_handle: '' },
+    { id: '1', first_name: 'Kel', last_name: '', bio: 'Master loctician with 15+ years of experience. Known as "The Loc Gawd" for expert loc installation and maintenance.', specialties: ['Starter Locs', 'Retwists', 'Loc Repair'], instagram_handle: 'kelatic' },
+    { id: '2', first_name: 'Destiny', last_name: '', bio: 'Skilled loctician specializing in loc styling and creative loc designs.', specialties: ['Loc Styling', 'Retwists', 'Color'], instagram_handle: '' },
+    { id: '3', first_name: 'Shoop', last_name: '', bio: 'Loc specialist with a keen eye for detail and a passion for healthy locs.', specialties: ['Retwists', 'Loc Detox', 'Maintenance'], instagram_handle: '' },
   ];
 
   const testimonials = [
     { name: 'Aisha M.', text: 'Best loc retwist I\'ve ever had! Kel really knows his craft. My locs have never looked better.', rating: 5 },
-    { name: 'Destiny T.', text: 'The knotless braids are absolutely perfect. Light, beautiful, and lasted 8 weeks!', rating: 5 },
+    { name: 'Terrence W.', text: 'Started my loc journey here 2 years ago. The team is amazing and my locs are thriving!', rating: 5 },
     { name: 'Marcus J.', text: 'Finally found a salon that understands men\'s locs. Professional service every time.', rating: 5 },
     { name: 'Keisha R.', text: 'The loc detox was amazing. My scalp feels so clean and my locs are thriving!', rating: 5 },
   ];
@@ -185,7 +185,7 @@ export default function LandingPage() {
                   LOC GAWD
                 </h1>
                 <p className="text-xl text-white/60 max-w-md leading-relaxed">
-                  Houston&apos;s premier destination for locs, braids, and natural hair. Where every crown gets the royal treatment.
+                  Houston&apos;s premier loc specialists. Expert loc installation, maintenance, and styling. Where every crown gets the royal treatment.
                 </p>
               </div>
 
@@ -347,7 +347,7 @@ export default function LandingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { icon: Award, title: 'Expert Stylists', desc: '15+ years mastering locs and natural hair' },
+              { icon: Award, title: 'Loc Experts', desc: '15+ years mastering the art of locs' },
               { icon: Heart, title: 'Healthy Hair', desc: 'Premium products that nourish your crown' },
               { icon: Shield, title: 'Clean & Safe', desc: 'Sanitized tools, welcoming environment' },
               { icon: Calendar, title: 'Easy Booking', desc: 'Book online 24/7, instant confirmation' },
@@ -597,7 +597,7 @@ export default function LandingPage() {
                 </div>
               </div>
               <p className="text-white/50 max-w-sm">
-                Houston&apos;s premier destination for locs, braids, and natural hair. Where every crown gets the royal treatment.
+                Houston&apos;s premier loc specialists. Expert loc installation, maintenance, and styling.
               </p>
             </div>
 
