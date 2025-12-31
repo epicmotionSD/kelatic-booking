@@ -111,7 +111,7 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-8">
               <a href="#services" className="text-gray-600 hover:text-purple-600 transition-colors">Services</a>
               <a href="#stylists" className="text-gray-600 hover:text-purple-600 transition-colors">Our Team</a>
-              <a href="#about" className="text-gray-600 hover:text-purple-600 transition-colors">About</a>
+              <a href="#academy" className="text-gray-600 hover:text-purple-600 transition-colors">Academy</a>
               <a href="#contact" className="text-gray-600 hover:text-purple-600 transition-colors">Contact</a>
               <Link
                 href="/book"
@@ -139,7 +139,7 @@ export default function LandingPage() {
             <div className="flex flex-col gap-4 px-4">
               <a href="#services" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">Services</a>
               <a href="#stylists" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">Our Team</a>
-              <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">About</a>
+              <a href="#academy" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">Academy</a>
               <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2">Contact</a>
               <Link
                 href="/book"
@@ -178,11 +178,15 @@ export default function LandingPage() {
                   Book Appointment
                 </Link>
                 <a
-                  href="#services"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-full font-semibold text-lg hover:border-purple-200 hover:text-purple-600 transition-colors"
+                  href="https://www.youtube.com/@kelatic"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-gray-200 text-gray-700 rounded-full font-semibold text-lg hover:border-red-200 hover:text-red-600 transition-colors"
                 >
-                  View Services
-                  <ChevronRight className="w-5 h-5" />
+                  <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  Watch Our Work
                 </a>
               </div>
 
@@ -205,20 +209,19 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Hero Image */}
+            {/* Hero Image with YouTube Video */}
             <div className="relative">
-              <div className="aspect-[4/5] bg-gradient-to-br from-purple-200 to-purple-400 rounded-3xl overflow-hidden shadow-2xl">
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center text-white p-8">
-                    <div className="w-32 h-32 mx-auto mb-6 bg-white/20 rounded-full flex items-center justify-center backdrop-blur">
-                      <Sparkles className="w-16 h-16" />
-                    </div>
-                    <p className="text-xl font-medium opacity-90">Beautiful Hair Starts Here</p>
-                  </div>
-                </div>
+              <div className="aspect-[9/16] max-h-[500px] bg-black rounded-3xl overflow-hidden shadow-2xl">
+                <iframe
+                  className="w-full h-full"
+                  src="https://www.youtube.com/embed/b9kadh1jTD4"
+                  title="KeLatic Hair Lounge"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
               </div>
-              {/* Floating Cards */}
-              <div className="absolute -left-4 top-1/4 bg-white rounded-xl shadow-lg p-4 hidden lg:block">
+              {/* Floating Cards with Animation */}
+              <div className="absolute -left-4 top-1/4 bg-white rounded-xl shadow-lg p-4 hidden lg:block animate-[float_3s_ease-in-out_infinite]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                     <Clock className="w-5 h-5 text-green-600" />
@@ -229,7 +232,7 @@ export default function LandingPage() {
                   </div>
                 </div>
               </div>
-              <div className="absolute -right-4 bottom-1/4 bg-white rounded-xl shadow-lg p-4 hidden lg:block">
+              <div className="absolute -right-4 bottom-1/3 bg-white rounded-xl shadow-lg p-4 hidden lg:block animate-[float_3s_ease-in-out_infinite_0.5s]">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                     <Star className="w-5 h-5 text-purple-600" />
@@ -238,6 +241,13 @@ export default function LandingPage() {
                     <div className="text-sm font-medium text-gray-900">Top Rated</div>
                     <div className="text-xs text-gray-500">500+ 5-star reviews</div>
                   </div>
+                </div>
+              </div>
+              {/* Wednesday Special Tag */}
+              <div className="absolute -right-2 top-4 bg-gradient-to-r from-yellow-400 to-yellow-500 text-gray-900 rounded-full px-4 py-2 shadow-lg hidden lg:block animate-[float_3s_ease-in-out_infinite_1s]">
+                <div className="flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="font-bold">$75 Wednesdays!</span>
                 </div>
               </div>
             </div>
@@ -427,6 +437,94 @@ export default function LandingPage() {
             <Calendar className="w-5 h-5" />
             Book Your Appointment
           </Link>
+        </div>
+      </section>
+
+      {/* Loc Academy Section */}
+      <section id="academy" className="py-20 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-300 rounded-full text-sm font-medium mb-6 border border-purple-500/30">
+                <Sparkles className="w-4 h-4" />
+                Coming January 5th, 2025
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6">
+                Loc Academy
+              </h2>
+              <p className="text-lg text-gray-300 mb-6 leading-relaxed">
+                Learn the art of locs from The Loc Gawd himself. Our comprehensive training program
+                will teach you everything from starter locs to advanced styling techniques.
+              </p>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-300">Hands-on training with real clients</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-300">Certificate upon completion</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-300">Business & marketing guidance</span>
+                </li>
+                <li className="flex items-center gap-3">
+                  <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <span className="text-gray-300">Small class sizes for personalized attention</span>
+                </li>
+              </ul>
+              <div className="flex flex-col sm:flex-row gap-4">
+                <a
+                  href="mailto:kelatic@gmail.com?subject=Loc Academy Interest"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-purple-600 text-white rounded-full font-semibold text-lg hover:bg-purple-500 transition-all"
+                >
+                  <Mail className="w-5 h-5" />
+                  Get Notified
+                </a>
+                <a
+                  href="https://www.instagram.com/kelatic"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-white/30 text-white rounded-full font-semibold text-lg hover:bg-white/10 transition-colors"
+                >
+                  <Instagram className="w-5 h-5" />
+                  Follow for Updates
+                </a>
+              </div>
+            </div>
+            <div className="relative">
+              <div className="aspect-square bg-gradient-to-br from-purple-600/20 to-purple-800/20 rounded-3xl border border-purple-500/30 flex items-center justify-center">
+                <div className="text-center p-8">
+                  <div className="w-24 h-24 mx-auto mb-6 bg-purple-600 rounded-2xl flex items-center justify-center">
+                    <Award className="w-12 h-12 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-2">Become a Certified Loctician</h3>
+                  <p className="text-purple-300">Start your journey in the loc industry</p>
+                </div>
+              </div>
+              {/* Floating elements */}
+              <div className="absolute -top-4 -right-4 bg-purple-600 text-white rounded-full px-4 py-2 font-bold animate-float">
+                Limited Spots!
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
