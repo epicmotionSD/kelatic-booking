@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ChatWidget } from '@/components/chat/chat-widget';
+import { StylistCarousel } from '@/components/home/stylist-carousel';
 import {
   Calendar,
   Star,
@@ -112,6 +113,7 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-10">
               <a href="#services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</a>
               <a href="#team" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Team</a>
+              <Link href="/barber-block" className="text-sm font-medium text-white/70 hover:text-red-400 transition-colors">Barber Block</Link>
               <a href="#academy" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Academy</a>
               <a href="#contact" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Contact</a>
               <Link
@@ -140,6 +142,7 @@ export default function LandingPage() {
             <div className="flex flex-col gap-4 px-6">
               <a href="#services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Services</a>
               <a href="#team" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Team</a>
+              <Link href="/barber-block" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg hover:text-red-400">Barber Block</Link>
               <a href="#academy" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Academy</a>
               <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Contact</a>
               <Link
@@ -278,24 +281,8 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Video Section */}
-      <section id="video" className="py-24 bg-zinc-950">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-black mb-4">See The Work</h2>
-            <p className="text-white/50 text-lg">Watch the transformation</p>
-          </div>
-          <div className="aspect-[9/16] max-w-md mx-auto rounded-3xl overflow-hidden shadow-2xl shadow-amber-500/10 border border-white/10">
-            <iframe
-              className="w-full h-full"
-              src="https://www.youtube.com/embed/b9kadh1jTD4"
-              title="KeLatic Hair Lounge"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </div>
-      </section>
+      {/* Video Carousel Section */}
+      <StylistCarousel />
 
       {/* Services Section */}
       <section id="services" className="py-24 bg-black">
@@ -416,7 +403,14 @@ export default function LandingPage() {
                 {stylist.specialties && (
                   <p className="text-amber-400 text-sm mb-2">{stylist.specialties.join(' • ')}</p>
                 )}
-                <p className="text-white/50 text-sm line-clamp-2">{stylist.bio}</p>
+                <p className="text-white/50 text-sm line-clamp-2 mb-4">{stylist.bio}</p>
+                <Link
+                  href={`/book?stylist=${stylist.id}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full text-sm font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Book with {stylist.first_name}
+                </Link>
               </div>
             ))}
           </div>

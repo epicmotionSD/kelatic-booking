@@ -7,6 +7,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const serviceId = searchParams.get('serviceId');
+    const barbersOnly = searchParams.get('barbers') === 'true';
 
     const supabase = createAdminClient();
 
@@ -24,7 +25,8 @@ export async function GET(request: NextRequest) {
             bio,
             specialties,
             instagram_handle,
-            is_active
+            is_active,
+            is_barber
           )
         `)
         .eq('service_id', serviceId)
@@ -36,21 +38,32 @@ export async function GET(request: NextRequest) {
       }
 
       // Extract and dedupe stylists
-      const stylists = stylistServices
+      let stylists = stylistServices
         ?.map((ss) => ss.profiles)
         .filter((p: any) => p?.is_active)
-        .filter((p, index, self) => 
+        .filter((p, index, self) =>
           index === self.findIndex((t: any) => t.id === (p as any).id)
         );
 
+      // Filter by barbers if requested
+      if (barbersOnly && stylists) {
+        stylists = stylists.filter((p: any) => p?.is_barber === true);
+      }
+
       return NextResponse.json({ stylists: stylists || [] });
     } else {
-      // Get all active stylists
-      const { data: stylists, error } = await supabase
+      // Get all active stylists (optionally filtered by barbers)
+      let query = supabase
         .from('profiles')
-        .select('id, first_name, last_name, avatar_url, bio, specialties, instagram_handle')
+        .select('id, first_name, last_name, avatar_url, bio, specialties, instagram_handle, is_barber')
         .eq('role', 'stylist')
         .eq('is_active', true);
+
+      if (barbersOnly) {
+        query = query.eq('is_barber', true);
+      }
+
+      const { data: stylists, error } = await query;
 
       if (error) {
         console.error('Error fetching stylists:', error);

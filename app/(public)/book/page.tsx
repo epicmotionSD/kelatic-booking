@@ -1,6 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ServiceSelection } from '@/components/booking/service-selection';
 import { StylistSelection } from '@/components/booking/stylist-selection';
@@ -52,11 +53,68 @@ const STEPS: { key: BookingStep; label: string }[] = [
   { key: 'confirmation', label: 'Confirmed' },
 ];
 
-export default function BookingPage() {
+function BookingContent() {
+  const searchParams = useSearchParams();
+  const preselectedStylistId = searchParams.get('stylist');
+  const preselectedServiceId = searchParams.get('service');
+
   const [currentStep, setCurrentStep] = useState<BookingStep>('service');
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
+  const [initialized, setInitialized] = useState(false);
 
   const currentStepIndex = STEPS.findIndex((s) => s.key === currentStep);
+
+  // Initialize with URL params
+  useEffect(() => {
+    if (initialized) return;
+
+    const initFromParams = async () => {
+      let startStep: BookingStep = 'service';
+      const updates: Partial<BookingData> = {};
+
+      // Pre-fetch stylist if specified (most common use case from video/barber pages)
+      if (preselectedStylistId) {
+        try {
+          const res = await fetch('/api/stylists');
+          const data = await res.json();
+          const stylist = data.stylists?.find((s: Profile) => s.id === preselectedStylistId);
+          if (stylist) {
+            updates.stylist = stylist;
+            updates.anyAvailableStylist = false;
+          }
+        } catch (e) {
+          console.error('Failed to fetch stylist:', e);
+        }
+      }
+
+      // Pre-fetch service if specified
+      if (preselectedServiceId) {
+        try {
+          const res = await fetch('/api/services');
+          const data = await res.json();
+          const service = data.services?.find((s: Service) => s.id === preselectedServiceId);
+          if (service) {
+            updates.service = service;
+            startStep = 'stylist';
+            // If we also have a stylist, skip to datetime
+            if (updates.stylist) {
+              startStep = 'datetime';
+            }
+          }
+        } catch (e) {
+          console.error('Failed to fetch service:', e);
+        }
+      }
+
+      if (Object.keys(updates).length > 0) {
+        setBookingData((prev) => ({ ...prev, ...updates }));
+        setCurrentStep(startStep);
+      }
+      setInitialized(true);
+    };
+
+    initFromParams();
+  }, [preselectedStylistId, preselectedServiceId, initialized]);
 
   function updateBookingData(updates: Partial<BookingData>) {
     setBookingData((prev) => ({ ...prev, ...updates }));
@@ -246,5 +304,26 @@ export default function BookingPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+function BookingLoading() {
+  return (
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+      <div className="flex flex-col items-center gap-4">
+        <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20 animate-pulse">
+          <span className="text-black font-black">K</span>
+        </div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400" />
+      </div>
+    </div>
+  );
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={<BookingLoading />}>
+      <BookingContent />
+    </Suspense>
   );
 }

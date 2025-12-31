@@ -33,6 +33,7 @@ export interface Profile {
   specialties?: string[];
   instagram_handle?: string;
   is_active: boolean;
+  is_barber?: boolean;
   commission_rate?: number;
   
   // Metadata
@@ -242,6 +243,26 @@ export interface ChatMessage {
   content: string;
   tool_calls?: Record<string, unknown>;
   created_at: string;
+}
+
+// ============================================
+// STYLIST VIDEO TYPES
+// ============================================
+
+export interface StylistVideo {
+  id: string;
+  stylist_id: string;
+  youtube_url: string;
+  title?: string;
+  description?: string;
+  sort_order: number;
+  is_featured: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StylistVideoWithProfile extends StylistVideo {
+  stylist: Profile;
 }
 
 // ============================================
