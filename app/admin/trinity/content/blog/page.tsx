@@ -122,7 +122,7 @@ ${result.content}
             href="/admin/trinity"
             className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1 mb-2"
           >
-            ← Back to Trinity AI
+            ← Back to AI Marketing
           </Link>
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-purple-600" />
@@ -269,7 +269,7 @@ ${result.content}
             <div className="text-gray-500 text-center py-16">
               <Sparkles className="w-12 h-12 mx-auto mb-4 text-gray-300" />
               <p>Enter a topic and generate your blog post</p>
-              <p className="text-sm mt-1">Trinity AI will create SEO-optimized content</p>
+              <p className="text-sm mt-1">AI will create SEO-optimized content</p>
             </div>
           )}
         </div>

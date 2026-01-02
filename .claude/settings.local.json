@@ -23,7 +23,17 @@
       "Bash(clip)",
       "Bash(set /p=\"UPDATE profiles SET is_barber = true WHERE first_name = ''London'';\")",
       "Bash(powershell -command \"Set-Clipboard -Value \"\"UPDATE profiles SET is_barber = true WHERE first_name = ''London'';\"\"\")",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(powershell -command \"Get-Content ''c:\\\\Users\\\\shawn\\\\Downloads\\\\kelatic-booking\\\\supabase\\\\migrations\\\\009_newsletter_subscribers.sql'' | Set-Clipboard\")",
+      "Bash(winget install:*)",
+      "Bash(vercel --version:*)",
+      "Bash(stripe:*)",
+      "Bash(pnpm --version:*)",
+      "Bash(where:*)",
+      "Bash(echo:*)",
+      "Bash(xargs:*)",
+      "Bash(powershell -command \"Get-Content ''c:\\\\Users\\\\shawn\\\\Downloads\\\\kelatic-booking\\\\supabase\\\\migrations\\\\010_multi_tenant.sql'' | Set-Clipboard\")",
+      "Bash(powershell -command \"Get-Content ''c:\\\\Users\\\\shawn\\\\Downloads\\\\kelatic-booking\\\\supabase\\\\migrations\\\\010_multi_tenant_full.sql'' | Set-Clipboard\")"
     ]
   }
 }

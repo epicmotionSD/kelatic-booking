@@ -12,18 +12,35 @@ function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [isPlatform, setIsPlatform] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const redirectTo = searchParams.get('redirect') || '/admin';
   const loginType = searchParams.get('type') || 'admin';
 
-  const titles: Record<string, { title: string; subtitle: string }> = {
+  // Detect if we're on the platform root (no subdomain)
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+    const isRootDomain = hostname === 'x3o.ai' || hostname === 'www.x3o.ai';
+    const hasNoSubdomain = isLocalhost || isRootDomain || hostname.endsWith('.vercel.app');
+    setIsPlatform(hasNoSubdomain);
+  }, []);
+
+  const platformTitles: Record<string, { title: string; subtitle: string }> = {
+    admin: { title: 'Command Center', subtitle: 'Access your AI Board of Directors' },
+    stylist: { title: 'Stylist Portal', subtitle: 'View your appointments' },
+    client: { title: 'Client Login', subtitle: 'View your bookings' },
+  };
+
+  const tenantTitles: Record<string, { title: string; subtitle: string }> = {
     admin: { title: 'Admin Login', subtitle: 'Sign in to admin dashboard' },
     stylist: { title: 'Stylist Portal', subtitle: 'View your appointments' },
     client: { title: 'Client Login', subtitle: 'View your bookings' },
   };
 
+  const titles = isPlatform ? platformTitles : tenantTitles;
   const { title, subtitle } = titles[loginType] || titles.admin;
 
   async function handleResetPassword(e: React.FormEvent) {
@@ -85,17 +102,26 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden">
       {/* Background effects */}
       <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-black" />
-      <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-amber-500/5 to-transparent" />
-      <div className="absolute bottom-0 left-0 w-1/2 h-full bg-gradient-to-r from-amber-500/5 to-transparent" />
+      <div className={`absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l to-transparent ${isPlatform ? 'from-violet-500/5' : 'from-amber-500/5'}`} />
+      <div className={`absolute bottom-0 left-0 w-1/2 h-full bg-gradient-to-r to-transparent ${isPlatform ? 'from-fuchsia-500/5' : 'from-amber-500/5'}`} />
 
       <div className="relative z-10 w-full max-w-md px-4">
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center mb-8">
-          <img
-            src="/logo.png"
-            alt="Kelatic Hair Lounge"
-            className="h-16 w-auto"
-          />
+          {isPlatform ? (
+            <div className="flex items-center gap-2">
+              <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-xl flex items-center justify-center font-bold text-white text-lg">
+                x3
+              </div>
+              <span className="text-2xl font-bold text-white">x3o.ai</span>
+            </div>
+          ) : (
+            <img
+              src="/logo.png"
+              alt="Kelatic Hair Lounge"
+              className="h-16 w-auto"
+            />
+          )}
         </Link>
 
         <form
@@ -110,7 +136,11 @@ function LoginForm() {
               <label className="block mb-2 text-sm font-medium text-white/70">Email</label>
               <input
                 type="email"
-                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50 transition-all"
+                className={`w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none transition-all ${
+                  isPlatform
+                    ? 'focus:border-violet-400/50 focus:ring-1 focus:ring-violet-400/50'
+                    : 'focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50'
+                }`}
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -122,7 +152,11 @@ function LoginForm() {
               <label className="block mb-2 text-sm font-medium text-white/70">Password</label>
               <input
                 type="password"
-                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50 transition-all"
+                className={`w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none transition-all ${
+                  isPlatform
+                    ? 'focus:border-violet-400/50 focus:ring-1 focus:ring-violet-400/50'
+                    : 'focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50'
+                }`}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -145,7 +179,11 @@ function LoginForm() {
 
           <button
             type="submit"
-            className="w-full mt-6 py-3.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100"
+            className={`w-full mt-6 py-3.5 rounded-xl font-bold transition-all hover:scale-[1.02] disabled:opacity-50 disabled:hover:scale-100 ${
+              isPlatform
+                ? 'bg-gradient-to-r from-violet-500 to-fuchsia-500 text-white hover:shadow-lg hover:shadow-violet-500/30'
+                : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
+            }`}
             disabled={loading}
           >
             {loading ? "Signing in..." : "Sign In"}
@@ -153,7 +191,11 @@ function LoginForm() {
 
           <button
             type="button"
-            className="w-full mt-3 text-amber-400/70 hover:text-amber-400 text-sm transition-colors"
+            className={`w-full mt-3 text-sm transition-colors ${
+              isPlatform
+                ? 'text-violet-400/70 hover:text-violet-400'
+                : 'text-amber-400/70 hover:text-amber-400'
+            }`}
             onClick={handleResetPassword}
             disabled={resetLoading || !email}
           >
@@ -162,8 +204,8 @@ function LoginForm() {
         </form>
 
         <p className="text-center mt-6 text-white/30 text-sm">
-          <Link href="/" className="hover:text-amber-400 transition-colors">
-            ← Back to website
+          <Link href="/" className={`transition-colors ${isPlatform ? 'hover:text-violet-400' : 'hover:text-amber-400'}`}>
+            ← Back to {isPlatform ? 'platform' : 'website'}
           </Link>
         </p>
       </div>

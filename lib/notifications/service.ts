@@ -1,6 +1,8 @@
 // Notification Service - Email (SendGrid) & SMS (Twilio)
+// Multi-tenant aware - uses business context for branding
 import sgMail from '@sendgrid/mail';
 import twilio from 'twilio';
+import type { Business, BusinessSettings } from '@/lib/tenant';
 
 // Initialize SendGrid
 if (process.env.SENDGRID_API_KEY) {
@@ -12,14 +14,34 @@ const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_T
   ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
   : null;
 
-const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'bookings@kelatic.com';
-const FROM_PHONE = process.env.TWILIO_PHONE_NUMBER || '';
-const SALON_NAME = 'Kelatic Hair Lounge';
-const SALON_PHONE = '(713) 485-4000';
-const SALON_ADDRESS = '9430 Richmond Ave, Houston, TX 77063';
-const LOGO_URL = `${process.env.NEXT_PUBLIC_APP_URL || 'https://kelatic.com'}/logo.png`;
-const BRAND_COLOR = '#f59e0b'; // Amber/Gold
-const BRAND_GRADIENT = 'linear-gradient(135deg, #f59e0b 0%, #eab308 100%)';
+const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+
+// Get business URL
+function getBusinessUrl(business: Business): string {
+  if (business.custom_domain) {
+    return `https://${business.custom_domain}`;
+  }
+  return `https://${business.slug}.${ROOT_DOMAIN}`;
+}
+
+// Get full address string
+function getFullAddress(business: Business): string {
+  const parts = [business.address, business.city, business.state, business.zip].filter(Boolean);
+  return parts.join(', ');
+}
+
+// Get logo URL
+function getLogoUrl(business: Business): string {
+  if (business.logo_url?.startsWith('http')) {
+    return business.logo_url;
+  }
+  return `${getBusinessUrl(business)}${business.logo_url || '/logo.png'}`;
+}
+
+// Get brand gradient
+function getBrandGradient(business: Business): string {
+  return `linear-gradient(135deg, ${business.primary_color} 0%, ${business.secondary_color} 100%)`;
+}
 
 export interface AppointmentDetails {
   id: string;
@@ -29,11 +51,16 @@ export interface AppointmentDetails {
   stylist_name: string;
   service_name: string;
   service_duration: number;
-  appointment_date: string; // ISO date string
-  appointment_time: string; // HH:MM format
+  appointment_date: string;
+  appointment_time: string;
   total_amount: number;
   add_ons?: string[];
   notes?: string;
+}
+
+export interface BusinessContext {
+  business: Business;
+  settings?: BusinessSettings | null;
 }
 
 // Format date for display
@@ -69,7 +96,13 @@ function formatDuration(minutes: number): string {
 // EMAIL TEMPLATES
 // ============================================
 
-function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
+function getConfirmationEmailHtml(appointment: AppointmentDetails, ctx: BusinessContext): string {
+  const { business } = ctx;
+  const siteUrl = getBusinessUrl(business);
+  const logoUrl = getLogoUrl(business);
+  const address = getFullAddress(business);
+  const gradient = getBrandGradient(business);
+
   const addOnsHtml = appointment.add_ons?.length
     ? `<p style="margin: 0; color: #666;">Add-ons: ${appointment.add_ons.join(', ')}</p>`
     : '';
@@ -88,18 +121,18 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
           <!-- Header with Logo -->
           <tr>
-            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${BRAND_COLOR};">
-              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 60px; width: auto;" />
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
+              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
             </td>
           </tr>
           <!-- Title Banner -->
           <tr>
-            <td style="background: ${BRAND_GRADIENT}; padding: 30px; text-align: center;">
+            <td style="background: ${gradient}; padding: 30px; text-align: center;">
               <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">Appointment Confirmed!</h1>
               <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">We're excited to see you</p>
             </td>
           </tr>
-          
+
           <!-- Content -->
           <tr>
             <td style="padding: 40px;">
@@ -113,7 +146,7 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding-bottom: 16px; border-bottom: 1px solid #52525b;">
-                          <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Service</p>
+                          <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Service</p>
                           <p style="margin: 4px 0 0; color: #ffffff; font-size: 18px; font-weight: 600;">${appointment.service_name}</p>
                           ${addOnsHtml}
                         </td>
@@ -123,11 +156,11 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
                           <table width="100%">
                             <tr>
                               <td width="50%">
-                                <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Date</p>
+                                <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Date</p>
                                 <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatDate(appointment.appointment_date)}</p>
                               </td>
                               <td width="50%">
-                                <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Time</p>
+                                <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Time</p>
                                 <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatTime(appointment.appointment_time)}</p>
                               </td>
                             </tr>
@@ -139,11 +172,11 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
                           <table width="100%">
                             <tr>
                               <td width="50%">
-                                <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Stylist</p>
+                                <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Stylist</p>
                                 <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${appointment.stylist_name}</p>
                               </td>
                               <td width="50%">
-                                <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Duration</p>
+                                <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Duration</p>
                                 <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatDuration(appointment.service_duration)}</p>
                               </td>
                             </tr>
@@ -152,31 +185,33 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
                       </tr>
                       <tr>
                         <td style="padding-top: 16px;">
-                          <p style="margin: 0; color: ${BRAND_COLOR}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Total</p>
-                          <p style="margin: 4px 0 0; color: ${BRAND_COLOR}; font-size: 24px; font-weight: 700;">$${appointment.total_amount.toFixed(2)}</p>
+                          <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Total</p>
+                          <p style="margin: 4px 0 0; color: ${business.primary_color}; font-size: 24px; font-weight: 700;">$${appointment.total_amount.toFixed(2)}</p>
                         </td>
                       </tr>
                     </table>
                   </td>
                 </tr>
               </table>
-              
+
               <!-- Location -->
+              ${address ? `
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
                 <tr>
                   <td>
                     <p style="margin: 0 0 8px; color: #ffffff; font-size: 16px; font-weight: 600;">📍 Location</p>
-                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(SALON_ADDRESS)}" style="color: ${BRAND_COLOR}; font-size: 14px; text-decoration: none;">Get Directions →</a>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">${address}</p>
+                    <a href="https://maps.google.com/?q=${encodeURIComponent(address)}" style="color: ${business.primary_color}; font-size: 14px; text-decoration: none;">Get Directions →</a>
                   </td>
                 </tr>
               </table>
+              ` : ''}
 
               <!-- Important Info -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color: rgba(245, 158, 11, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(245, 158, 11, 0.3);">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 12px; color: ${BRAND_COLOR}; font-size: 16px; font-weight: 600;">⚡ Important Reminders</p>
+                    <p style="margin: 0 0 12px; color: ${business.primary_color}; font-size: 16px; font-weight: 600;">⚡ Important Reminders</p>
                     <ul style="margin: 0; padding-left: 20px; color: #a1a1aa; font-size: 14px; line-height: 1.8;">
                       <li>Please arrive 10-15 minutes early</li>
                       <li>Come with clean, product-free hair unless otherwise instructed</li>
@@ -191,12 +226,12 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center" style="padding-bottom: 20px;">
-                    <a href="${process.env.NEXT_PUBLIC_APP_URL}/appointments/${appointment.id}" style="display: inline-block; padding: 14px 32px; background: ${BRAND_GRADIENT}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">View Appointment</a>
+                    <a href="${siteUrl}/appointments/${appointment.id}" style="display: inline-block; padding: 14px 32px; background: ${gradient}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">View Appointment</a>
                   </td>
                 </tr>
                 <tr>
                   <td align="center">
-                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">Need to make changes? <a href="${process.env.NEXT_PUBLIC_APP_URL}/appointments/${appointment.id}/reschedule" style="color: ${BRAND_COLOR}; text-decoration: none;">Reschedule</a> or call us at <a href="tel:${SALON_PHONE.replace(/[^0-9]/g, '')}" style="color: ${BRAND_COLOR}; text-decoration: none;">${SALON_PHONE}</a></p>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">Need to make changes? <a href="${siteUrl}/appointments/${appointment.id}/reschedule" style="color: ${business.primary_color}; text-decoration: none;">Reschedule</a>${business.phone ? ` or call us at <a href="tel:${business.phone.replace(/[^0-9]/g, '')}" style="color: ${business.primary_color}; text-decoration: none;">${business.phone}</a>` : ''}</p>
                   </td>
                 </tr>
               </table>
@@ -206,11 +241,11 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
           <!-- Footer -->
           <tr>
             <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
-              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 40px; width: auto; margin-bottom: 15px;" />
-              <p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
-              <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${SALON_PHONE}</p>
-              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${SALON_NAME}. All rights reserved.</p>
-              <p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">Houston's Premier Loc Specialists</p>
+              <img src="${logoUrl}" alt="${business.name}" style="height: 40px; width: auto; margin-bottom: 15px;" />
+              ${address ? `<p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${address}</p>` : ''}
+              ${business.phone ? `<p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${business.phone}</p>` : ''}
+              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${business.name}. All rights reserved.</p>
+              ${business.tagline ? `<p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">${business.tagline}</p>` : ''}
             </td>
           </tr>
         </table>
@@ -222,7 +257,11 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails): string {
   `;
 }
 
-function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: number): string {
+function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: number, ctx: BusinessContext): string {
+  const { business } = ctx;
+  const logoUrl = getLogoUrl(business);
+  const address = getFullAddress(business);
+  const gradient = getBrandGradient(business);
   const timeLabel = hoursUntil === 24 ? 'tomorrow' : 'today';
 
   return `
@@ -239,13 +278,13 @@ function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: numbe
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
           <!-- Header with Logo -->
           <tr>
-            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${BRAND_COLOR};">
-              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 60px; width: auto;" />
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
+              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
             </td>
           </tr>
           <!-- Title Banner -->
           <tr>
-            <td style="background: ${BRAND_GRADIENT}; padding: 30px; text-align: center;">
+            <td style="background: ${gradient}; padding: 30px; text-align: center;">
               <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">Appointment Reminder ⏰</h1>
               <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">Your appointment is ${timeLabel}!</p>
             </td>
@@ -255,7 +294,7 @@ function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: numbe
           <tr>
             <td style="padding: 40px;">
               <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
-              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">This is a friendly reminder about your upcoming appointment at ${SALON_NAME}.</p>
+              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">This is a friendly reminder about your upcoming appointment at ${business.name}.</p>
 
               <!-- Appointment Summary -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
@@ -272,7 +311,7 @@ function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: numbe
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color: rgba(245, 158, 11, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(245, 158, 11, 0.3);">
                 <tr>
                   <td>
-                    <p style="margin: 0 0 12px; color: ${BRAND_COLOR}; font-size: 16px; font-weight: 600;">✅ Pre-Appointment Checklist</p>
+                    <p style="margin: 0 0 12px; color: ${business.primary_color}; font-size: 16px; font-weight: 600;">✅ Pre-Appointment Checklist</p>
                     <ul style="margin: 0; padding-left: 20px; color: #a1a1aa; font-size: 14px; line-height: 2;">
                       <li>Arrive 10-15 minutes early</li>
                       <li>Hair should be clean and product-free</li>
@@ -284,21 +323,23 @@ function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: numbe
               </table>
 
               <!-- Location -->
+              ${address ? `
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
                 <tr>
                   <td>
                     <p style="margin: 0 0 8px; color: #ffffff; font-size: 16px; font-weight: 600;">📍 Location</p>
-                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(SALON_ADDRESS)}" style="color: ${BRAND_COLOR}; font-size: 14px; text-decoration: none;">Get Directions →</a>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">${address}</p>
+                    <a href="https://maps.google.com/?q=${encodeURIComponent(address)}" style="color: ${business.primary_color}; font-size: 14px; text-decoration: none;">Get Directions →</a>
                   </td>
                 </tr>
               </table>
+              ` : ''}
 
               <!-- CTA -->
               <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                   <td align="center">
-                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">Can't make it? Please call us at <a href="tel:${SALON_PHONE.replace(/[^0-9]/g, '')}" style="color: ${BRAND_COLOR}; text-decoration: none;">${SALON_PHONE}</a> to reschedule.</p>
+                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">Can't make it? ${business.phone ? `Please call us at <a href="tel:${business.phone.replace(/[^0-9]/g, '')}" style="color: ${business.primary_color}; text-decoration: none;">${business.phone}</a> to reschedule.` : `Please contact us to reschedule.`}</p>
                   </td>
                 </tr>
               </table>
@@ -308,11 +349,11 @@ function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: numbe
           <!-- Footer -->
           <tr>
             <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
-              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 40px; width: auto; margin-bottom: 15px;" />
-              <p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
-              <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${SALON_PHONE}</p>
+              <img src="${logoUrl}" alt="${business.name}" style="height: 40px; width: auto; margin-bottom: 15px;" />
+              ${address ? `<p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${address}</p>` : ''}
+              ${business.phone ? `<p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${business.phone}</p>` : ''}
               <p style="margin: 0; color: #71717a; font-size: 12px;">See you soon! ✨</p>
-              <p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">Houston's Premier Loc Specialists</p>
+              ${business.tagline ? `<p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">${business.tagline}</p>` : ''}
             </td>
           </tr>
         </table>
@@ -324,7 +365,13 @@ function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: numbe
   `;
 }
 
-function getCancellationEmailHtml(appointment: AppointmentDetails): string {
+function getCancellationEmailHtml(appointment: AppointmentDetails, ctx: BusinessContext): string {
+  const { business } = ctx;
+  const siteUrl = getBusinessUrl(business);
+  const logoUrl = getLogoUrl(business);
+  const address = getFullAddress(business);
+  const gradient = getBrandGradient(business);
+
   return `
 <!DOCTYPE html>
 <html>
@@ -339,8 +386,8 @@ function getCancellationEmailHtml(appointment: AppointmentDetails): string {
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
           <!-- Header with Logo -->
           <tr>
-            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${BRAND_COLOR};">
-              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 60px; width: auto;" />
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
+              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
             </td>
           </tr>
           <!-- Title Banner -->
@@ -372,7 +419,7 @@ function getCancellationEmailHtml(appointment: AppointmentDetails): string {
                 <tr>
                   <td align="center" style="padding-bottom: 20px;">
                     <p style="margin: 0 0 20px; color: #a1a1aa; font-size: 16px;">We'd love to see you soon! Book a new appointment when you're ready.</p>
-                    <a href="${process.env.NEXT_PUBLIC_APP_URL}/book" style="display: inline-block; padding: 14px 32px; background: ${BRAND_GRADIENT}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">Book New Appointment</a>
+                    <a href="${siteUrl}/book" style="display: inline-block; padding: 14px 32px; background: ${gradient}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">Book New Appointment</a>
                   </td>
                 </tr>
               </table>
@@ -382,11 +429,11 @@ function getCancellationEmailHtml(appointment: AppointmentDetails): string {
           <!-- Footer -->
           <tr>
             <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
-              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 40px; width: auto; margin-bottom: 15px;" />
-              <p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
-              <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${SALON_PHONE}</p>
-              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${SALON_NAME}. All rights reserved.</p>
-              <p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">Houston's Premier Loc Specialists</p>
+              <img src="${logoUrl}" alt="${business.name}" style="height: 40px; width: auto; margin-bottom: 15px;" />
+              ${address ? `<p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${address}</p>` : ''}
+              ${business.phone ? `<p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${business.phone}</p>` : ''}
+              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${business.name}. All rights reserved.</p>
+              ${business.tagline ? `<p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">${business.tagline}</p>` : ''}
             </td>
           </tr>
         </table>
@@ -402,53 +449,62 @@ function getCancellationEmailHtml(appointment: AppointmentDetails): string {
 // SMS TEMPLATES
 // ============================================
 
-function getConfirmationSms(appointment: AppointmentDetails): string {
-  return `✅ ${SALON_NAME} Booking Confirmed!
+function getConfirmationSms(appointment: AppointmentDetails, ctx: BusinessContext): string {
+  const { business } = ctx;
+  const address = getFullAddress(business);
+
+  return `✅ ${business.name} Booking Confirmed!
 
 📅 ${formatDate(appointment.appointment_date)}
 ⏰ ${formatTime(appointment.appointment_time)}
 💇 ${appointment.service_name} with ${appointment.stylist_name}
-
-📍 ${SALON_ADDRESS}
-
-Need to reschedule? Call ${SALON_PHONE}`;
+${address ? `\n📍 ${address}` : ''}
+${business.phone ? `\nNeed to reschedule? Call ${business.phone}` : ''}`;
 }
 
-function getReminderSms(appointment: AppointmentDetails, hoursUntil: number): string {
+function getReminderSms(appointment: AppointmentDetails, hoursUntil: number, ctx: BusinessContext): string {
+  const { business } = ctx;
   const timeLabel = hoursUntil === 24 ? 'tomorrow' : 'today';
-  return `⏰ Reminder: Your ${SALON_NAME} appointment is ${timeLabel}!
+
+  return `⏰ Reminder: Your ${business.name} appointment is ${timeLabel}!
 
 📅 ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}
 💇 ${appointment.service_name}
 
-Please arrive 10 min early. Can't make it? Call ${SALON_PHONE}`;
+Please arrive 10 min early.${business.phone ? ` Can't make it? Call ${business.phone}` : ''}`;
 }
 
-function getCancellationSms(appointment: AppointmentDetails): string {
-  return `Your ${SALON_NAME} appointment on ${formatDate(appointment.appointment_date)} has been cancelled.
+function getCancellationSms(appointment: AppointmentDetails, ctx: BusinessContext): string {
+  const { business } = ctx;
+  const siteUrl = getBusinessUrl(business);
 
-Book a new appointment anytime at ${process.env.NEXT_PUBLIC_APP_URL}/book or call ${SALON_PHONE}`;
+  return `Your ${business.name} appointment on ${formatDate(appointment.appointment_date)} has been cancelled.
+
+Book a new appointment anytime at ${siteUrl}/book${business.phone ? ` or call ${business.phone}` : ''}`;
 }
 
 // ============================================
 // SEND FUNCTIONS
 // ============================================
 
-export async function sendConfirmationEmail(appointment: AppointmentDetails): Promise<boolean> {
+export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx: BusinessContext): Promise<boolean> {
   if (!process.env.SENDGRID_API_KEY) {
     console.log('[Email] SendGrid not configured, skipping confirmation email');
     return false;
   }
 
+  const { business } = ctx;
+  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
+
   try {
     await sgMail.send({
       to: appointment.client_email,
       from: {
-        email: FROM_EMAIL,
-        name: SALON_NAME,
+        email: fromEmail,
+        name: business.name,
       },
       subject: `✨ Appointment Confirmed - ${formatDate(appointment.appointment_date)}`,
-      html: getConfirmationEmailHtml(appointment),
+      html: getConfirmationEmailHtml(appointment, ctx),
     });
     console.log(`[Email] Confirmation sent to ${appointment.client_email}`);
     return true;
@@ -458,21 +514,24 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails): Pr
   }
 }
 
-export async function sendReminderEmail(appointment: AppointmentDetails, hoursUntil: number): Promise<boolean> {
+export async function sendReminderEmail(appointment: AppointmentDetails, hoursUntil: number, ctx: BusinessContext): Promise<boolean> {
   if (!process.env.SENDGRID_API_KEY) {
     console.log('[Email] SendGrid not configured, skipping reminder email');
     return false;
   }
 
+  const { business } = ctx;
+  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
+
   try {
     await sgMail.send({
       to: appointment.client_email,
       from: {
-        email: FROM_EMAIL,
-        name: SALON_NAME,
+        email: fromEmail,
+        name: business.name,
       },
       subject: `⏰ Reminder: Your appointment is ${hoursUntil === 24 ? 'tomorrow' : 'today'}!`,
-      html: getReminderEmailHtml(appointment, hoursUntil),
+      html: getReminderEmailHtml(appointment, hoursUntil, ctx),
     });
     console.log(`[Email] Reminder sent to ${appointment.client_email}`);
     return true;
@@ -482,21 +541,24 @@ export async function sendReminderEmail(appointment: AppointmentDetails, hoursUn
   }
 }
 
-export async function sendCancellationEmail(appointment: AppointmentDetails): Promise<boolean> {
+export async function sendCancellationEmail(appointment: AppointmentDetails, ctx: BusinessContext): Promise<boolean> {
   if (!process.env.SENDGRID_API_KEY) {
     console.log('[Email] SendGrid not configured, skipping cancellation email');
     return false;
   }
 
+  const { business } = ctx;
+  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
+
   try {
     await sgMail.send({
       to: appointment.client_email,
       from: {
-        email: FROM_EMAIL,
-        name: SALON_NAME,
+        email: fromEmail,
+        name: business.name,
       },
-      subject: `Appointment Cancelled - ${SALON_NAME}`,
-      html: getCancellationEmailHtml(appointment),
+      subject: `Appointment Cancelled - ${business.name}`,
+      html: getCancellationEmailHtml(appointment, ctx),
     });
     console.log(`[Email] Cancellation sent to ${appointment.client_email}`);
     return true;
@@ -506,16 +568,18 @@ export async function sendCancellationEmail(appointment: AppointmentDetails): Pr
   }
 }
 
-export async function sendConfirmationSms(appointment: AppointmentDetails): Promise<boolean> {
-  if (!twilioClient || !FROM_PHONE || !appointment.client_phone) {
+export async function sendConfirmationSms(appointment: AppointmentDetails, ctx: BusinessContext): Promise<boolean> {
+  const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
+
+  if (!twilioClient || !fromPhone || !appointment.client_phone) {
     console.log('[SMS] Twilio not configured or no phone number, skipping confirmation SMS');
     return false;
   }
 
   try {
     await twilioClient.messages.create({
-      body: getConfirmationSms(appointment),
-      from: FROM_PHONE,
+      body: getConfirmationSms(appointment, ctx),
+      from: fromPhone,
       to: appointment.client_phone,
     });
     console.log(`[SMS] Confirmation sent to ${appointment.client_phone}`);
@@ -526,16 +590,18 @@ export async function sendConfirmationSms(appointment: AppointmentDetails): Prom
   }
 }
 
-export async function sendReminderSms(appointment: AppointmentDetails, hoursUntil: number): Promise<boolean> {
-  if (!twilioClient || !FROM_PHONE || !appointment.client_phone) {
+export async function sendReminderSms(appointment: AppointmentDetails, hoursUntil: number, ctx: BusinessContext): Promise<boolean> {
+  const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
+
+  if (!twilioClient || !fromPhone || !appointment.client_phone) {
     console.log('[SMS] Twilio not configured or no phone number, skipping reminder SMS');
     return false;
   }
 
   try {
     await twilioClient.messages.create({
-      body: getReminderSms(appointment, hoursUntil),
-      from: FROM_PHONE,
+      body: getReminderSms(appointment, hoursUntil, ctx),
+      from: fromPhone,
       to: appointment.client_phone,
     });
     console.log(`[SMS] Reminder sent to ${appointment.client_phone}`);
@@ -546,16 +612,18 @@ export async function sendReminderSms(appointment: AppointmentDetails, hoursUnti
   }
 }
 
-export async function sendCancellationSms(appointment: AppointmentDetails): Promise<boolean> {
-  if (!twilioClient || !FROM_PHONE || !appointment.client_phone) {
+export async function sendCancellationSms(appointment: AppointmentDetails, ctx: BusinessContext): Promise<boolean> {
+  const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
+
+  if (!twilioClient || !fromPhone || !appointment.client_phone) {
     console.log('[SMS] Twilio not configured or no phone number, skipping cancellation SMS');
     return false;
   }
 
   try {
     await twilioClient.messages.create({
-      body: getCancellationSms(appointment),
-      from: FROM_PHONE,
+      body: getCancellationSms(appointment, ctx),
+      from: fromPhone,
       to: appointment.client_phone,
     });
     console.log(`[SMS] Cancellation sent to ${appointment.client_phone}`);
@@ -570,13 +638,13 @@ export async function sendCancellationSms(appointment: AppointmentDetails): Prom
 // COMBINED NOTIFICATION FUNCTIONS
 // ============================================
 
-export async function sendBookingConfirmation(appointment: AppointmentDetails): Promise<{
+export async function sendBookingConfirmation(appointment: AppointmentDetails, ctx: BusinessContext): Promise<{
   email: boolean;
   sms: boolean;
 }> {
   const [emailResult, smsResult] = await Promise.all([
-    sendConfirmationEmail(appointment),
-    sendConfirmationSms(appointment),
+    sendConfirmationEmail(appointment, ctx),
+    sendConfirmationSms(appointment, ctx),
   ]);
 
   return { email: emailResult, sms: smsResult };
@@ -584,26 +652,27 @@ export async function sendBookingConfirmation(appointment: AppointmentDetails): 
 
 export async function sendBookingReminder(
   appointment: AppointmentDetails,
-  hoursUntil: number
+  hoursUntil: number,
+  ctx: BusinessContext
 ): Promise<{
   email: boolean;
   sms: boolean;
 }> {
   const [emailResult, smsResult] = await Promise.all([
-    sendReminderEmail(appointment, hoursUntil),
-    sendReminderSms(appointment, hoursUntil),
+    sendReminderEmail(appointment, hoursUntil, ctx),
+    sendReminderSms(appointment, hoursUntil, ctx),
   ]);
 
   return { email: emailResult, sms: smsResult };
 }
 
-export async function sendBookingCancellation(appointment: AppointmentDetails): Promise<{
+export async function sendBookingCancellation(appointment: AppointmentDetails, ctx: BusinessContext): Promise<{
   email: boolean;
   sms: boolean;
 }> {
   const [emailResult, smsResult] = await Promise.all([
-    sendCancellationEmail(appointment),
-    sendCancellationSms(appointment),
+    sendCancellationEmail(appointment, ctx),
+    sendCancellationSms(appointment, ctx),
   ]);
 
   return { email: emailResult, sms: smsResult };
@@ -616,16 +685,21 @@ export async function sendBookingCancellation(appointment: AppointmentDetails): 
 export async function notifyStylistNewBooking(
   stylistEmail: string,
   stylistPhone: string | null,
-  appointment: AppointmentDetails
+  appointment: AppointmentDetails,
+  ctx: BusinessContext
 ): Promise<void> {
+  const { business } = ctx;
+  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
+  const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
+
   // Email to stylist
   if (process.env.SENDGRID_API_KEY) {
     try {
       await sgMail.send({
         to: stylistEmail,
         from: {
-          email: FROM_EMAIL,
-          name: SALON_NAME,
+          email: fromEmail,
+          name: business.name,
         },
         subject: `📅 New Booking: ${appointment.client_name} - ${formatDate(appointment.appointment_date)}`,
         html: `
@@ -644,11 +718,11 @@ export async function notifyStylistNewBooking(
   }
 
   // SMS to stylist
-  if (twilioClient && FROM_PHONE && stylistPhone) {
+  if (twilioClient && fromPhone && stylistPhone) {
     try {
       await twilioClient.messages.create({
         body: `📅 New booking: ${appointment.client_name} for ${appointment.service_name} on ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}`,
-        from: FROM_PHONE,
+        from: fromPhone,
         to: stylistPhone,
       });
     } catch (error) {
@@ -665,17 +739,24 @@ export interface NewsletterContent {
   subject: string;
   previewText?: string;
   headline: string;
-  content: string; // HTML content
+  content: string;
   ctaText?: string;
   ctaUrl?: string;
 }
 
 function getNewsletterEmailHtml(
   content: NewsletterContent,
-  subscriberEmail: string
+  subscriberEmail: string,
+  ctx: BusinessContext
 ): string {
+  const { business } = ctx;
+  const siteUrl = getBusinessUrl(business);
+  const logoUrl = getLogoUrl(business);
+  const address = getFullAddress(business);
+  const gradient = getBrandGradient(business);
+
   const unsubscribeToken = Buffer.from(subscriberEmail.toLowerCase()).toString('base64');
-  const unsubscribeUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriberEmail)}&token=${unsubscribeToken}`;
+  const unsubscribeUrl = `${siteUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriberEmail)}&token=${unsubscribeToken}`;
 
   return `
 <!DOCTYPE html>
@@ -693,14 +774,14 @@ function getNewsletterEmailHtml(
         <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
           <!-- Header with Logo -->
           <tr>
-            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${BRAND_COLOR};">
-              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 60px; width: auto;" />
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
+              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
             </td>
           </tr>
 
           <!-- Headline Banner -->
           <tr>
-            <td style="background: ${BRAND_GRADIENT}; padding: 30px; text-align: center;">
+            <td style="background: ${gradient}; padding: 30px; text-align: center;">
               <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">${content.headline}</h1>
             </td>
           </tr>
@@ -717,7 +798,7 @@ function getNewsletterEmailHtml(
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 30px;">
                 <tr>
                   <td align="center">
-                    <a href="${content.ctaUrl}" style="display: inline-block; padding: 16px 40px; background: ${BRAND_GRADIENT}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 700; font-size: 16px;">${content.ctaText}</a>
+                    <a href="${content.ctaUrl}" style="display: inline-block; padding: 16px 40px; background: ${gradient}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 700; font-size: 16px;">${content.ctaText}</a>
                   </td>
                 </tr>
               </table>
@@ -735,20 +816,22 @@ function getNewsletterEmailHtml(
           <!-- Footer -->
           <tr>
             <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
-              <img src="${LOGO_URL}" alt="${SALON_NAME}" style="height: 40px; width: auto; margin-bottom: 15px;" />
-              <p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${SALON_ADDRESS}</p>
+              <img src="${logoUrl}" alt="${business.name}" style="height: 40px; width: auto; margin-bottom: 15px;" />
+              ${address ? `<p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${address}</p>` : ''}
+              ${business.phone ? `
               <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">
-                <a href="tel:${SALON_PHONE.replace(/[^0-9]/g, '')}" style="color: ${BRAND_COLOR}; text-decoration: none;">${SALON_PHONE}</a>
+                <a href="tel:${business.phone.replace(/[^0-9]/g, '')}" style="color: ${business.primary_color}; text-decoration: none;">${business.phone}</a>
               </p>
+              ` : ''}
 
               <!-- Social Links -->
               <p style="margin: 0 0 20px;">
-                <a href="https://instagram.com/kelatic" style="color: ${BRAND_COLOR}; text-decoration: none; margin: 0 10px;">Instagram</a>
-                <a href="${process.env.NEXT_PUBLIC_APP_URL}/book" style="color: ${BRAND_COLOR}; text-decoration: none; margin: 0 10px;">Book Now</a>
+                ${business.instagram_handle ? `<a href="https://instagram.com/${business.instagram_handle.replace('@', '')}" style="color: ${business.primary_color}; text-decoration: none; margin: 0 10px;">Instagram</a>` : ''}
+                <a href="${siteUrl}/book" style="color: ${business.primary_color}; text-decoration: none; margin: 0 10px;">Book Now</a>
               </p>
 
-              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${SALON_NAME}. All rights reserved.</p>
-              <p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">Houston's Premier Loc Specialists</p>
+              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${business.name}. All rights reserved.</p>
+              ${business.tagline ? `<p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">${business.tagline}</p>` : ''}
 
               <!-- Unsubscribe -->
               <p style="margin: 20px 0 0; color: #52525b; font-size: 11px;">
@@ -767,22 +850,26 @@ function getNewsletterEmailHtml(
 
 export async function sendNewsletterEmail(
   to: string,
-  content: NewsletterContent
+  content: NewsletterContent,
+  ctx: BusinessContext
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
   if (!process.env.SENDGRID_API_KEY) {
     console.log('[Newsletter] SendGrid not configured, skipping email');
     return { success: false, error: 'SendGrid not configured' };
   }
 
+  const { business } = ctx;
+  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `newsletter@${ROOT_DOMAIN}`;
+
   try {
     const [response] = await sgMail.send({
       to,
       from: {
-        email: FROM_EMAIL,
-        name: SALON_NAME,
+        email: fromEmail,
+        name: business.name,
       },
       subject: content.subject,
-      html: getNewsletterEmailHtml(content, to),
+      html: getNewsletterEmailHtml(content, to, ctx),
     });
 
     console.log(`[Newsletter] Email sent to ${to}`);
@@ -801,7 +888,8 @@ export async function sendNewsletterEmail(
 
 export async function sendBulkNewsletter(
   subscribers: Array<{ email: string; firstName?: string }>,
-  content: NewsletterContent
+  content: NewsletterContent,
+  ctx: BusinessContext
 ): Promise<{
   sent: number;
   failed: number;
@@ -811,9 +899,8 @@ export async function sendBulkNewsletter(
   let sent = 0;
   let failed = 0;
 
-  // Send emails with rate limiting (100 emails per second is SendGrid's limit)
   for (const subscriber of subscribers) {
-    const result = await sendNewsletterEmail(subscriber.email, content);
+    const result = await sendNewsletterEmail(subscriber.email, content, ctx);
     results.push({
       email: subscriber.email,
       success: result.success,

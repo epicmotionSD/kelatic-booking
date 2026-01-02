@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '10');
     const includeStats = searchParams.get('stats') === 'true';
 
-    const generations = await getRecentGenerations(type || undefined, limit);
+    // TODO: In multi-tenant, get business ID from session
+    const defaultBusinessId = 'default';
+    const generations = await getRecentGenerations(defaultBusinessId, type || undefined, limit);
 
     const response: {
       generations: typeof generations;
@@ -19,7 +21,7 @@ export async function GET(request: NextRequest) {
     } = { generations };
 
     if (includeStats) {
-      response.stats = await getGenerationStats();
+      response.stats = await getGenerationStats(defaultBusinessId);
     }
 
     return NextResponse.json(response);

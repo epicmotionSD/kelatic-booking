@@ -83,7 +83,21 @@ export async function POST(request: NextRequest) {
     // If test email provided, send only to that email
     if (testEmail) {
       const { sendNewsletterEmail } = await import('@/lib/notifications/service');
-      const result = await sendNewsletterEmail(testEmail, newsletterContent);
+      // Default context for test emails
+      const testCtx = {
+        business: {
+          id: 'test',
+          name: 'x3o.ai',
+          slug: 'x3o',
+          email: 'support@x3o.ai',
+          business_type: 'platform',
+          brand_voice: 'professional',
+          primary_color: '#8b5cf6',
+          secondary_color: '#a78bfa',
+        },
+        settings: null,
+      };
+      const result = await sendNewsletterEmail(testEmail, newsletterContent, testCtx as any);
 
       if (result.success) {
         return NextResponse.json({
@@ -138,8 +152,21 @@ export async function POST(request: NextRequest) {
       // Continue anyway - campaign tracking is optional
     }
 
-    // Send bulk newsletter
-    const result = await sendBulkNewsletter(subscribers, newsletterContent);
+    // Send bulk newsletter with platform context
+    const platformCtx = {
+      business: {
+        id: 'platform',
+        name: 'x3o.ai',
+        slug: 'x3o',
+        email: 'support@x3o.ai',
+        business_type: 'platform',
+        brand_voice: 'professional',
+        primary_color: '#8b5cf6',
+        secondary_color: '#a78bfa',
+      },
+      settings: null,
+    };
+    const result = await sendBulkNewsletter(subscribers, newsletterContent, platformCtx as any);
 
     // Update campaign status
     if (campaign) {

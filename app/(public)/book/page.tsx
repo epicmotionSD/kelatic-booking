@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ServiceSelection } from '@/components/booking/service-selection';
+import { PriceTierSelection } from '@/components/booking/price-tier-selection';
 import { StylistSelection } from '@/components/booking/stylist-selection';
 import { DateTimeSelection } from '@/components/booking/datetime-selection';
 import { ClientInfo } from '@/components/booking/client-info';
@@ -11,11 +11,21 @@ import { PaymentStep } from '@/components/booking/payment-step';
 import { Confirmation } from '@/components/booking/confirmation';
 import type { Service, Profile, TimeSlot, ServiceCategory } from '@/types/database';
 
-export type BookingStep = 'service' | 'stylist' | 'datetime' | 'info' | 'payment' | 'confirmation';
+export type BookingStep = 'browse' | 'stylist' | 'datetime' | 'info' | 'payment' | 'confirmation';
+
+interface PriceTier {
+  id: string;
+  name: string;
+  priceRange: string;
+  minPrice: number;
+  maxPrice: number;
+}
 
 export interface BookingData {
   service: Service | null;
   addons: Service[];
+  priceTier: PriceTier | null;
+  availableServices: Service[];
   stylist: Profile | null;
   anyAvailableStylist: boolean;
   date: string | null;
@@ -35,6 +45,8 @@ export interface BookingData {
 const initialBookingData: BookingData = {
   service: null,
   addons: [],
+  priceTier: null,
+  availableServices: [],
   stylist: null,
   anyAvailableStylist: false,
   date: null,
@@ -45,7 +57,7 @@ const initialBookingData: BookingData = {
 };
 
 const STEPS: { key: BookingStep; label: string }[] = [
-  { key: 'service', label: 'Service' },
+  { key: 'browse', label: 'Browse' },
   { key: 'stylist', label: 'Stylist' },
   { key: 'datetime', label: 'Date & Time' },
   { key: 'info', label: 'Your Info' },
@@ -56,10 +68,8 @@ const STEPS: { key: BookingStep; label: string }[] = [
 function BookingContent() {
   const searchParams = useSearchParams();
   const preselectedStylistId = searchParams.get('stylist');
-  const preselectedServiceId = searchParams.get('service');
-  const categoryFilter = searchParams.get('category') as ServiceCategory | null;
 
-  const [currentStep, setCurrentStep] = useState<BookingStep>('service');
+  const [currentStep, setCurrentStep] = useState<BookingStep>('browse');
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
   const [initialized, setInitialized] = useState(false);
 
@@ -70,10 +80,10 @@ function BookingContent() {
     if (initialized) return;
 
     const initFromParams = async () => {
-      let startStep: BookingStep = 'service';
+      let startStep: BookingStep = 'browse';
       const updates: Partial<BookingData> = {};
 
-      // Pre-fetch stylist if specified (most common use case from video/barber pages)
+      // Pre-fetch stylist if specified (from landing page "Book with X" buttons)
       if (preselectedStylistId) {
         try {
           const res = await fetch('/api/stylists');
@@ -82,28 +92,10 @@ function BookingContent() {
           if (stylist) {
             updates.stylist = stylist;
             updates.anyAvailableStylist = false;
+            startStep = 'datetime'; // Skip to date selection if stylist pre-selected
           }
         } catch (e) {
           console.error('Failed to fetch stylist:', e);
-        }
-      }
-
-      // Pre-fetch service if specified
-      if (preselectedServiceId) {
-        try {
-          const res = await fetch('/api/services');
-          const data = await res.json();
-          const service = data.services?.find((s: Service) => s.id === preselectedServiceId);
-          if (service) {
-            updates.service = service;
-            startStep = 'stylist';
-            // If we also have a stylist, skip to datetime
-            if (updates.stylist) {
-              startStep = 'datetime';
-            }
-          }
-        } catch (e) {
-          console.error('Failed to fetch service:', e);
         }
       }
 
@@ -115,7 +107,7 @@ function BookingContent() {
     };
 
     initFromParams();
-  }, [preselectedStylistId, preselectedServiceId, initialized]);
+  }, [preselectedStylistId, initialized]);
 
   function updateBookingData(updates: Partial<BookingData>) {
     setBookingData((prev) => ({ ...prev, ...updates }));
@@ -226,21 +218,31 @@ function BookingContent() {
 
       {/* Main Content */}
       <main className="max-w-3xl mx-auto px-4 py-8">
-        {currentStep === 'service' && (
-          <ServiceSelection
-            selectedService={bookingData.service}
-            selectedAddons={bookingData.addons}
-            categoryFilter={categoryFilter || undefined}
-            onSelect={(service, addons) => {
-              updateBookingData({ service, addons });
+        {currentStep === 'browse' && (
+          <PriceTierSelection
+            onSelectTier={(tier, services) => {
+              updateBookingData({
+                priceTier: tier,
+                availableServices: services,
+                // Select the first service from the tier as default
+                service: services.length > 0 ? services[0] : null
+              });
               goToStep('stylist');
+            }}
+            onSelectStylist={(stylist) => {
+              if (stylist.id === 'any') {
+                updateBookingData({ stylist: null, anyAvailableStylist: true });
+              } else {
+                updateBookingData({ stylist, anyAvailableStylist: false });
+              }
+              goToStep('datetime');
             }}
           />
         )}
 
         {currentStep === 'stylist' && (
           <StylistSelection
-            serviceId={bookingData.service?.id || ''}
+            serviceId={bookingData.service?.id || bookingData.availableServices[0]?.id || ''}
             selectedStylist={bookingData.stylist}
             anyAvailable={bookingData.anyAvailableStylist}
             onSelect={(stylist, anyAvailable) => {
@@ -253,7 +255,7 @@ function BookingContent() {
 
         {currentStep === 'datetime' && (
           <DateTimeSelection
-            serviceId={bookingData.service?.id || ''}
+            serviceId={bookingData.service?.id || bookingData.availableServices[0]?.id || ''}
             stylistId={bookingData.anyAvailableStylist ? undefined : bookingData.stylist?.id}
             selectedDate={bookingData.date}
             selectedSlot={bookingData.timeSlot}

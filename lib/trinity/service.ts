@@ -1,6 +1,6 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createAdminClient } from '../supabase/client';
-import { PROMPTS, ContentType, CONTENT_TYPE_LABELS } from './prompts';
+import { getPromptForType, ContentType, CONTENT_TYPE_LABELS, BusinessContext } from './prompts';
 
 // Lazy initialize to avoid build-time errors
 let anthropic: Anthropic | null = null;
@@ -20,6 +20,7 @@ export interface GenerationRequest {
   tone?: 'professional' | 'casual' | 'playful' | 'inspiring';
   targetAudience?: string;
   additionalInstructions?: string;
+  businessContext: BusinessContext;
 }
 
 export interface GenerationResult {
@@ -30,6 +31,7 @@ export interface GenerationResult {
     topic: string;
     generatedAt: string;
     wordCount: number;
+    businessId?: string;
   };
 }
 
@@ -37,8 +39,10 @@ export async function generateContent(
   request: GenerationRequest
 ): Promise<GenerationResult> {
   const supabase = createAdminClient();
+  const { businessContext } = request;
 
-  const systemPrompt = PROMPTS[request.type];
+  // Get dynamic system prompt based on business context
+  const systemPrompt = getPromptForType(request.type, businessContext);
 
   const userPrompt = buildUserPrompt(request);
 
@@ -60,17 +64,19 @@ export async function generateContent(
 
   const generatedContent = textBlock?.text || '';
 
-  // Save to database
+  // Save to database with business_id
   const { data: saved } = await supabase
     .from('trinity_generations')
     .insert({
       type: request.type,
       prompt: userPrompt,
       output: generatedContent,
+      business_id: businessContext.business.id,
       metadata: {
         topic: request.topic,
         tone: request.tone,
         targetAudience: request.targetAudience,
+        businessName: businessContext.business.name,
       },
     })
     .select('id')
@@ -84,6 +90,7 @@ export async function generateContent(
       topic: request.topic,
       generatedAt: new Date().toISOString(),
       wordCount: generatedContent.split(/\s+/).length,
+      businessId: businessContext.business.id,
     },
   };
 }
@@ -135,6 +142,7 @@ function buildUserPrompt(request: GenerationRequest): string {
 }
 
 export async function getRecentGenerations(
+  businessId: string,
   type?: ContentType,
   limit: number = 10
 ): Promise<GenerationResult[]> {
@@ -142,7 +150,8 @@ export async function getRecentGenerations(
 
   let query = supabase
     .from('trinity_generations')
-    .select('id, type, output, metadata, created_at')
+    .select('id, type, output, metadata, created_at, business_id')
+    .eq('business_id', businessId)
     .order('created_at', { ascending: false })
     .limit(limit);
 
@@ -160,11 +169,12 @@ export async function getRecentGenerations(
       topic: row.metadata?.topic || '',
       generatedAt: row.created_at,
       wordCount: row.output.split(/\s+/).length,
+      businessId: row.business_id,
     },
   }));
 }
 
-export async function getGenerationStats(): Promise<{
+export async function getGenerationStats(businessId: string): Promise<{
   totalGenerations: number;
   byType: Record<ContentType, number>;
   thisMonth: number;
@@ -173,7 +183,8 @@ export async function getGenerationStats(): Promise<{
 
   const { count: total } = await supabase
     .from('trinity_generations')
-    .select('*', { count: 'exact', head: true });
+    .select('*', { count: 'exact', head: true })
+    .eq('business_id', businessId);
 
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
@@ -182,11 +193,13 @@ export async function getGenerationStats(): Promise<{
   const { count: thisMonth } = await supabase
     .from('trinity_generations')
     .select('*', { count: 'exact', head: true })
+    .eq('business_id', businessId)
     .gte('created_at', startOfMonth.toISOString());
 
   const { data: typeCounts } = await supabase
     .from('trinity_generations')
-    .select('type');
+    .select('type')
+    .eq('business_id', businessId);
 
   const byType: Record<ContentType, number> = {
     social: 0,
@@ -195,6 +208,7 @@ export async function getGenerationStats(): Promise<{
     video: 0,
     education: 0,
     graphics: 0,
+    newsletter: 0,
   };
 
   typeCounts?.forEach((row) => {

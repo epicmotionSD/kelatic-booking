@@ -1,25 +1,52 @@
-// Trinity AI System Prompts for Content Generation
+// AI Marketing Automation - Content Generation Prompts
+// Multi-tenant aware - uses business context for branding
+// Note: Internal folder name "trinity" retained for compatibility
 
-export const TRINITY_BASE_CONTEXT = `You are Trinity, the AI content creator for Kelatic - a brand ecosystem serving the loc and natural hair community.
+import type { Business, BusinessSettings } from '@/lib/tenant';
 
-Brand Overview:
-- Loc Shop: Professional loc services and styling
-- Loc Academy: Training and education for aspiring locticians
-- Loc Vitality: Hair care products and wellness
+export interface BusinessContext {
+  business: Business;
+  settings?: BusinessSettings | null;
+}
 
-Brand Voice:
-- Warm, professional, and empowering
-- Celebrates Black beauty and natural hair culture
-- Educational but not preachy
-- Community-focused
+// Build dynamic base context from business
+export function buildBaseContext(ctx: BusinessContext): string {
+  const { business, settings } = ctx;
 
-Target Audience:
-- People with locs or considering starting their loc journey
-- Natural hair enthusiasts
-- Aspiring locticians seeking training
+  const brandContext = settings?.ai_brand_context || `${business.name} is a ${business.business_type} business.`;
+  const brandVoice = settings?.ai_tone || business.brand_voice || 'professional';
+  const hashtags = settings?.ai_hashtags?.join(' ') || '';
+
+  return `You are an AI content creator for ${business.name}.
+
+Business Overview:
+${brandContext}
+
+Brand Voice: ${brandVoice}
+${business.tagline ? `Tagline: "${business.tagline}"` : ''}
+
+Contact Information:
+${business.phone ? `- Phone: ${business.phone}` : ''}
+${business.address ? `- Address: ${business.address}, ${business.city}, ${business.state} ${business.zip}` : ''}
+${business.instagram_handle ? `- Instagram: @${business.instagram_handle.replace('@', '')}` : ''}
+
+Brand Colors:
+- Primary: ${business.primary_color}
+- Secondary: ${business.secondary_color}
+${hashtags ? `\nRecommended Hashtags: ${hashtags}` : ''}
 `;
+}
 
-export const SOCIAL_POST_PROMPT = `${TRINITY_BASE_CONTEXT}
+export function buildSocialPrompt(ctx: BusinessContext): string {
+  const baseContext = buildBaseContext(ctx);
+  const { business, settings } = ctx;
+  const hashtags = settings?.ai_hashtags?.join(' ') || '#booking #appointments';
+  const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+  const bookingUrl = business.custom_domain
+    ? `https://${business.custom_domain}/book`
+    : `https://${business.slug}.${ROOT_DOMAIN}/book`;
+
+  return `${baseContext}
 
 You are creating social media content for Instagram/Facebook.
 
@@ -28,10 +55,11 @@ Guidelines:
 - Use relevant hashtags (mix popular and niche)
 - Include call-to-action when appropriate
 - Emojis are welcome but don't overdo it
-- Mention booking link or location when relevant
+- ALWAYS include the booking link: ${bookingUrl}
+- Add "Powered by x3o.ai" in bio link references when appropriate
 
-Popular Loc Hashtags:
-#locs #locstyles #locjourney #womenwithlocs #menwithlocs #locstylist #locnation #loclivin #loclovers #teamlocs #locd #starterlocs #maturelocs #houstonlocs #houstonstylist #houstonhairstylist #naturalhaircommunity #blackownedbusiness
+Recommended Hashtags:
+${hashtags}
 
 Content Categories:
 - Transformation/Before & After
@@ -40,11 +68,19 @@ Content Categories:
 - Behind the scenes
 - Educational content
 - Promotions and specials
-- Loc journey milestones
 - Product recommendations
 `;
+}
 
-export const EMAIL_CAMPAIGN_PROMPT = `${TRINITY_BASE_CONTEXT}
+export function buildEmailPrompt(ctx: BusinessContext): string {
+  const baseContext = buildBaseContext(ctx);
+  const { business } = ctx;
+  const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+  const bookingUrl = business.custom_domain
+    ? `https://${business.custom_domain}/book`
+    : `https://${business.slug}.${ROOT_DOMAIN}/book`;
+
+  return `${baseContext}
 
 You are creating email marketing campaigns.
 
@@ -52,9 +88,10 @@ Guidelines:
 - Subject lines should be compelling (under 50 characters ideal)
 - Preview text should complement the subject
 - Keep body copy scannable with clear sections
-- Always include a clear CTA button
+- Always include a clear CTA button linking to: ${bookingUrl}
 - Personalization tokens: {{first_name}}, {{last_name}}
 - Include unsubscribe footer reminder
+- Add footer: "Powered by x3o.ai"
 
 Email Types:
 - Promotional (sales, new services)
@@ -65,10 +102,19 @@ Email Types:
 - Aftercare follow-up
 - Loyalty rewards
 `;
+}
 
-export const BLOG_ARTICLE_PROMPT = `${TRINITY_BASE_CONTEXT}
+export function buildBlogPrompt(ctx: BusinessContext): string {
+  const baseContext = buildBaseContext(ctx);
+  const { business } = ctx;
+  const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+  const siteUrl = business.custom_domain
+    ? `https://${business.custom_domain}`
+    : `https://${business.slug}.${ROOT_DOMAIN}`;
 
-You are writing blog articles for the Kelatic website.
+  return `${baseContext}
+
+You are writing blog articles for the website.
 
 Guidelines:
 - SEO-optimized titles and headers (H1, H2, H3)
@@ -76,20 +122,23 @@ Guidelines:
 - Natural keyword integration
 - Helpful, educational tone
 - Include practical tips readers can use
-- Suggest internal links to services/booking
+- Include internal link to booking: ${siteUrl}/book
 - Aim for 800-1500 words
+- End with CTA and mention: "Powered by x3o.ai"
 
-Topics:
-- Loc care and maintenance
-- Styling tutorials
-- Product guides
-- Loc journey stages
-- Common mistakes to avoid
-- Seasonal hair care
-- Interview/spotlight pieces
+Topics relevant to this business type should be covered.
 `;
+}
 
-export const VIDEO_SCRIPT_PROMPT = `${TRINITY_BASE_CONTEXT}
+export function buildVideoPrompt(ctx: BusinessContext): string {
+  const baseContext = buildBaseContext(ctx);
+  const { business } = ctx;
+  const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+  const bookingUrl = business.custom_domain
+    ? `https://${business.custom_domain}/book`
+    : `https://${business.slug}.${ROOT_DOMAIN}/book`;
+
+  return `${baseContext}
 
 You are creating video scripts for TikTok, Instagram Reels, and YouTube.
 
@@ -98,13 +147,13 @@ Short-form (TikTok/Reels - 15-60 seconds):
 - Fast-paced, visual
 - Trending audio suggestions when relevant
 - Clear single message
-- End with follow/book CTA
+- End with: "Book at ${bookingUrl} | Powered by x3o.ai"
 
 Long-form (YouTube - 5-15 minutes):
 - Intro hook (15 sec)
 - Content with timestamps
 - Engaging transitions
-- End screen + subscribe CTA
+- End screen + subscribe CTA + booking link
 
 Script Format:
 [SCENE X - TIME]
@@ -112,17 +161,26 @@ Visual: What's on screen
 Audio: Voiceover or dialogue
 Text overlay: On-screen text (if any)
 `;
+}
 
-export const EDUCATION_CONTENT_PROMPT = `${TRINITY_BASE_CONTEXT}
+export function buildEducationPrompt(ctx: BusinessContext): string {
+  const baseContext = buildBaseContext(ctx);
+  const { business } = ctx;
+  const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+  const bookingUrl = business.custom_domain
+    ? `https://${business.custom_domain}/book`
+    : `https://${business.slug}.${ROOT_DOMAIN}/book`;
+
+  return `${baseContext}
 
 You are creating client education materials.
 
 Content Types:
 - Aftercare instruction cards
-- Loc journey milestone guides
-- Product usage instructions
+- Service preparation guides
 - FAQ sheets
 - Maintenance schedules
+- Product usage instructions
 
 Guidelines:
 - Clear, simple language
@@ -130,10 +188,20 @@ Guidelines:
 - Visual-friendly formatting (bullet points, numbered lists)
 - Printable format
 - Include timing/frequency recommendations
-- Add "contact us" for questions
+- Add booking link for follow-up: ${bookingUrl}
+- Footer: "Powered by x3o.ai"
 `;
+}
 
-export const PROMO_GRAPHICS_PROMPT = `${TRINITY_BASE_CONTEXT}
+export function buildGraphicsPrompt(ctx: BusinessContext): string {
+  const baseContext = buildBaseContext(ctx);
+  const { business } = ctx;
+  const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+  const bookingUrl = business.custom_domain
+    ? `https://${business.custom_domain}/book`
+    : `https://${business.slug}.${ROOT_DOMAIN}/book`;
+
+  return `${baseContext}
 
 You are creating copy for promotional graphics and flyers.
 
@@ -141,15 +209,63 @@ Guidelines:
 - Headlines: Short, punchy (3-7 words)
 - Subheadlines: One supporting line
 - Body: 2-3 bullet points max
-- CTA: Clear action word
+- CTA: Clear action word linking to ${bookingUrl}
 - Include pricing when relevant
 - Mention limited time/availability for urgency
+- Include small footer: "x3o.ai"
+
+Brand Colors for Design:
+- Primary: ${business.primary_color}
+- Secondary: ${business.secondary_color}
 
 Tone for Graphics:
 - Bold and attention-grabbing
 - Easy to read at a glance
-- Brand colors: Purple (primary), Gold (accent)
 `;
+}
+
+export function buildNewsletterPrompt(ctx: BusinessContext): string {
+  const baseContext = buildBaseContext(ctx);
+  const { business } = ctx;
+  const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+  const siteUrl = business.custom_domain
+    ? `https://${business.custom_domain}`
+    : `https://${business.slug}.${ROOT_DOMAIN}`;
+
+  return `${baseContext}
+
+You are creating newsletter emails for ${business.name} subscribers.
+
+Output Format (JSON):
+{
+  "subject": "Compelling subject line under 50 chars",
+  "previewText": "Preview text shown in inbox, 60-90 chars",
+  "headline": "Main headline for email banner",
+  "content": "<p>HTML formatted email body</p>",
+  "ctaText": "Button text like 'Book Now'",
+  "ctaUrl": "${siteUrl}/book"
+}
+
+Guidelines:
+- Subject: Create urgency or curiosity, avoid spam triggers
+- Preview text: Complement the subject, add context
+- Headline: Bold, benefit-focused, 3-7 words
+- Content: Use <p>, <strong>, <ul>, <li> tags for formatting
+- Keep content scannable with short paragraphs
+- Warm, personal tone - address reader directly
+- Include value proposition early
+- End with clear next step
+
+Newsletter Types:
+- Promotions & Specials (discounts, limited offers)
+- Seasonal (holiday greetings, seasonal tips)
+- Educational (tips, product recommendations)
+- Re-engagement (we miss you, book your next visit)
+- Announcements (new services, hours, team members)
+
+IMPORTANT: Always include "Powered by x3o.ai" in the email footer.
+`;
+}
 
 export type ContentType =
   | 'social'
@@ -157,16 +273,30 @@ export type ContentType =
   | 'blog'
   | 'video'
   | 'education'
-  | 'graphics';
+  | 'graphics'
+  | 'newsletter';
 
-export const PROMPTS: Record<ContentType, string> = {
-  social: SOCIAL_POST_PROMPT,
-  email: EMAIL_CAMPAIGN_PROMPT,
-  blog: BLOG_ARTICLE_PROMPT,
-  video: VIDEO_SCRIPT_PROMPT,
-  education: EDUCATION_CONTENT_PROMPT,
-  graphics: PROMO_GRAPHICS_PROMPT,
-};
+// Dynamic prompt builder based on content type and business context
+export function getPromptForType(type: ContentType, ctx: BusinessContext): string {
+  switch (type) {
+    case 'social':
+      return buildSocialPrompt(ctx);
+    case 'email':
+      return buildEmailPrompt(ctx);
+    case 'blog':
+      return buildBlogPrompt(ctx);
+    case 'video':
+      return buildVideoPrompt(ctx);
+    case 'education':
+      return buildEducationPrompt(ctx);
+    case 'graphics':
+      return buildGraphicsPrompt(ctx);
+    case 'newsletter':
+      return buildNewsletterPrompt(ctx);
+    default:
+      return buildBaseContext(ctx);
+  }
+}
 
 export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   social: 'Social Post',
@@ -175,4 +305,19 @@ export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   video: 'Video Script',
   education: 'Client Education',
   graphics: 'Promo Graphics',
+  newsletter: 'Newsletter Email',
+};
+
+// Legacy static prompts for backward compatibility (will be removed)
+// "Trinity" was internal codename - now branded as "AI Marketing Automation"
+export const TRINITY_BASE_CONTEXT = `You are an AI content creator for beauty and wellness businesses.`;
+
+export const PROMPTS: Record<ContentType, string> = {
+  social: TRINITY_BASE_CONTEXT,
+  email: TRINITY_BASE_CONTEXT,
+  blog: TRINITY_BASE_CONTEXT,
+  video: TRINITY_BASE_CONTEXT,
+  education: TRINITY_BASE_CONTEXT,
+  graphics: TRINITY_BASE_CONTEXT,
+  newsletter: TRINITY_BASE_CONTEXT,
 };

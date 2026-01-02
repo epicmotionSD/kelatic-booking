@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       'video',
       'education',
       'graphics',
+      'newsletter',
     ];
 
     if (!validTypes.includes(body.type)) {
@@ -31,6 +32,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // TODO: In multi-tenant, get business context from session/request
+    const defaultBusinessContext = {
+      business: {
+        id: 'default',
+        name: 'Kelatic',
+        slug: 'kelatic',
+        email: 'kelatic@gmail.com',
+        business_type: 'salon',
+        brand_voice: 'professional',
+        primary_color: '#f59e0b',
+        secondary_color: '#eab308',
+      },
+      settings: null,
+    };
+
     const request_data: GenerationRequest = {
       type: body.type,
       topic: body.topic,
@@ -38,6 +54,7 @@ export async function POST(request: NextRequest) {
       tone: body.tone,
       targetAudience: body.targetAudience,
       additionalInstructions: body.additionalInstructions,
+      businessContext: body.businessContext || defaultBusinessContext,
     };
 
     const result = await generateContent(request_data);

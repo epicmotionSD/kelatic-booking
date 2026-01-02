@@ -154,9 +154,9 @@ export default function TrinityDashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">Trinity AI</h1>
+        <h1 className="text-2xl font-bold text-white">AI Marketing Automation</h1>
         <p className="text-white/50 mt-1">
-          AI-powered marketing and content creation for Kelatic
+          Powered by x3o.ai&apos;s Board of Directors - Create marketing content for your business
         </p>
       </div>
 
@@ -176,7 +176,7 @@ export default function TrinityDashboard() {
         </div>
         <div className="bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl p-6 text-white">
           <div className="text-3xl font-bold">Active</div>
-          <div className="text-purple-200 text-sm mt-1">Powered by Claude AI</div>
+          <div className="text-purple-200 text-sm mt-1">Powered by x3o.ai</div>
         </div>
       </div>
 
@@ -305,7 +305,7 @@ export default function TrinityDashboard() {
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
-                        Generating with Claude AI...
+                        Generating content...
                       </>
                     ) : (
                       <>

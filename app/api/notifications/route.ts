@@ -102,31 +102,47 @@ export async function POST(request: NextRequest) {
 
     let result;
 
+    // TODO: In multi-tenant, fetch business context from appointment
+    const defaultCtx = {
+      business: {
+        id: 'default',
+        name: 'Kelatic',
+        slug: 'kelatic',
+        email: 'kelatic@gmail.com',
+        business_type: 'salon',
+        brand_voice: 'professional',
+        primary_color: '#f59e0b',
+        secondary_color: '#eab308',
+      },
+      settings: null,
+    };
+
     switch (type) {
       case 'confirmation':
-        result = await sendBookingConfirmation(appointmentDetails);
+        result = await sendBookingConfirmation(appointmentDetails, defaultCtx as any);
 
         // Also notify stylist
         if (stylist?.email) {
           await notifyStylistNewBooking(
             stylist.email,
             stylist.phone,
-            appointmentDetails
+            appointmentDetails,
+            defaultCtx as any
           );
         }
         break;
 
       case 'cancellation':
-        result = await sendBookingCancellation(appointmentDetails);
+        result = await sendBookingCancellation(appointmentDetails, defaultCtx as any);
         break;
 
       case 'reminder':
         // Calculate hours until appointment
         const now = new Date();
         const hoursUntil = Math.round((startTime.getTime() - now.getTime()) / (1000 * 60 * 60));
-        
+
         const { sendBookingReminder } = await import('@/lib/notifications/service');
-        result = await sendBookingReminder(appointmentDetails, hoursUntil);
+        result = await sendBookingReminder(appointmentDetails, hoursUntil, defaultCtx as any);
         break;
     }
 

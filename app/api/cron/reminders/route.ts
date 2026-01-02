@@ -133,7 +133,21 @@ export async function GET(request: NextRequest) {
             notes: appointment.notes || undefined,
           };
 
-          const result = await sendBookingReminder(appointmentDetails, window.hours);
+          // TODO: In multi-tenant, fetch business context from appointment
+          const defaultCtx = {
+            business: {
+              id: 'default',
+              name: 'Kelatic',
+              slug: 'kelatic',
+              email: 'kelatic@gmail.com',
+              business_type: 'salon',
+              brand_voice: 'professional',
+              primary_color: '#f59e0b',
+              secondary_color: '#eab308',
+            },
+            settings: null,
+          };
+          const result = await sendBookingReminder(appointmentDetails, window.hours, defaultCtx as any);
 
           if (result.email) results.sent.email++;
           if (result.sms) results.sent.sms++;

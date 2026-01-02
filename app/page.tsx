@@ -282,8 +282,61 @@ export default function LandingPage() {
       {/* Video Carousel Section */}
       <StylistCarousel />
 
+      {/* Team Section - Featured Near Top */}
+      <section id="team" className="py-24 bg-black">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Our Stylists</span>
+            <h2 className="text-4xl md:text-5xl font-black mt-2">Meet The Team</h2>
+          </div>
+
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+            {featuredStylists.map((stylist) => (
+              <div key={stylist.id} className="group">
+                <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/5 overflow-hidden relative mb-5 group-hover:border-amber-400/30 transition-colors">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-white/10">
+                      <span className="text-4xl font-black text-white/80">
+                        {stylist.first_name.charAt(0)}{stylist.last_name ? stylist.last_name.charAt(0) : ''}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
+                    {stylist.instagram_handle && (
+                      <a
+                        href={`https://instagram.com/${stylist.instagram_handle}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-white hover:text-amber-400 transition-colors"
+                      >
+                        <Instagram className="w-5 h-5" />
+                        @{stylist.instagram_handle}
+                      </a>
+                    )}
+                  </div>
+                </div>
+                <h3 className="text-xl font-bold mb-1">
+                  {stylist.first_name} {stylist.last_name}
+                </h3>
+                {stylist.specialties && (
+                  <p className="text-amber-400 text-sm mb-2">{stylist.specialties.join(', ')}</p>
+                )}
+                <p className="text-white/50 text-sm line-clamp-2 mb-4">{stylist.bio}</p>
+                <Link
+                  href={`/book?stylist=${stylist.id}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full text-sm font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Book with {stylist.first_name}
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Services Section */}
-      <section id="services" className="py-24 bg-black">
+      <section id="services" className="py-24 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
             <div>
@@ -356,59 +409,6 @@ export default function LandingPage() {
                 </div>
                 <h3 className="text-xl font-bold mb-2">{item.title}</h3>
                 <p className="text-white/50">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section id="team" className="py-24 bg-black">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">The Squad</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-2">Meet The Team</h2>
-          </div>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {featuredStylists.map((stylist) => (
-              <div key={stylist.id} className="group">
-                <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/5 overflow-hidden relative mb-5 group-hover:border-amber-400/30 transition-colors">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-white/10">
-                      <span className="text-4xl font-black text-white/80">
-                        {stylist.first_name.charAt(0)}{stylist.last_name ? stylist.last_name.charAt(0) : ''}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                    {stylist.instagram_handle && (
-                      <a
-                        href={`https://instagram.com/${stylist.instagram_handle}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-white hover:text-amber-400 transition-colors"
-                      >
-                        <Instagram className="w-5 h-5" />
-                        @{stylist.instagram_handle}
-                      </a>
-                    )}
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold mb-1">
-                  {stylist.first_name} {stylist.last_name}
-                </h3>
-                {stylist.specialties && (
-                  <p className="text-amber-400 text-sm mb-2">{stylist.specialties.join(' • ')}</p>
-                )}
-                <p className="text-white/50 text-sm line-clamp-2 mb-4">{stylist.bio}</p>
-                <Link
-                  href={`/book?stylist=${stylist.id}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full text-sm font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Book with {stylist.first_name}
-                </Link>
               </div>
             ))}
           </div>

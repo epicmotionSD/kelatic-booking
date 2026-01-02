@@ -14,23 +14,43 @@ export default function ResetPasswordPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Supabase passes the access token in the URL hash
-    // The client library will automatically pick it up
     const supabase = createClient();
+    let mounted = true;
 
     // Check if we have a valid session from the reset link
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY") {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (mounted && event === "PASSWORD_RECOVERY") {
         setReady(true);
       }
     });
 
-    // Also check current session
+    // Check current session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
+      if (mounted && session) {
         setReady(true);
       }
     });
+
+    // Fallback: If URL has hash fragment (reset token), enable form after delay
+    // This handles mobile browsers where auth events may not fire properly
+    const hasHashToken = typeof window !== 'undefined' &&
+      window.location.hash.includes('access_token');
+
+    let timeoutId: NodeJS.Timeout | undefined;
+    if (hasHashToken) {
+      timeoutId = setTimeout(() => {
+        if (mounted) {
+          setReady(true);
+        }
+      }, 2000);
+    }
+
+    // Cleanup
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+      if (timeoutId) clearTimeout(timeoutId);
+    };
   }, []);
 
   async function handleResetPassword(e: React.FormEvent) {

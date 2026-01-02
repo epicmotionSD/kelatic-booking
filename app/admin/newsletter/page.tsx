@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Mail, Send, Users, TrendingUp, Clock, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Send, Users, TrendingUp, Clock, CheckCircle, AlertCircle, Sparkles, X } from 'lucide-react';
 
 interface Stats {
   totalSubscribers: number;
@@ -34,6 +34,13 @@ export default function NewsletterPage() {
   const [testEmail, setTestEmail] = useState('');
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState<{ success: boolean; message: string } | null>(null);
+
+  // Trinity AI state
+  const [showTrinityModal, setShowTrinityModal] = useState(false);
+  const [trinityTopic, setTrinityTopic] = useState('');
+  const [trinityTone, setTrinityTone] = useState<'professional' | 'casual' | 'playful' | 'inspiring'>('casual');
+  const [generating, setGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState('');
 
   useEffect(() => {
     loadData();
@@ -135,6 +142,66 @@ export default function NewsletterPage() {
     }
   }
 
+  async function handleTrinityGenerate() {
+    if (!trinityTopic.trim()) {
+      setGenerateError('Please describe what you want to create');
+      return;
+    }
+
+    setGenerating(true);
+    setGenerateError('');
+
+    try {
+      const res = await fetch('/api/trinity/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'newsletter',
+          topic: trinityTopic,
+          tone: trinityTone,
+          additionalInstructions: 'Return ONLY valid JSON with no markdown code blocks or extra text.',
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Generation failed');
+      }
+
+      const data = await res.json();
+
+      // Parse the JSON response
+      let parsed;
+      try {
+        // Try to extract JSON if wrapped in code blocks
+        let content = data.content;
+        const jsonMatch = content.match(/```json\n?([\s\S]*?)\n?```/) || content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          content = jsonMatch[1] || jsonMatch[0];
+        }
+        parsed = JSON.parse(content);
+      } catch {
+        throw new Error('Failed to parse generated content');
+      }
+
+      // Populate the form fields
+      if (parsed.subject) setSubject(parsed.subject);
+      if (parsed.previewText) setPreviewText(parsed.previewText);
+      if (parsed.headline) setHeadline(parsed.headline);
+      if (parsed.content) setContent(parsed.content);
+      if (parsed.ctaText) setCtaText(parsed.ctaText);
+      if (parsed.ctaUrl) setCtaUrl(parsed.ctaUrl);
+
+      // Close modal and reset
+      setShowTrinityModal(false);
+      setTrinityTopic('');
+      setSendResult({ success: true, message: 'Newsletter generated! Review and send when ready.' });
+    } catch (error) {
+      setGenerateError(error instanceof Error ? error.message : 'Failed to generate');
+    } finally {
+      setGenerating(false);
+    }
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -199,10 +266,20 @@ export default function NewsletterPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Newsletter Composer */}
         <div className="lg:col-span-2 bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6 space-y-6">
-          <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-            <Send className="w-5 h-5 text-amber-400" />
-            Compose Newsletter
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Send className="w-5 h-5 text-amber-400" />
+              Compose Newsletter
+            </h2>
+            <button
+              type="button"
+              onClick={() => setShowTrinityModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 text-purple-400 rounded-xl text-sm font-medium hover:bg-purple-500/30 transition-all border border-purple-500/30"
+            >
+              <Sparkles className="w-4 h-4" />
+              Generate with AI
+            </button>
+          </div>
 
           {/* Subject */}
           <div>
@@ -398,6 +475,140 @@ export default function NewsletterPage() {
           </div>
         </div>
       </div>
+
+      {/* Trinity AI Generation Modal */}
+      {showTrinityModal && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-purple-400" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white">AI Content Generator</h2>
+                  <p className="text-white/50 text-sm">Describe your newsletter and let AI create it</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowTrinityModal(false);
+                  setTrinityTopic('');
+                  setGenerateError('');
+                }}
+                className="p-2 text-white/50 hover:text-white transition-colors"
+                aria-label="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  What kind of newsletter do you want to create?
+                </label>
+                <textarea
+                  value={trinityTopic}
+                  onChange={(e) => setTrinityTopic(e.target.value)}
+                  placeholder="e.g., New year promotion offering 15% off all retwist services in January, targeting existing clients who haven't booked in 30+ days"
+                  rows={4}
+                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  Tone
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {(['casual', 'professional', 'playful', 'inspiring'] as const).map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setTrinityTone(t)}
+                      className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                        trinityTone === t
+                          ? 'bg-purple-500 text-white'
+                          : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                      }`}
+                    >
+                      {t.charAt(0).toUpperCase() + t.slice(1)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {generateError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+                  {generateError}
+                </div>
+              )}
+
+              {/* Quick Ideas */}
+              <div className="pt-2">
+                <p className="text-white/50 text-xs mb-2">Quick ideas (click to use):</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    'Monthly retwist reminder',
+                    'New year special offer',
+                    'Summer loc care tips',
+                    'We miss you - come back!',
+                  ].map((idea) => (
+                    <button
+                      key={idea}
+                      type="button"
+                      onClick={() => setTrinityTopic(idea)}
+                      className="px-3 py-1 bg-white/5 text-white/60 rounded-lg text-xs hover:bg-white/10 transition-colors"
+                    >
+                      {idea}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 border-t border-white/10 flex gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowTrinityModal(false);
+                  setTrinityTopic('');
+                  setGenerateError('');
+                }}
+                className="flex-1 px-4 py-3 bg-white/5 text-white rounded-xl font-medium hover:bg-white/10 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleTrinityGenerate}
+                disabled={generating || !trinityTopic.trim()}
+                className="flex-1 px-4 py-3 bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-xl font-bold hover:shadow-lg hover:shadow-purple-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {generating ? (
+                  <>
+                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-5 h-5" />
+                    Generate Newsletter
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

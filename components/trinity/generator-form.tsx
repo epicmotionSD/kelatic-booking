@@ -204,7 +204,7 @@ export default function GeneratorForm({
                   Generating...
                 </span>
               ) : (
-                'Generate with Trinity'
+                'Generate Content'
               )}
             </button>
             <button
@@ -266,7 +266,7 @@ export default function GeneratorForm({
                 />
               </svg>
               <p>Fill in the details and click Generate</p>
-              <p className="text-sm mt-1">Trinity will create your content</p>
+              <p className="text-sm mt-1">AI will create your content</p>
             </div>
           )}
         </div>

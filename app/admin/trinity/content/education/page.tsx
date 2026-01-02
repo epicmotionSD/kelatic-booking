@@ -10,7 +10,7 @@ export default function ClientEducationCreator() {
         href="/admin/trinity"
         className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
       >
-        ← Back to Trinity AI
+        ← Back to AI Marketing
       </Link>
 
       <GeneratorForm
