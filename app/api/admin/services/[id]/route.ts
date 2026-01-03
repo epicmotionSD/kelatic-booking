@@ -94,6 +94,38 @@ export async function PUT(
       return NextResponse.json({ error: 'Failed to update service' }, { status: 500 });
     }
 
+    // Handle stylist assignments if provided
+    if (body.stylistIds !== undefined) {
+      // Remove existing assignments
+      await supabase
+        .from('stylist_services')
+        .delete()
+        .eq('service_id', id);
+
+      // Add new assignments
+      if (body.stylistIds && body.stylistIds.length > 0) {
+        const { hasPermission, profile } = await checkServicePermissions(supabase);
+        if (hasPermission) {
+          const assignments = body.stylistIds.map((stylistId: string) => ({
+            service_id: id,
+            stylist_id: stylistId,
+            business_id: profile?.business_id,
+            is_active: true
+          }));
+
+          const { error: assignmentError } = await supabase
+            .from('stylist_services')
+            .insert(assignments);
+
+          if (assignmentError) {
+            console.error('Error updating stylist assignments:', assignmentError);
+            // Service updated but assignments failed - log warning but don't fail the request
+            console.warn('Service updated but stylist assignments failed');
+          }
+        }
+      }
+    }
+
     return NextResponse.json({ service });
   } catch (error) {
     console.error('Update service error:', error);

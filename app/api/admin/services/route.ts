@@ -102,6 +102,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create service' }, { status: 500 });
     }
 
+    // Handle stylist assignments if provided
+    if (body.stylistIds && body.stylistIds.length > 0) {
+      const assignments = body.stylistIds.map((stylistId: string) => ({
+        service_id: service.id,
+        stylist_id: stylistId,
+        business_id: profile?.business_id,
+        is_active: true
+      }));
+
+      const { error: assignmentError } = await supabase
+        .from('stylist_services')
+        .insert(assignments);
+
+      if (assignmentError) {
+        console.error('Error creating stylist assignments:', assignmentError);
+        // Service created but assignments failed - log warning but don't fail the request
+        console.warn('Service created but stylist assignments failed');
+      }
+    }
+
     return NextResponse.json({ service });
   } catch (error) {
     console.error('Create service error:', error);

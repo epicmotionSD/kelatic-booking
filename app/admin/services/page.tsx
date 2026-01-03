@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/lib/currency';
-import type { Service, ServiceCategory } from '@/types/database';
+import type { Service, ServiceCategory, Profile } from '@/types/database';
 
 const CATEGORY_LABELS: Record<ServiceCategory, string> = {
   locs: 'Locs',
@@ -17,6 +17,7 @@ const CATEGORY_LABELS: Record<ServiceCategory, string> = {
 
 export default function ServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
+  const [serviceStylistCounts, setServiceStylistCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState<Service | null>(null);
@@ -31,6 +32,22 @@ export default function ServicesPage() {
       const res = await fetch('/api/admin/services');
       const data = await res.json();
       setServices(data.services || []);
+      
+      // Fetch stylist counts for each service
+      const counts: Record<string, number> = {};
+      for (const service of data.services || []) {
+        try {
+          const stylistRes = await fetch(`/api/admin/services/${service.id}/stylists`);
+          if (stylistRes.ok) {
+            const stylistData = await stylistRes.json();
+            counts[service.id] = (stylistData.stylistIds || []).length;
+          }
+        } catch (error) {
+          console.error(`Failed to fetch stylists for service ${service.id}:`, error);
+          counts[service.id] = 0;
+        }
+      }
+      setServiceStylistCounts(counts);
     } catch (error) {
       console.error('Failed to fetch services:', error);
     } finally {
@@ -231,11 +248,26 @@ export default function ServicesPage() {
                 </span>
               </div>
 
-              {service.deposit_required && (
+              {(service.deposit_required || serviceStylistCounts[service.id] > 0) && (
                 <div className="mt-3 pt-3 border-t border-white/10 flex items-center gap-2">
-                  <span className="px-2 py-1 bg-amber-400/10 text-amber-400 text-xs rounded-full">
-                    ${service.deposit_amount} deposit
-                  </span>
+                  {service.deposit_required && (
+                    <span className="px-2 py-1 bg-amber-400/10 text-amber-400 text-xs rounded-full">
+                      ${service.deposit_amount} deposit
+                    </span>
+                  )}
+                  {serviceStylistCounts[service.id] > 0 && (
+                    <span className="px-2 py-1 bg-blue-400/10 text-blue-400 text-xs rounded-full flex items-center gap-1">
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      {serviceStylistCounts[service.id]} stylist{serviceStylistCounts[service.id] !== 1 ? 's' : ''}
+                    </span>
+                  )}
+                  {serviceStylistCounts[service.id] === 0 && (
+                    <span className="px-2 py-1 bg-orange-400/10 text-orange-400 text-xs rounded-full">
+                      No stylists assigned
+                    </span>
+                  )}
                 </div>
               )}
             </div>
@@ -274,8 +306,35 @@ function ServiceModal({ service, onClose, onSave }: ServiceModalProps) {
     deposit_required: service?.deposit_required || false,
     deposit_amount: service?.deposit_amount?.toString() || '',
   });
+  const [stylists, setStylists] = useState<Profile[]>([]);
+  const [selectedStylists, setSelectedStylists] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  // Fetch stylists and current assignments when modal opens
+  useEffect(() => {
+    async function fetchStylists() {
+      try {
+        const res = await fetch('/api/admin/stylists');
+        const data = await res.json();
+        const stylistProfiles = (data.stylists || []).filter((s: Profile) => s.role === 'stylist');
+        setStylists(stylistProfiles);
+
+        // If editing a service, fetch current stylist assignments
+        if (service) {
+          const assignRes = await fetch(`/api/admin/services/${service.id}/stylists`);
+          if (assignRes.ok) {
+            const assignData = await assignRes.json();
+            setSelectedStylists(assignData.stylistIds || []);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch stylists:', error);
+      }
+    }
+    
+    fetchStylists();
+  }, [service]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -293,6 +352,7 @@ function ServiceModal({ service, onClose, onSave }: ServiceModalProps) {
         deposit_amount: formData.deposit_required
           ? parseFloat(formData.deposit_amount)
           : null,
+        stylistIds: selectedStylists, // Include stylist assignments
       };
 
       const res = await fetch(
@@ -317,6 +377,14 @@ function ServiceModal({ service, onClose, onSave }: ServiceModalProps) {
     } finally {
       setLoading(false);
     }
+  }
+
+  function toggleStylist(stylistId: string) {
+    setSelectedStylists(prev =>
+      prev.includes(stylistId)
+        ? prev.filter(id => id !== stylistId)
+        : [...prev, stylistId]
+    );
   }
 
   return (
@@ -438,6 +506,45 @@ function ServiceModal({ service, onClose, onSave }: ServiceModalProps) {
               />
             </div>
           )}
+
+          {/* Stylist Assignment */}
+          <div>
+            <label className="block text-sm font-medium text-white/70 mb-3">
+              Assign Locticians/Stylists
+            </label>
+            <div className="space-y-2 max-h-40 overflow-y-auto">
+              {stylists.length > 0 ? (
+                stylists.map((stylist) => (
+                  <label
+                    key={stylist.id}
+                    className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedStylists.includes(stylist.id)}
+                      onChange={() => toggleStylist(stylist.id)}
+                      className="w-4 h-4 rounded border-white/30 bg-transparent text-amber-400 focus:ring-amber-400/50"
+                    />
+                    <div className="flex-1">
+                      <p className="text-white font-medium">
+                        {stylist.first_name} {stylist.last_name}
+                      </p>
+                      {stylist.specialties && stylist.specialties.length > 0 && (
+                        <p className="text-xs text-amber-400">
+                          {stylist.specialties.slice(0, 2).join(', ')}
+                        </p>
+                      )}
+                    </div>
+                  </label>
+                ))
+              ) : (
+                <p className="text-white/40 text-sm text-center py-4">No stylists found</p>
+              )}
+            </div>
+            <p className="text-xs text-white/40 mt-2">
+              Select which locticians/stylists can perform this service
+            </p>
+          </div>
 
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl text-sm">
