@@ -74,10 +74,19 @@ export class SupportAgent extends BaseFunctionalAgent {
           result = await this.getMetrics();
           break;
         case 'add_knowledge':
-          result = await this.addKnowledgeArticle(task.input);
+          result = await this.addKnowledgeArticle(task.input as {
+            category: string;
+            question: string;
+            answer: string;
+            keywords?: string[];
+          });
           break;
         case 'track_feature':
-          result = await this.trackFeatureDiscovery(task.input);
+          result = await this.trackFeatureDiscovery(task.input as {
+            featureName: string;
+            userId?: string;
+            source: 'support_chat' | 'onboarding' | 'tooltip' | 'search';
+          });
           break;
         default:
           throw new Error(`Unknown task type: ${task.taskType}`);
