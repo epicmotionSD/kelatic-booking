@@ -347,7 +347,7 @@ export class RetentionAgent extends BaseFunctionalAgent {
     );
     const totalVisits = (appointments || []).length;
 
-    const currentTier = currentStatus?.current_tier || 'standard';
+    const currentTier = (currentStatus?.current_tier as VipTier) || 'standard';
 
     // Determine recommended tier
     let recommendedTier: VipTier = 'standard';
@@ -365,8 +365,8 @@ export class RetentionAgent extends BaseFunctionalAgent {
       platinum: 3,
     };
 
-    const shouldPromote = tierOrder[recommendedTier] > tierOrder[currentTier];
-    const shouldDemote = tierOrder[recommendedTier] < tierOrder[currentTier];
+    const shouldPromote = tierOrder[recommendedTier] > tierOrder[currentTier as VipTier];
+    const shouldDemote = tierOrder[recommendedTier] < tierOrder[currentTier as VipTier];
 
     // Calculate next tier requirements
     let nextTierRequirements: { spendNeeded: number; visitsNeeded: number } | undefined;
