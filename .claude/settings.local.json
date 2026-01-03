@@ -33,7 +33,9 @@
       "Bash(echo:*)",
       "Bash(xargs:*)",
       "Bash(powershell -command \"Get-Content ''c:\\\\Users\\\\shawn\\\\Downloads\\\\kelatic-booking\\\\supabase\\\\migrations\\\\010_multi_tenant.sql'' | Set-Clipboard\")",
-      "Bash(powershell -command \"Get-Content ''c:\\\\Users\\\\shawn\\\\Downloads\\\\kelatic-booking\\\\supabase\\\\migrations\\\\010_multi_tenant_full.sql'' | Set-Clipboard\")"
+      "Bash(powershell -command \"Get-Content ''c:\\\\Users\\\\shawn\\\\Downloads\\\\kelatic-booking\\\\supabase\\\\migrations\\\\010_multi_tenant_full.sql'' | Set-Clipboard\")",
+      "Bash(ls:*)",
+      "Bash(rm:*)"
     ]
   }
 }

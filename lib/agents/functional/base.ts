@@ -282,11 +282,17 @@ export function createFunctionalAgent(
       const { MarketingAgent } = require('./marketing/service');
       return new MarketingAgent(businessId);
     case 'scheduling':
-      throw new Error('Scheduling agent not yet implemented');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { SchedulingAgent } = require('./scheduling/service');
+      return new SchedulingAgent(businessId);
     case 'retention':
-      throw new Error('Retention agent not yet implemented');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { RetentionAgent } = require('./retention/service');
+      return new RetentionAgent(businessId);
     case 'support':
-      throw new Error('Support agent not yet implemented');
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const { SupportAgent } = require('./support/service');
+      return new SupportAgent(businessId);
     default:
       throw new Error(`Unknown agent type: ${agentType}`);
   }

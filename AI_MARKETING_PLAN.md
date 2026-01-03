@@ -1,17 +1,31 @@
-# AI Marketing Automation - Multi-Tenant Content Generation
+# AI Marketing Automation - x3o.ai Sub-Agent
 
-**Platform:** x3o.ai
-**Powered by:** x3o.ai's Board of Directors
-**Status:** Implemented with multi-tenant support
-**Anchor Tenant:** Kelatic Hair Lounge (kelatic.x3o.ai)
+> **Sub-Agent Type:** Content Generation
+> **Parent Platform:** x3o.ai ("The Shopify for Platform Builds")
+> **Status:** LIVE
+> **First Tenant:** Kelatic Hair Lounge (kelatic.x3o.ai)
 
 ---
 
 ## Overview
 
-AI Marketing Automation is the AI-powered content generation engine for the x3o.ai platform. Each tenant gets personalized AI content that reflects their unique brand voice, colors, and business context.
+AI Marketing Automation is a **sub-agent** within the x3o.ai platform ecosystem. It provides AI-powered content generation capabilities to all platform tenants, automatically adapting to each business's brand voice, colors, and context.
 
-All generated content automatically includes x3o.ai links and branding.
+**Position in x3o.ai Architecture:**
+
+```
+x3o.ai Platform
+├── Templates (Trinity Booking, etc.)
+├── Sub-Agents
+│   └── AI Marketing Automation ← This document
+└── MCP Servers (OpenConductor)
+```
+
+All generated content automatically includes:
+
+- Tenant-specific booking URLs
+- "Powered by x3o.ai" branding
+- Platform promotion links
 
 ## Architecture
 

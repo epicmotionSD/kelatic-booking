@@ -1,8 +1,12 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import { getTenantContext, generateTenantMetadata, generateTenantJsonLd } from '@/lib/tenant/server';
 import { BusinessProvider, BusinessThemeStyle } from '@/lib/tenant/context';
+
+// Google Ads tracking ID (set in env)
+const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -73,6 +77,23 @@ export default async function RootLayout({
         {business && <BusinessThemeStyle business={business} />}
       </head>
       <body className={inter.className} suppressHydrationWarning={true}>
+        {/* Google Ads Tag */}
+        {GOOGLE_ADS_ID && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+              strategy="afterInteractive"
+            />
+            <Script id="google-ads" strategy="afterInteractive">
+              {`
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+                gtag('config', '${GOOGLE_ADS_ID}');
+              `}
+            </Script>
+          </>
+        )}
         <BusinessProvider business={business} settings={settings}>
           {children}
         </BusinessProvider>

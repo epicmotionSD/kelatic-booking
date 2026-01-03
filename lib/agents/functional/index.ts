@@ -4,8 +4,8 @@
 export * from './types';
 export * from './base';
 
-// Agent implementations will be exported here as they're created
-// export * from './marketing';
-// export * from './scheduling';
-// export * from './retention';
-// export * from './support';
+// Agent implementations
+export * from './marketing';
+export * from './scheduling';
+export * from './retention';
+export * from './support';

@@ -1,6 +1,8 @@
 'use client';
 
+import { useEffect } from 'react';
 import { formatCurrency } from '@/lib/currency';
+import { trackBookingConversion } from '@/lib/google-ads';
 import type { BookingData } from '@/app/(public)/book/page';
 
 interface ConfirmationProps {
@@ -8,6 +10,13 @@ interface ConfirmationProps {
 }
 
 export function Confirmation({ bookingData }: ConfirmationProps) {
+  // Track Google Ads conversion when booking is confirmed
+  useEffect(() => {
+    const servicePrice = bookingData.service?.base_price || 0;
+    const addonsPrice = bookingData.addons.reduce((sum, a) => sum + a.base_price, 0);
+    const totalPrice = servicePrice + addonsPrice;
+    trackBookingConversion(totalPrice);
+  }, [bookingData]);
   const formatDateTime = (): { date: string; time: string } => {
     if (!bookingData.timeSlot) return { date: '', time: '' };
     const d = new Date(bookingData.timeSlot.start_time);
