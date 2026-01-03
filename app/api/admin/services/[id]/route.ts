@@ -1,5 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/client';
+import { createServerSupabaseClient } from '@/lib/supabase/client';
+
+// Helper function to check if user has permission to manage services
+async function checkServicePermissions(supabase: any) {
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
+  
+  if (authError || !user) {
+    return { hasPermission: false, error: 'Authentication required' };
+  }
+
+  // Check if user has admin, owner, or stylist role in any business
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role, business_id')
+    .eq('id', user.id)
+    .single();
+
+  if (!profile) {
+    return { hasPermission: false, error: 'Profile not found' };
+  }
+
+  // Allow admin, owner, and stylist (locticians) roles
+  if (!['admin', 'owner', 'stylist'].includes(profile.role)) {
+    return { hasPermission: false, error: 'Insufficient permissions - only admins, owners, and stylists can manage services' };
+  }
+
+  return { hasPermission: true, profile };
+}
 
 export async function GET(
   request: NextRequest,
@@ -7,7 +34,13 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const supabase = createAdminClient();
+    const supabase = await createServerSupabaseClient();
+
+    // Check permissions
+    const { hasPermission, error: permissionError } = await checkServicePermissions(supabase);
+    if (!hasPermission) {
+      return NextResponse.json({ error: permissionError }, { status: 401 });
+    }
 
     const { data: service, error } = await supabase
       .from('services')
@@ -33,7 +66,13 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    const supabase = createAdminClient();
+    const supabase = await createServerSupabaseClient();
+
+    // Check permissions
+    const { hasPermission, error: permissionError } = await checkServicePermissions(supabase);
+    if (!hasPermission) {
+      return NextResponse.json({ error: permissionError }, { status: 401 });
+    }
 
     const { data: service, error } = await supabase
       .from('services')
@@ -69,7 +108,13 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await request.json();
-    const supabase = createAdminClient();
+    const supabase = await createServerSupabaseClient();
+
+    // Check permissions
+    const { hasPermission, error: permissionError } = await checkServicePermissions(supabase);
+    if (!hasPermission) {
+      return NextResponse.json({ error: permissionError }, { status: 401 });
+    }
 
     const updates: any = {};
 
@@ -106,7 +151,13 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const supabase = createAdminClient();
+    const supabase = await createServerSupabaseClient();
+
+    // Check permissions
+    const { hasPermission, error: permissionError } = await checkServicePermissions(supabase);
+    if (!hasPermission) {
+      return NextResponse.json({ error: permissionError }, { status: 401 });
+    }
 
     // Check if service is used in any appointments
     const { count } = await supabase
@@ -121,9 +172,9 @@ export async function DELETE(
         .update({ is_active: false })
         .eq('id', id);
 
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: 'Service deactivated (has existing appointments)',
-        deactivated: true 
+        deactivated: true
       });
     }
 
