@@ -103,7 +103,7 @@ export interface RetentionDashboard {
   }>;
 }
 
-export interface CreateCampaignInput {
+export interface CreateRetentionCampaignInput {
   name: string;
   targetSegment: HealthStatus;
   triggerType: TriggerType;

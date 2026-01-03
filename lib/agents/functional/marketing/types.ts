@@ -10,7 +10,7 @@ import type {
   CampaignStatus,
 } from '../types';
 
-export interface CreateCampaignInput {
+export interface CreateMarketingCampaignInput {
   name: string;
   description?: string;
   campaignType: CampaignType;

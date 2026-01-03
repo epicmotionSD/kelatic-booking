@@ -13,7 +13,7 @@ import type {
   CampaignStatus,
 } from '../types';
 import type {
-  CreateCampaignInput,
+  CreateMarketingCampaignInput,
   GenerateCalendarInput,
   GeneratedCalendarItem,
   SchedulePostInput,
@@ -60,7 +60,7 @@ export class MarketingAgent extends BaseFunctionalAgent {
 
       switch (task.taskType) {
         case 'create_campaign':
-          result = await this.createCampaign(task.input as CreateCampaignInput);
+          result = await this.createCampaign(task.input as CreateMarketingCampaignInput);
           break;
         case 'generate_calendar':
           result = await this.generateContentCalendar(task.input as GenerateCalendarInput);
@@ -99,7 +99,7 @@ export class MarketingAgent extends BaseFunctionalAgent {
   // CAMPAIGN MANAGEMENT
   // ============================================
 
-  async createCampaign(input: CreateCampaignInput): Promise<MarketingCampaign> {
+  async createCampaign(input: CreateMarketingCampaignInput): Promise<MarketingCampaign> {
     const { data, error } = await this.supabase
       .from('marketing_campaigns')
       .insert({

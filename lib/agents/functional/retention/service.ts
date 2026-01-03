@@ -20,7 +20,7 @@ import type {
   RetentionRecommendation,
   ChurnRiskSegment,
   RetentionDashboard,
-  CreateCampaignInput,
+  CreateRetentionCampaignInput,
 } from './types';
 import {
   RETENTION_SYSTEM_PROMPT,
@@ -71,7 +71,7 @@ export class RetentionAgent extends BaseFunctionalAgent {
           result = await this.checkReengagementTriggers();
           break;
         case 'create_campaign':
-          result = await this.createCampaign(task.input as CreateCampaignInput);
+          result = await this.createCampaign(task.input as CreateRetentionCampaignInput);
           break;
         case 'get_at_risk':
           result = await this.getAtRiskClients();
@@ -508,7 +508,7 @@ export class RetentionAgent extends BaseFunctionalAgent {
   // CAMPAIGNS
   // ============================================
 
-  async createCampaign(input: CreateCampaignInput): Promise<RetentionCampaign> {
+  async createCampaign(input: CreateRetentionCampaignInput): Promise<RetentionCampaign> {
     const { data, error } = await this.supabase
       .from('retention_campaigns')
       .insert({
