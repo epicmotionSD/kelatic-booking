@@ -401,14 +401,15 @@ export class SupportAgent extends BaseFunctionalAgent {
     if (error) {
       const { data: article } = await this.supabase
         .from('support_knowledge_base')
-        .select(column)
+        .select(`${column}`)
         .eq('id', articleId)
         .single();
 
       if (article) {
+        const currentValue = article[column as keyof typeof article] as number || 0;
         await this.supabase
           .from('support_knowledge_base')
-          .update({ [column]: (article[column] || 0) + 1 })
+          .update({ [column]: currentValue + 1 })
           .eq('id', articleId);
       }
     }
