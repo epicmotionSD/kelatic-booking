@@ -229,13 +229,41 @@ function BookingContent() {
               });
               goToStep('stylist');
             }}
-            onSelectStylist={(stylist) => {
-              if (stylist.id === 'any') {
-                updateBookingData({ stylist: null, anyAvailableStylist: true });
-              } else {
-                updateBookingData({ stylist, anyAvailableStylist: false });
+            onSelectStylist={async (stylist) => {
+              try {
+                // Fetch all services to set a default when booking by stylist
+                const res = await fetch('/api/services');
+                const data = await res.json();
+                const allServices = data.services || [];
+                
+                if (stylist.id === 'any') {
+                  updateBookingData({
+                    stylist: null,
+                    anyAvailableStylist: true,
+                    // Set default service and available services for "any stylist" bookings
+                    service: allServices.length > 0 ? allServices[0] : null,
+                    availableServices: allServices
+                  });
+                } else {
+                  updateBookingData({
+                    stylist,
+                    anyAvailableStylist: false,
+                    // Set default service and available services for specific stylist bookings
+                    service: allServices.length > 0 ? allServices[0] : null,
+                    availableServices: allServices
+                  });
+                }
+                goToStep('datetime');
+              } catch (error) {
+                console.error('Failed to fetch services:', error);
+                // Fallback: still allow progression but without services
+                if (stylist.id === 'any') {
+                  updateBookingData({ stylist: null, anyAvailableStylist: true });
+                } else {
+                  updateBookingData({ stylist, anyAvailableStylist: false });
+                }
+                goToStep('datetime');
               }
-              goToStep('datetime');
             }}
           />
         )}

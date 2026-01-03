@@ -62,7 +62,7 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'price' | 'stylist'>('stylist');
+  const [viewMode, setViewMode] = useState<'price' | 'stylist'>('price');
 
   useEffect(() => {
     fetchData();
