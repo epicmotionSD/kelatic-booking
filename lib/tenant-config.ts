@@ -1,7 +1,7 @@
 // Multi-tenant Analytics Configuration
 // Maps domains to their respective Google Analytics IDs
 
-export const tenantAnalytics = {
+export const tenantAnalytics: Record<string, string> = {
   // Kelatic Hair Lounge (AI-Enhanced)
   'kelatic.x3o.ai': 'AW-937265883',           // Kelatic's Google Ads ID
   'kelatic.com': 'AW-937265883',              // Same ID for kelatic.com if used
@@ -16,7 +16,7 @@ export const tenantAnalytics = {
   'localhost:3001': 'G-TESTID123456',
 };
 
-export const tenantGoogleAds = {
+export const tenantGoogleAds: Record<string, { adsId: string; bookingConversion?: string; leadConversion?: string; } | null> = {
   // Kelatic Hair Lounge Google Ads Configuration
   'kelatic.x3o.ai': {
     adsId: 'AW-937265883',
