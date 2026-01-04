@@ -110,6 +110,7 @@ export default function LandingPage() {
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-10">
               <Link href="/services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</Link>
+              <Link href="/special-offers" className="text-sm font-medium text-amber-400 hover:text-yellow-400 transition-colors animate-pulse">$75 Tuesday Special</Link>
               <a href="#team" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Team</a>
               <Link href="/blog" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Blog</Link>
               <Link href="/barber-block" className="text-sm font-medium text-white/70 hover:text-red-400 transition-colors">Barber Block</Link>
@@ -140,6 +141,7 @@ export default function LandingPage() {
           <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 py-6">
             <div className="flex flex-col gap-4 px-6">
               <Link href="/services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Services</Link>
+              <Link href="/special-offers" onClick={() => setMobileMenuOpen(false)} className="text-amber-400 py-2 text-lg animate-pulse">$75 Tuesday Special</Link>
               <a href="#team" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Team</a>
               <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Blog</Link>
               <Link href="/barber-block" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg hover:text-red-400">Barber Block</Link>
