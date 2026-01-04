@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
+import { InstagramGallery } from '@/components/instagram/gallery';
 import type { Service, ServiceCategory, Profile } from '@/types/database';
-import { Clock, Users, Sparkles, Star, Crown, ArrowRight } from 'lucide-react';
+import { Clock, Users, Sparkles, Star, Crown, ArrowRight, Instagram } from 'lucide-react';
 
 const CATEGORY_LABELS: Record<ServiceCategory, string> = {
   locs: 'Locs',
@@ -224,6 +225,50 @@ export default function ServicesPage() {
         )}
       </main>
 
+      {/* Instagram Portfolio Gallery */}
+      <section className="bg-black/30 border-t border-white/5 py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <Instagram className="w-8 h-8 text-amber-400" />
+              <h2 className="text-3xl font-bold text-white">Our Work</h2>
+              <Instagram className="w-8 h-8 text-amber-400" />
+            </div>
+            <p className="text-xl text-white/70 mb-4">
+              See the latest transformations from our talented locticians
+            </p>
+            <a
+              href="https://instagram.com/kelatichairlounge_"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
+            >
+              <span>@kelatichairlounge_</span>
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+          
+          <InstagramGallery
+            limit={12}
+            category={activeCategory === 'all' ? undefined : activeCategory as string}
+            className="mb-8"
+          />
+          
+          <div className="text-center">
+            <a
+              href="https://instagram.com/kelatichairlounge_"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:border-amber-400/50 hover:bg-white/10 transition-all"
+            >
+              <Instagram className="w-5 h-5" />
+              View More on Instagram
+              <ArrowRight className="w-5 h-5" />
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-amber-400/10 to-yellow-500/10 border-t border-white/10 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
@@ -231,7 +276,7 @@ export default function ServicesPage() {
           <p className="text-xl text-white/70 mb-8">
             Experience Houston's premier loc and natural hair care
           </p>
-          <Link 
+          <Link
             href="/book"
             className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-amber-500/30 transition-all"
           >
