@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
 import { InstagramGallery } from '@/components/instagram/gallery';
+import { Footer } from '@/components/layout/footer';
 import type { Service, ServiceCategory, Profile } from '@/types/database';
 import { Clock, Users, Sparkles, Star, Crown, ArrowRight, Instagram } from 'lucide-react';
 
@@ -287,13 +288,8 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-black/30 border-t border-white/5">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-white/40">
-          <p>Questions? Call us at <a href="tel:+17134854000" className="text-amber-400 hover:text-amber-300">(713) 485-4000</a></p>
-          <p className="mt-1">9430 Richmond Ave, Houston, TX 77063</p>
-        </div>
-      </footer>
+      {/* Shared Footer with AI Chatbot */}
+      <Footer />
     </div>
   );
 }

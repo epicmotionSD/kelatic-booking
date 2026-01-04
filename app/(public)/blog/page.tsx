@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { ArrowLeft, Clock, Calendar } from 'lucide-react';
 import { blogPosts, type BlogPost } from '@/lib/blog-posts';
+import { Footer } from '@/components/layout/footer';
 
 const CATEGORY_LABELS: Record<BlogPost['category'], string> = {
   care: 'Loc Care',
@@ -176,17 +177,8 @@ export default function BlogPage() {
         </section>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-black/30 border-t border-white/5 mt-12">
-        <div className="max-w-6xl mx-auto px-4 py-8 text-center text-sm text-white/40">
-          <p>
-            <a href="tel:+17134854000" className="text-amber-400 hover:text-amber-300">
-              (713) 485-4000
-            </a>{' '}
-            | 9430 Richmond Ave, Houston, TX 77063
-          </p>
-        </div>
-      </footer>
+      {/* Shared Footer with AI Chatbot */}
+      <Footer />
     </div>
   );
 }

@@ -109,8 +109,9 @@ export default function LandingPage() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-10">
-              <a href="#services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</a>
+              <Link href="/services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</Link>
               <a href="#team" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Team</a>
+              <Link href="/blog" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Blog</Link>
               <Link href="/barber-block" className="text-sm font-medium text-white/70 hover:text-red-400 transition-colors">Barber Block</Link>
               <a href="#academy" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Academy</a>
               <a href="#contact" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Contact</a>
@@ -138,8 +139,9 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 py-6">
             <div className="flex flex-col gap-4 px-6">
-              <a href="#services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Services</a>
+              <Link href="/services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Services</Link>
               <a href="#team" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Team</a>
+              <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Blog</Link>
               <Link href="/barber-block" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg hover:text-red-400">Barber Block</Link>
               <a href="#academy" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Academy</a>
               <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Contact</a>
@@ -600,8 +602,9 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold mb-6">Quick Links</h4>
               <div className="space-y-3">
-                <a href="#services" className="block text-white/50 hover:text-amber-400 transition-colors">Services</a>
+                <Link href="/services" className="block text-white/50 hover:text-amber-400 transition-colors">Services</Link>
                 <a href="#team" className="block text-white/50 hover:text-amber-400 transition-colors">Team</a>
+                <Link href="/blog" className="block text-white/50 hover:text-amber-400 transition-colors">Blog</Link>
                 <a href="#academy" className="block text-white/50 hover:text-amber-400 transition-colors">Academy</a>
                 <Link href="/book" className="block text-white/50 hover:text-amber-400 transition-colors">Book Now</Link>
               </div>
