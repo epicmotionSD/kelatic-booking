@@ -1,12 +1,11 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import Script from 'next/script';
+import { GoogleAnalytics } from '@next/third-parties/google';
+import { headers } from 'next/headers';
 import './globals.css';
 import { getTenantContext, generateTenantMetadata, generateTenantJsonLd } from '@/lib/tenant/server';
 import { BusinessProvider, BusinessThemeStyle } from '@/lib/tenant/context';
-
-// Google Ads tracking ID (set in env)
-const GOOGLE_ADS_ID = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID;
+import { getAnalyticsId, getGoogleAdsConfig } from '@/lib/tenant-config';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -56,6 +55,14 @@ export default async function RootLayout({
   const business = context?.business || null;
   const settings = context?.settings || null;
 
+  // Get the incoming hostname for analytics
+  const headersList = await headers();
+  const host = headersList.get('host');
+  
+  // Get the correct analytics ID for this tenant/domain
+  const analyticsId = getAnalyticsId(host);
+  const googleAdsConfig = getGoogleAdsConfig(host);
+
   // Generate JSON-LD for tenant or platform
   const jsonLd = business
     ? generateTenantJsonLd(business, settings)
@@ -77,26 +84,12 @@ export default async function RootLayout({
         {business && <BusinessThemeStyle business={business} />}
       </head>
       <body className={inter.className} suppressHydrationWarning={true}>
-        {/* Google Ads Tag */}
-        {GOOGLE_ADS_ID && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
-              strategy="afterInteractive"
-            />
-            <Script id="google-ads" strategy="afterInteractive">
-              {`
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', '${GOOGLE_ADS_ID}');
-              `}
-            </Script>
-          </>
-        )}
         <BusinessProvider business={business} settings={settings}>
           {children}
         </BusinessProvider>
+        
+        {/* Dynamic Google Analytics/Ads - optimized for Vercel */}
+        {analyticsId && <GoogleAnalytics gaId={analyticsId} />}
       </body>
     </html>
   );
