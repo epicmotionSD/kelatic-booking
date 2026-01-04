@@ -68,11 +68,11 @@ export default function SpecialOffersPage() {
               </div>
             </Link>
             <div className="flex items-center gap-4">
-              <Link 
-                href="/book"
+              <Link
+                href="/book?special=tuesday75"
                 className="px-6 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
               >
-                Book Now
+                Book $75 Special
               </Link>
               <Link href="/" className="text-sm text-white/50 hover:text-amber-400 transition-colors">
                 ← Back to site
@@ -122,7 +122,7 @@ export default function SpecialOffersPage() {
 
           {/* CTA Button */}
           <Link
-            href="/book"
+            href="/book?special=tuesday75"
             className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-black text-xl hover:shadow-2xl hover:shadow-amber-500/40 transition-all hover:scale-105 mb-12"
           >
             <Calendar className="w-6 h-6" />
@@ -231,7 +231,7 @@ export default function SpecialOffersPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Link
-              href="/book"
+              href="/book?special=tuesday75"
               className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-black text-lg hover:shadow-2xl hover:shadow-amber-500/40 transition-all hover:scale-105"
             >
               <Calendar className="w-6 h-6" />

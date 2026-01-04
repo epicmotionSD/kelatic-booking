@@ -68,6 +68,8 @@ const STEPS: { key: BookingStep; label: string }[] = [
 function BookingContent() {
   const searchParams = useSearchParams();
   const preselectedStylistId = searchParams.get('stylist');
+  const preselectedServiceId = searchParams.get('service');
+  const specialOffer = searchParams.get('special'); // For special offers like "tuesday75"
 
   const [currentStep, setCurrentStep] = useState<BookingStep>('browse');
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
@@ -83,20 +85,59 @@ function BookingContent() {
       let startStep: BookingStep = 'browse';
       const updates: Partial<BookingData> = {};
 
-      // Pre-fetch stylist if specified (from landing page "Book with X" buttons)
-      if (preselectedStylistId) {
-        try {
-          const res = await fetch('/api/stylists');
-          const data = await res.json();
-          const stylist = data.stylists?.find((s: Profile) => s.id === preselectedStylistId);
+      try {
+        // Pre-fetch services for service pre-selection
+        const servicesRes = await fetch('/api/services');
+        const servicesData = await servicesRes.json();
+        const allServices = servicesData.services || [];
+
+        // Handle special offers (e.g., ?special=tuesday75)
+        if (specialOffer === 'tuesday75') {
+          // Find the retwist service or create a special offer service
+          const retwistService = allServices.find((s: Service) =>
+            s.name.toLowerCase().includes('retwist') ||
+            s.name.toLowerCase().includes('maintenance')
+          );
+          
+          if (retwistService) {
+            // Create a special version with the offer price
+            const specialService = {
+              ...retwistService,
+              name: 'Tuesday Special - Shampoo & Retwist',
+              base_price: 75,
+              description: 'Tuesday Special: Professional shampoo and expert retwist for just $75 (Regular $85)',
+              id: `special-${retwistService.id}`
+            };
+            updates.service = specialService;
+            updates.availableServices = [specialService];
+            startStep = 'stylist'; // Skip to stylist selection
+          }
+        }
+        // Handle direct service pre-selection (e.g., ?service=service-id)
+        else if (preselectedServiceId) {
+          const service = allServices.find((s: Service) => s.id === preselectedServiceId);
+          if (service) {
+            updates.service = service;
+            updates.availableServices = allServices;
+            startStep = 'stylist'; // Skip to stylist selection
+          }
+        }
+
+        // Pre-fetch stylist if specified (from landing page "Book with X" buttons)
+        if (preselectedStylistId) {
+          const stylistsRes = await fetch('/api/stylists');
+          const stylistsData = await stylistsRes.json();
+          const stylist = stylistsData.stylists?.find((s: Profile) => s.id === preselectedStylistId);
           if (stylist) {
             updates.stylist = stylist;
             updates.anyAvailableStylist = false;
-            startStep = 'datetime'; // Skip to date selection if stylist pre-selected
+            // If we also have a service selected, go to datetime
+            startStep = updates.service ? 'datetime' : 'browse';
           }
-        } catch (e) {
-          console.error('Failed to fetch stylist:', e);
         }
+
+      } catch (e) {
+        console.error('Failed to fetch initialization data:', e);
       }
 
       if (Object.keys(updates).length > 0) {
@@ -107,7 +148,7 @@ function BookingContent() {
     };
 
     initFromParams();
-  }, [preselectedStylistId, initialized]);
+  }, [preselectedStylistId, preselectedServiceId, specialOffer, initialized]);
 
   function updateBookingData(updates: Partial<BookingData>) {
     setBookingData((prev) => ({ ...prev, ...updates }));
