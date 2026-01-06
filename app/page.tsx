@@ -20,6 +20,8 @@ import {
   Menu,
   X,
   Play,
+  ArrowRight,
+  ExternalLink,
 } from 'lucide-react';
 
 interface Service {
@@ -109,8 +111,8 @@ export default function LandingPage() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-10">
-              <Link href="/services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</Link>
-              <Link href="/special-offers" className="text-sm font-medium text-amber-400 hover:text-yellow-400 transition-colors animate-pulse">$75 Tuesday Special</Link>
+              <Link href="/services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Loc Services</Link>
+              <Link href="/special-offers" className="text-sm font-medium text-amber-400 hover:text-yellow-400 transition-colors animate-pulse">$75 Wednesday Special</Link>
               <a href="#team" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Team</a>
               <Link href="/blog" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Blog</Link>
               <Link href="/barber-block" className="text-sm font-medium text-white/70 hover:text-red-400 transition-colors">Barber Block</Link>
@@ -140,8 +142,8 @@ export default function LandingPage() {
         {mobileMenuOpen && (
           <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 py-6">
             <div className="flex flex-col gap-4 px-6">
-              <Link href="/services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Services</Link>
-              <Link href="/special-offers" onClick={() => setMobileMenuOpen(false)} className="text-amber-400 py-2 text-lg animate-pulse">$75 Tuesday Special</Link>
+              <Link href="/services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Loc Services</Link>
+              <Link href="/special-offers" onClick={() => setMobileMenuOpen(false)} className="text-amber-400 py-2 text-lg animate-pulse">$75 Wednesday Special</Link>
               <a href="#team" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Team</a>
               <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Blog</Link>
               <Link href="/barber-block" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg hover:text-red-400">Barber Block</Link>
@@ -159,28 +161,83 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="min-h-screen pt-20 relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-black" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-amber-500/10 to-transparent" />
-        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent" />
+      <section className="min-h-screen pt-20 relative overflow-hidden bg-gradient-to-br from-black via-zinc-950 to-black">
+        {/* Background elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-yellow-500/5 rounded-full blur-3xl" />
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-conic from-amber-500/10 via-transparent to-yellow-500/10 rounded-full blur-2xl" />
+        </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
           <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8">
-            <h1 className="text-4xl md:text-6xl font-black leading-tight text-white">
-              Loc Retwist, Starter Locs, Loc Detox, Loc Extensions, and More.
-            </h1>
-            <p className="text-lg md:text-xl text-white/70 max-w-xl mx-auto">
-              Houston’s leading locticians. Expert care for your natural hair journey.
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400/10 border border-amber-400/20 rounded-full text-amber-400 text-sm font-medium mb-6">
+              <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse" />
+              Houston's #1 Loc Specialists
+            </div>
+            <div className="space-y-4 max-w-5xl">
+              <h1 className="text-6xl md:text-8xl font-black leading-[0.9]">
+                <span className="bg-gradient-to-r from-white via-amber-100 to-amber-300 bg-clip-text text-transparent">
+                  Expert Loc Care &
+                </span>
+              </h1>
+              <h2 className="text-5xl md:text-7xl font-black leading-[0.9]">
+                <span className="bg-gradient-to-r from-amber-400 via-yellow-300 to-orange-400 bg-clip-text text-transparent">
+                  Professional Maintenance
+                </span>
+              </h2>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-4xl mx-auto">
+              <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                Loc Retwist
+              </div>
+              <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                Starter Locs
+              </div>
+              <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                Loc Detox
+              </div>
+              <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                Loc Extensions
+              </div>
+              <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                Palm Rolling
+              </div>
+              <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                Loc Repair
+              </div>
+              <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                Loc Styling
+              </div>
+              <div className="px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white/90 text-sm font-semibold hover:bg-white/10 transition-colors">
+                Loc Consultation
+              </div>
+            </div>
+
+            <p className="text-xl text-white/60 max-w-2xl leading-relaxed">
+              Book with Houston's most trusted loc specialists. From starter locs to maintenance, 
+              we provide expert care for your loc journey with precision and artistry.
             </p>
-            <Link
-              href="/book"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-lg shadow-lg hover:scale-105 transition-all"
-            >
-              <Calendar className="w-5 h-5" />
-              Book Appointment
-              <ChevronRight className="w-5 h-5" />
-            </Link>
+
+            <div className="flex flex-col sm:flex-row gap-4 items-center pt-4">
+              <Link 
+                href="/book" 
+                className="group relative bg-gradient-to-r from-amber-400 to-orange-500 text-black px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-amber-500/25 transition-all duration-300 hover:-translate-y-1 flex items-center gap-3"
+              >
+                <Calendar className="w-5 h-5" />
+                Book Appointment
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+              
+              <Link 
+                href="/services" 
+                className="group px-8 py-4 border border-white/20 text-white rounded-xl font-bold text-lg hover:bg-white/10 transition-all duration-300 flex items-center gap-3"
+              >
+                View All Services
+                <ExternalLink className="w-5 h-5 group-hover:scale-110 transition-transform" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
