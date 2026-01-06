@@ -181,43 +181,8 @@ export default function LandingPage() {
               Book Appointment
               <ChevronRight className="w-5 h-5" />
             </Link>
-                  <div className="text-4xl font-black text-amber-400">5K+</div>
-                  <div className="text-sm text-white/50">Clients</div>
-                </div>
-                <div className="w-px h-12 bg-white/20" />
-                <div className="text-center">
-                  <div className="flex items-center gap-1 text-4xl font-black text-amber-400">
-                    4.9 <Star className="w-7 h-7 fill-amber-400" />
-                  </div>
-                  <div className="text-sm text-white/50">Rating</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right - Hero Visual */}
-            <div className="relative hidden lg:block">
-              <div className="relative">
-                {/* Main image placeholder */}
-                <div className="aspect-[3/4] rounded-3xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 overflow-hidden relative">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-40 h-40 rounded-full bg-gradient-to-br from-amber-400/20 to-yellow-500/20 flex items-center justify-center backdrop-blur-sm border border-amber-400/30">
-                      <span className="text-6xl font-black text-amber-400">K</span>
-                    </div>
-                  </div>
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                </div>
-
-                {/* Floating elements */}
-                <div className="absolute -left-8 top-1/4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl animate-float">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                      <Clock className="w-6 h-6 text-green-400" />
-                    </div>
-                    <div>
-                      <div className="font-bold">Open Today</div>
-                      <div className="text-sm text-white/50">9AM - 6PM</div>
-                    </div>
+          </div>
+        </div>
                   </div>
                 </div>
 
