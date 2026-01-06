@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
-import { Calendar, CreditCard, Users, TrendingUp, AlertTriangle, CheckCircle, Settings, Zap, Target, Clock, ArrowUpRight, ArrowDownRight, PlusCircle } from 'lucide-react';
+import { Calendar, CreditCard, Users, TrendingUp, AlertTriangle, CheckCircle, Settings, Zap, Target, Clock } from 'lucide-react';
 
 interface DashboardMetrics {
   todayAppointments: number;
@@ -40,6 +40,7 @@ export default function AdminDashboard() {
   const [metrics, setMetrics] = useState<DashboardMetrics | null>(null);
   const [setupStatus, setSetupStatus] = useState<SetupStatus | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dateRange, setDateRange] = useState<'today' | 'week' | 'month'>('today');
 
   useEffect(() => {
     Promise.all([fetchMetrics(), checkSetupStatus()]);
@@ -67,7 +68,7 @@ export default function AdminDashboard() {
           googleCalendar: data.settings.googleCalendarConnected || false,
           smsEmail: data.settings.smsEmailEnabled || false,
           businessInfo: !!(data.settings.name && data.settings.email && data.settings.phone),
-          paymentSetup: true
+          paymentSetup: true // Assume payment is set up if they have revenue
         });
       }
     } catch (error) {
@@ -75,11 +76,13 @@ export default function AdminDashboard() {
     }
   }
 
+  // Generate smart business insights
   const generateInsights = (): BusinessInsight[] => {
     const insights: BusinessInsight[] = [];
     
     if (!setupStatus) return insights;
 
+    // Setup incomplete insights
     if (!setupStatus.googleCalendar || !setupStatus.smsEmail) {
       insights.push({
         type: 'action',
@@ -94,6 +97,7 @@ export default function AdminDashboard() {
       });
     }
 
+    // Business performance insights
     if (metrics) {
       if (metrics.pendingDeposits > 0) {
         insights.push({
@@ -136,6 +140,8 @@ export default function AdminDashboard() {
     return insights;
   };
 
+  const insights = generateInsights();
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -144,11 +150,6 @@ export default function AdminDashboard() {
     );
   }
 
-  const insights = generateInsights();
-  const weeklyGrowth = metrics?.weekRevenue && metrics?.todayRevenue 
-    ? Math.round(((metrics.todayRevenue / (metrics.weekRevenue / 7)) - 1) * 100) 
-    : 0;
-
   const stats = [
     {
       label: "Today's Appointments",
@@ -156,8 +157,7 @@ export default function AdminDashboard() {
       icon: <Calendar className="w-6 h-6" />,
       color: 'from-blue-400 to-blue-500',
       bgColor: 'bg-blue-500/10',
-      change: metrics?.weekAppointments ? `${Math.round(((metrics.todayAppointments / (metrics.weekAppointments / 7)) - 1) * 100)}%` : null,
-      trend: metrics?.todayAppointments > (metrics?.weekAppointments / 7) ? 'up' : 'down'
+      change: metrics?.weekAppointments ? `${Math.round(((metrics.todayAppointments / metrics.weekAppointments) * 7 - 1) * 100)}%` : null
     },
     {
       label: "Today's Revenue",
@@ -165,8 +165,7 @@ export default function AdminDashboard() {
       icon: <CreditCard className="w-6 h-6" />,
       color: 'from-emerald-400 to-green-500',
       bgColor: 'bg-emerald-500/10',
-      change: weeklyGrowth ? `${weeklyGrowth}%` : null,
-      trend: weeklyGrowth > 0 ? 'up' : 'down'
+      change: metrics?.weekRevenue ? `${Math.round(((metrics.todayRevenue / metrics.weekRevenue) * 7 - 1) * 100)}%` : null
     },
     {
       label: 'This Week',
@@ -188,7 +187,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
+      {/* Header with Smart Insights */}
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
           <h1 className="text-3xl font-bold text-white mb-2">
@@ -205,6 +204,7 @@ export default function AdminDashboard() {
           </p>
         </div>
         
+        {/* Quick Actions */}
         <div className="flex gap-3">
           <Link
             href="/admin/appointments/new"
@@ -258,14 +258,13 @@ export default function AdminDashboard() {
                   {insight.action && (
                     <Link
                       href={insight.action.href}
-                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
                         insight.action.variant === 'primary'
                           ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
                           : 'bg-white/10 text-white hover:bg-white/20'
                       }`}
                     >
                       {insight.action.label}
-                      <ArrowUpRight className="w-4 h-4" />
                     </Link>
                   )}
                 </div>
@@ -289,18 +288,13 @@ export default function AdminDashboard() {
                 </div>
               </div>
               {stat.change && (
-                <div className="flex items-center gap-1">
-                  {stat.trend === 'up' ? (
-                    <ArrowUpRight className="w-4 h-4 text-green-400" />
-                  ) : (
-                    <ArrowDownRight className="w-4 h-4 text-red-400" />
-                  )}
-                  <span className={`text-sm font-medium ${
-                    stat.trend === 'up' ? 'text-green-400' : 'text-red-400'
-                  }`}>
-                    {stat.change}
-                  </span>
-                </div>
+                <span className={`text-sm font-medium px-2 py-1 rounded-full ${
+                  stat.change.startsWith('-') 
+                    ? 'text-red-400 bg-red-500/10' 
+                    : 'text-green-400 bg-green-500/10'
+                }`}>
+                  {stat.change}
+                </span>
               )}
             </div>
             <div>
@@ -319,64 +313,49 @@ export default function AdminDashboard() {
         {/* Upcoming Appointments */}
         <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10">
           <div className="p-6 border-b border-white/10 flex items-center justify-between">
-            <h2 className="font-semibold text-white flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-400" />
-              Upcoming Today
-            </h2>
+            <h2 className="font-semibold text-white">Upcoming Today</h2>
             <Link
               href="/admin/appointments"
-              className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1"
+              className="text-sm text-amber-400 hover:text-amber-300"
             >
-              View All
-              <ArrowUpRight className="w-4 h-4" />
+              View All →
             </Link>
           </div>
           <div className="divide-y divide-white/10">
             {metrics?.upcomingAppointments?.length === 0 ? (
-              <div className="p-6 text-center">
-                <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-blue-400" />
-                </div>
-                <p className="text-white/50 mb-4">No appointments scheduled for today</p>
-                <Link
-                  href="/admin/appointments/new"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors"
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  Book First Appointment
-                </Link>
+              <div className="p-6 text-center text-white/50">
+                No appointments scheduled for today
               </div>
             ) : (
-              metrics?.upcomingAppointments?.slice(0, 5).map((appointment) => (
-                <div key={appointment.id} className="p-4 hover:bg-white/5 transition-colors">
+              metrics?.upcomingAppointments?.slice(0, 5).map((apt) => (
+                <div key={apt.id} className="p-4 hover:bg-white/5 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full flex items-center justify-center border border-blue-400/30">
-                      <span className="text-sm text-blue-400 font-bold">
-                        {appointment.client_name?.charAt(0) || 'W'}
+                    <div className="w-12 h-12 bg-amber-400/10 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-amber-400 font-semibold">
+                        {apt.client_name?.[0] || 'W'}
                       </span>
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-white">
-                        {appointment.client_name}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-white truncate">
+                        {apt.client_name || 'Walk-in'}
                       </p>
-                      <p className="text-sm text-white/50">
-                        {appointment.service_name} • {appointment.stylist_name}
-                      </p>
+                      <p className="text-sm text-white/50">{apt.service_name}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm font-medium text-amber-400">
-                        {appointment.time}
-                      </p>
-                      <span className={`text-xs px-2 py-1 rounded-full ${
-                        appointment.status === 'confirmed' 
-                          ? 'bg-green-500/20 text-green-400' 
-                          : appointment.status === 'pending'
-                          ? 'bg-amber-500/20 text-amber-400'
-                          : 'bg-blue-500/20 text-blue-400'
-                      }`}>
-                        {appointment.status}
-                      </span>
+                      <p className="font-medium text-white">{apt.time}</p>
+                      <p className="text-sm text-white/50">{apt.stylist_name}</p>
                     </div>
+                    <span
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        apt.status === 'confirmed'
+                          ? 'bg-green-500/20 text-green-400'
+                          : apt.status === 'pending'
+                          ? 'bg-amber-500/20 text-amber-400'
+                          : 'bg-white/10 text-white/60'
+                      }`}
+                    >
+                      {apt.status}
+                    </span>
                   </div>
                 </div>
               ))
@@ -387,25 +366,18 @@ export default function AdminDashboard() {
         {/* Recent Payments */}
         <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10">
           <div className="p-6 border-b border-white/10 flex items-center justify-between">
-            <h2 className="font-semibold text-white flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-green-400" />
-              Recent Payments
-            </h2>
+            <h2 className="font-semibold text-white">Recent Payments</h2>
             <Link
               href="/admin/reports"
-              className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1"
+              className="text-sm text-amber-400 hover:text-amber-300"
             >
-              View Reports
-              <ArrowUpRight className="w-4 h-4" />
+              View Reports →
             </Link>
           </div>
           <div className="divide-y divide-white/10">
             {metrics?.recentPayments?.length === 0 ? (
-              <div className="p-6 text-center">
-                <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CreditCard className="w-8 h-8 text-green-400" />
-                </div>
-                <p className="text-white/50">No recent payments</p>
+              <div className="p-6 text-center text-white/50">
+                No recent payments
               </div>
             ) : (
               metrics?.recentPayments?.slice(0, 5).map((payment) => (
@@ -420,7 +392,7 @@ export default function AdminDashboard() {
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-green-400">
+                      <p className="font-semibold text-amber-400">
                         {formatCurrency(payment.amount * 100)}
                       </p>
                       <p className="text-xs text-white/50">
@@ -439,26 +411,20 @@ export default function AdminDashboard() {
         {/* Top Services */}
         <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10">
           <div className="p-6 border-b border-white/10">
-            <h2 className="font-semibold text-white flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-amber-400" />
-              Popular Services This Week
-            </h2>
+            <h2 className="font-semibold text-white">Popular Services This Week</h2>
           </div>
           <div className="p-6">
             {metrics?.topServices?.map((service, index) => (
               <div key={service.name} className="mb-4 last:mb-0">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-white flex items-center gap-2">
-                    <span className="w-6 h-6 bg-amber-500/20 rounded-full flex items-center justify-center text-xs text-amber-400 font-bold">
-                      {index + 1}
-                    </span>
-                    {service.name}
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium text-white">
+                    {index + 1}. {service.name}
                   </span>
                   <span className="text-sm text-white/50">{service.count} bookings</span>
                 </div>
                 <div className="w-full bg-white/10 rounded-full h-2">
                   <div
-                    className="bg-gradient-to-r from-amber-400 to-yellow-500 h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-amber-400 to-yellow-500 h-2 rounded-full"
                     style={{
                       width: `${(service.count / (metrics?.topServices?.[0]?.count || 1)) * 100}%`,
                     }}
@@ -480,40 +446,48 @@ export default function AdminDashboard() {
           <div className="p-6 grid grid-cols-2 gap-4">
             <Link
               href="/admin/pos"
-              className="flex flex-col items-center justify-center p-4 bg-green-500/10 rounded-xl hover:bg-green-500/20 transition-colors border border-green-500/20 group"
+              className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/10"
             >
-              <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <CreditCard className="w-6 h-6 text-green-400" />
+              <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-2">
+                <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
               </div>
               <span className="text-sm font-medium text-white">Open POS</span>
             </Link>
 
             <Link
               href="/admin/appointments/new"
-              className="flex flex-col items-center justify-center p-4 bg-blue-500/10 rounded-xl hover:bg-blue-500/20 transition-colors border border-blue-500/20 group"
+              className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/10"
             >
-              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <Calendar className="w-6 h-6 text-blue-400" />
+              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-2">
+                <svg className="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
               </div>
               <span className="text-sm font-medium text-white">Book Appointment</span>
             </Link>
 
             <Link
               href="/admin/clients/new"
-              className="flex flex-col items-center justify-center p-4 bg-purple-500/10 rounded-xl hover:bg-purple-500/20 transition-colors border border-purple-500/20 group"
+              className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/10"
             >
-              <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mb-2">
+                <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
               </div>
               <span className="text-sm font-medium text-white">Add Client</span>
             </Link>
 
             <Link
               href="/admin/services"
-              className="flex flex-col items-center justify-center p-4 bg-amber-500/10 rounded-xl hover:bg-amber-500/20 transition-colors border border-amber-500/20 group"
+              className="flex flex-col items-center justify-center p-4 bg-white/5 rounded-xl hover:bg-white/10 transition-colors border border-white/10"
             >
-              <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <Settings className="w-6 h-6 text-amber-400" />
+              <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mb-2">
+                <svg className="w-6 h-6 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
               </div>
               <span className="text-sm font-medium text-white">Manage Services</span>
             </Link>
@@ -523,9 +497,11 @@ export default function AdminDashboard() {
 
       {/* Pending Actions Alert */}
       {(metrics?.pendingDeposits || 0) > 0 && (
-        <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl p-4 flex items-center gap-4">
+        <div className="mt-8 bg-amber-400/10 border border-amber-400/30 rounded-xl p-4 flex items-center gap-4">
           <div className="w-10 h-10 bg-amber-400/20 rounded-full flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-5 h-5 text-amber-400" />
+            <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
           </div>
           <div className="flex-1">
             <p className="font-medium text-amber-400">
@@ -537,10 +513,9 @@ export default function AdminDashboard() {
           </div>
           <Link
             href="/admin/appointments?status=pending"
-            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm"
           >
             View Pending
-            <ArrowUpRight className="w-4 h-4" />
           </Link>
         </div>
       )}
