@@ -9,12 +9,51 @@ interface NotificationData extends InAppNotification {
   isNew?: boolean;
 }
 
+interface SetupStatus {
+  googleCalendar: boolean;
+  smsEmail: boolean;
+  businessHours: boolean;
+  businessInfo: boolean;
+}
+
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<NotificationData[]>([]);
   const [loading, setLoading] = useState(false);
   const [markingAsRead, setMarkingAsRead] = useState<string | null>(null);
+  const [setupStatus, setSetupStatus] = useState<SetupStatus>({
+    googleCalendar: false,
+    smsEmail: false,
+    businessHours: true, // Assume completed
+    businessInfo: true   // Assume completed
+  });
+  const [setupLoading, setSetupLoading] = useState(true);
   const bellRef = useRef<HTMLButtonElement>(null);
+
+  // Check setup completion status
+  const checkSetupStatus = async () => {
+    setSetupLoading(true);
+    try {
+      const response = await fetch('/api/admin/settings');
+      const data = await response.json();
+      
+      if (data.success && data.settings) {
+        setSetupStatus({
+          googleCalendar: data.settings.googleCalendarConnected || false,
+          smsEmail: data.settings.smsEmailEnabled || false,
+          businessHours: true, // Always true since it has defaults
+          businessInfo: !!(data.settings.name && data.settings.email && data.settings.phone)
+        });
+      }
+    } catch (error) {
+      console.error('Failed to check setup status:', error);
+    } finally {
+      setSetupLoading(false);
+    }
+  };
+
+  // Check if setup is incomplete
+  const isSetupIncomplete = !setupLoading && (!setupStatus.googleCalendar || !setupStatus.smsEmail);
 
   // Fetch notifications
   const fetchNotifications = async () => {
@@ -148,8 +187,13 @@ export default function NotificationBell() {
 
   // Effects
   useEffect(() => {
+    checkSetupStatus(); // Check setup status on mount
+  }, []);
+
+  useEffect(() => {
     if (open) {
       fetchNotifications();
+      checkSetupStatus(); // Refresh setup status when opening
     }
   }, [open]);
 
@@ -177,9 +221,10 @@ export default function NotificationBell() {
     return () => clearInterval(interval);
   }, [open]);
 
-  // Show indicator if there are unread notifications
+  // Show indicator if there are unread notifications or setup is incomplete
   const unreadCount = notifications.filter(n => !n.is_read).length;
   const hasUrgent = notifications.some(n => !n.is_read && n.priority === 'urgent');
+  const shouldShowIndicator = unreadCount > 0 || isSetupIncomplete;
 
   return (
     <div className="relative">
@@ -189,18 +234,58 @@ export default function NotificationBell() {
         onClick={() => setOpen(!open)}
         aria-label="Notifications"
       >
-        <Bell className={`w-5 h-5 ${hasUrgent ? 'text-red-500 animate-pulse' : ''}`} />
-        {unreadCount > 0 && (
+        <Bell className={`w-5 h-5 ${hasUrgent || isSetupIncomplete ? 'text-red-500 animate-pulse' : ''}`} />
+        {shouldShowIndicator && (
           <span className={`absolute -top-1 -right-1 min-w-[1.25rem] h-5 flex items-center justify-center rounded-full text-xs font-bold text-white ${
-            hasUrgent ? 'bg-red-500 animate-pulse' : 'bg-blue-500'
+            hasUrgent || isSetupIncomplete ? 'bg-red-500 animate-pulse' : 'bg-blue-500'
           }`}>
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {isSetupIncomplete && unreadCount === 0 ? '!' : unreadCount > 99 ? '99+' : unreadCount}
           </span>
         )}
       </button>
 
       {open && (
         <div className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+          {/* Setup Status Alert */}
+          {isSetupIncomplete && (
+            <div className="p-4 bg-amber-50 border-b border-amber-200">
+              <div className="flex items-start gap-3">
+                <Settings className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <h4 className="font-medium text-amber-900 text-sm">
+                    Complete Your Setup
+                  </h4>
+                  <p className="text-amber-700 text-sm mt-1">
+                    Some integrations are not configured:
+                  </p>
+                  <ul className="mt-2 space-y-1 text-sm">
+                    {!setupStatus.googleCalendar && (
+                      <li className="flex items-center gap-2 text-amber-700">
+                        <Calendar className="w-3 h-3" />
+                        Google Calendar
+                      </li>
+                    )}
+                    {!setupStatus.smsEmail && (
+                      <li className="flex items-center gap-2 text-amber-700">
+                        <Bell className="w-3 h-3" />
+                        SMS & Email Notifications
+                      </li>
+                    )}
+                  </ul>
+                  <button
+                    onClick={() => {
+                      setOpen(false);
+                      window.location.href = '/admin/settings?tab=integrations';
+                    }}
+                    className="mt-2 text-xs font-medium text-amber-800 hover:text-amber-900 underline"
+                  >
+                    Go to Settings →
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Header */}
           <div className="p-4 border-b bg-gray-50">
             <div className="flex items-center justify-between">
@@ -334,38 +419,6 @@ export default function NotificationBell() {
                 View all notifications & settings
               </button>
             </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-        <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-96 overflow-y-auto">
-          <div className="p-4 border-b font-semibold">Notifications</div>
-          {loading ? (
-            <div className="p-4 text-gray-500">Loading...</div>
-          ) : notifications.length === 0 ? (
-            <div className="p-4 text-gray-500">No notifications</div>
-          ) : (
-            <ul className="divide-y divide-gray-100">
-              {notifications.map((n) => (
-                <li key={n.id} className="p-4 hover:bg-gray-50">
-                  <div className="text-sm font-medium text-gray-900">
-                    {n.notification_type.charAt(0).toUpperCase() + n.notification_type.slice(1)}
-                  </div>
-                  <div className="text-xs text-gray-600 mt-1">
-                    Appointment ID: {n.appointment_id}<br />
-                    {n.created_at ? new Date(n.created_at).toLocaleString() : ''}
-                  </div>
-                  {n.recipient_email && (
-                    <div className="text-xs text-gray-400 mt-1">To: {n.recipient_email}</div>
-                  )}
-                  {n.recipient_phone && (
-                    <div className="text-xs text-gray-400">SMS: {n.recipient_phone}</div>
-                  )}
-                </li>
-              ))}
-            </ul>
           )}
         </div>
       )}

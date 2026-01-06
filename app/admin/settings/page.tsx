@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { CheckCircle } from 'lucide-react';
 
 interface BusinessSettings {
   name: string;
@@ -22,6 +24,9 @@ interface BusinessSettings {
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 export default function SettingsPage() {
+  const searchParams = useSearchParams();
+  const initialTab = searchParams?.get('tab') as 'general' | 'hours' | 'booking' | 'integrations' || 'general';
+  
   const [settings, setSettings] = useState<BusinessSettings>({
     name: 'KeLatic Hair Lounge',
     address: '9430 Richmond Ave, Houston, TX 77063',
@@ -46,21 +51,132 @@ export default function SettingsPage() {
   });
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [activeTab, setActiveTab] = useState<'general' | 'hours' | 'booking' | 'integrations'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'hours' | 'booking' | 'integrations'>(initialTab);
+  const [integrationStatus, setIntegrationStatus] = useState({
+    googleCalendar: false,
+    smsEmail: false,
+    stripe: true
+  });
+  const [setupLoading, setSetupLoading] = useState<string | null>(null);
+
+  // Load settings on component mount
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  async function loadSettings() {
+    try {
+      const response = await fetch('/api/admin/settings');
+      const data = await response.json();
+      
+      if (data.success && data.settings) {
+        setSettings(data.settings);
+        setIntegrationStatus({
+          googleCalendar: data.settings.googleCalendarConnected || false,
+          smsEmail: data.settings.smsEmailEnabled || false,
+          stripe: data.settings.stripeConnected || true
+        });
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+    }
+  }
 
   async function handleSave() {
     setLoading(true);
     setSaved(false);
 
     try {
-      // In production, save to API
-      await new Promise((resolve) => setTimeout(resolve, 500));
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      const response = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          settings: {
+            ...settings,
+            googleCalendarConnected: integrationStatus.googleCalendar,
+            smsEmailEnabled: integrationStatus.smsEmail,
+            stripeConnected: integrationStatus.stripe
+          }
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        throw new Error(data.error || 'Failed to save settings');
+      }
     } catch (error) {
       console.error('Failed to save settings:', error);
+      // Show error to user
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleConnectGoogle() {
+    setSetupLoading('google-calendar');
+    try {
+      const response = await fetch('/api/admin/integrations/connect', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ provider: 'google-calendar' }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setIntegrationStatus(prev => ({ ...prev, googleCalendar: true }));
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        throw new Error(data.error || 'Failed to connect Google Calendar');
+      }
+    } catch (error) {
+      console.error('Failed to connect Google Calendar:', error);
+    } finally {
+      setSetupLoading(null);
+    }
+  }
+
+  async function handleSetupNotifications() {
+    setSetupLoading('notifications');
+    try {
+      const response = await fetch('/api/admin/notifications/setup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          type: 'sms-email',
+          settings: {
+            sms: true,
+            email: true,
+            reminders: true,
+            confirmations: true
+          }
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setIntegrationStatus(prev => ({ ...prev, smsEmail: true }));
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        throw new Error(data.error || 'Failed to setup notifications');
+      }
+    } catch (error) {
+      console.error('Failed to setup notifications:', error);
+    } finally {
+      setSetupLoading(null);
     }
   }
 
@@ -407,12 +523,21 @@ export default function SettingsPage() {
                   <p className="text-sm text-white/50">Appointment reminders & confirmations</p>
                 </div>
               </div>
-              <span className="px-3 py-1 bg-white/10 text-white/50 text-sm rounded-full">
-                Not Configured
+              <span className={`px-3 py-1 text-sm rounded-full ${
+                integrationStatus.smsEmail 
+                  ? 'bg-green-500/20 text-green-400' 
+                  : 'bg-white/10 text-white/50'
+              }`}>
+                {integrationStatus.smsEmail ? 'Enabled' : 'Not Configured'}
               </span>
             </div>
-            <button className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm">
-              Set Up Notifications
+            <button 
+              onClick={handleSetupNotifications}
+              disabled={setupLoading === 'notifications' || integrationStatus.smsEmail}
+              className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {setupLoading === 'notifications' ? 'Setting Up...' : 
+               integrationStatus.smsEmail ? 'Configured' : 'Set Up Notifications'}
             </button>
           </div>
 
@@ -430,12 +555,21 @@ export default function SettingsPage() {
                   <p className="text-sm text-white/50">Sync appointments with Google</p>
                 </div>
               </div>
-              <span className="px-3 py-1 bg-white/10 text-white/50 text-sm rounded-full">
-                Not Connected
+              <span className={`px-3 py-1 text-sm rounded-full ${
+                integrationStatus.googleCalendar 
+                  ? 'bg-green-500/20 text-green-400' 
+                  : 'bg-white/10 text-white/50'
+              }`}>
+                {integrationStatus.googleCalendar ? 'Connected' : 'Not Connected'}
               </span>
             </div>
-            <button className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm">
-              Connect Google
+            <button 
+              onClick={handleConnectGoogle}
+              disabled={setupLoading === 'google-calendar' || integrationStatus.googleCalendar}
+              className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {setupLoading === 'google-calendar' ? 'Connecting...' : 
+               integrationStatus.googleCalendar ? 'Connected' : 'Connect Google'}
             </button>
           </div>
 
