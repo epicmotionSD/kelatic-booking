@@ -181,30 +181,6 @@ export default function LandingPage() {
               Book Appointment
               <ChevronRight className="w-5 h-5" />
             </Link>
-                  </div>
-                </div>
-
-                <div className="absolute -right-8 top-1/2 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl animate-[float_3s_ease-in-out_infinite_0.5s]">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                      <Star className="w-6 h-6 text-amber-400" />
-                    </div>
-                    <div>
-                      <div className="font-bold">Top Rated</div>
-                      <div className="text-sm text-white/50">500+ Reviews</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Wednesday special */}
-                <div className="absolute -right-4 top-8 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full px-5 py-2.5 shadow-xl shadow-amber-500/30 animate-[float_3s_ease-in-out_infinite_1s]">
-                  <div className="flex items-center gap-2 font-bold">
-                    <Sparkles className="w-4 h-4" />
-                    $75 Wednesdays!
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
