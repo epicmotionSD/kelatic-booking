@@ -18,7 +18,7 @@ export async function GET(
         end_time,
         status,
         quoted_price,
-        total_amount,
+        final_price,
         client_notes,
         service:services (
           id,

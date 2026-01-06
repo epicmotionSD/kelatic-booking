@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
+import { formatTime, formatDate } from '@/lib/date-utils';
 
 interface Appointment {
   id: string;
@@ -87,21 +88,7 @@ export default function AppointmentsPage() {
     }
   }
 
-  function formatTime(isoString: string) {
-    return new Date(isoString).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  }
 
-  function formatDate(dateStr: string) {
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-    });
-  }
 
   return (
     <div>

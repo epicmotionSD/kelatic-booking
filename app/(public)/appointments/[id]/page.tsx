@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { formatDate, formatTime, formatDuration, formatDateForCal } from '@/lib/date-utils';
 import {
   Calendar,
   Clock,
@@ -26,7 +27,7 @@ interface Appointment {
   end_time: string;
   status: string;
   quoted_price: number;
-  total_amount: number;
+  final_price: number;
   client_notes?: string;
   service: {
     id: string;
@@ -53,8 +54,8 @@ interface Appointment {
   }>;
 }
 
-const SALON_PHONE = '(713) 555-1234';
-const SALON_ADDRESS = '123 Main Street, Houston, TX 77001';
+const SALON_PHONE = '(713) 485-4000';
+const SALON_ADDRESS = '9430 Richmond Ave, Houston, TX 77063';
 
 export default function AppointmentPage() {
   const params = useParams();
@@ -116,10 +117,6 @@ export default function AppointmentPage() {
 
     const startDate = new Date(appointment.start_time);
     const endDate = new Date(appointment.end_time);
-    
-    const formatDateForCal = (date: Date) => {
-      return date.toISOString().replace(/-|:|\.\d{3}/g, '');
-    };
 
     const event = {
       title: `${appointment.service.name} at KeLatic Hair Lounge`,
@@ -134,32 +131,7 @@ export default function AppointmentPage() {
     window.open(googleUrl, '_blank');
   };
 
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
 
-  const formatTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    return date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  };
-
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const mins = minutes % 60;
-    if (hours === 0) return `${mins} min`;
-    if (mins === 0) return `${hours} hr`;
-    return `${hours} hr ${mins} min`;
-  };
 
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
@@ -328,7 +300,7 @@ export default function AppointmentPage() {
               <div className="flex items-center justify-between">
                 <span className="text-gray-600">Total</span>
                 <span className="text-2xl font-bold text-gray-900">
-                  ${(appointment.total_amount || appointment.quoted_price).toFixed(2)}
+                  ${(appointment.final_price || appointment.quoted_price || 0).toFixed(2)}
                 </span>
               </div>
             </div>

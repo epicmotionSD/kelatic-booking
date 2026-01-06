@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/lib/currency';
+import { formatTime, formatDate, formatShortDate } from '@/lib/date-utils';
 
 interface Appointment {
   id: string;
@@ -57,30 +58,6 @@ export default function StylistDashboard() {
     } finally {
       setLoading(false);
     }
-  }
-
-  function formatTime(isoString: string) {
-    return new Date(isoString).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
-  }
-
-  function formatDate(dateStr: string) {
-    return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
-      weekday: 'long',
-      month: 'long',
-      day: 'numeric',
-    });
-  }
-
-  function formatFullDate(isoString: string) {
-    return new Date(isoString).toLocaleDateString('en-US', {
-      weekday: 'short',
-      month: 'short',
-      day: 'numeric',
-    });
   }
 
   // Calculate stats
@@ -240,7 +217,7 @@ export default function StylistDashboard() {
                   </div>
                   {view === 'upcoming' && (
                     <div className="text-xs text-white/40 mt-1">
-                      {formatFullDate(apt.start_time)}
+                      {formatShortDate(apt.start_time)}
                     </div>
                   )}
                 </div>

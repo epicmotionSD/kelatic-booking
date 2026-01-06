@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/lib/currency';
+import { formatTime } from '@/lib/date-utils';
 import { CheckoutModal } from '@/components/pos/checkout-modal';
 import { WalkInModal } from '@/components/pos/walk-in-modal';
 import { ReaderStatus } from '@/components/pos/reader-status';
@@ -74,14 +75,6 @@ export default function POSPage() {
       no_show: 'bg-white/10 text-white/50',
     };
     return styles[status] || 'bg-white/10 text-white/50';
-  };
-
-  const formatTime = (isoString: string) => {
-    return new Date(isoString).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
   };
 
   return (

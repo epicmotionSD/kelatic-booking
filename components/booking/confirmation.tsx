@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect } from 'react';
+import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
+import { formatDateTime } from '@/lib/date-utils';
 import { trackBookingConversion } from '@/lib/google-ads';
 import type { BookingData } from '@/app/(public)/book/page';
 
@@ -17,25 +19,7 @@ export function Confirmation({ bookingData }: ConfirmationProps) {
     const totalPrice = servicePrice + addonsPrice;
     trackBookingConversion(totalPrice);
   }, [bookingData]);
-  const formatDateTime = (): { date: string; time: string } => {
-    if (!bookingData.timeSlot) return { date: '', time: '' };
-    const d = new Date(bookingData.timeSlot.start_time);
-    return {
-      date: d.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'long',
-        day: 'numeric',
-        year: 'numeric',
-      }),
-      time: d.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      }),
-    };
-  };
-
-  const { date, time } = formatDateTime();
+  const { date, time } = formatDateTime(bookingData.timeSlot?.start_time || '');
 
   const servicePrice = bookingData.service?.base_price || 0;
   const addonsPrice = bookingData.addons.reduce((sum, a) => sum + a.base_price, 0);
@@ -189,12 +173,21 @@ export function Confirmation({ bookingData }: ConfirmationProps) {
           Add to Calendar
         </button>
 
-        <a
-          href="/"
-          className="block w-full py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-colors text-center"
-        >
-          Back to Home
-        </a>
+        {bookingData.appointmentId ? (
+          <Link
+            href={`/appointments/${bookingData.appointmentId}`}
+            className="block w-full py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-colors text-center"
+          >
+            View Appointment Details
+          </Link>
+        ) : (
+          <a
+            href="/"
+            className="block w-full py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-colors text-center"
+          >
+            Back to Home
+          </a>
+        )}
       </div>
 
       {/* Reminders */}

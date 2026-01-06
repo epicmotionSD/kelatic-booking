@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
+import { formatTime } from '@/lib/date-utils';
 
 interface Service {
   id: string;
@@ -210,14 +211,6 @@ function NewAppointmentContent() {
     } finally {
       setLoading(false);
     }
-  }
-
-  function formatTime(isoString: string) {
-    return new Date(isoString).toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    });
   }
 
   const availableSlots = slots.filter(s => s.available);
