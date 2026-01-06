@@ -95,7 +95,7 @@ export default function AdminDashboard() {
     }
 
     if (metrics) {
-      if (metrics.pendingDeposits > 0) {
+      if ((metrics.pendingDeposits || 0) > 0) {
         insights.push({
           type: 'warning',
           title: 'Pending Deposits',
@@ -109,7 +109,7 @@ export default function AdminDashboard() {
         });
       }
 
-      if (metrics.todayAppointments === 0 && new Date().getHours() > 10) {
+      if ((metrics.todayAppointments || 0) === 0 && new Date().getHours() > 10) {
         insights.push({
           type: 'info',
           title: 'No Appointments Today',
@@ -123,7 +123,7 @@ export default function AdminDashboard() {
         });
       }
 
-      if (metrics.newClients > 5) {
+      if ((metrics.newClients || 0) > 5) {
         insights.push({
           type: 'success',
           title: 'Growing Client Base',
@@ -146,7 +146,7 @@ export default function AdminDashboard() {
 
   const insights = generateInsights();
   const weeklyGrowth = metrics?.weekRevenue && metrics?.todayRevenue 
-    ? Math.round(((metrics.todayRevenue / (metrics.weekRevenue / 7)) - 1) * 100) 
+    ? Math.round((((metrics.todayRevenue || 0) / ((metrics.weekRevenue || 1) / 7)) - 1) * 100) 
     : 0;
 
   const stats = [
@@ -156,8 +156,8 @@ export default function AdminDashboard() {
       icon: <Calendar className="w-6 h-6" />,
       color: 'from-blue-400 to-blue-500',
       bgColor: 'bg-blue-500/10',
-      change: metrics?.weekAppointments ? `${Math.round(((metrics.todayAppointments / (metrics.weekAppointments / 7)) - 1) * 100)}%` : null,
-      trend: metrics?.todayAppointments > (metrics?.weekAppointments / 7) ? 'up' : 'down'
+      change: metrics?.weekAppointments ? `${Math.round((((metrics.todayAppointments || 0) / ((metrics.weekAppointments || 1) / 7)) - 1) * 100)}%` : null,
+      trend: (metrics?.todayAppointments || 0) > ((metrics?.weekAppointments || 0) / 7) ? 'up' : 'down'
     },
     {
       label: "Today's Revenue",

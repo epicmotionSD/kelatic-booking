@@ -8,7 +8,11 @@ export interface PushNotificationSubscription {
     auth: string;
   };
 }
-
+interface NotificationAction {
+  action: string;
+  title: string;
+  icon?: string;
+}
 export interface NotificationOptions {
   title: string;
   body: string;
@@ -199,13 +203,13 @@ class PushNotificationManager {
       icon: options.icon || '/icon-192x192.png',
       badge: options.badge || '/badge-72x72.png',
       data: options.data,
-      actions: options.actions,
+      ...(options.actions && { actions: options.actions }),
       requireInteraction: options.requireInteraction,
       vibrate: [200, 100, 200],
       tag: options.data?.type || 'local',
       renotify: true,
       timestamp: Date.now(),
-    });
+    } as any);
   }
 
   // Send subscription to server
@@ -235,7 +239,7 @@ class PushNotificationManager {
   }
 
   // Utility functions
-  private urlB64ToUint8Array(base64String: string): Uint8Array {
+  private urlB64ToUint8Array(base64String: string): BufferSource {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
     const base64 = (base64String + padding)
       .replace(/-/g, '+')
@@ -247,7 +251,7 @@ class PushNotificationManager {
     for (let i = 0; i < rawData.length; ++i) {
       outputArray[i] = rawData.charCodeAt(i);
     }
-    return outputArray;
+    return outputArray.buffer;
   }
 
   private arrayBufferToBase64(buffer: ArrayBuffer): string {

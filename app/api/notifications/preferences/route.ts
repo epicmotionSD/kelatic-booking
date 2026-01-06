@@ -112,15 +112,16 @@ export async function POST(request: NextRequest) {
     if (preferences && typeof preferences === 'object') {
       for (const [type, settings] of Object.entries(preferences)) {
         if (typeof settings === 'object' && settings !== null) {
+          const settingsObj = settings as any;
           const { error } = await supabase
             .from('notification_preferences')
             .upsert([{
               user_id: user.id,
               type: type as NotificationType,
-              email_enabled: settings.email,
-              sms_enabled: settings.sms,
-              push_enabled: settings.push,
-              in_app_enabled: settings.in_app,
+              email_enabled: settingsObj.email,
+              sms_enabled: settingsObj.sms,
+              push_enabled: settingsObj.push,
+              in_app_enabled: settingsObj.in_app,
               updated_at: new Date().toISOString()
             }]);
 

@@ -165,6 +165,7 @@ export class NotificationService {
       if (options.customTemplate) {
         subject = this.renderTemplate(options.customTemplate.subject, variables);
         content = this.renderTemplate(options.customTemplate.content, variables);
+        templateId = 'custom';
       } else {
         const template = await this.getTemplate(type, 'email', options.businessId);
         if (!template) {
@@ -232,7 +233,7 @@ export class NotificationService {
         channel: 'email',
         status: 'failed',
         error_message: error instanceof Error ? error.message : 'Unknown error',
-        template_id: templateId
+        template_id: 'email-template'
       });
 
       return {
@@ -280,6 +281,7 @@ export class NotificationService {
 
       if (options.customTemplate) {
         message = this.renderTemplate(options.customTemplate, variables);
+        templateId = 'custom';
       } else {
         const template = await this.getTemplate(type, 'sms', options.businessId);
         if (!template) {
@@ -338,7 +340,7 @@ export class NotificationService {
         channel: 'sms',
         status: 'failed',
         error_message: error instanceof Error ? error.message : 'Unknown error',
-        template_id: templateId
+        template_id: 'sms-template'
       });
 
       return {
@@ -575,8 +577,8 @@ export class NotificationService {
       actionUrl?: string;
       actionLabel?: string;
     } = {}
-  ): Promise<Record<NotificationChannel, any>> {
-    const results: Record<NotificationChannel, any> = {};
+  ): Promise<Partial<Record<NotificationChannel, any>>> {
+    const results: Partial<Record<NotificationChannel, any>> = {};
 
     // Send to each channel
     const promises = channels.map(async (channel) => {
