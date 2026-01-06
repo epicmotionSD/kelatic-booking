@@ -181,8 +181,6 @@ export default function LandingPage() {
               Book Appointment
               <ChevronRight className="w-5 h-5" />
             </Link>
-          </div>
-        </div>
                   </div>
                 </div>
 
