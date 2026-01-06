@@ -63,6 +63,7 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
   const [stylists, setStylists] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'price' | 'stylist'>('price');
+  const [selectedTier, setSelectedTier] = useState<PriceTier | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -112,8 +113,40 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-2">Book Your Appointment</h2>
-      <p className="text-white/50 mb-6">Choose how you'd like to book</p>
+      <div className="text-center mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Book Your Appointment</h2>
+        <p className="text-white/60 mb-6">Choose how you'd like to start your booking</p>
+      </div>
+
+      {/* Quick Booking Options */}
+      <div className="mb-8 p-6 bg-white/5 border border-white/10 rounded-2xl">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-amber-400" />
+          Popular Services
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {services.filter(s => ['$75 Shampoo Retwist', 'Consultaton', 'Shampoo Retwist w/style'].includes(s.name)).slice(0, 4).map((service) => (
+            <button
+              key={service.id}
+              onClick={() => {
+                const tier = PRICE_TIERS.find(t => service.base_price >= t.minPrice && service.base_price <= t.maxPrice);
+                if (tier) {
+                  onSelectTier(tier, [service]);
+                }
+              }}
+              className="text-left p-4 bg-white/5 border border-white/10 rounded-xl hover:border-amber-400/50 hover:bg-amber-400/5 transition-all"
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <h4 className="font-semibold text-white">{service.name}</h4>
+                  <p className="text-sm text-white/50">{service.duration} min</p>
+                </div>
+                <span className="text-amber-400 font-bold">{formatCurrency(service.base_price * 100)}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* View Mode Toggle */}
       <div className="flex gap-2 mb-8">
@@ -126,7 +159,7 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
           }`}
         >
           <Users className="w-5 h-5 inline-block mr-2" />
-          Choose Stylist
+          Choose Stylist First
         </button>
         <button
           onClick={() => setViewMode('price')}
@@ -137,7 +170,7 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
           }`}
         >
           <Sparkles className="w-5 h-5 inline-block mr-2" />
-          Browse by Price
+          Browse by Price Range
         </button>
       </div>
 

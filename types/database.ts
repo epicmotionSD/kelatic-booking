@@ -7,6 +7,28 @@ export type PaymentStatus = 'pending' | 'paid' | 'partial' | 'refunded' | 'faile
 export type PaymentMethod = 'card_online' | 'card_terminal' | 'cash' | 'other';
 export type ServiceCategory = 'locs' | 'braids' | 'natural' | 'silk_press' | 'color' | 'treatments' | 'barber' | 'other';
 
+// Notification Types
+export type NotificationType = 
+  | 'booking_confirmation' 
+  | 'booking_cancellation' 
+  | 'booking_reschedule'
+  | 'reminder_24hr' 
+  | 'reminder_2hr' 
+  | 'reminder_30min'
+  | 'payment_received'
+  | 'payment_failed'
+  | 'stylist_assigned'
+  | 'stylist_unavailable'
+  | 'service_completed'
+  | 'review_request'
+  | 'newsletter_welcome'
+  | 'system_alert'
+  | 'promotion_alert';
+
+export type NotificationChannel = 'email' | 'sms' | 'push' | 'in_app';
+export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
+export type NotificationStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'bounced';
+
 // ============================================
 // CORE TYPES
 // ============================================
@@ -35,6 +57,14 @@ export interface Profile {
   is_active: boolean;
   is_barber?: boolean;
   commission_rate?: number;
+  
+  // Notification preferences
+  notification_email: boolean;
+  notification_sms: boolean;
+  notification_push: boolean;
+  notification_in_app: boolean;
+  notification_marketing: boolean;
+  push_subscription?: string; // Web push subscription data
   
   // Metadata
   created_at: string;
@@ -317,4 +347,100 @@ export interface ClientFormData {
   phone?: string;
   hair_type?: string;
   notes?: string;
+}
+
+// ============================================
+// NOTIFICATION SYSTEM TYPES
+// ============================================
+
+export interface NotificationTemplate {
+  id: string;
+  business_id?: string;
+  name: string;
+  type: NotificationType;
+  channel: NotificationChannel;
+  subject_template: string;
+  content_template: string;
+  variables: string[]; // JSON array of template variables
+  is_active: boolean;
+  is_system: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InAppNotification {
+  id: string;
+  user_id: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  priority: NotificationPriority;
+  is_read: boolean;
+  action_url?: string;
+  action_label?: string;
+  metadata?: any; // JSON data for additional context
+  expires_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NotificationLog {
+  id: string;
+  appointment_id?: string;
+  user_id?: string;
+  notification_type: NotificationType;
+  channel: NotificationChannel;
+  recipient_email?: string;
+  recipient_phone?: string;
+  status: NotificationStatus;
+  error_message?: string;
+  template_id?: string;
+  metadata?: any; // JSON data
+  sent_at?: string;
+  delivered_at?: string;
+  opened_at?: string;
+  clicked_at?: string;
+  created_at: string;
+}
+
+export interface NotificationPreference {
+  id: string;
+  user_id: string;
+  type: NotificationType;
+  email_enabled: boolean;
+  sms_enabled: boolean;
+  push_enabled: boolean;
+  in_app_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PushSubscription {
+  id: string;
+  user_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  user_agent?: string;
+  is_active: boolean;
+  last_used_at?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NotificationQueue {
+  id: string;
+  user_id: string;
+  type: NotificationType;
+  channel: NotificationChannel;
+  priority: NotificationPriority;
+  data: any; // JSON data for the notification
+  scheduled_for: string;
+  attempts: number;
+  max_attempts: number;
+  status: NotificationStatus;
+  error_message?: string;
+  processed_at?: string;
+  created_at: string;
+  updated_at: string;
 }

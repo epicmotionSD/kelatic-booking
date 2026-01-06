@@ -120,23 +120,23 @@ export default function PlatformLandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-zinc-950 text-white" suppressHydrationWarning>
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-zinc-950/80 backdrop-blur-lg border-b border-zinc-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-lg flex items-center justify-center font-bold text-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" suppressHydrationWarning>
+          <div className="flex items-center justify-between h-16" suppressHydrationWarning>
+            <div className="flex items-center gap-2" suppressHydrationWarning>
+              <div className="w-8 h-8 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-lg flex items-center justify-center font-bold text-sm" suppressHydrationWarning>
                 x3
               </div>
               <span className="text-xl font-bold">x3o.ai</span>
             </div>
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-8" suppressHydrationWarning>
               <a href="#features" className="text-zinc-400 hover:text-white transition">Features</a>
               <a href="#pricing" className="text-zinc-400 hover:text-white transition">Pricing</a>
               <a href="#demo" className="text-zinc-400 hover:text-white transition">Demo</a>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4" suppressHydrationWarning>
               <Link href="/login" className="text-zinc-400 hover:text-white transition">
                 Sign In
               </Link>
@@ -153,8 +153,8 @@ export default function PlatformLandingPage() {
 
       {/* Hero Section */}
       <section className="pt-32 pb-20 px-4">
-        <div className="max-w-5xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-1.5 mb-8">
+        <div className="max-w-5xl mx-auto text-center" suppressHydrationWarning>
+          <div className="inline-flex items-center gap-2 bg-zinc-900 border border-zinc-800 rounded-full px-4 py-1.5 mb-8" suppressHydrationWarning>
             <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
             <span className="text-sm text-zinc-400">Now with AI Content Generation</span>
           </div>
@@ -168,7 +168,7 @@ export default function PlatformLandingPage() {
             White-label booking software with AI-powered marketing. Perfect for salons, barbershops, spas, and agencies.
           </p>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12" suppressHydrationWarning>
             <input
               type="email"
               placeholder="Enter your email"
@@ -185,14 +185,14 @@ export default function PlatformLandingPage() {
         </div>
 
         {/* Board of Directors Visualization */}
-        <div className="max-w-5xl mx-auto mt-16 px-4">
+        <div className="max-w-5xl mx-auto mt-16 px-4" suppressHydrationWarning>
           <BoardVisualizer variant="hero" interactive={true} />
         </div>
       </section>
 
       {/* Board of Directors Section */}
       <section className="py-20 px-4 bg-zinc-900/30 border-y border-zinc-800">
-        <div className="max-w-6xl mx-auto">
+        <div className="max-w-6xl mx-auto" suppressHydrationWarning>
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full px-4 py-1.5 mb-6">
               <Zap className="w-4 h-4 text-cyan-400" />
@@ -251,15 +251,15 @@ export default function PlatformLandingPage() {
 
       {/* Features Section */}
       <section id="features" className="py-20 px-4 bg-zinc-900/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+        <div className="max-w-6xl mx-auto" suppressHydrationWarning>
+          <div className="text-center mb-16" suppressHydrationWarning>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Everything You Need to Run Your Business</h2>
             <p className="text-zinc-400 max-w-2xl mx-auto">
               From booking to payments to marketing, all under your brand.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6" suppressHydrationWarning>
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -334,13 +334,13 @@ export default function PlatformLandingPage() {
 
       {/* Pricing Section */}
       <section id="pricing" className="py-20 px-4 bg-zinc-900/50">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-16">
+        <div className="max-w-6xl mx-auto" suppressHydrationWarning>
+          <div className="text-center mb-16" suppressHydrationWarning>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
             <p className="text-zinc-400">Start free, upgrade when you're ready.</p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8" suppressHydrationWarning>
             {pricingTiers.map((tier, index) => (
               <div
                 key={index}

@@ -109,6 +109,16 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
+    // In development, allow direct admin access on main domain
+    if (process.env.NODE_ENV === 'development' && pathname.startsWith('/admin')) {
+      if (!user) {
+        const loginUrl = new URL('/login', request.url);
+        loginUrl.searchParams.set('redirect', pathname);
+        return NextResponse.redirect(loginUrl);
+      }
+      return response;
+    }
+
     // Redirect tenant-only routes to platform landing
     if (pathname.startsWith('/admin') || pathname.startsWith('/book') || pathname.startsWith('/stylist')) {
       return NextResponse.redirect(new URL('/', request.url));

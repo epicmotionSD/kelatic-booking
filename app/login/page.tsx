@@ -64,20 +64,22 @@ function LoginForm() {
     e.preventDefault();
     setLoading(true);
     setError("");
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    
+    try {
+      const supabase = createClient();
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-      return;
-    }
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
 
-    // For stylist/client logins, verify role
-    if (loginType === 'stylist' || loginType === 'client') {
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
+      // For stylist/client logins, verify role
+      if (loginType === 'stylist' || loginType === 'client') {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
         .eq('id', data.user.id)
         .single();
 
@@ -96,7 +98,12 @@ function LoginForm() {
 
     setLoading(false);
     router.push(redirectTo);
+  } catch (networkError) {
+    setLoading(false);
+    setError('Network error - try incognito mode or disable browser extensions');
+    console.error('Login network error:', networkError);
   }
+}
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-black relative overflow-hidden">
@@ -145,6 +152,7 @@ function LoginForm() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                suppressHydrationWarning
               />
             </div>
 
@@ -161,6 +169,7 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                suppressHydrationWarning
               />
             </div>
           </div>
@@ -185,6 +194,7 @@ function LoginForm() {
                 : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
             }`}
             disabled={loading}
+            suppressHydrationWarning
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
