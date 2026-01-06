@@ -65,9 +65,9 @@ export default function StylistLayout({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50" style={{background: 'linear-gradient(135deg, rgb(255 251 235), rgb(255 247 237), rgb(254 252 232))'}}>
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-amber-200/50 shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-xl border-b border-amber-200/50 shadow-sm" style={{backgroundColor: 'rgba(255, 255, 255, 0.9)', borderBottomColor: 'rgba(251 191 36 / 0.5)'}}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
