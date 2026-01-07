@@ -350,8 +350,6 @@ export default function AdminDashboard() {
                   Book First Appointment
                 </Link>
               </div>
-                </Link>
-              </div>
             ) : (
               metrics?.upcomingAppointments?.slice(0, 5).map((appointment) => (
                 <div key={appointment.id} className="p-4 hover:bg-white/5 transition-colors">
