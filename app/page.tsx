@@ -95,9 +95,9 @@ export default function LandingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-stone-50 text-stone-900">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-xl border-b border-amber-200/30 shadow-lg">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-xl border-b border-amber-200/30 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
@@ -120,7 +120,7 @@ export default function LandingPage() {
               <a href="#contact" className="text-sm font-medium text-gray-600 hover:text-amber-600 transition-colors">Contact</a>
               <Link
                 href="/book"
-                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
+                className="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-stone-900 rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
               >
                 Book Now
               </Link>
@@ -140,7 +140,7 @@ export default function LandingPage() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden bg-white/95 backdrop-blur-xl border-t border-amber-200/30 py-6 shadow-lg">
+          <div className="md:hidden bg-white backdrop-blur-xl border-t border-amber-200/30 py-6 shadow-lg">
             <div className="flex flex-col gap-4 px-6">
               <Link href="/services" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2 text-lg hover:text-amber-600">Loc Services</Link>
               <Link href="/special-offers" onClick={() => setMobileMenuOpen(false)} className="text-amber-600 py-2 text-lg animate-pulse">$75 Wednesday Special</Link>
@@ -151,7 +151,7 @@ export default function LandingPage() {
               <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-gray-600 py-2 text-lg hover:text-amber-600">Contact</a>
               <Link
                 href="/book"
-                className="mt-4 px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full font-bold text-center"
+                className="mt-4 px-6 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-stone-900 rounded-full font-bold text-center"
               >
                 Book Now
               </Link>
@@ -194,7 +194,7 @@ export default function LandingPage() {
             <div className="flex flex-col sm:flex-row gap-4 items-center pt-4">
               <Link 
                 href="/book" 
-                className="group relative bg-gradient-to-r from-amber-500 to-orange-500 text-white px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-amber-500/25 transition-all duration-300 hover:-translate-y-1 flex items-center gap-3"
+                className="group relative bg-gradient-to-r from-amber-500 to-orange-500 text-stone-900 px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl hover:shadow-amber-500/25 transition-all duration-300 hover:-translate-y-1 flex items-center gap-3"
               >
                 <Calendar className="w-5 h-5" />
                 Book Appointment
@@ -241,7 +241,7 @@ export default function LandingPage() {
                         href={`https://instagram.com/${stylist.instagram_handle}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-white hover:text-amber-300 transition-colors"
+                        className="flex items-center gap-2 text-stone-900 hover:text-amber-300 transition-colors"
                       >
                         <Instagram className="w-5 h-5" />
                         @{stylist.instagram_handle}
@@ -258,7 +258,7 @@ export default function LandingPage() {
                 <p className="text-gray-600 text-sm line-clamp-2 mb-4">{stylist.bio}</p>
                 <Link
                   href={`/book?stylist=${stylist.id}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full text-sm font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-stone-900 rounded-full text-sm font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
                 >
                   <Calendar className="w-4 h-4" />
                   Book with {stylist.first_name}
@@ -313,7 +313,7 @@ export default function LandingPage() {
           <div className="text-center mt-12">
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-stone-900 rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
             >
               Book Your Service
               <ChevronRight className="w-5 h-5" />
@@ -379,8 +379,8 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMnM1LjM3MyAxMiAxMiAxMiAxMi01LjM3MyAxMi0xMi01LjM3My0xMi0xMi0xMnptMCAxOGMtMy4zMTQgMC02LTIuNjg2LTYtNnMyLjY4Ni02IDYtNiA2IDIuNjg2IDYgNi0yLjY4NiA2LTYgNnoiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjEiLz48L2c+PC9zdmc+')] opacity-30" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-6xl font-playfair font-bold text-white mb-6">Ready to Level Up?</h2>
-          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
+          <h2 className="text-4xl md:text-6xl font-playfair font-bold text-stone-900 mb-6">Ready to Level Up?</h2>
+          <p className="text-xl text-stone-900/90 mb-10 max-w-2xl mx-auto">
             Book your appointment today and experience why Houston trusts Kelatic with their crown.
           </p>
           <Link
@@ -414,7 +414,7 @@ export default function LandingPage() {
                 {['Hands-on training with real clients', 'Certificate upon completion', 'Business & marketing guidance', 'Small class sizes'].map((item, idx) => (
                   <li key={idx} className="flex items-center gap-3">
                     <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-stone-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                       </svg>
                     </div>
@@ -425,7 +425,7 @@ export default function LandingPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="mailto:kelatic@gmail.com?subject=Loc Academy Interest"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-stone-900 rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
                 >
                   <Mail className="w-5 h-5" />
                   Get Notified
@@ -446,13 +446,13 @@ export default function LandingPage() {
               <div className="aspect-square rounded-3xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/50 flex items-center justify-center shadow-xl">
                 <div className="text-center">
                   <div className="w-28 h-28 mx-auto bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-amber-500/30">
-                    <Award className="w-14 h-14 text-white" />
+                    <Award className="w-14 h-14 text-stone-900" />
                   </div>
                   <h3 className="text-2xl font-playfair font-bold mb-2 text-gray-900">Get Certified</h3>
                   <p className="text-gray-600">Start your loc career</p>
                 </div>
               </div>
-              <div className="absolute -top-4 -right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-full px-5 py-2 font-bold shadow-xl animate-float">
+              <div className="absolute -top-4 -right-4 bg-gradient-to-r from-amber-500 to-orange-500 text-stone-900 rounded-full px-5 py-2 font-bold shadow-xl animate-float">
                 Limited Spots!
               </div>
             </div>
@@ -526,7 +526,7 @@ export default function LandingPage() {
                   className="h-16 w-auto"
                 />
               </div>
-              <p className="text-white/50 max-w-sm">
+              <p className="text-stone-900/50 max-w-sm">
                 Houston&apos;s premier loc specialists. Expert loc installation, maintenance, and styling.
               </p>
             </div>
@@ -534,31 +534,31 @@ export default function LandingPage() {
             <div>
               <h4 className="font-playfair font-bold mb-6">Quick Links</h4>
               <div className="space-y-3">
-                <Link href="/services" className="block text-white/50 hover:text-amber-400 transition-colors">Services</Link>
-                <a href="#team" className="block text-white/50 hover:text-amber-400 transition-colors">Team</a>
-                <Link href="/blog" className="block text-white/50 hover:text-amber-400 transition-colors">Blog</Link>
-                <a href="#academy" className="block text-white/50 hover:text-amber-400 transition-colors">Academy</a>
-                <Link href="/book" className="block text-white/50 hover:text-amber-400 transition-colors">Book Now</Link>
+                <Link href="/services" className="block text-stone-900/50 hover:text-amber-600 transition-colors">Services</Link>
+                <a href="#team" className="block text-stone-900/50 hover:text-amber-600 transition-colors">Team</a>
+                <Link href="/blog" className="block text-stone-900/50 hover:text-amber-600 transition-colors">Blog</Link>
+                <a href="#academy" className="block text-stone-900/50 hover:text-amber-600 transition-colors">Academy</a>
+                <Link href="/book" className="block text-stone-900/50 hover:text-amber-600 transition-colors">Book Now</Link>
               </div>
             </div>
 
             <div>
               <h4 className="font-playfair font-bold mb-6">Connect</h4>
               <div className="flex items-center gap-3">
-                <a href="https://instagram.com/kelatic" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
+                <a href="https://instagram.com/kelatic" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-12 h-12 bg-white rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
                   <Instagram className="w-5 h-5" />
                 </a>
-                <a href="tel:+17134854000" aria-label="Call us" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
+                <a href="tel:+17134854000" aria-label="Call us" className="w-12 h-12 bg-white rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
                   <Phone className="w-5 h-5" />
                 </a>
-                <a href="mailto:kelatic@gmail.com" aria-label="Email us" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
+                <a href="mailto:kelatic@gmail.com" aria-label="Email us" className="w-12 h-12 bg-white rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
                   <Mail className="w-5 h-5" />
                 </a>
               </div>
             </div>
           </div>
 
-          <div className="border-t border-white/5 mt-12 pt-8 text-center text-white/30 text-sm">
+          <div className="border-t border-white/5 mt-12 pt-8 text-center text-stone-900/30 text-sm">
             <p>© {new Date().getFullYear()} Kelatic Hair Lounge. All rights reserved.</p>
           </div>
         </div>

@@ -146,33 +146,33 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-2">Your Information</h2>
-      <p className="text-white/50 mb-6">Almost done! Just need a few details</p>
+      <h2 className="text-xl font-bold text-stone-900 mb-2">Your Information</h2>
+      <p className="text-stone-900/50 mb-6">Almost done! Just need a few details</p>
 
       {/* Booking Summary */}
       <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl p-4 mb-6">
-        <h3 className="font-semibold text-white mb-2">Booking Summary</h3>
+        <h3 className="font-semibold text-stone-900 mb-2">Booking Summary</h3>
         <div className="space-y-1 text-sm">
-          <p className="text-white">
+          <p className="text-stone-900">
             <span className="font-medium">{bookingData.service?.name}</span>
             {bookingData.addons.length > 0 && (
-              <span className="text-white/50">
+              <span className="text-stone-900/50">
                 {' '}
                 + {bookingData.addons.map((a) => a.name).join(', ')}
               </span>
             )}
           </p>
-          <p className="text-white/60">{formatDateTime()}</p>
-          <p className="text-white/60">with {bookingData.timeSlot?.stylist_name}</p>
+          <p className="text-stone-900/60">{formatDateTime()}</p>
+          <p className="text-stone-900/60">with {bookingData.timeSlot?.stylist_name}</p>
         </div>
         <div className="mt-3 pt-3 border-t border-amber-400/20 flex justify-between">
-          <span className="font-medium text-white">Total</span>
-          <span className="font-bold text-amber-400">
+          <span className="font-medium text-stone-900">Total</span>
+          <span className="font-bold text-amber-600">
             {formatCurrency(totalPrice * 100)}
           </span>
         </div>
         {bookingData.service?.deposit_required && (
-          <p className="text-sm text-amber-400/80 mt-2">
+          <p className="text-sm text-amber-600/80 mt-2">
             A {formatCurrency(depositAmount * 100)} deposit is required to secure your appointment
           </p>
         )}
@@ -185,8 +185,8 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
           onClick={() => setIsNewClient(true)}
           className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
             isNewClient
-              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
-              : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+              ? 'bg-amber-500 text-white hover:bg-amber-600'
+              : 'bg-white text-stone-900/70 hover:bg-white/10 border border-stone-300'
           }`}
         >
           I&apos;m New Here
@@ -196,8 +196,8 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
           onClick={() => setIsNewClient(false)}
           className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
             !isNewClient
-              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
-              : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+              ? 'bg-amber-500 text-white hover:bg-amber-600'
+              : 'bg-white text-stone-900/70 hover:bg-white/10 border border-stone-300'
           }`}
         >
           I&apos;ve Been Before
@@ -208,7 +208,7 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="firstName" className="block text-sm font-medium text-white/70 mb-1">
+            <label htmlFor="firstName" className="block text-sm font-medium text-stone-900/70 mb-1">
               First Name
             </label>
             <input
@@ -217,8 +217,8 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
               name="firstName"
               value={formData.firstName}
               onChange={handleChange}
-              className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50 transition-all ${
-                errors.firstName ? 'border-red-500' : 'border-white/10'
+              className={`w-full px-4 py-3 bg-white border rounded-xl text-stone-900 placeholder-white/30 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all ${
+                errors.firstName ? 'border-red-500' : 'border-stone-300'
               }`}
               placeholder="Jane"
             />
@@ -228,7 +228,7 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
           </div>
 
           <div>
-            <label htmlFor="lastName" className="block text-sm font-medium text-white/70 mb-1">
+            <label htmlFor="lastName" className="block text-sm font-medium text-stone-900/70 mb-1">
               Last Name
             </label>
             <input
@@ -237,8 +237,8 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
               name="lastName"
               value={formData.lastName}
               onChange={handleChange}
-              className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50 transition-all ${
-                errors.lastName ? 'border-red-500' : 'border-white/10'
+              className={`w-full px-4 py-3 bg-white border rounded-xl text-stone-900 placeholder-white/30 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all ${
+                errors.lastName ? 'border-red-500' : 'border-stone-300'
               }`}
               placeholder="Doe"
             />
@@ -249,7 +249,7 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-white/70 mb-1">
+          <label htmlFor="email" className="block text-sm font-medium text-stone-900/70 mb-1">
             Email
           </label>
           <input
@@ -258,8 +258,8 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50 transition-all ${
-              errors.email ? 'border-red-500' : 'border-white/10'
+            className={`w-full px-4 py-3 bg-white border rounded-xl text-stone-900 placeholder-white/30 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all ${
+              errors.email ? 'border-red-500' : 'border-stone-300'
             }`}
             placeholder="jane@example.com"
           />
@@ -269,7 +269,7 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
         </div>
 
         <div>
-          <label htmlFor="phone" className="block text-sm font-medium text-white/70 mb-1">
+          <label htmlFor="phone" className="block text-sm font-medium text-stone-900/70 mb-1">
             Phone Number
           </label>
           <input
@@ -278,8 +278,8 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
             name="phone"
             value={formData.phone}
             onChange={handleChange}
-            className={`w-full px-4 py-3 bg-white/5 border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50 transition-all ${
-              errors.phone ? 'border-red-500' : 'border-white/10'
+            className={`w-full px-4 py-3 bg-white border rounded-xl text-stone-900 placeholder-white/30 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all ${
+              errors.phone ? 'border-red-500' : 'border-stone-300'
             }`}
             placeholder="(555) 123-4567"
           />
@@ -289,7 +289,7 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
         </div>
 
         <div>
-          <label htmlFor="notes" className="block text-sm font-medium text-white/70 mb-1">
+          <label htmlFor="notes" className="block text-sm font-medium text-stone-900/70 mb-1">
             Special Requests (Optional)
           </label>
           <textarea
@@ -298,21 +298,21 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
             value={formData.notes}
             onChange={handleChange}
             rows={3}
-            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50 transition-all"
+            className="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 placeholder-white/30 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition-all"
             placeholder="Any special requests or things we should know?"
           />
         </div>
 
         {/* Cancellation Policy */}
-        <div className="bg-white/5 border border-white/10 rounded-xl p-4">
+        <div className="bg-white border border-stone-300 rounded-xl p-4">
           <label className="flex items-start gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={agreedToPolicy}
               onChange={(e) => setAgreedToPolicy(e.target.checked)}
-              className="mt-1 w-4 h-4 rounded border-white/30 bg-transparent text-amber-400 focus:ring-amber-400/50"
+              className="mt-1 w-4 h-4 rounded border-white/30 bg-transparent text-amber-600 focus:ring-amber-500"
             />
-            <span className="text-sm text-white/60">
+            <span className="text-sm text-stone-900/60">
               I understand that deposits are non-refundable. Appointments can be rescheduled
               with at least 24 hours notice. No-shows or late cancellations will forfeit the deposit.
             </span>
@@ -335,14 +335,14 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
             type="button"
             onClick={onBack}
             disabled={loading}
-            className="flex-1 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-colors disabled:opacity-50"
+            className="flex-1 py-3 bg-white border border-stone-300 text-stone-900 rounded-xl font-semibold hover:bg-white/10 transition-colors disabled:opacity-50"
           >
             Back
           </button>
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            className="flex-1 py-3 bg-amber-500 text-white hover:bg-amber-600 rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? (
               <>

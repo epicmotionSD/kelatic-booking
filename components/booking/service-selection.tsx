@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Clock, Check, Plus, ArrowRight } from 'lucide-react';
 import { formatCurrency } from '@/lib/currency';
 import type { Service, ServiceCategory } from '@/types/database';
 
@@ -126,8 +127,8 @@ export function ServiceSelection({
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-6">
-        {categoryFilter ? `Select a ${CATEGORY_LABELS[categoryFilter]} Service` : 'Select a Service'}
+      <h2 className="text-2xl font-playfair font-bold text-stone-900 mb-6">
+        {categoryFilter ? `Select a ${CATEGORY_LABELS[categoryFilter]} Service` : 'Choose Your Perfect Service'}
       </h2>
 
       {/* Category Tabs - hide when filtered to single category */}
@@ -137,8 +138,8 @@ export function ServiceSelection({
             onClick={() => setActiveCategory('all')}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeCategory === 'all'
-                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                ? 'bg-amber-500 text-white shadow-lg'
+                : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
             }`}
           >
             All Services
@@ -149,8 +150,8 @@ export function ServiceSelection({
               onClick={() => setActiveCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 activeCategory === category
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-                  : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                  ? 'bg-amber-500 text-white shadow-lg'
+                  : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
               }`}
             >
               {CATEGORY_LABELS[category]}
@@ -160,63 +161,68 @@ export function ServiceSelection({
       )}
 
       {/* Service List */}
-      <div className="space-y-3">
+      <div className="grid gap-4">
         {filteredServices.map((service) => (
           <button
             key={service.id}
             onClick={() => handleServiceSelect(service)}
-            className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
+            className={`w-full text-left p-6 rounded-xl border-2 transition-all hover:shadow-lg ${
               selected?.id === service.id
-                ? 'border-amber-400 bg-amber-400/10'
-                : 'border-white/10 bg-white/5 hover:border-amber-400/50 hover:bg-white/10'
+                ? 'border-amber-500 bg-amber-50 shadow-lg'
+                : 'border-stone-200 bg-white hover:border-amber-300 hover:bg-amber-50'
             }`}
           >
             <div className="flex justify-between items-start">
               <div className="flex-1">
-                <div className="flex items-center gap-2">
-                  <h3 className="font-semibold text-white">{service.name}</h3>
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="font-semibold text-stone-900 text-lg">{service.name}</h3>
                   {service.deposit_required && (
-                    <span className="px-2 py-0.5 bg-amber-400/20 text-amber-400 text-xs rounded-full border border-amber-400/30">
+                    <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full border border-amber-200">
                       Deposit Required
                     </span>
                   )}
                 </div>
                 {service.description && (
-                  <p className="text-sm text-white/50 mt-1">{service.description}</p>
+                  <p className="text-stone-600 mt-1 mb-3 leading-relaxed">{service.description}</p>
                 )}
-                <p className="text-sm text-white/40 mt-2">
-                  {service.duration} minutes
-                </p>
+                <div className="flex items-center gap-4 text-sm text-stone-500">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {service.duration} minutes
+                  </span>
+                </div>
               </div>
-              <div className="text-right ml-4">
-                <p className="font-bold text-amber-400">
+              <div className="text-right ml-6">
+                <p className="font-bold text-2xl text-amber-600">
                   {formatCurrency(service.base_price * 100)}
                 </p>
                 {service.deposit_required && service.deposit_amount && (
-                  <p className="text-xs text-white/40">
+                  <p className="text-sm text-stone-500 mt-1">
                     {formatCurrency(service.deposit_amount * 100)} deposit
                   </p>
                 )}
+              </div>
               </div>
             </div>
 
             {/* Selection indicator */}
             <div
-              className={`mt-3 flex items-center justify-center py-2 rounded-lg transition-all ${
+              className={`mt-4 flex items-center justify-center py-3 rounded-lg transition-all ${
                 selected?.id === service.id
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold'
-                  : 'bg-white/5 text-white/60'
+                  ? 'bg-amber-500 text-white font-semibold shadow-lg'
+                  : 'bg-stone-100 text-stone-600 hover:bg-amber-100'
               }`}
             >
               {selected?.id === service.id ? (
                 <span className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
+                  <Check className="w-4 h-4" />
                   Selected
                 </span>
               ) : (
-                'Select'
+                <span className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  Choose This Service
+                </span>
               )}
             </div>
           </button>
@@ -225,43 +231,44 @@ export function ServiceSelection({
 
       {/* Add-ons Section */}
       {showAddons && selected && addonServices.length > 0 && (
-        <div className="mt-8">
-          <h3 className="text-lg font-semibold text-white mb-4">
-            Add a Treatment (Optional)
+        <div className="mt-8 p-6 bg-stone-50 rounded-xl border border-stone-200">
+          <h3 className="text-lg font-playfair font-semibold text-stone-900 mb-4">
+            Enhance Your Experience (Optional)
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {addonServices.map((addon) => {
               const isSelected = addons.find((a) => a.id === addon.id);
               return (
                 <button
                   key={addon.id}
                   onClick={() => toggleAddon(addon)}
-                  className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
+                  className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all hover:shadow-md ${
                     isSelected
-                      ? 'border-amber-400 bg-amber-400/10'
-                      : 'border-white/10 bg-white/5 hover:border-amber-400/50'
+                      ? 'border-amber-500 bg-amber-50'
+                      : 'border-stone-200 bg-white hover:border-amber-300'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                         isSelected
-                          ? 'border-amber-400 bg-amber-400'
-                          : 'border-white/30'
+                          ? 'border-amber-500 bg-amber-500'
+                          : 'border-stone-300'
                       }`}
                     >
                       {isSelected && (
-                        <svg className="w-3 h-3 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                        </svg>
+                        <Check className="w-3 h-3 text-white" />
                       )}
                     </div>
                     <div className="text-left">
-                      <p className="font-medium text-white">{addon.name}</p>
-                      <p className="text-sm text-white/50">+{addon.duration} min</p>
+                      <p className="font-medium text-stone-900">{addon.name}</p>
+                      <p className="text-sm text-stone-600 flex items-center gap-1">
+                        <Clock className="w-4 h-4" />
+                        +{addon.duration} min
+                      </p>
                     </div>
                   </div>
-                  <p className="font-semibold text-amber-400">
+                  <p className="font-semibold text-amber-600">
                     +{formatCurrency(addon.base_price * 100)}
                   </p>
                 </button>
@@ -273,34 +280,35 @@ export function ServiceSelection({
 
       {/* Summary & Continue */}
       {selected && (
-        <div className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-xl border-t border-white/10 p-4 shadow-lg">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                <p className="font-medium text-white">{selected.name}</p>
-                {addons.length > 0 && (
-                  <p className="text-sm text-white/50">
-                    + {addons.map((a) => a.name).join(', ')}
-                  </p>
-                )}
-                <p className="text-sm text-white/40">{totalDuration} minutes</p>
+        <div className="sticky bottom-4 mt-8 bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex-1">
+              <p className="font-semibold text-stone-900 text-lg">{selected.name}</p>
+              {addons.length > 0 && (
+                <p className="text-stone-600 mt-1">
+                  + {addons.map((a) => a.name).join(', ')}
+                </p>
+              )}
+              <div className="flex items-center gap-1 text-stone-500 mt-2">
+                <Clock className="w-4 h-4" />
+                <span className="text-sm">{totalDuration} minutes total</span>
               </div>
-              <p className="text-xl font-bold text-amber-400">
+            </div>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-amber-600">
                 {formatCurrency(totalPrice * 100)}
               </p>
             </div>
-            <button
-              onClick={handleContinue}
-              className="w-full py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
-            >
-              Continue
-            </button>
           </div>
+          <button
+            onClick={handleContinue}
+            className="w-full py-4 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all shadow-lg flex items-center justify-center gap-2"
+          >
+            Continue to Stylist Selection
+            <ArrowRight className="w-5 h-5" />
+          </button>
         </div>
       )}
-
-      {/* Spacer for fixed bottom bar */}
-      {selected && <div className="h-32" />}
     </div>
   );
 }
