@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { Users, Plus, Mail, Phone, Instagram, Star, Edit, Trash2, MapPin, X } from 'lucide-react';
 
 interface Stylist {
   id: string;
@@ -104,20 +105,21 @@ export default function StylistsPage() {
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Stylists</h1>
-          <p className="text-white/50">Manage your team</p>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
+            <Users className="w-8 h-8 text-amber-600" />
+            Divine Stylists
+          </h1>
+          <p className="text-stone-600">Manage your talented team</p>
         </div>
         <button
           onClick={() => openModal()}
-          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
+          className="px-6 py-3 bg-amber-500 text-stone-900 rounded-xl font-semibold hover:bg-amber-600 transition-all flex items-center gap-2 w-fit shadow-lg"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus className="w-5 h-5" />
           Add Stylist
         </button>
       </div>
@@ -125,27 +127,15 @@ export default function StylistsPage() {
       {/* Stylists Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
         </div>
       ) : stylists.length === 0 ? (
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-12 text-center">
-          <svg
-            className="w-12 h-12 mx-auto text-white/20 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-          </svg>
-          <p className="text-white/50 mb-4">No stylists yet</p>
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-12 text-center">
+          <Users className="w-12 h-12 mx-auto text-stone-300 mb-4" />
+          <p className="text-stone-600 mb-4">No stylists yet</p>
           <button
             onClick={() => openModal()}
-            className="text-amber-400 hover:text-amber-300"
+            className="text-amber-600 hover:text-amber-700"
           >
             Add your first stylist →
           </button>
@@ -155,12 +145,12 @@ export default function StylistsPage() {
           {stylists.map((stylist) => (
             <div
               key={stylist.id}
-              className={`bg-white/5 backdrop-blur rounded-xl border border-white/10 overflow-hidden ${
+              className={`bg-white rounded-xl border border-amber-200 shadow-lg overflow-hidden ${
                 !stylist.is_active ? 'opacity-60' : ''
               }`}
             >
               {/* Header */}
-              <div className="p-6 border-b border-white/10">
+              <div className="p-6 border-b border-stone-200">
                 <div className="flex items-start gap-4">
                   {stylist.avatar_url ? (
                     <img
@@ -170,7 +160,7 @@ export default function StylistsPage() {
                     />
                   ) : (
                     <div className="w-16 h-16 bg-amber-400/10 rounded-full flex items-center justify-center">
-                      <span className="text-amber-400 font-semibold text-xl">
+                      <span className="text-amber-600 font-semibold text-xl">
                         {stylist.first_name[0]}
                         {stylist.last_name[0]}
                       </span>
@@ -178,17 +168,17 @@ export default function StylistsPage() {
                   )}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-white">
+                      <h3 className="font-semibold text-stone-900">
                         {stylist.first_name} {stylist.last_name}
                       </h3>
                       {!stylist.is_active && (
-                        <span className="px-2 py-1 bg-white/10 text-white/50 text-xs rounded-full">
+                        <span className="px-2 py-1 bg-white/10 text-stone-600 text-xs rounded-full">
                           Inactive
                         </span>
                       )}
                     </div>
                     {stylist.instagram_handle && (
-                      <p className="text-sm text-amber-400">
+                      <p className="text-sm text-amber-600">
                         @{stylist.instagram_handle}
                       </p>
                     )}
@@ -197,7 +187,7 @@ export default function StylistsPage() {
                         {stylist.specialties.slice(0, 3).map((s) => (
                           <span
                             key={s}
-                            className="px-2 py-0.5 bg-white/10 text-white/60 text-xs rounded"
+                            className="px-2 py-0.5 bg-white/10 text-stone-900/60 text-xs rounded"
                           >
                             {s}
                           </span>
@@ -209,18 +199,18 @@ export default function StylistsPage() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 divide-x divide-white/10 border-b border-white/10">
+              <div className="grid grid-cols-2 divide-x divide-white/10 border-b border-stone-200">
                 <div className="p-4 text-center">
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-2xl font-bold text-stone-900">
                     {stylist.services_count}
                   </p>
-                  <p className="text-xs text-white/50">Services</p>
+                  <p className="text-xs text-stone-600">Services</p>
                 </div>
                 <div className="p-4 text-center">
-                  <p className="text-2xl font-bold text-white">
+                  <p className="text-2xl font-bold text-stone-900">
                     {stylist.appointments_this_week}
                   </p>
-                  <p className="text-xs text-white/50">This Week</p>
+                  <p className="text-xs text-stone-600">This Week</p>
                 </div>
               </div>
 
@@ -241,14 +231,14 @@ export default function StylistsPage() {
               <div className="p-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => openModal(stylist)}
-                  className="flex-1 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10"
+                  className="flex-1 py-2 bg-white/5 text-stone-900 rounded-xl hover:bg-amber-50 transition-colors text-sm border border-stone-200"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleInvite(stylist)}
                   disabled={inviting === stylist.id}
-                  className="flex-1 py-2 bg-amber-500/10 text-amber-400 rounded-xl hover:bg-amber-500/20 transition-colors text-sm border border-amber-500/30 disabled:opacity-50"
+                  className="flex-1 py-2 bg-amber-500/10 text-amber-600 rounded-xl hover:bg-amber-500/20 transition-colors text-sm border border-amber-500/30 disabled:opacity-50"
                 >
                   {inviting === stylist.id ? 'Sending...' : 'Invite'}
                 </button>
@@ -346,22 +336,20 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-900 border border-white/10 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">
+      <div className="bg-zinc-900 border border-stone-200 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-stone-200 flex items-center justify-between">
+          <h2 className="text-lg font-semibold text-stone-900">
             {stylist ? 'Edit Stylist' : 'Add Stylist'}
           </h2>
-          <button onClick={onClose} className="text-white/40 hover:text-white">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+          <button onClick={onClose} className="text-stone-600 hover:text-stone-900">
+            <X className="w-6 h-6" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1">
+              <label className="block text-sm font-medium text-stone-900/70 mb-1">
                 First Name
               </label>
               <input
@@ -370,12 +358,12 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, first_name: e.target.value })
                 }
-                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-stone-900 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
                 required
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-white/70 mb-1">
+              <label className="block text-sm font-medium text-stone-900/70 mb-1">
                 Last Name
               </label>
               <input
@@ -384,14 +372,14 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, last_name: e.target.value })
                 }
-                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-stone-900 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
                 required
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">
+            <label className="block text-sm font-medium text-stone-900/70 mb-1">
               Email
             </label>
             <input
@@ -400,13 +388,13 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-stone-900 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">
+            <label className="block text-sm font-medium text-stone-900/70 mb-1">
               Phone
             </label>
             <input
@@ -415,16 +403,16 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
               }
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-stone-900 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">
+            <label className="block text-sm font-medium text-stone-900/70 mb-1">
               Instagram Handle
             </label>
             <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-stone-900/40">
                 @
               </span>
               <input
@@ -433,27 +421,27 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, instagram_handle: e.target.value })
                 }
-                className="w-full pl-8 pr-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full pl-8 pr-4 py-2 bg-white/5 border border-white/20 rounded-xl text-stone-900 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
                 placeholder="username"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">
+            <label className="block text-sm font-medium text-stone-900/70 mb-1">
               Bio
             </label>
             <textarea
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-stone-900 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
               placeholder="Brief description..."
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">
+            <label className="block text-sm font-medium text-stone-900/70 mb-1">
               Specialties
             </label>
             <input
@@ -462,13 +450,13 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, specialties: e.target.value })
               }
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-stone-900 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
               placeholder="Locs, Braids, Color (comma-separated)"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">
+            <label className="block text-sm font-medium text-stone-900/70 mb-1">
               Commission Rate (%)
             </label>
             <input
@@ -479,7 +467,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, commission_rate: e.target.value })
               }
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-stone-900 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
             />
           </div>
 
@@ -493,14 +481,14 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+              className="flex-1 py-2 bg-white/5 border border-stone-200 text-stone-900 rounded-xl hover:bg-amber-50 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
+              className="flex-1 py-2 bg-amber-500 text-white hover:bg-amber-600 rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Save Stylist'}
             </button>

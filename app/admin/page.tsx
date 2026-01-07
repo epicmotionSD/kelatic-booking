@@ -189,15 +189,15 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       {/* Premium Light Header */}
-      <div className="bg-white/90 backdrop-blur-xl p-8 rounded-3xl border border-amber-200/30 shadow-2xl bg-gradient-to-r from-amber-50 to-orange-50">
+      <div className="bg-white p-8 rounded-2xl border border-amber-200 shadow-lg">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1">
-            <h1 className="text-4xl font-bold mb-3">
+            <h1 className="text-4xl font-playfair font-bold mb-3">
               <span className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">
                 ✨ Welcome back, Divine Loctician! 
               </span>
             </h1>
-            <p className="text-gray-700 text-lg font-medium">
+            <p className="text-stone-700 text-lg font-medium">
               Master your craft • {new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -230,32 +230,32 @@ export default function AdminDashboard() {
             {insights.map((insight, index) => (
               <div
                 key={index}
-                className={`bg-white/90 backdrop-blur-xl p-6 rounded-2xl border shadow-xl hover:shadow-2xl transition-all ${
+                className={`bg-white p-6 rounded-2xl border shadow-lg hover:shadow-xl transition-all ${
                   insight.type === 'success' 
-                    ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-300/50' 
+                    ? 'border-emerald-200' 
                     : insight.type === 'warning' 
-                    ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300/50'
+                    ? 'border-amber-200'
                     : insight.type === 'action'
-                    ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300/50'
-                    : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-300/50'
+                    ? 'border-amber-200'
+                    : 'border-stone-200'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 flex-1">
                     <div className={`p-3 rounded-2xl shadow-lg ${
                       insight.type === 'success' 
-                        ? 'bg-emerald-100 text-emerald-600' 
+                        ? 'bg-emerald-100 text-emerald-700' 
                         : insight.type === 'warning' 
-                        ? 'bg-amber-100 text-amber-600'
+                        ? 'bg-amber-100 text-amber-700'
                         : insight.type === 'action'
-                        ? 'bg-amber-100 text-amber-600'
-                        : 'bg-gray-100 text-gray-600'
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-stone-100 text-stone-700'
                     }`}>
                       {insight.icon}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 text-lg">{insight.title}</h3>
-                      <p className="text-gray-600 mt-1">{insight.description}</p>
+                      <h3 className="font-bold text-stone-900 text-lg">{insight.title}</h3>
+                      <p className="text-stone-600 mt-1">{insight.description}</p>
                     </div>
                   </div>
                   {insight.action && (
@@ -283,17 +283,16 @@ export default function AdminDashboard() {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white/90 backdrop-blur-xl rounded-2xl border border-amber-200/30 p-6 hover:scale-105 transition-all group shadow-xl hover:shadow-2xl"
-            style={{ background: `linear-gradient(135deg, ${stat.bgColor?.replace('from-', 'rgba(').replace('to-', 'rgba(').replace('/20', ', 0.1)').replace('/20', ', 0.15)')} )` }}
+            className="bg-white rounded-2xl border border-amber-200 p-6 hover:shadow-lg transition-all group shadow-md"
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="p-4 rounded-2xl bg-white/80 backdrop-blur-sm shadow-lg border border-amber-200/30">
-                <div className={`bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
+              <div className="p-4 rounded-2xl bg-cream-50 shadow-sm border border-amber-100">
+                <div className={`text-amber-600`}>
                   {stat.icon}
                 </div>
               </div>
               {stat.change && (
-                <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 backdrop-blur-sm border border-amber-200/30">
+                <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-cream-50 border border-amber-100">
                   {stat.trend === 'up' ? (
                     <ArrowUpRight className="w-4 h-4 text-emerald-600" />
                   ) : (
@@ -308,10 +307,10 @@ export default function AdminDashboard() {
               )}
             </div>
             <div>
-              <p className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</p>
-              <p className="text-gray-700 font-medium">{stat.label}</p>
+              <p className="text-3xl font-bold text-stone-900 mb-2">{stat.value}</p>
+              <p className="text-stone-700 font-medium">{stat.label}</p>
               {stat.subtitle && (
-                <p className="text-gray-600 text-sm font-light">{stat.subtitle}</p>
+                <p className="text-stone-600 text-sm font-light">{stat.subtitle}</p>
               )}
             </div>
           </div>
@@ -321,10 +320,10 @@ export default function AdminDashboard() {
       {/* Divine Content Grid */}
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Divine Upcoming Sessions */}
-        <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-amber-200/30 shadow-xl">
-          <div className="p-6 border-b border-amber-200/30 flex items-center justify-between">
-            <h2 className="text-xl font-playfair font-bold text-gray-900 flex items-center gap-3">
-              <Clock className="w-6 h-6 text-blue-600" />
+        <div className="bg-white rounded-2xl border border-amber-200 shadow-lg">
+          <div className="p-6 border-b border-amber-200 flex items-center justify-between">
+            <h2 className="text-xl font-playfair font-bold text-stone-900 flex items-center gap-3">
+              <Clock className="w-6 h-6 text-amber-600" />
               Divine Sessions Today
             </h2>
             <Link
@@ -335,16 +334,16 @@ export default function AdminDashboard() {
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="divide-y divide-amber-200/30">
+          <div className="divide-y divide-amber-200">
             {metrics?.upcomingAppointments?.length === 0 ? (
               <div className="p-6 text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="w-8 h-8 text-amber-600" />
                 </div>
-                <p className="text-gray-600 mb-4">No appointments scheduled for today</p>
+                <p className="text-stone-600 mb-4">No appointments scheduled for today</p>
                 <Link
                   href="/admin/appointments/new"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-amber-100 text-amber-600 rounded-lg hover:bg-amber-200 transition-colors"
                 >
                   <PlusCircle className="w-4 h-4" />
                   Book First Appointment

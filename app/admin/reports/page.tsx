@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/lib/currency';
+import { BarChart3, DollarSign, Calendar, Users, UserPlus, TrendingUp } from 'lucide-react';
 
 interface ReportData {
   period: string;
@@ -44,18 +45,21 @@ export default function ReportsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Reports</h1>
-          <p className="text-white/50">Track your business performance</p>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
+            <BarChart3 className="w-8 h-8 text-amber-600" />
+            Divine Insights
+          </h1>
+          <p className="text-stone-600">Track your business performance</p>
         </div>
         <div className="flex gap-2">
           {(['today', 'week', 'month', 'year'] as const).map((p) => (
@@ -64,8 +68,8 @@ export default function ReportsPage() {
               onClick={() => setPeriod(p)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                 period === p
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
-                  : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                  ? 'bg-amber-500 text-white shadow-lg'
+                  : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
               }`}
             >
               {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -76,58 +80,50 @@ export default function ReportsPage() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-white/50">Total Revenue</span>
-            <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+            <span className="text-sm text-stone-600">Total Revenue</span>
+            <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+              <DollarSign className="w-4 h-4 text-green-600" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-amber-400">
+          <p className="text-3xl font-bold text-amber-600">
             {formatCurrency((data?.revenue || 0) * 100)}
           </p>
         </div>
 
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-white/50">Appointments</span>
-            <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
+            <span className="text-sm text-stone-600">Appointments</span>
+            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-blue-600" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-white">
+          <p className="text-3xl font-bold text-stone-900">
             {data?.appointments || 0}
           </p>
         </div>
 
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-white/50">New Clients</span>
-            <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
+            <span className="text-sm text-stone-600">New Clients</span>
+            <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+              <UserPlus className="w-4 h-4 text-amber-600" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-white">
+          <p className="text-3xl font-bold text-stone-900">
             {data?.newClients || 0}
           </p>
         </div>
 
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-white/50">Avg. Ticket</span>
-            <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
-              <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
+            <span className="text-sm text-stone-600">Avg. Ticket</span>
+            <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-amber-600" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-white">
+          <p className="text-3xl font-bold text-stone-900">
             {formatCurrency((data?.avgTicket || 0) * 100)}
           </p>
         </div>
@@ -135,8 +131,8 @@ export default function ReportsPage() {
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Revenue Chart Placeholder */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
-          <h3 className="font-semibold text-white mb-4">Revenue Trend</h3>
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <h3 className="font-playfair font-semibold text-stone-900 mb-4">Revenue Trend</h3>
           <div className="h-64 flex items-end justify-between gap-2">
             {data?.dailyRevenue?.slice(-14).map((day, index) => {
               const maxRevenue = Math.max(
@@ -154,7 +150,7 @@ export default function ReportsPage() {
                     style={{ height: `${Math.max(height, 4)}%` }}
                     title={`${day.date}: ${formatCurrency(day.revenue * 100)}`}
                   />
-                  <span className="text-xs text-white/40 -rotate-45 origin-left">
+                  <span className="text-xs text-stone-400 -rotate-45 origin-left">
                     {new Date(day.date).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
@@ -167,8 +163,8 @@ export default function ReportsPage() {
         </div>
 
         {/* Payment Methods */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
-          <h3 className="font-semibold text-white mb-4">Payment Methods</h3>
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <h3 className="font-playfair font-semibold text-stone-900 mb-4">Payment Methods</h3>
           <div className="space-y-4">
             {data?.paymentBreakdown?.map((method) => {
               const total = data.paymentBreakdown.reduce(
@@ -180,7 +176,7 @@ export default function ReportsPage() {
               return (
                 <div key={method.method}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm font-medium text-stone-900">
                       {method.method === 'card_terminal'
                         ? 'Card (POS)'
                         : method.method === 'card_online'
@@ -189,11 +185,11 @@ export default function ReportsPage() {
                         ? 'Cash'
                         : method.method}
                     </span>
-                    <span className="text-sm text-white/50">
+                    <span className="text-sm text-stone-600">
                       {formatCurrency(method.amount * 100)} ({method.count})
                     </span>
                   </div>
-                  <div className="w-full bg-white/10 rounded-full h-2">
+                  <div className="w-full bg-stone-100 rounded-full h-2">
                     <div
                       className="bg-gradient-to-r from-amber-400 to-yellow-500 h-2 rounded-full"
                       style={{ width: `${percentage}%` }}
@@ -203,85 +199,90 @@ export default function ReportsPage() {
               );
             })}
             {(!data?.paymentBreakdown || data.paymentBreakdown.length === 0) && (
-              <p className="text-center text-white/50 py-8">No payment data</p>
+              <p className="text-center text-stone-500 py-8">No payment data</p>
             )}
           </div>
         </div>
 
         {/* Top Services */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
-          <h3 className="font-semibold text-white mb-4">Top Services</h3>
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <h3 className="font-playfair font-semibold text-stone-900 mb-4">Top Services</h3>
           <div className="space-y-4">
             {data?.topServices?.slice(0, 5).map((service, index) => (
               <div key={service.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-amber-400/10 rounded-lg flex items-center justify-center text-amber-400 font-semibold text-sm">
+                <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center text-amber-600 font-semibold text-sm">
                   {index + 1}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white truncate">
+                  <p className="font-medium text-stone-900 truncate">
                     {service.name}
                   </p>
-                  <p className="text-sm text-white/50">
+                  <p className="text-sm text-stone-600">
                     {service.count} appointments
                   </p>
                 </div>
-                <p className="font-semibold text-amber-400">
+                <p className="font-semibold text-amber-600">
                   {formatCurrency(service.revenue * 100)}
                 </p>
               </div>
             ))}
             {(!data?.topServices || data.topServices.length === 0) && (
-              <p className="text-center text-white/50 py-8">No service data</p>
+              <p className="text-center text-stone-500 py-8">No service data</p>
             )}
           </div>
         </div>
 
         {/* Top Stylists */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
-          <h3 className="font-semibold text-white mb-4">Stylist Performance</h3>
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <h3 className="font-playfair font-semibold text-stone-900 mb-4">Stylist Performance</h3>
           <div className="space-y-4">
             {data?.topStylists?.map((stylist, index) => (
               <div key={stylist.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-amber-400/10 rounded-full flex items-center justify-center text-amber-400 font-medium text-sm">
+                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center text-amber-600 font-medium text-sm">
                   {stylist.name
                     .split(' ')
                     .map((n) => n[0])
                     .join('')}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white truncate">
+                  <p className="font-medium text-stone-900 truncate">
                     {stylist.name}
                   </p>
-                  <p className="text-sm text-white/50">
+                  <p className="text-sm text-stone-600">
                     {stylist.appointments} appointments
                   </p>
                 </div>
-                <p className="font-semibold text-amber-400">
+                <p className="font-semibold text-amber-600">
                   {formatCurrency(stylist.revenue * 100)}
                 </p>
               </div>
             ))}
             {(!data?.topStylists || data.topStylists.length === 0) && (
-              <p className="text-center text-white/50 py-8">No stylist data</p>
+              <p className="text-center text-stone-500 py-8">No stylist data</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Export */}
-      <div className="mt-8 bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+      <div className="mt-8 bg-white rounded-xl border border-amber-200 shadow-lg p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h3 className="font-semibold text-white">Export Data</h3>
-            <p className="text-sm text-white/50">
-              Download reports for your records or accounting
-            </p>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+              <Users className="w-4 h-4 text-amber-600" />
+            </div>
+            <div>
+              <h3 className="font-playfair font-semibold text-stone-900">Export Data</h3>
+              <p className="text-sm text-stone-600">
+                Download reports for your records or accounting
+              </p>
+            </div>
           </div>
           <div className="flex gap-2">
-            <button className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10">
+            <button className="px-4 py-2 bg-white text-stone-700 rounded-xl hover:bg-amber-50 transition-colors text-sm border border-stone-200">
               Export CSV
             </button>
-            <button className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10">
+            <button className="px-4 py-2 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors text-sm shadow-lg">
               Export PDF
             </button>
           </div>

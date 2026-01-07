@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatCurrency } from '@/lib/currency';
+import { Briefcase, Plus, Users, Clock, DollarSign, MoreVertical, Edit, Power, Trash2 } from 'lucide-react';
 import type { Service, ServiceCategory, Profile } from '@/types/database';
 
 const CATEGORY_LABELS: Record<ServiceCategory, string> = {
@@ -102,20 +103,21 @@ export default function ServicesPage() {
   }, {} as Record<ServiceCategory, number>);
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Services</h1>
-          <p className="text-white/50">Manage your service menu and pricing</p>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
+            <Briefcase className="w-8 h-8 text-amber-600" />
+            Sacred Arts
+          </h1>
+          <p className="text-stone-600">Manage your service menu and pricing</p>
         </div>
         <button
           onClick={() => openModal()}
-          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
+          className="px-4 py-2 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all flex items-center gap-2 w-fit"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus className="w-5 h-5" />
           Add Service
         </button>
       </div>
@@ -126,8 +128,8 @@ export default function ServicesPage() {
           onClick={() => setActiveCategory('all')}
           className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
             activeCategory === 'all'
-              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
-              : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+              ? 'bg-amber-500 text-white shadow-lg'
+              : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
           }`}
         >
           All ({services.length})
@@ -138,8 +140,8 @@ export default function ServicesPage() {
             onClick={() => setActiveCategory(category)}
             className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
               activeCategory === category
-                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
-                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                ? 'bg-amber-500 text-white shadow-lg'
+                : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
             }`}
           >
             {CATEGORY_LABELS[category]} ({categoryCounts[category]})
@@ -150,27 +152,15 @@ export default function ServicesPage() {
       {/* Services Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-12 text-center">
-          <svg
-            className="w-12 h-12 mx-auto text-white/20 mb-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-            />
-          </svg>
-          <p className="text-white/50 mb-4">No services found</p>
+        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-12 text-center">
+          <Briefcase className="w-12 h-12 mx-auto text-amber-300 mb-4" />
+          <p className="text-stone-600 mb-4">No services found</p>
           <button
             onClick={() => openModal()}
-            className="text-amber-400 hover:text-amber-300"
+            className="text-amber-600 hover:text-amber-700 font-medium"
           >
             Create your first service →
           </button>
@@ -180,22 +170,22 @@ export default function ServicesPage() {
           {filteredServices.map((service) => (
             <div
               key={service.id}
-              className={`bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6 ${
+              className={`bg-white rounded-xl border border-amber-200 shadow-lg hover:shadow-xl transition-all p-6 ${
                 !service.is_active ? 'opacity-60' : ''
               }`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <span className="text-xs font-medium text-amber-400 uppercase tracking-wide">
+                  <span className="text-xs font-medium text-amber-600 uppercase tracking-wide">
                     {CATEGORY_LABELS[service.category]}
                   </span>
-                  <h3 className="font-semibold text-white mt-1">
+                  <h3 className="font-semibold text-stone-900 mt-1">
                     {service.name}
                   </h3>
                 </div>
                 <div className="flex items-center gap-2">
                   {!service.is_active && (
-                    <span className="px-2 py-1 bg-white/10 text-white/50 text-xs rounded-full">
+                    <span className="px-2 py-1 bg-stone-100 text-stone-600 text-xs rounded-full border border-stone-200">
                       Inactive
                     </span>
                   )}
@@ -205,29 +195,30 @@ export default function ServicesPage() {
                         const menu = e.currentTarget.nextElementSibling;
                         menu?.classList.toggle('hidden');
                       }}
-                      className="p-1 text-white/40 hover:text-white"
+                      className="p-1 text-stone-400 hover:text-stone-700"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                      </svg>
+                      <MoreVertical className="w-5 h-5" />
                     </button>
-                    <div className="hidden absolute right-0 mt-1 w-36 bg-zinc-900 rounded-xl shadow-lg border border-white/10 py-1 z-10">
+                    <div className="hidden absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-stone-200 py-1 z-10">
                       <button
                         onClick={() => openModal(service)}
-                        className="w-full text-left px-4 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white"
+                        className="w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-amber-50 flex items-center gap-2"
                       >
+                        <Edit className="w-4 h-4" />
                         Edit
                       </button>
                       <button
                         onClick={() => handleToggleActive(service)}
-                        className="w-full text-left px-4 py-2 text-sm text-white/70 hover:bg-white/5 hover:text-white"
+                        className="w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-amber-50 flex items-center gap-2"
                       >
+                        <Power className="w-4 h-4" />
                         {service.is_active ? 'Deactivate' : 'Activate'}
                       </button>
                       <button
                         onClick={() => handleDelete(service.id)}
-                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5"
+                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                       >
+                        <Trash2 className="w-4 h-4" />
                         Delete
                       </button>
                     </div>
@@ -236,14 +227,18 @@ export default function ServicesPage() {
               </div>
 
               {service.description && (
-                <p className="text-sm text-white/50 mb-4 line-clamp-2">
+                <p className="text-sm text-stone-600 mb-4 line-clamp-2">
                   {service.description}
                 </p>
               )}
 
               <div className="flex items-center justify-between text-sm">
-                <span className="text-white/50">{service.duration} min</span>
-                <span className="font-semibold text-amber-400">
+                <span className="text-stone-600 flex items-center gap-1">
+                  <Clock className="w-4 h-4" />
+                  {service.duration} min
+                </span>
+                <span className="font-semibold text-amber-600 flex items-center gap-1">
+                  <DollarSign className="w-4 h-4" />
                   {formatCurrency(service.base_price * 100)}
                 </span>
               </div>

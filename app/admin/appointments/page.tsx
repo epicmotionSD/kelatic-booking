@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
-import { formatTime, formatDate } from '@/lib/date-utils';
+import { Plus, Calendar, Filter, Users, Clock } from 'lucide-react';
 
 interface Appointment {
   id: string;
@@ -19,12 +19,12 @@ interface Appointment {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-500/20 text-amber-400',
-  confirmed: 'bg-green-500/20 text-green-400',
-  in_progress: 'bg-blue-500/20 text-blue-400',
-  completed: 'bg-white/10 text-white/60',
-  cancelled: 'bg-red-500/20 text-red-400',
-  no_show: 'bg-red-500/20 text-red-400',
+  pending: 'bg-amber-100 text-amber-700 border-amber-200',
+  confirmed: 'bg-green-100 text-green-700 border-green-200',
+  in_progress: 'bg-blue-100 text-blue-700 border-blue-200',
+  completed: 'bg-stone-100 text-stone-600 border-stone-200',
+  cancelled: 'bg-red-100 text-red-700 border-red-200',
+  no_show: 'bg-red-100 text-red-700 border-red-200',
 };
 
 export default function AppointmentsPage() {
@@ -91,30 +91,31 @@ export default function AppointmentsPage() {
 
 
   return (
-    <div>
+    <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-white">Appointments</h1>
-          <p className="text-white/50">{formatDate(filters.date)}</p>
+          <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
+            <Calendar className="w-8 h-8 text-amber-600" />
+            Sacred Sessions
+          </h1>
+          <p className="text-stone-600">{formatDate(filters.date)}</p>
         </div>
         <Link
           href="/admin/appointments/new"
-          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
+          className="px-4 py-2 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all flex items-center gap-2 w-fit"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
+          <Plus className="w-5 h-5" />
           New Appointment
         </Link>
       </div>
 
       {/* Filters */}
-      <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-4 mb-6">
+      <div className="bg-white rounded-xl border border-amber-200 p-4 mb-6 shadow-sm">
         <div className="flex flex-wrap gap-4">
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">
+            <label className="block text-sm font-medium text-stone-700 mb-1">
               Date
             </label>
             <input
@@ -123,13 +124,13 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, date: e.target.value })
               }
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+              className="px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
             />
           </div>
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-white/70 mb-1">
+            <label className="block text-sm font-medium text-stone-700 mb-1">
               Status
             </label>
             <select
@@ -137,7 +138,7 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              className="px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+              className="px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
