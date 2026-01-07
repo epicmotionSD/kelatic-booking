@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.font-playfair {
+  font-family: var(--font-playfair), serif;
+}
+
 :root {
   --foreground-rgb: 15, 15, 23;
   --background-start-rgb: 255, 252, 248;

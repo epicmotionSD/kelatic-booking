@@ -175,49 +175,20 @@ export default function LandingPage() {
               <div className="w-2 h-2 bg-amber-600 rounded-full animate-pulse" />
               Houston's #1 Loc Specialists
             </div>
-            <div className="space-y-4 max-w-5xl">
-              <h1 className="text-6xl md:text-8xl font-black leading-[0.9]">
+            <div className="space-y-6 max-w-4xl">
+              <h1 className="text-5xl md:text-7xl font-playfair font-bold leading-tight">
                 <span className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
                   Expert Loc Care &
                 </span>
-              </h1>
-              <h2 className="text-5xl md:text-7xl font-black leading-[0.9]">
+                <br />
                 <span className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 bg-clip-text text-transparent">
-                  Professional Maintenance
+                  Professional Artistry
                 </span>
-              </h2>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-8 max-w-4xl mx-auto">
-              <div className="px-4 py-3 bg-white/80 backdrop-blur border border-amber-200/50 rounded-xl text-gray-700 text-sm font-semibold hover:bg-white/90 hover:shadow-md transition-all">
-                Loc Retwist
-              </div>
-              <div className="px-4 py-3 bg-white/80 backdrop-blur border border-amber-200/50 rounded-xl text-gray-700 text-sm font-semibold hover:bg-white/90 hover:shadow-md transition-all">
-                Starter Locs
-              </div>
-              <div className="px-4 py-3 bg-white/80 backdrop-blur border border-amber-200/50 rounded-xl text-gray-700 text-sm font-semibold hover:bg-white/90 hover:shadow-md transition-all">
-                Loc Detox
-              </div>
-              <div className="px-4 py-3 bg-white/80 backdrop-blur border border-amber-200/50 rounded-xl text-gray-700 text-sm font-semibold hover:bg-white/90 hover:shadow-md transition-all">
-                Loc Extensions
-              </div>
-              <div className="px-4 py-3 bg-white/80 backdrop-blur border border-amber-200/50 rounded-xl text-gray-700 text-sm font-semibold hover:bg-white/90 hover:shadow-md transition-all">
-                Palm Rolling
-              </div>
-              <div className="px-4 py-3 bg-white/80 backdrop-blur border border-amber-200/50 rounded-xl text-gray-700 text-sm font-semibold hover:bg-white/90 hover:shadow-md transition-all">
-                Loc Repair
-              </div>
-              <div className="px-4 py-3 bg-white/80 backdrop-blur border border-amber-200/50 rounded-xl text-gray-700 text-sm font-semibold hover:bg-white/90 hover:shadow-md transition-all">
-                Loc Styling
-              </div>
-              <div className="px-4 py-3 bg-white/80 backdrop-blur border border-amber-200/50 rounded-xl text-gray-700 text-sm font-semibold hover:bg-white/90 hover:shadow-md transition-all">
-                Loc Consultation
-              </div>
+              </h1>
             </div>
 
-            <p className="text-xl text-gray-600 max-w-2xl leading-relaxed">
-              Book with Houston's most trusted loc specialists. From starter locs to maintenance, 
-              we provide expert care for your loc journey with precision and artistry.
+            <p className="text-lg text-gray-600 max-w-xl leading-relaxed font-light">
+              Houston's premier destination for expert loc care and professional maintenance.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-center pt-4">

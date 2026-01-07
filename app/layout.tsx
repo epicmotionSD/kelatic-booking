@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import { GoogleAnalytics } from '@next/third-parties/google';
 import { headers } from 'next/headers';
 import './globals.css';
@@ -8,6 +8,7 @@ import { BusinessProvider, BusinessThemeStyle } from '@/lib/tenant/context';
 import { getAnalyticsId, getGoogleAdsConfig } from '@/lib/tenant-config';
 
 const inter = Inter({ subsets: ['latin'] });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
 const platformUrl = `https://${ROOT_DOMAIN}`;
@@ -83,7 +84,7 @@ export default async function RootLayout({
         />
         {business && <BusinessThemeStyle business={business} />}
       </head>
-      <body className={inter.className} suppressHydrationWarning={true}>
+      <body className={`${inter.className} ${playfair.variable}`} suppressHydrationWarning={true}>
         <BusinessProvider business={business} settings={settings}>
           {children}
         </BusinessProvider>
