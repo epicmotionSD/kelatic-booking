@@ -83,10 +83,10 @@ export default function AdminDashboard() {
     if (!setupStatus.googleCalendar || !setupStatus.smsEmail) {
       insights.push({
         type: 'action',
-        title: 'Complete Your Setup',
-        description: `${!setupStatus.googleCalendar ? 'Google Calendar' : ''}${!setupStatus.googleCalendar && !setupStatus.smsEmail ? ' and ' : ''}${!setupStatus.smsEmail ? 'SMS notifications' : ''} ${(!setupStatus.googleCalendar && !setupStatus.smsEmail) ? 'are' : 'is'} not connected.`,
+        title: 'Complete Your Divine Setup',
+        description: `${!setupStatus.googleCalendar ? 'Divine Calendar' : ''}${!setupStatus.googleCalendar && !setupStatus.smsEmail ? ' and ' : ''}${!setupStatus.smsEmail ? 'Sacred SMS notifications' : ''} ${(!setupStatus.googleCalendar && !setupStatus.smsEmail) ? 'are' : 'is'} not connected to your divine throne.`,
         action: {
-          label: 'Complete Setup',
+          label: 'Ascend to Completion',
           href: '/admin/settings?tab=integrations',
           variant: 'primary'
         },
@@ -98,10 +98,10 @@ export default function AdminDashboard() {
       if ((metrics.pendingDeposits || 0) > 0) {
         insights.push({
           type: 'warning',
-          title: 'Pending Deposits',
-          description: `${metrics.pendingDeposits} appointment${metrics.pendingDeposits !== 1 ? 's' : ''} awaiting payment confirmation.`,
+          title: 'Divine Offerings Pending',
+          description: `${metrics.pendingDeposits} sacred session${metrics.pendingDeposits !== 1 ? 's' : ''} awaiting golden payment confirmation.`,
           action: {
-            label: 'Review Pending',
+            label: 'Collect Divine Offerings',
             href: '/admin/appointments?status=pending',
             variant: 'secondary'
           },
@@ -112,10 +112,10 @@ export default function AdminDashboard() {
       if ((metrics.todayAppointments || 0) === 0 && new Date().getHours() > 10) {
         insights.push({
           type: 'info',
-          title: 'No Appointments Today',
-          description: 'Consider reaching out to clients or running a promotion.',
+          title: 'No Divine Sessions Today',
+          description: 'Reach out to your disciples or bless them with a divine promotion.',
           action: {
-            label: 'Book Appointment',
+            label: 'Create Divine Session',
             href: '/admin/appointments/new',
             variant: 'primary'
           },
@@ -126,8 +126,8 @@ export default function AdminDashboard() {
       if ((metrics.newClients || 0) > 5) {
         insights.push({
           type: 'success',
-          title: 'Growing Client Base',
-          description: `${metrics.newClients} new clients this month! Your business is growing.`,
+          title: 'Divine Disciples Growing',
+          description: `${metrics.newClients} new disciples have joined your sacred craft this month! Your divine reign expands.`,
           icon: <TrendingUp className="w-5 h-5" />
         });
       }
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gold-500/20 border-t-gold-400 shadow-lg" />
       </div>
     );
   }
@@ -151,117 +151,120 @@ export default function AdminDashboard() {
 
   const stats = [
     {
-      label: "Today's Appointments",
+      label: "Today's Divine Sessions",
       value: metrics?.todayAppointments || 0,
       icon: <Calendar className="w-6 h-6" />,
-      color: 'from-blue-400 to-blue-500',
-      bgColor: 'bg-blue-500/10',
+      color: 'from-gold-400 to-amber-500',
+      bgColor: 'bg-gradient-to-br from-gold-500/20 to-amber-400/20',
       change: metrics?.weekAppointments ? `${Math.round((((metrics.todayAppointments || 0) / ((metrics.weekAppointments || 1) / 7)) - 1) * 100)}%` : null,
       trend: (metrics?.todayAppointments || 0) > ((metrics?.weekAppointments || 0) / 7) ? 'up' : 'down'
     },
     {
-      label: "Today's Revenue",
+      label: "Today's Golden Revenue",
       value: formatCurrency((metrics?.todayRevenue || 0) * 100),
       icon: <CreditCard className="w-6 h-6" />,
       color: 'from-emerald-400 to-green-500',
-      bgColor: 'bg-emerald-500/10',
+      bgColor: 'bg-gradient-to-br from-emerald-500/20 to-green-400/20',
       change: weeklyGrowth ? `${weeklyGrowth}%` : null,
       trend: weeklyGrowth > 0 ? 'up' : 'down'
     },
     {
-      label: 'This Week',
+      label: 'This Divine Week',
       value: metrics?.weekAppointments || 0,
-      subtitle: 'appointments',
+      subtitle: 'blessed appointments',
       icon: <TrendingUp className="w-6 h-6" />,
-      color: 'from-amber-400 to-yellow-500',
-      bgColor: 'bg-amber-500/10'
+      color: 'from-orange-400 to-amber-500',
+      bgColor: 'bg-gradient-to-br from-orange-500/20 to-amber-400/20'
     },
     {
-      label: 'New Clients',
+      label: 'New Disciples',
       value: metrics?.newClients || 0,
-      subtitle: 'this month',
+      subtitle: 'joining the divine craft',
       icon: <Users className="w-6 h-6" />,
       color: 'from-purple-400 to-pink-500',
-      bgColor: 'bg-purple-500/10'
+      bgColor: 'bg-gradient-to-br from-purple-500/20 to-pink-400/20'
     },
   ];
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row gap-6">
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-white mb-2">
-            Welcome back! 
-            <span className="bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent"> ✨</span>
-          </h1>
-          <p className="text-white/60">
-            {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </p>
-        </div>
-        
-        <div className="flex gap-3">
-          <Link
-            href="/admin/appointments/new"
-            className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2"
-          >
-            <Calendar className="w-5 h-5" />
-            New Appointment
-          </Link>
+      {/* Premium Glass Header */}
+      <div className="glass-header p-8 rounded-3xl border border-white/10 backdrop-blur-xl bg-gradient-to-r from-gold-500/20 to-amber-400/20 shadow-2xl shadow-gold-500/10">
+        <div className="flex flex-col lg:flex-row gap-6">
+          <div className="flex-1">
+            <h1 className="text-4xl font-bold mb-3">
+              <span className="bg-gradient-to-r from-gold-300 via-amber-200 to-orange-200 bg-clip-text text-transparent">
+                ✨ Welcome back, Divine Loctician! 
+              </span>
+            </h1>
+            <p className="text-amber-100/80 text-lg font-medium">
+              Master your craft • {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </p>
+          </div>
+          
+          <div className="flex gap-3">
+            <Link
+              href="/admin/appointments/new"
+              className="px-8 py-4 bg-gradient-to-r from-gold-400 via-amber-400 to-orange-400 text-black rounded-2xl font-bold hover:shadow-xl hover:shadow-gold-500/40 transition-all flex items-center gap-3 hover:scale-105 transform shadow-lg"
+            >
+              <Calendar className="w-6 h-6" />
+              New Divine Appointment
+            </Link>
+          </div>
         </div>
       </div>
 
-      {/* Smart Business Insights */}
+      {/* Divine Business Insights */}
       {insights.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
-            <Zap className="w-5 h-5 text-amber-400" />
-            Business Insights
+        <div className="space-y-6">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-gold-300 to-amber-200 bg-clip-text text-transparent flex items-center gap-3">
+            <Zap className="w-6 h-6 text-gold-400" />
+            Divine Business Insights
           </h2>
           <div className="grid gap-4">
             {insights.map((insight, index) => (
               <div
                 key={index}
-                className={`p-4 rounded-xl border backdrop-blur-sm ${
+                className={`stats-card p-6 rounded-2xl border backdrop-blur-sm shadow-lg hover:shadow-xl transition-all ${
                   insight.type === 'success' 
-                    ? 'bg-emerald-500/10 border-emerald-500/20' 
+                    ? 'bg-gradient-to-r from-emerald-500/20 to-green-400/20 border-emerald-500/30' 
                     : insight.type === 'warning' 
-                    ? 'bg-amber-500/10 border-amber-500/20'
+                    ? 'bg-gradient-to-r from-amber-500/20 to-orange-400/20 border-amber-500/30'
                     : insight.type === 'action'
-                    ? 'bg-blue-500/10 border-blue-500/20'
-                    : 'bg-white/5 border-white/10'
+                    ? 'bg-gradient-to-r from-gold-500/20 to-amber-400/20 border-gold-500/30'
+                    : 'bg-gradient-to-r from-white/10 to-white/5 border-white/20'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3 flex-1">
-                    <div className={`p-2 rounded-lg ${
+                  <div className="flex items-start gap-4 flex-1">
+                    <div className={`p-3 rounded-2xl shadow-lg ${
                       insight.type === 'success' 
-                        ? 'bg-emerald-500/20 text-emerald-400' 
+                        ? 'bg-gradient-to-br from-emerald-500/30 to-green-400/30 text-emerald-300' 
                         : insight.type === 'warning' 
-                        ? 'bg-amber-500/20 text-amber-400'
+                        ? 'bg-gradient-to-br from-amber-500/30 to-orange-400/30 text-amber-300'
                         : insight.type === 'action'
-                        ? 'bg-blue-500/20 text-blue-400'
-                        : 'bg-white/10 text-white/60'
+                        ? 'bg-gradient-to-br from-gold-500/30 to-amber-400/30 text-gold-300'
+                        : 'bg-gradient-to-br from-white/20 to-white/10 text-white/70'
                     }`}>
                       {insight.icon}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-medium text-white">{insight.title}</h3>
-                      <p className="text-sm text-white/60 mt-1">{insight.description}</p>
+                      <h3 className="font-bold text-amber-100 text-lg">{insight.title}</h3>
+                      <p className="text-amber-200/70 mt-1">{insight.description}</p>
                     </div>
                   </div>
                   {insight.action && (
                     <Link
                       href={insight.action.href}
-                      className={`px-4 py-2 rounded-lg font-medium text-sm transition-all flex items-center gap-2 ${
+                      className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transform ${
                         insight.action.variant === 'primary'
-                          ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
-                          : 'bg-white/10 text-white hover:bg-white/20'
+                          ? 'bg-gradient-to-r from-gold-400 via-amber-400 to-orange-400 text-black hover:shadow-gold-500/40'
+                          : 'bg-gradient-to-r from-white/20 to-white/10 text-amber-200 hover:from-white/30 hover:to-white/20'
                       }`}
                     >
                       {insight.action.label}
@@ -275,28 +278,29 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Performance Metrics */}
+      {/* Divine Performance Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6 hover:bg-white/10 transition-all group"
+            className="stats-card backdrop-blur-xl rounded-2xl border border-white/20 p-6 hover:scale-105 transition-all group shadow-xl hover:shadow-2xl"
+            style={{ background: stat.bgColor }}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className={`p-3 rounded-xl ${stat.bgColor}`}>
+              <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm shadow-lg">
                 <div className={`bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                   {stat.icon}
                 </div>
               </div>
               {stat.change && (
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm">
                   {stat.trend === 'up' ? (
-                    <ArrowUpRight className="w-4 h-4 text-green-400" />
+                    <ArrowUpRight className="w-4 h-4 text-emerald-400" />
                   ) : (
                     <ArrowDownRight className="w-4 h-4 text-red-400" />
                   )}
-                  <span className={`text-sm font-medium ${
-                    stat.trend === 'up' ? 'text-green-400' : 'text-red-400'
+                  <span className={`text-sm font-bold ${
+                    stat.trend === 'up' ? 'text-emerald-400' : 'text-red-400'
                   }`}>
                     {stat.change}
                   </span>
@@ -304,30 +308,30 @@ export default function AdminDashboard() {
               )}
             </div>
             <div>
-              <p className="text-2xl font-bold text-white mb-1">{stat.value}</p>
-              <p className="text-white/50 text-sm">{stat.label}</p>
+              <p className="text-3xl font-bold bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent mb-2">{stat.value}</p>
+              <p className="text-amber-200/80 font-medium">{stat.label}</p>
               {stat.subtitle && (
-                <p className="text-white/30 text-xs">{stat.subtitle}</p>
+                <p className="text-amber-300/60 text-sm font-light">{stat.subtitle}</p>
               )}
             </div>
           </div>
         ))}
       </div>
 
-      {/* Main Content Grid */}
+      {/* Divine Content Grid */}
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Upcoming Appointments */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10">
-          <div className="p-6 border-b border-white/10 flex items-center justify-between">
-            <h2 className="font-semibold text-white flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-400" />
-              Upcoming Today
+        {/* Divine Upcoming Sessions */}
+        <div className="stats-card backdrop-blur-xl rounded-2xl border border-gold-500/20 shadow-xl">
+          <div className="p-6 border-b border-gold-500/20 flex items-center justify-between">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-gold-300 to-amber-200 bg-clip-text text-transparent flex items-center gap-3">
+              <Clock className="w-6 h-6 text-gold-400" />
+              Divine Sessions Today
             </h2>
             <Link
               href="/admin/appointments"
-              className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1"
+              className="text-sm text-gold-400 hover:text-gold-300 flex items-center gap-1 font-medium"
             >
-              View All
+              View All Sacred Sessions
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
@@ -384,28 +388,28 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Payments */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10">
-          <div className="p-6 border-b border-white/10 flex items-center justify-between">
-            <h2 className="font-semibold text-white flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-green-400" />
-              Recent Payments
+        {/* Divine Golden Payments */}
+        <div className="stats-card backdrop-blur-xl rounded-2xl border border-gold-500/20 shadow-xl">
+          <div className="p-6 border-b border-gold-500/20 flex items-center justify-between">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-gold-300 to-amber-200 bg-clip-text text-transparent flex items-center gap-3">
+              <CreditCard className="w-6 h-6 text-emerald-400" />
+              Divine Golden Revenue
             </h2>
             <Link
               href="/admin/reports"
-              className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1"
+              className="text-sm text-gold-400 hover:text-gold-300 flex items-center gap-1 font-medium"
             >
-              View Reports
+              View Sacred Reports
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="divide-y divide-white/10">
+          <div className="divide-y divide-gold-500/10">
             {metrics?.recentPayments?.length === 0 ? (
               <div className="p-6 text-center">
-                <div className="w-16 h-16 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CreditCard className="w-8 h-8 text-green-400" />
+                <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-green-400/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <CreditCard className="w-10 h-10 text-emerald-400" />
                 </div>
-                <p className="text-white/50">No recent payments</p>
+                <p className="text-amber-200/60">No divine payments yet</p>
               </div>
             ) : (
               metrics?.recentPayments?.slice(0, 5).map((payment) => (

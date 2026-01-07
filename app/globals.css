@@ -3,19 +3,73 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 255, 255, 255;
-  --background-end-rgb: 255, 255, 255;
+  --foreground-rgb: 255, 255, 255;
+  --background-start-rgb: 15, 15, 23;
+  --background-end-rgb: 30, 20, 15;
+  --gold-start: 255, 207, 84;
+  --gold-end: 255, 171, 0;
+  --amber-glow: 251, 191, 36;
 }
 
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+      135deg,
+      rgb(var(--background-start-rgb)) 0%,
+      rgb(var(--background-end-rgb)) 50%,
+      rgb(15, 15, 23) 100%
+    );
+  min-height: 100vh;
+}
+
+/* Golden gradient backgrounds */
+.bg-golden-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(var(--gold-start), 0.9) 0%,
+    rgba(var(--gold-end), 0.8) 100%
+  );
+}
+
+.bg-warm-gradient {
+  background: linear-gradient(
+    135deg,
+    #0f0f17 0%,
+    #1e140f 25%,
+    #2d1b0e 50%,
+    #1e140f 75%,
+    #0f0f17 100%
+  );
+}
+
+/* Glass effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 207, 84, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.glass-header {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 207, 84, 0.15) 0%,
+    rgba(255, 171, 0, 0.1) 100%
+  );
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 207, 84, 0.2);
+}
+
+/* Stats cards with glow */
+.stats-card {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 207, 84, 0.1) 0%,
+    rgba(255, 171, 0, 0.05) 100%
+  );
+  border: 1px solid rgba(255, 207, 84, 0.3);
+  box-shadow: 0 8px 25px rgba(251, 191, 36, 0.2);
+  backdrop-filter: blur(10px);
 }
 
 /* Custom scrollbar */
