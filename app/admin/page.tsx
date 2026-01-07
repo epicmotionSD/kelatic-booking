@@ -139,7 +139,7 @@ export default function AdminDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-gold-500/20 border-t-gold-400 shadow-lg" />
+        <div className="animate-spin rounded-full h-12 w-12 border-4 border-white/20 border-t-amber-400 shadow-lg" />
       </div>
     );
   }
@@ -189,15 +189,15 @@ export default function AdminDashboard() {
   return (
     <div className="space-y-8">
       {/* Premium Glass Header */}
-      <div className="glass-header p-8 rounded-3xl border border-white/10 backdrop-blur-xl bg-gradient-to-r from-gold-500/20 to-amber-400/20 shadow-2xl shadow-gold-500/10">
+      <div className="glass-header p-8 rounded-3xl border border-white/20 backdrop-blur-xl bg-gradient-to-r from-amber-500/10 to-orange-400/10 shadow-2xl">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-3">
-              <span className="bg-gradient-to-r from-gold-300 via-amber-200 to-orange-200 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-amber-300 via-orange-200 to-amber-200 bg-clip-text text-transparent">
                 ✨ Welcome back, Divine Loctician! 
               </span>
             </h1>
-            <p className="text-amber-100/80 text-lg font-medium">
+            <p className="text-white/80 text-lg font-medium">
               Master your craft • {new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
           <div className="flex gap-3">
             <Link
               href="/admin/appointments/new"
-              className="px-8 py-4 bg-gradient-to-r from-gold-400 via-amber-400 to-orange-400 text-black rounded-2xl font-bold hover:shadow-xl hover:shadow-gold-500/40 transition-all flex items-center gap-3 hover:scale-105 transform shadow-lg"
+              className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-bold hover:shadow-xl hover:shadow-amber-500/30 transition-all flex items-center gap-3 hover:scale-105 transform shadow-lg"
             >
               <Calendar className="w-6 h-6" />
               New Divine Appointment
@@ -222,8 +222,8 @@ export default function AdminDashboard() {
       {/* Divine Business Insights */}
       {insights.length > 0 && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-gold-300 to-amber-200 bg-clip-text text-transparent flex items-center gap-3">
-            <Zap className="w-6 h-6 text-gold-400" />
+          <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+            <Zap className="w-6 h-6 text-amber-400" />
             Divine Business Insights
           </h2>
           <div className="grid gap-4">
@@ -232,11 +232,11 @@ export default function AdminDashboard() {
                 key={index}
                 className={`stats-card p-6 rounded-2xl border backdrop-blur-sm shadow-lg hover:shadow-xl transition-all ${
                   insight.type === 'success' 
-                    ? 'bg-gradient-to-r from-emerald-500/20 to-green-400/20 border-emerald-500/30' 
+                    ? 'bg-gradient-to-r from-emerald-500/15 to-green-400/15 border-emerald-400/40' 
                     : insight.type === 'warning' 
-                    ? 'bg-gradient-to-r from-amber-500/20 to-orange-400/20 border-amber-500/30'
+                    ? 'bg-gradient-to-r from-amber-500/15 to-orange-400/15 border-amber-400/40'
                     : insight.type === 'action'
-                    ? 'bg-gradient-to-r from-gold-500/20 to-amber-400/20 border-gold-500/30'
+                    ? 'bg-gradient-to-r from-amber-500/15 to-orange-400/15 border-amber-400/40'
                     : 'bg-gradient-to-r from-white/10 to-white/5 border-white/20'
                 }`}
               >
@@ -244,18 +244,18 @@ export default function AdminDashboard() {
                   <div className="flex items-start gap-4 flex-1">
                     <div className={`p-3 rounded-2xl shadow-lg ${
                       insight.type === 'success' 
-                        ? 'bg-gradient-to-br from-emerald-500/30 to-green-400/30 text-emerald-300' 
+                        ? 'bg-emerald-500/20 text-emerald-400' 
                         : insight.type === 'warning' 
-                        ? 'bg-gradient-to-br from-amber-500/30 to-orange-400/30 text-amber-300'
+                        ? 'bg-amber-500/20 text-amber-400'
                         : insight.type === 'action'
-                        ? 'bg-gradient-to-br from-gold-500/30 to-amber-400/30 text-gold-300'
-                        : 'bg-gradient-to-br from-white/20 to-white/10 text-white/70'
+                        ? 'bg-amber-500/20 text-amber-400'
+                        : 'bg-white/20 text-white/70'
                     }`}>
                       {insight.icon}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-amber-100 text-lg">{insight.title}</h3>
-                      <p className="text-amber-200/70 mt-1">{insight.description}</p>
+                      <h3 className="font-bold text-white text-lg">{insight.title}</h3>
+                      <p className="text-white/70 mt-1">{insight.description}</p>
                     </div>
                   </div>
                   {insight.action && (
@@ -263,8 +263,8 @@ export default function AdminDashboard() {
                       href={insight.action.href}
                       className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transform ${
                         insight.action.variant === 'primary'
-                          ? 'bg-gradient-to-r from-gold-400 via-amber-400 to-orange-400 text-black hover:shadow-gold-500/40'
-                          : 'bg-gradient-to-r from-white/20 to-white/10 text-amber-200 hover:from-white/30 hover:to-white/20'
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-amber-500/40'
+                          : 'bg-white/20 text-white hover:bg-white/30'
                       }`}
                     >
                       {insight.action.label}
@@ -308,10 +308,10 @@ export default function AdminDashboard() {
               )}
             </div>
             <div>
-              <p className="text-3xl font-bold bg-gradient-to-r from-white to-amber-100 bg-clip-text text-transparent mb-2">{stat.value}</p>
-              <p className="text-amber-200/80 font-medium">{stat.label}</p>
+              <p className="text-3xl font-bold text-white mb-2">{stat.value}</p>
+              <p className="text-white/80 font-medium">{stat.label}</p>
               {stat.subtitle && (
-                <p className="text-amber-300/60 text-sm font-light">{stat.subtitle}</p>
+                <p className="text-white/60 text-sm font-light">{stat.subtitle}</p>
               )}
             </div>
           </div>
@@ -321,15 +321,15 @@ export default function AdminDashboard() {
       {/* Divine Content Grid */}
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Divine Upcoming Sessions */}
-        <div className="stats-card backdrop-blur-xl rounded-2xl border border-gold-500/20 shadow-xl">
-          <div className="p-6 border-b border-gold-500/20 flex items-center justify-between">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-gold-300 to-amber-200 bg-clip-text text-transparent flex items-center gap-3">
-              <Clock className="w-6 h-6 text-gold-400" />
+        <div className="stats-card backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
+          <div className="p-6 border-b border-white/20 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-white flex items-center gap-3">
+              <Clock className="w-6 h-6 text-blue-400" />
               Divine Sessions Today
             </h2>
             <Link
               href="/admin/appointments"
-              className="text-sm text-gold-400 hover:text-gold-300 flex items-center gap-1 font-medium"
+              className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
             >
               View All Sacred Sessions
               <ArrowUpRight className="w-4 h-4" />
@@ -388,28 +388,28 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Divine Golden Payments */}
-        <div className="stats-card backdrop-blur-xl rounded-2xl border border-gold-500/20 shadow-xl">
-          <div className="p-6 border-b border-gold-500/20 flex items-center justify-between">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-gold-300 to-amber-200 bg-clip-text text-transparent flex items-center gap-3">
+        {/* Divine Revenue */}
+        <div className="stats-card backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
+          <div className="p-6 border-b border-white/20 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-white flex items-center gap-3">
               <CreditCard className="w-6 h-6 text-emerald-400" />
-              Divine Golden Revenue
+              Divine Revenue
             </h2>
             <Link
               href="/admin/reports"
-              className="text-sm text-gold-400 hover:text-gold-300 flex items-center gap-1 font-medium"
+              className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
             >
               View Sacred Reports
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="divide-y divide-gold-500/10">
+          <div className="divide-y divide-white/10">
             {metrics?.recentPayments?.length === 0 ? (
               <div className="p-6 text-center">
-                <div className="w-20 h-20 bg-gradient-to-br from-emerald-500/20 to-green-400/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <div className="w-20 h-20 bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <CreditCard className="w-10 h-10 text-emerald-400" />
                 </div>
-                <p className="text-amber-200/60">No divine payments yet</p>
+                <p className="text-white/60">No divine payments yet</p>
               </div>
             ) : (
               metrics?.recentPayments?.slice(0, 5).map((payment) => (

@@ -119,14 +119,14 @@ export default function AdminLayout({
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 glass-effect border-r border-gold-500/20 transform transition-transform lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 glass-effect border-r border-white/20 transform transition-transform lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-gold-500/20">
+        <div className="h-16 flex items-center px-6 border-b border-white/20">
           <Link href="/admin" className="flex items-center">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-gold-300 to-amber-200 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
               ✨ Loctician Gods
             </h1>
           </Link>
@@ -146,8 +146,8 @@ export default function AdminLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                   isActive
-                    ? 'bg-gradient-to-r from-gold-400 via-amber-400 to-orange-400 text-black font-bold shadow-xl shadow-gold-500/30'
-                    : 'text-amber-200/70 hover:bg-gold-500/10 hover:text-amber-100 hover:shadow-lg'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-xl'
+                    : 'text-white/70 hover:bg-white/10 hover:text-white hover:shadow-lg'
                 }`}
               >
                 {item.icon}
@@ -158,14 +158,14 @@ export default function AdminLayout({
         </nav>
 
         {/* Divine User Profile */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gold-500/20">
-          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-gold-500/10 to-amber-400/10 rounded-xl backdrop-blur-sm">
-            <div className="w-10 h-10 bg-gradient-to-br from-gold-400/30 to-amber-400/20 rounded-full flex items-center justify-center border border-gold-400/40 shadow-lg">
-              <span className="text-sm text-gold-300 font-bold">✨</span>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/20">
+          <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-xl backdrop-blur-sm">
+            <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center border border-amber-400/40 shadow-lg">
+              <span className="text-sm text-amber-400 font-bold">✨</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-amber-100 font-bold truncate">Divine Admin</p>
-              <p className="text-xs text-amber-200/60 truncate">kelatic@gods.com</p>
+              <p className="text-sm text-white font-bold truncate">Divine Admin</p>
+              <p className="text-xs text-white/60 truncate">kelatic@gods.com</p>
             </div>
             <button
               className="text-xs text-red-400 hover:text-red-300 transition-colors font-medium"
@@ -184,11 +184,11 @@ export default function AdminLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Divine Top Bar */}
-        <header className="h-16 glass-header border-b border-gold-500/20 flex items-center px-4 lg:px-8 sticky top-0 z-30">
+        <header className="h-16 glass-header border-b border-white/20 flex items-center px-4 lg:px-8 sticky top-0 z-30">
           {/* Mobile menu button */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 -ml-2 text-amber-200/70 hover:text-amber-100 lg:hidden"
+            className="p-2 -ml-2 text-white/70 hover:text-white lg:hidden"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -203,7 +203,7 @@ export default function AdminLayout({
             <Link
               href="/"
               target="_blank"
-              className="text-sm text-amber-200/60 hover:text-gold-300 transition-colors hidden sm:block font-medium"
+              className="text-sm text-white/60 hover:text-amber-400 transition-colors hidden sm:block font-medium"
             >
               View Divine Site ✨
             </Link>
