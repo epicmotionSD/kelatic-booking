@@ -5,6 +5,24 @@ import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
 import { Plus, Calendar, Filter, Users, Clock } from 'lucide-react';
 
+// Utility functions
+const formatDate = (dateStr: string) => {
+  return new Date(dateStr).toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+};
+
+const formatTime = (timeStr: string) => {
+  return new Date(`2000-01-01T${timeStr}`).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true
+  });
+};
+
 interface Appointment {
   id: string;
   client_name: string;

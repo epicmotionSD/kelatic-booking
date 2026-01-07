@@ -202,7 +202,6 @@ export function ServiceSelection({
                   </p>
                 )}
               </div>
-              </div>
             </div>
 
             {/* Selection indicator */}

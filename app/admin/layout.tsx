@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import NotificationBell from './NotificationBell';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -14,8 +14,11 @@ import {
   UserCheck, 
   BarChart3, 
   Settings, 
-  HelpCircle 
+  HelpCircle,
+  Menu,
+  X
 } from 'lucide-react';
+import { SkipLink, useAriaLiveRegion } from '@/lib/accessibility';
 
 const NAV_ITEMS = [
   {
@@ -77,26 +80,79 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const { announce } = useAriaLiveRegion();
+
+  // Mobile detection and responsive handling
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) {
+        setSidebarOpen(false); // Close sidebar on desktop
+      }
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Announce page changes for screen readers
+  useEffect(() => {
+    const pageName = NAV_ITEMS.find(item => item.href === pathname)?.label || 'Page';
+    announce(`Navigated to ${pageName}`);
+  }, [pathname, announce]);
+
+  const handleSidebarToggle = () => {
+    const newState = !sidebarOpen;
+    setSidebarOpen(newState);
+    announce(newState ? 'Navigation menu opened' : 'Navigation menu closed');
+  };
 
   return (
     <div className="min-h-screen bg-cream-50">
+      {/* Skip Links */}
+      <SkipLink href="#main-content">Skip to main content</SkipLink>
+      <SkipLink href="#navigation">Skip to navigation</SkipLink>
+      
+      {/* Mobile menu button */}
+      <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-amber-200 shadow-sm">
+        <Link href="/admin" className="flex items-center">
+          <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+            ✨ Loctician Gods
+          </h1>
+        </Link>
+        <button
+          onClick={handleSidebarToggle}
+          aria-expanded={sidebarOpen}
+          aria-controls="sidebar-navigation"
+          aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
+          className="p-2 rounded-md text-stone-600 hover:bg-amber-50 hover:text-amber-600 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+        >
+          {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
       {/* Mobile sidebar overlay */}
-      {sidebarOpen && (
+      {sidebarOpen && isMobile && (
         <div
           className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          aria-hidden="true"
         />
       )}
 
       {/* Sidebar */}
       <aside
+        id="sidebar-navigation"
         className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-amber-200 shadow-xl transform transition-transform lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        aria-label="Main navigation"
       >
         {/* Logo */}
         <div className="h-16 flex items-center px-6 border-b border-amber-200">
-          <Link href="/admin" className="flex items-center">
+          <Link href="/admin" className="flex items-center focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md">
             <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
               ✨ Loctician Gods
             </h1>
@@ -104,7 +160,7 @@ export default function AdminLayout({
         </div>
 
         {/* Navigation */}
-        <nav className="p-3 space-y-1">
+        <nav id="navigation" className="p-3 space-y-1" role="navigation" aria-label="Admin panel navigation">
           {NAV_ITEMS.map((item) => {
             const isActive =
               pathname === item.href ||
@@ -114,8 +170,9 @@ export default function AdminLayout({
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setSidebarOpen(false)}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
+                onClick={() => isMobile && setSidebarOpen(false)}
+                aria-current={isActive ? 'page' : undefined}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
                   isActive
                     ? 'bg-amber-500 text-white font-bold shadow-lg'
                     : 'text-stone-700 hover:bg-amber-100 hover:text-amber-900 hover:shadow-md'
@@ -158,12 +215,11 @@ export default function AdminLayout({
         <header className="h-16 bg-white border-b border-amber-200 shadow-sm flex items-center px-4 lg:px-8 sticky top-0 z-30">
           {/* Mobile menu button */}
           <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 -ml-2 text-stone-600 hover:text-amber-900 lg:hidden"
+            onClick={handleSidebarToggle}
+            aria-label="Open navigation menu"
+            className="p-2 -ml-2 text-stone-600 hover:text-amber-900 lg:hidden focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <Menu className="w-6 h-6" />
           </button>
 
           {/* Page title - populated by page */}
@@ -174,7 +230,8 @@ export default function AdminLayout({
             <Link
               href="/"
               target="_blank"
-              className="text-sm text-stone-600 hover:text-amber-600 transition-colors hidden sm:block font-medium"
+              className="text-sm text-stone-600 hover:text-amber-600 transition-colors hidden sm:block font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md px-2 py-1"
+              rel="noopener noreferrer"
             >
               View Divine Site ✨
             </Link>
@@ -183,7 +240,11 @@ export default function AdminLayout({
         </header>
 
         {/* Page content */}
-        <main className="p-4 lg:p-8">{children}</main>
+        <main id="main-content" className="p-4 lg:p-8" role="main" aria-label="Main content area">
+          <div className="max-w-7xl mx-auto">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );

@@ -1,15 +1,14 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+import { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
   // Enable React strict mode for better development experience
   reactStrictMode: true,
   
   // Enable experimental features for performance
   experimental: {
     optimizePackageImports: ['lucide-react', '@heroicons/react'],
+    serverComponentsExternalPackages: ['@supabase/supabase-js'],
   },
-
-  // External packages for server components
-  serverExternalPackages: ['@supabase/supabase-js'],
 
   // Image optimization configuration
   images: {
