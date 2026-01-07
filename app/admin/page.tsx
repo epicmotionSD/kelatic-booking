@@ -188,16 +188,16 @@ export default function AdminDashboard() {
 
   return (
     <div className="space-y-8">
-      {/* Premium Glass Header */}
-      <div className="glass-header p-8 rounded-3xl border border-white/20 backdrop-blur-xl bg-gradient-to-r from-amber-500/10 to-orange-400/10 shadow-2xl">
+      {/* Premium Light Header */}
+      <div className="bg-white/90 backdrop-blur-xl p-8 rounded-3xl border border-amber-200/30 shadow-2xl bg-gradient-to-r from-amber-50 to-orange-50">
         <div className="flex flex-col lg:flex-row gap-6">
           <div className="flex-1">
             <h1 className="text-4xl font-bold mb-3">
-              <span className="bg-gradient-to-r from-amber-300 via-orange-200 to-amber-200 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">
                 ✨ Welcome back, Divine Loctician! 
               </span>
             </h1>
-            <p className="text-white/80 text-lg font-medium">
+            <p className="text-gray-700 text-lg font-medium">
               Master your craft • {new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -222,40 +222,40 @@ export default function AdminDashboard() {
       {/* Divine Business Insights */}
       {insights.length > 0 && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-3">
-            <Zap className="w-6 h-6 text-amber-400" />
+          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+            <Zap className="w-6 h-6 text-amber-600" />
             Divine Business Insights
           </h2>
           <div className="grid gap-4">
             {insights.map((insight, index) => (
               <div
                 key={index}
-                className={`stats-card p-6 rounded-2xl border backdrop-blur-sm shadow-lg hover:shadow-xl transition-all ${
+                className={`bg-white/90 backdrop-blur-xl p-6 rounded-2xl border shadow-xl hover:shadow-2xl transition-all ${
                   insight.type === 'success' 
-                    ? 'bg-gradient-to-r from-emerald-500/15 to-green-400/15 border-emerald-400/40' 
+                    ? 'bg-gradient-to-r from-emerald-50 to-green-50 border-emerald-300/50' 
                     : insight.type === 'warning' 
-                    ? 'bg-gradient-to-r from-amber-500/15 to-orange-400/15 border-amber-400/40'
+                    ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300/50'
                     : insight.type === 'action'
-                    ? 'bg-gradient-to-r from-amber-500/15 to-orange-400/15 border-amber-400/40'
-                    : 'bg-gradient-to-r from-white/10 to-white/5 border-white/20'
+                    ? 'bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300/50'
+                    : 'bg-gradient-to-r from-gray-50 to-slate-50 border-gray-300/50'
                 }`}
               >
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-4 flex-1">
                     <div className={`p-3 rounded-2xl shadow-lg ${
                       insight.type === 'success' 
-                        ? 'bg-emerald-500/20 text-emerald-400' 
+                        ? 'bg-emerald-100 text-emerald-600' 
                         : insight.type === 'warning' 
-                        ? 'bg-amber-500/20 text-amber-400'
+                        ? 'bg-amber-100 text-amber-600'
                         : insight.type === 'action'
-                        ? 'bg-amber-500/20 text-amber-400'
-                        : 'bg-white/20 text-white/70'
+                        ? 'bg-amber-100 text-amber-600'
+                        : 'bg-gray-100 text-gray-600'
                     }`}>
                       {insight.icon}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-white text-lg">{insight.title}</h3>
-                      <p className="text-white/70 mt-1">{insight.description}</p>
+                      <h3 className="font-bold text-gray-900 text-lg">{insight.title}</h3>
+                      <p className="text-gray-600 mt-1">{insight.description}</p>
                     </div>
                   </div>
                   {insight.action && (
@@ -264,7 +264,7 @@ export default function AdminDashboard() {
                       className={`px-6 py-3 rounded-xl font-bold transition-all flex items-center gap-2 shadow-lg hover:shadow-xl hover:scale-105 transform ${
                         insight.action.variant === 'primary'
                           ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:shadow-amber-500/40'
-                          : 'bg-white/20 text-white hover:bg-white/30'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
                       {insight.action.label}
@@ -283,24 +283,24 @@ export default function AdminDashboard() {
         {stats.map((stat, index) => (
           <div
             key={index}
-            className="stats-card backdrop-blur-xl rounded-2xl border border-white/20 p-6 hover:scale-105 transition-all group shadow-xl hover:shadow-2xl"
-            style={{ background: stat.bgColor }}
+            className="bg-white/90 backdrop-blur-xl rounded-2xl border border-amber-200/30 p-6 hover:scale-105 transition-all group shadow-xl hover:shadow-2xl"
+            style={{ background: `linear-gradient(135deg, ${stat.bgColor?.replace('from-', 'rgba(').replace('to-', 'rgba(').replace('/20', ', 0.1)').replace('/20', ', 0.15)')} )` }}
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="p-4 rounded-2xl bg-white/10 backdrop-blur-sm shadow-lg">
+              <div className="p-4 rounded-2xl bg-white/80 backdrop-blur-sm shadow-lg border border-amber-200/30">
                 <div className={`bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}>
                   {stat.icon}
                 </div>
               </div>
               {stat.change && (
-                <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-white/10 backdrop-blur-sm">
+                <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-white/80 backdrop-blur-sm border border-amber-200/30">
                   {stat.trend === 'up' ? (
-                    <ArrowUpRight className="w-4 h-4 text-emerald-400" />
+                    <ArrowUpRight className="w-4 h-4 text-emerald-600" />
                   ) : (
-                    <ArrowDownRight className="w-4 h-4 text-red-400" />
+                    <ArrowDownRight className="w-4 h-4 text-red-600" />
                   )}
                   <span className={`text-sm font-bold ${
-                    stat.trend === 'up' ? 'text-emerald-400' : 'text-red-400'
+                    stat.trend === 'up' ? 'text-emerald-600' : 'text-red-600'
                   }`}>
                     {stat.change}
                   </span>
@@ -308,10 +308,10 @@ export default function AdminDashboard() {
               )}
             </div>
             <div>
-              <p className="text-3xl font-bold text-white mb-2">{stat.value}</p>
-              <p className="text-white/80 font-medium">{stat.label}</p>
+              <p className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</p>
+              <p className="text-gray-700 font-medium">{stat.label}</p>
               {stat.subtitle && (
-                <p className="text-white/60 text-sm font-light">{stat.subtitle}</p>
+                <p className="text-gray-600 text-sm font-light">{stat.subtitle}</p>
               )}
             </div>
           </div>
@@ -321,33 +321,35 @@ export default function AdminDashboard() {
       {/* Divine Content Grid */}
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Divine Upcoming Sessions */}
-        <div className="stats-card backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
-          <div className="p-6 border-b border-white/20 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-white flex items-center gap-3">
-              <Clock className="w-6 h-6 text-blue-400" />
+        <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-amber-200/30 shadow-xl">
+          <div className="p-6 border-b border-amber-200/30 flex items-center justify-between">
+            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3">
+              <Clock className="w-6 h-6 text-blue-600" />
               Divine Sessions Today
             </h2>
             <Link
               href="/admin/appointments"
-              className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
+              className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1 font-medium"
             >
               View All Sacred Sessions
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="divide-y divide-white/10">
+          <div className="divide-y divide-amber-200/30">
             {metrics?.upcomingAppointments?.length === 0 ? (
               <div className="p-6 text-center">
-                <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-blue-400" />
+                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="w-8 h-8 text-blue-600" />
                 </div>
-                <p className="text-white/50 mb-4">No appointments scheduled for today</p>
+                <p className="text-gray-600 mb-4">No appointments scheduled for today</p>
                 <Link
                   href="/admin/appointments/new"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
                 >
                   <PlusCircle className="w-4 h-4" />
                   Book First Appointment
+                </Link>
+              </div>
                 </Link>
               </div>
             ) : (
@@ -397,37 +399,37 @@ export default function AdminDashboard() {
             </h2>
             <Link
               href="/admin/reports"
-              className="text-sm text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
+              className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1 font-medium"
             >
               View Sacred Reports
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
-          <div className="divide-y divide-white/10">
+          <div className="divide-y divide-amber-200/30">
             {metrics?.recentPayments?.length === 0 ? (
               <div className="p-6 text-center">
-                <div className="w-20 h-20 bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-                  <CreditCard className="w-10 h-10 text-emerald-400" />
+                <div className="w-20 h-20 bg-emerald-100 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+                  <CreditCard className="w-10 h-10 text-emerald-600" />
                 </div>
-                <p className="text-white/60">No divine payments yet</p>
+                <p className="text-gray-600">No divine payments yet</p>
               </div>
             ) : (
               metrics?.recentPayments?.slice(0, 5).map((payment) => (
-                <div key={payment.id} className="p-4 hover:bg-white/5 transition-colors">
+                <div key={payment.id} className="p-4 hover:bg-amber-50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="font-medium text-white">
+                      <p className="font-medium text-gray-900">
                         {payment.client_name}
                       </p>
-                      <p className="text-sm text-white/50">
+                      <p className="text-sm text-gray-600">
                         {payment.service_name} • {payment.time_ago}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold text-green-400">
+                      <p className="font-semibold text-green-600">
                         {formatCurrency(payment.amount * 100)}
                       </p>
-                      <p className="text-xs text-white/50">
+                      <p className="text-xs text-gray-600">
                         {payment.method === 'card_terminal' ? 'Card (POS)' :
                          payment.method === 'card_online' ? 'Card (Online)' :
                          payment.method === 'cash' ? 'Cash' : payment.method}
@@ -441,10 +443,10 @@ export default function AdminDashboard() {
         </div>
 
         {/* Top Services */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10">
-          <div className="p-6 border-b border-white/10">
-            <h2 className="font-semibold text-white flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-amber-400" />
+        <div className="bg-white/90 backdrop-blur-xl rounded-xl border border-amber-200/30 shadow-xl">
+          <div className="p-6 border-b border-amber-200/30">
+            <h2 className="font-semibold text-gray-900 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-amber-600" />
               Popular Services This Week
             </h2>
           </div>
@@ -452,17 +454,17 @@ export default function AdminDashboard() {
             {metrics?.topServices?.map((service, index) => (
               <div key={service.name} className="mb-4 last:mb-0">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-white flex items-center gap-2">
-                    <span className="w-6 h-6 bg-amber-500/20 rounded-full flex items-center justify-center text-xs text-amber-400 font-bold">
+                  <span className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                    <span className="w-6 h-6 bg-amber-100 rounded-full flex items-center justify-center text-xs text-amber-600 font-bold">
                       {index + 1}
                     </span>
                     {service.name}
                   </span>
-                  <span className="text-sm text-white/50">{service.count} bookings</span>
+                  <span className="text-sm text-gray-600">{service.count} bookings</span>
                 </div>
-                <div className="w-full bg-white/10 rounded-full h-2">
+                <div className="w-full bg-amber-100 rounded-full h-2">
                   <div
-                    className="bg-gradient-to-r from-amber-400 to-yellow-500 h-2 rounded-full transition-all"
+                    className="bg-gradient-to-r from-amber-500 to-orange-500 h-2 rounded-full transition-all"
                     style={{
                       width: `${(service.count / (metrics?.topServices?.[0]?.count || 1)) * 100}%`,
                     }}
@@ -471,55 +473,55 @@ export default function AdminDashboard() {
               </div>
             ))}
             {(!metrics?.topServices || metrics.topServices.length === 0) && (
-              <p className="text-center text-white/50">No data yet</p>
+              <p className="text-center text-gray-600">No data yet</p>
             )}
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10">
-          <div className="p-6 border-b border-white/10">
-            <h2 className="font-semibold text-white">Quick Actions</h2>
+        <div className="bg-white/90 backdrop-blur-xl rounded-xl border border-amber-200/30 shadow-xl">
+          <div className="p-6 border-b border-amber-200/30">
+            <h2 className="font-semibold text-gray-900">Quick Actions</h2>
           </div>
           <div className="p-6 grid grid-cols-2 gap-4">
             <Link
               href="/admin/pos"
-              className="flex flex-col items-center justify-center p-4 bg-green-500/10 rounded-xl hover:bg-green-500/20 transition-colors border border-green-500/20 group"
+              className="flex flex-col items-center justify-center p-4 bg-green-50 rounded-xl hover:bg-green-100 transition-colors border border-green-200 group"
             >
-              <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <CreditCard className="w-6 h-6 text-green-400" />
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <CreditCard className="w-6 h-6 text-green-600" />
               </div>
-              <span className="text-sm font-medium text-white">Open POS</span>
+              <span className="text-sm font-medium text-gray-900">Open POS</span>
             </Link>
 
             <Link
               href="/admin/appointments/new"
-              className="flex flex-col items-center justify-center p-4 bg-blue-500/10 rounded-xl hover:bg-blue-500/20 transition-colors border border-blue-500/20 group"
+              className="flex flex-col items-center justify-center p-4 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors border border-blue-200 group"
             >
-              <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <Calendar className="w-6 h-6 text-blue-400" />
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <Calendar className="w-6 h-6 text-blue-600" />
               </div>
-              <span className="text-sm font-medium text-white">Book Appointment</span>
+              <span className="text-sm font-medium text-gray-900">Book Appointment</span>
             </Link>
 
             <Link
               href="/admin/clients/new"
-              className="flex flex-col items-center justify-center p-4 bg-purple-500/10 rounded-xl hover:bg-purple-500/20 transition-colors border border-purple-500/20 group"
+              className="flex flex-col items-center justify-center p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors border border-purple-200 group"
             >
-              <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <Users className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <Users className="w-6 h-6 text-purple-600" />
               </div>
-              <span className="text-sm font-medium text-white">Add Client</span>
+              <span className="text-sm font-medium text-gray-900">Add Client</span>
             </Link>
 
             <Link
               href="/admin/services"
-              className="flex flex-col items-center justify-center p-4 bg-amber-500/10 rounded-xl hover:bg-amber-500/20 transition-colors border border-amber-500/20 group"
+              className="flex flex-col items-center justify-center p-4 bg-amber-50 rounded-xl hover:bg-amber-100 transition-colors border border-amber-200 group"
             >
-              <div className="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                <Settings className="w-6 h-6 text-amber-400" />
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
+                <Settings className="w-6 h-6 text-amber-600" />
               </div>
-              <span className="text-sm font-medium text-white">Manage Services</span>
+              <span className="text-sm font-medium text-gray-900">Manage Services</span>
             </Link>
           </div>
         </div>
@@ -527,21 +529,21 @@ export default function AdminDashboard() {
 
       {/* Pending Actions Alert */}
       {(metrics?.pendingDeposits || 0) > 0 && (
-        <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl p-4 flex items-center gap-4">
-          <div className="w-10 h-10 bg-amber-400/20 rounded-full flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="w-5 h-5 text-amber-400" />
+        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
+          <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="w-5 h-5 text-amber-600" />
           </div>
           <div className="flex-1">
-            <p className="font-medium text-amber-400">
+            <p className="font-medium text-amber-800">
               {metrics?.pendingDeposits} pending deposit{metrics?.pendingDeposits !== 1 ? 's' : ''}
             </p>
-            <p className="text-sm text-white/60">
+            <p className="text-sm text-amber-700">
               These appointments haven&apos;t been confirmed with payment yet
             </p>
           </div>
           <Link
             href="/admin/appointments?status=pending"
-            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm flex items-center gap-2"
+            className="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm flex items-center gap-2"
           >
             View Pending
             <ArrowUpRight className="w-4 h-4" />

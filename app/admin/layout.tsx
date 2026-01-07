@@ -112,21 +112,21 @@ export default function AdminLayout({
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 glass-effect border-r border-white/20 transform transition-transform lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white/80 backdrop-blur-xl border-r border-amber-200/50 shadow-2xl transform transition-transform lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-white/20">
+        <div className="h-16 flex items-center px-6 border-b border-amber-200/30">
           <Link href="/admin" className="flex items-center">
-            <h1 className="text-xl font-bold bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
+            <h1 className="text-xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
               ✨ Loctician Gods
             </h1>
           </Link>
@@ -146,8 +146,8 @@ export default function AdminLayout({
                 onClick={() => setSidebarOpen(false)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                   isActive
-                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-xl'
-                    : 'text-white/70 hover:bg-white/10 hover:text-white hover:shadow-lg'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold shadow-lg'
+                    : 'text-gray-700 hover:bg-amber-100 hover:text-gray-900 hover:shadow-md'
                 }`}
               >
                 {item.icon}
@@ -158,17 +158,17 @@ export default function AdminLayout({
         </nav>
 
         {/* Divine User Profile */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/20">
-          <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-xl backdrop-blur-sm">
-            <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center border border-amber-400/40 shadow-lg">
-              <span className="text-sm text-amber-400 font-bold">✨</span>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-amber-200/30">
+          <div className="flex items-center gap-3 px-4 py-3 bg-amber-50 rounded-xl border border-amber-200/30">
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-sm text-white font-bold">✨</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-white font-bold truncate">Divine Admin</p>
-              <p className="text-xs text-white/60 truncate">kelatic@gods.com</p>
+              <p className="text-sm text-gray-900 font-bold truncate">Divine Admin</p>
+              <p className="text-xs text-gray-600 truncate">kelatic@gods.com</p>
             </div>
             <button
-              className="text-xs text-red-400 hover:text-red-300 transition-colors font-medium"
+              className="text-xs text-red-600 hover:text-red-700 transition-colors font-medium"
               onClick={async () => {
                 const supabase = (await import('@/lib/supabase/client')).createClient();
                 await supabase.auth.signOut();
@@ -184,11 +184,11 @@ export default function AdminLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Divine Top Bar */}
-        <header className="h-16 glass-header border-b border-white/20 flex items-center px-4 lg:px-8 sticky top-0 z-30">
+        <header className="h-16 bg-white/90 backdrop-blur-xl border-b border-amber-200/30 shadow-sm flex items-center px-4 lg:px-8 sticky top-0 z-30">
           {/* Mobile menu button */}
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 -ml-2 text-white/70 hover:text-white lg:hidden"
+            className="p-2 -ml-2 text-gray-600 hover:text-gray-900 lg:hidden"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -203,7 +203,7 @@ export default function AdminLayout({
             <Link
               href="/"
               target="_blank"
-              className="text-sm text-white/60 hover:text-amber-400 transition-colors hidden sm:block font-medium"
+              className="text-sm text-gray-600 hover:text-amber-600 transition-colors hidden sm:block font-medium"
             >
               View Divine Site ✨
             </Link>
