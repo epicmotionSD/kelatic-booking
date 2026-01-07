@@ -9,7 +9,12 @@ const nextConfig = {
   },
 
   // External packages for server components
-  serverExternalPackages: ['@supabase/supabase-js'],
+  serverExternalPackages: [
+    '@supabase/supabase-js',
+    'web-push',
+    '@stripe/terminal-js',
+    '@anthropic-ai/sdk'
+  ],
 
   // Image optimization configuration
   images: {
@@ -68,7 +73,25 @@ const nextConfig = {
   }),
 
   // Webpack optimizations
-  webpack: (config, { dev, isServer }) => {
+  webpack: (config, { dev, isServer, webpack }) => {
+    // Handle browser-only packages on server
+    if (isServer) {
+      // Externalize packages that expect browser environment
+      config.externals = [
+        ...config.externals,
+        'web-push',
+        'canvas',
+        'jsdom'
+      ];
+      
+      // Use IgnorePlugin to skip problematic modules during server build
+      config.plugins.push(
+        new webpack.IgnorePlugin({
+          resourceRegExp: /^canvas$/,
+        })
+      );
+    }
+    
     // Production optimizations
     if (!dev) {
       config.optimization = {

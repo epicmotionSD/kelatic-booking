@@ -27,6 +27,10 @@ const DEFAULT_BLUR_DATA_URL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH
 
 // Generate blur data URL from image dimensions and color
 export function generateBlurDataURL(width: number, height: number, color: string = '#f3f4f6'): string {
+  if (typeof document === 'undefined') {
+    return DEFAULT_BLUR_DATA_URL;
+  }
+  
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;

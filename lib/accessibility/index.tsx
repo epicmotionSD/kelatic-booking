@@ -8,6 +8,8 @@ export class FocusManager {
   private static focusStack: HTMLElement[] = [];
 
   static pushFocus(element: HTMLElement): void {
+    if (typeof document === 'undefined') return;
+    
     const currentFocus = document.activeElement as HTMLElement;
     if (currentFocus) {
       this.focusStack.push(currentFocus);
@@ -110,6 +112,8 @@ export class ScreenReaderAnnouncer {
 // Hook for keyboard navigation
 export function useKeyboardNavigation(handlers: Record<string, () => void>) {
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const handleKeydown = (e: KeyboardEvent) => {
       const handler = handlers[e.key];
       if (handler) {
@@ -128,6 +132,8 @@ export function useReducedMotion(): boolean {
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     setPrefersReducedMotion(mediaQuery.matches);
 
@@ -147,6 +153,8 @@ export function useColorSchemePreference(): 'light' | 'dark' {
   const [colorScheme, setColorScheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     setColorScheme(mediaQuery.matches ? 'dark' : 'light');
 

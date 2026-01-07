@@ -20,6 +20,8 @@ export function useBreakpoint() {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     const updateBreakpoint = () => {
       const width = window.innerWidth;
       
