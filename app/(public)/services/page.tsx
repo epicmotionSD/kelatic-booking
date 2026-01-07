@@ -111,7 +111,7 @@ export default function ServicesPage() {
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-black/30 to-transparent py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-playfair font-bold text-white mb-4">
             Our Services
           </h1>
           <p className="text-xl text-white/70 mb-8 max-w-2xl mx-auto">
@@ -178,7 +178,7 @@ export default function ServicesPage() {
                       <Icon className="w-6 h-6 text-amber-400" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-bold text-white">{CATEGORY_LABELS[category]}</h2>
+                      <h2 className="text-2xl font-playfair font-bold text-white">{CATEGORY_LABELS[category]}</h2>
                       <p className="text-white/50">{CATEGORY_DESCRIPTIONS[category]}</p>
                     </div>
                   </div>
@@ -201,7 +201,7 @@ export default function ServicesPage() {
                   {React.createElement(CATEGORY_ICONS[activeCategory as ServiceCategory], { className: "w-6 h-6 text-amber-400" })}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-white">{CATEGORY_LABELS[activeCategory as ServiceCategory]}</h2>
+                  <h2 className="text-2xl font-playfair font-bold text-white">{CATEGORY_LABELS[activeCategory as ServiceCategory]}</h2>
                   <p className="text-white/50">{CATEGORY_DESCRIPTIONS[activeCategory as ServiceCategory]}</p>
                 </div>
               </div>
@@ -232,7 +232,7 @@ export default function ServicesPage() {
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
               <Instagram className="w-8 h-8 text-amber-400" />
-              <h2 className="text-3xl font-bold text-white">Our Work</h2>
+              <h2 className="text-3xl font-playfair font-bold text-white">Our Work</h2>
               <Instagram className="w-8 h-8 text-amber-400" />
             </div>
             <p className="text-xl text-white/70 mb-4">
@@ -273,7 +273,7 @@ export default function ServicesPage() {
       {/* CTA Section */}
       <section className="bg-gradient-to-r from-amber-400/10 to-yellow-500/10 border-t border-white/10 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Book?</h2>
+          <h2 className="text-3xl font-playfair font-bold text-white mb-4">Ready to Book?</h2>
           <p className="text-xl text-white/70 mb-8">
             Experience Houston's premier loc and natural hair care
           </p>

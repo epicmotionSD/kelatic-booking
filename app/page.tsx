@@ -221,7 +221,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-amber-600 font-medium tracking-wider uppercase text-sm">Our Stylists</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-2 text-gray-900">Meet The Team</h2>
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold mt-2 text-gray-900">Meet The Team</h2>
           </div>
 
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
@@ -249,7 +249,7 @@ export default function LandingPage() {
                     )}
                   </div>
                 </div>
-                <h3 className="text-xl font-bold mb-1 text-gray-900">
+                <h3 className="text-xl font-playfair font-bold mb-1 text-gray-900">
                   {stylist.first_name} {stylist.last_name}
                 </h3>
                 {stylist.specialties && (
@@ -275,7 +275,7 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
             <div>
               <span className="text-amber-600 font-medium tracking-wider uppercase text-sm">What We Offer</span>
-              <h2 className="text-4xl md:text-5xl font-black mt-2 text-gray-900">Our Services</h2>
+              <h2 className="text-4xl md:text-5xl font-playfair font-bold mt-2 text-gray-900">Our Services</h2>
             </div>
             <Link
               href="/book"
@@ -296,7 +296,7 @@ export default function LandingPage() {
                   <div className="w-14 h-14 bg-amber-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-amber-200 transition-colors">
                     <Sparkles className="w-7 h-7 text-amber-600" />
                   </div>
-                  <h3 className="text-xl font-bold mb-2 text-gray-900">{service.name}</h3>
+                  <h3 className="text-xl font-playfair font-bold mb-2 text-gray-900">{service.name}</h3>
                   <p className="text-gray-600 mb-5 line-clamp-2">{service.description}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-2xl font-black text-amber-600">${service.base_price}</span>
@@ -327,7 +327,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-amber-600 font-medium tracking-wider uppercase text-sm">Why Kelatic</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-2 text-gray-900">The Difference</h2>
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold mt-2 text-gray-900">The Difference</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -341,7 +341,7 @@ export default function LandingPage() {
                 <div className="w-20 h-20 mx-auto bg-gradient-to-br from-amber-100 to-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:from-amber-200 group-hover:to-orange-200 transition-colors shadow-lg">
                   <item.icon className="w-10 h-10 text-amber-600" />
                 </div>
-                <h3 className="text-xl font-bold mb-2 text-gray-900">{item.title}</h3>
+                <h3 className="text-xl font-playfair font-bold mb-2 text-gray-900">{item.title}</h3>
                 <p className="text-gray-600">{item.desc}</p>
               </div>
             ))}
@@ -354,7 +354,7 @@ export default function LandingPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <span className="text-amber-600 font-medium tracking-wider uppercase text-sm">Reviews</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-2 text-gray-900">Client Love</h2>
+            <h2 className="text-4xl md:text-5xl font-playfair font-bold mt-2 text-gray-900">Client Love</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -379,7 +379,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMnM1LjM3MyAxMiAxMiAxMiAxMi01LjM3MyAxMi0xMi01LjM3My0xMi0xMi0xMnptMCAxOGMtMy4zMTQgMC02LTIuNjg2LTYtNnMyLjY4Ni02IDYtNiA2IDIuNjg2IDYgNi0yLjY4NiA2LTYgNnoiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjEiLz48L2c+PC9zdmc+')] opacity-30" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-6xl font-black text-white mb-6">Ready to Level Up?</h2>
+          <h2 className="text-4xl md:text-6xl font-playfair font-bold text-white mb-6">Ready to Level Up?</h2>
           <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
             Book your appointment today and experience why Houston trusts Kelatic with their crown.
           </p>
@@ -404,7 +404,7 @@ export default function LandingPage() {
                 <Sparkles className="w-4 h-4" />
                 Coming January 5th, 2025
               </div>
-              <h2 className="text-4xl md:text-5xl font-black mb-6 text-gray-900">
+              <h2 className="text-4xl md:text-5xl font-playfair font-bold mb-6 text-gray-900">
                 Loc Academy
               </h2>
               <p className="text-xl text-gray-600 mb-8 leading-relaxed">
@@ -448,7 +448,7 @@ export default function LandingPage() {
                   <div className="w-28 h-28 mx-auto bg-gradient-to-br from-amber-500 to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-amber-500/30">
                     <Award className="w-14 h-14 text-white" />
                   </div>
-                  <h3 className="text-2xl font-black mb-2 text-gray-900">Get Certified</h3>
+                  <h3 className="text-2xl font-playfair font-bold mb-2 text-gray-900">Get Certified</h3>
                   <p className="text-gray-600">Start your loc career</p>
                 </div>
               </div>
@@ -466,7 +466,7 @@ export default function LandingPage() {
           <div className="grid lg:grid-cols-2 gap-16">
             <div>
               <span className="text-amber-600 font-medium tracking-wider uppercase text-sm">Location</span>
-              <h2 className="text-4xl md:text-5xl font-black mt-2 mb-10 text-gray-900">Visit Us</h2>
+              <h2 className="text-4xl md:text-5xl font-playfair font-bold mt-2 mb-10 text-gray-900">Visit Us</h2>
 
               <div className="space-y-6">
                 {[
@@ -488,7 +488,7 @@ export default function LandingPage() {
               </div>
 
               <div className="mt-10 pt-10 border-t border-amber-200">
-                <h3 className="font-bold mb-4 text-gray-900">Hours</h3>
+                <h3 className="font-playfair font-bold mb-4 text-gray-900">Hours</h3>
                 <div className="space-y-2 text-gray-600">
                   <div className="flex justify-between"><span>Monday - Friday</span><span className="text-gray-900 font-medium">9AM - 6PM</span></div>
                   <div className="flex justify-between"><span>Saturday</span><span className="text-gray-900 font-medium">9AM - 5PM</span></div>
@@ -532,7 +532,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-bold mb-6">Quick Links</h4>
+              <h4 className="font-playfair font-bold mb-6">Quick Links</h4>
               <div className="space-y-3">
                 <Link href="/services" className="block text-white/50 hover:text-amber-400 transition-colors">Services</Link>
                 <a href="#team" className="block text-white/50 hover:text-amber-400 transition-colors">Team</a>
@@ -543,7 +543,7 @@ export default function LandingPage() {
             </div>
 
             <div>
-              <h4 className="font-bold mb-6">Connect</h4>
+              <h4 className="font-playfair font-bold mb-6">Connect</h4>
               <div className="flex items-center gap-3">
                 <a href="https://instagram.com/kelatic" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
                   <Instagram className="w-5 h-5" />

@@ -222,7 +222,7 @@ export default function AdminDashboard() {
       {/* Divine Business Insights */}
       {insights.length > 0 && (
         <div className="space-y-6">
-          <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+          <h2 className="text-2xl font-playfair font-bold text-gray-900 flex items-center gap-3">
             <Zap className="w-6 h-6 text-amber-600" />
             Divine Business Insights
           </h2>
@@ -323,7 +323,7 @@ export default function AdminDashboard() {
         {/* Divine Upcoming Sessions */}
         <div className="bg-white/90 backdrop-blur-xl rounded-2xl border border-amber-200/30 shadow-xl">
           <div className="p-6 border-b border-amber-200/30 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3">
+            <h2 className="text-xl font-playfair font-bold text-gray-900 flex items-center gap-3">
               <Clock className="w-6 h-6 text-blue-600" />
               Divine Sessions Today
             </h2>
@@ -391,7 +391,7 @@ export default function AdminDashboard() {
         {/* Divine Revenue */}
         <div className="stats-card backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
           <div className="p-6 border-b border-white/20 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-white flex items-center gap-3">
+            <h2 className="text-xl font-playfair font-bold text-white flex items-center gap-3">
               <CreditCard className="w-6 h-6 text-emerald-400" />
               Divine Revenue
             </h2>
