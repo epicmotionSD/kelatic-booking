@@ -95,7 +95,7 @@ export default function SpecialOffersPage() {
             <span>Limited Time Offer</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
+          <h1 className="text-5xl md:text-7xl font-playfair font-bold mb-6 leading-tight">
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500">
               $75
             </span>
@@ -151,14 +151,14 @@ export default function SpecialOffersPage() {
       {/* What's Included */}
       <section className="py-16 bg-black/30">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">What's Included in Your $75 Special</h2>
+          <h2 className="text-3xl font-playfair font-bold text-center mb-12">What's Included in Your $75 Special</h2>
           
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-amber-400/30 transition-colors">
               <div className="w-16 h-16 bg-gradient-to-br from-blue-400/20 to-transparent rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Sparkles className="w-8 h-8 text-blue-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Professional Shampoo</h3>
+              <h3 className="text-xl font-playfair font-bold mb-3">Professional Shampoo</h3>
               <p className="text-white/60">
                 Deep cleansing with premium products to remove buildup and refresh your scalp
               </p>
@@ -168,7 +168,7 @@ export default function SpecialOffersPage() {
               <div className="w-16 h-16 bg-gradient-to-br from-amber-400/20 to-transparent rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Heart className="w-8 h-8 text-amber-400" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Expert Retwist</h3>
+              <h3 className="text-xl font-playfair font-bold mb-3">Expert Retwist</h3>
               <p className="text-white/60">
                 Precision retwisting by our master locticians to maintain your loc health and appearance
               </p>
@@ -187,7 +187,7 @@ export default function SpecialOffersPage() {
       {/* Social Proof */}
       <section className="py-16">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Clients Love Our Tuesday Special</h2>
+          <h2 className="text-3xl font-playfair font-bold text-center mb-12">Why Clients Love Our Tuesday Special</h2>
           
           <div className="grid md:grid-cols-3 gap-8">
             {[
@@ -224,7 +224,7 @@ export default function SpecialOffersPage() {
       {/* Final CTA */}
       <section className="py-20 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-y border-amber-500/20">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">Don't Miss Out - Book Your Tuesday Special</h2>
+          <h2 className="text-4xl font-playfair font-bold mb-6">Don't Miss Out - Book Your Tuesday Special</h2>
           <p className="text-xl text-white/70 mb-8">
             Limited slots available every Tuesday. Book now to secure your spot!
           </p>

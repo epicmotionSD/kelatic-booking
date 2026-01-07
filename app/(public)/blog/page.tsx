@@ -64,7 +64,7 @@ export default function BlogPage() {
       {/* Hero */}
       <section className="py-16 px-4 bg-gradient-to-b from-amber-950/20 to-transparent">
         <div className="max-w-6xl mx-auto text-center">
-          <h1 className="text-4xl md:text-5xl font-black mb-4">
+          <h1 className="text-4xl md:text-5xl font-playfair font-bold mb-4">
             The{' '}
             <span className="bg-gradient-to-r from-amber-400 to-yellow-500 text-transparent bg-clip-text">
               Loc Chop
@@ -99,7 +99,7 @@ export default function BlogPage() {
                     {featuredPost.readTime} min read
                   </span>
                 </div>
-                <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-amber-400 transition-colors">
+                <h3 className="text-2xl md:text-3xl font-playfair font-bold mb-4 group-hover:text-amber-400 transition-colors">
                   {featuredPost.title}
                 </h3>
                 <p className="text-white/60 text-lg mb-6">{featuredPost.excerpt}</p>
@@ -163,7 +163,7 @@ export default function BlogPage() {
 
         {/* CTA */}
         <section className="mt-16 text-center bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl border border-amber-500/20 p-12">
-          <h2 className="text-2xl font-bold mb-4">Ready to Start Your Loc Journey?</h2>
+          <h2 className="text-2xl font-playfair font-bold mb-4">Ready to Start Your Loc Journey?</h2>
           <p className="text-white/60 mb-6 max-w-xl mx-auto">
             Book a consultation with Houston&apos;s premier loc specialists and let&apos;s create
             something beautiful together.
