@@ -90,7 +90,7 @@ export async function GET() {
         address: business.address || '',
         phone: business.phone || '',
         email: business.email || '',
-        timezone: 'America/Chicago', // Not in DB yet, use default
+        timezone: business.timezone || 'America/Chicago',
         currency: 'USD', // Not in DB yet, use default
         bookingLeadTime: row.booking_min_notice_hours ?? 2,
         bookingWindowDays: row.booking_advance_days ?? 60,
@@ -121,7 +121,7 @@ export async function GET() {
         address: business.address || '',
         phone: business.phone || '',
         email: business.email || '',
-        timezone: 'America/Chicago',
+        timezone: business.timezone || 'America/Chicago',
         currency: 'USD',
         bookingLeadTime: 2,
         bookingWindowDays: 60,
@@ -170,9 +170,15 @@ export async function POST(request: NextRequest) {
       deposit_policy: settings.depositPolicy,
       business_hours: convertHoursToDb(settings.businessHours),
       send_booking_confirmations: settings.smsEmailEnabled,
-      // Note: timezone, currency, closed_days, google_calendar_connected, stripe_connected
-      // are not in the current schema - would need a migration to add them
     };
+
+    // Update timezone on the businesses table if provided
+    if (settings.timezone) {
+      await supabase
+        .from('businesses')
+        .update({ timezone: settings.timezone, updated_at: new Date().toISOString() })
+        .eq('id', business.id);
+    }
 
     const { error } = await supabase
       .from('business_settings')
