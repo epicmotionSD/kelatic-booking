@@ -5,7 +5,8 @@ import { requireBusiness } from '@/lib/tenant/server';
 // Map between numeric day keys (frontend) and string day names (database)
 const DAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
 
-// Convert database format (string day names) to frontend format (numeric keys 0-6)
+// Convert database format to frontend format (numeric keys 0-6)
+// DB can have either string keys ("sunday") or numeric keys ("0" or 0)
 function convertHoursFromDb(dbHours: Record<string, any> | null): Record<number, any> {
   if (!dbHours) {
     return {
@@ -19,18 +20,29 @@ function convertHoursFromDb(dbHours: Record<string, any> | null): Record<number,
   }
   
   const result: Record<number, any> = {};
-  DAY_NAMES.forEach((name, index) => {
-    result[index] = dbHours[name] ?? null;
-  });
+  
+  // Check if using string day names (sunday, monday, etc.)
+  if (dbHours.sunday !== undefined || dbHours.monday !== undefined) {
+    DAY_NAMES.forEach((name, index) => {
+      result[index] = dbHours[name] ?? null;
+    });
+  } else {
+    // Using numeric keys (0, 1, 2, etc. or "0", "1", "2")
+    for (let i = 0; i <= 6; i++) {
+      result[i] = dbHours[i] ?? dbHours[String(i)] ?? null;
+    }
+  }
+  
   return result;
 }
 
-// Convert frontend format (numeric keys 0-6) to database format (string day names)
+// Convert frontend format (numeric keys 0-6) to database format
+// We'll store as numeric string keys for simplicity
 function convertHoursToDb(frontendHours: Record<string | number, any>): Record<string, any> {
   const result: Record<string, any> = {};
-  DAY_NAMES.forEach((name, index) => {
-    result[name] = frontendHours[index] ?? frontendHours[String(index)] ?? null;
-  });
+  for (let i = 0; i <= 6; i++) {
+    result[String(i)] = frontendHours[i] ?? frontendHours[String(i)] ?? null;
+  }
   return result;
 }
 
