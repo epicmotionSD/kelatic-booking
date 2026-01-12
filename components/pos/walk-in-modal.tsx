@@ -73,21 +73,32 @@ export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
 
   async function fetchData() {
     setLoading(true);
+    setError(null);
     try {
       const [servicesRes, stylistsRes] = await Promise.all([
-        fetch('/api/admin/services'), // Use admin API to get all services for POS
+        fetch('/api/services'), // Use public API that works without strict auth
         fetch('/api/stylists'),
       ]);
 
+      if (!servicesRes.ok) {
+        throw new Error('Failed to load services');
+      }
+      if (!stylistsRes.ok) {
+        throw new Error('Failed to load stylists');
+      }
+
       const servicesData = await servicesRes.json();
       const stylistsData = await stylistsRes.json();
+
+      console.log('Loaded services:', servicesData.services?.length || 0);
+      console.log('Loaded stylists:', stylistsData.stylists?.length || 0);
 
       setServices(servicesData.services || []);
       setAllStylists(stylistsData.stylists || []);
       setStylists(stylistsData.stylists || []);
     } catch (err) {
       console.error('Failed to fetch data:', err);
-      setError('Failed to load services and stylists');
+      setError(err instanceof Error ? err.message : 'Failed to load services and stylists');
     } finally {
       setLoading(false);
     }
@@ -204,6 +215,11 @@ export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Service *
                 </label>
+                {services.length === 0 ? (
+                  <p className="text-sm text-amber-600 italic py-4 text-center bg-amber-50 rounded-lg">
+                    No services available. Please add services in Settings.
+                  </p>
+                ) : (
                 <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
                   {services.map((service) => (
                     <button
@@ -228,6 +244,7 @@ export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
                     </button>
                   ))}
                 </div>
+                )}
               </div>
 
               {/* Stylist Selection */}
