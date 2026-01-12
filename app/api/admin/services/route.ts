@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 
 export async function GET() {
   try {
     const business = await requireBusiness();
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     const { data: services, error } = await supabase
       .from('services')
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   try {
     const business = await requireBusiness();
     const body = await request.json();
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Get max sort_order for category within this business
     const { data: existing } = await supabase

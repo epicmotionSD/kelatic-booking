@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 
 // Map between numeric day keys (frontend) and string day names (database)
@@ -37,7 +37,7 @@ function convertHoursToDb(frontendHours: Record<string | number, any>): Record<s
 export async function GET() {
   try {
     const business = await requireBusiness();
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
 
     // Get business settings row
@@ -115,7 +115,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const business = await requireBusiness();
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     const body = await request.json();
     const { settings } = body;
