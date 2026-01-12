@@ -41,8 +41,11 @@ export async function GET(request: NextRequest) {
       query = query.eq('is_walk_in', false);
     }
 
-    // Note: We include all appointments, even those with null service_id
-    // This ensures pending/incomplete bookings are visible
+    // Only include appointments with valid service_id (filters out corrupt legacy data)
+    query = query.not('service_id', 'is', null);
+    
+    // Also require valid start_time
+    query = query.not('start_time', 'is', null);
 
     // Filter by date (if not 'all')
     if (date && date !== 'all') {
