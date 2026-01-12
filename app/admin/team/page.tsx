@@ -164,12 +164,12 @@ export default function TeamPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Team</h1>
-          <p className="text-gray-600">Manage your stylists and their schedules</p>
+          <h1 className="text-2xl font-bold text-white">Team</h1>
+          <p className="text-white/60">Manage your stylists and their schedules</p>
         </div>
         <button
           onClick={() => openModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
         >
           <Plus className="w-4 h-4" />
           Add Team Member
@@ -178,32 +178,32 @@ export default function TeamPage() {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
         <input
           type="text"
           placeholder="Search team members..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+          className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
         />
       </div>
 
       {/* Team Grid */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400"></div>
         </div>
       ) : filteredTeam.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No team members found</h3>
-          <p className="text-gray-500 mb-4">
+        <div className="bg-zinc-900 rounded-xl border border-white/10 p-12 text-center">
+          <Users className="w-12 h-12 text-white/30 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-white mb-2">No team members found</h3>
+          <p className="text-white/50 mb-4">
             {searchQuery ? 'Try a different search term' : 'Add your first team member to get started'}
           </p>
           {!searchQuery && (
             <button
               onClick={() => openModal()}
-              className="text-purple-600 hover:text-purple-700 font-medium"
+              className="text-amber-400 hover:text-amber-300 font-medium"
             >
               + Add Team Member
             </button>
@@ -214,18 +214,18 @@ export default function TeamPage() {
           {filteredTeam.map((member) => (
             <div
               key={member.id}
-              className={`bg-white rounded-xl border border-gray-200 p-6 ${
+              className={`bg-zinc-900 rounded-xl border border-white/10 p-6 ${
                 !member.is_active ? 'opacity-60' : ''
               }`}
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-700 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-lg">
                     {member.first_name.charAt(0)}{member.last_name.charAt(0)}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">
+                    <h3 className="font-semibold text-white">
                       {member.first_name} {member.last_name}
                     </h3>
                     {member.instagram_handle && (
@@ -233,7 +233,7 @@ export default function TeamPage() {
                         href={`https://instagram.com/${member.instagram_handle}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-sm text-gray-500 hover:text-purple-600"
+                        className="flex items-center gap-1 text-sm text-white/50 hover:text-amber-400"
                       >
                         <Instagram className="w-3 h-3" />
                         @{member.instagram_handle}
@@ -242,7 +242,7 @@ export default function TeamPage() {
                   </div>
                 </div>
                 {!member.is_active && (
-                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                  <span className="px-2 py-1 bg-white/10 text-white/60 text-xs rounded-full">
                     Inactive
                   </span>
                 )}
@@ -250,7 +250,7 @@ export default function TeamPage() {
 
               {/* Bio */}
               {member.bio && (
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">{member.bio}</p>
+                <p className="text-sm text-white/60 mb-4 line-clamp-2">{member.bio}</p>
               )}
 
               {/* Specialties */}
@@ -259,13 +259,13 @@ export default function TeamPage() {
                   {member.specialties.slice(0, 3).map((specialty) => (
                     <span
                       key={specialty}
-                      className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded-full"
+                      className="px-2 py-1 bg-amber-500/20 text-amber-400 text-xs rounded-full"
                     >
                       {specialty}
                     </span>
                   ))}
                   {member.specialties.length > 3 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+                    <span className="px-2 py-1 bg-white/10 text-white/60 text-xs rounded-full">
                       +{member.specialties.length - 3}
                     </span>
                   )}
@@ -273,7 +273,7 @@ export default function TeamPage() {
               )}
 
               {/* Stats */}
-              <div className="flex items-center gap-4 text-sm text-gray-500 mb-4 pb-4 border-b border-gray-100">
+              <div className="flex items-center gap-4 text-sm text-white/50 mb-4 pb-4 border-b border-white/10">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <span>{member.appointment_count || 0} appts</span>
@@ -283,7 +283,7 @@ export default function TeamPage() {
                   <span>{member.service_count || 0} services</span>
                 </div>
                 {member.commission_rate && (
-                  <div className="text-purple-600 font-medium">
+                  <div className="text-amber-400 font-medium">
                     {member.commission_rate}%
                   </div>
                 )}
@@ -293,14 +293,14 @@ export default function TeamPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => openModal(member)}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-white/10 text-white rounded-lg hover:bg-white/5 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
                   Edit
                 </button>
                 <Link
                   href={`/admin/team/${member.id}/schedule`}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-purple-50 text-purple-700 rounded-lg hover:bg-purple-100 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors"
                 >
                   <Calendar className="w-4 h-4" />
                   Schedule
@@ -313,17 +313,17 @@ export default function TeamPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white">
-              <h2 className="text-lg font-semibold text-gray-900">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-zinc-900 border border-white/10 rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-zinc-900">
+              <h2 className="text-lg font-semibold text-white">
                 {editingMember ? 'Edit Team Member' : 'Add Team Member'}
               </h2>
               <button
                 onClick={closeModal}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-white/5 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-white/40" />
               </button>
             </div>
 
@@ -331,7 +331,7 @@ export default function TeamPage() {
               {/* Name */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white/70 mb-1">
                     First Name *
                   </label>
                   <input
@@ -339,11 +339,11 @@ export default function TeamPage() {
                     value={formData.first_name}
                     onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
                     required
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-white/70 mb-1">
                     Last Name *
                   </label>
                   <input
@@ -351,60 +351,60 @@ export default function TeamPage() {
                     value={formData.last_name}
                     onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
                     required
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                   />
                 </div>
               </div>
 
               {/* Contact */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-white/70 mb-1">
                   Email *
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <input
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     required
-                    className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full pl-10 pr-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-white/70 mb-1">
                   Phone
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <input
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full pl-10 pr-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                   />
                 </div>
               </div>
 
               {/* Bio */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-white/70 mb-1">
                   Bio
                 </label>
                 <textarea
                   value={formData.bio}
                   onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 resize-none placeholder-white/40"
                   placeholder="A brief description of this stylist..."
                 />
               </div>
 
               {/* Specialties */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-white/70 mb-2">
                   Specialties
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -415,8 +415,8 @@ export default function TeamPage() {
                       onClick={() => toggleSpecialty(specialty)}
                       className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                         formData.specialties.includes(specialty)
-                          ? 'bg-purple-600 text-white'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-amber-500 text-black'
+                          : 'bg-white/10 text-white/70 hover:bg-white/20'
                       }`}
                     >
                       {specialty}
@@ -427,24 +427,24 @@ export default function TeamPage() {
 
               {/* Instagram */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-white/70 mb-1">
                   Instagram Handle
                 </label>
                 <div className="relative">
-                  <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Instagram className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
                   <input
                     type="text"
                     value={formData.instagram_handle}
                     onChange={(e) => setFormData(prev => ({ ...prev, instagram_handle: e.target.value.replace('@', '') }))}
                     placeholder="username"
-                    className="w-full pl-10 pr-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full pl-10 pr-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                   />
                 </div>
               </div>
 
               {/* Commission Rate */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-white/70 mb-1">
                   Commission Rate (%)
                 </label>
                 <input
@@ -453,21 +453,21 @@ export default function TeamPage() {
                   max="100"
                   value={formData.commission_rate}
                   onChange={(e) => setFormData(prev => ({ ...prev, commission_rate: parseFloat(e.target.value) || 0 }))}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                 />
               </div>
 
               {/* Active Toggle */}
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="font-medium text-gray-900">Active</div>
-                  <div className="text-sm text-gray-500">Allow this stylist to receive bookings</div>
+                  <div className="font-medium text-white">Active</div>
+                  <div className="text-sm text-white/50">Allow this stylist to receive bookings</div>
                 </div>
                 <button
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    formData.is_active ? 'bg-purple-600' : 'bg-gray-200'
+                    formData.is_active ? 'bg-amber-500' : 'bg-white/20'
                   }`}
                 >
                   <div
@@ -483,17 +483,17 @@ export default function TeamPage() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2 border border-white/10 text-white rounded-lg hover:bg-white/5 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
                 >
                   {saving ? (
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>
                   ) : (
                     <Check className="w-4 h-4" />
                   )}

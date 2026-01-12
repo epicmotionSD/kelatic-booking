@@ -23,11 +23,13 @@ interface PriceTier {
 
 export interface BookingData {
   service: Service | null;
+  originalServiceId: string | null; // For special offers - use this ID for DB queries
   addons: Service[];
   priceTier: PriceTier | null;
   availableServices: Service[];
   stylist: Profile | null;
   anyAvailableStylist: boolean;
+  isWednesdaySpecial: boolean;
   date: string | null;
   timeSlot: TimeSlot | null;
   clientInfo: {
@@ -44,11 +46,13 @@ export interface BookingData {
 
 const initialBookingData: BookingData = {
   service: null,
+  originalServiceId: null,
   addons: [],
   priceTier: null,
   availableServices: [],
   stylist: null,
   anyAvailableStylist: false,
+  isWednesdaySpecial: false,
   date: null,
   timeSlot: null,
   clientInfo: null,
@@ -101,15 +105,17 @@ function BookingContent() {
           
           if (retwistService) {
             // Create a special version with the offer price
+            // Keep original ID for database queries (stylist lookup, availability)
             const specialService = {
               ...retwistService,
-              name: 'Tuesday Special - Shampoo & Retwist',
+              name: 'Wednesday Special - Shampoo & Retwist',
               base_price: 75,
-              description: 'Tuesday Special: Professional shampoo and expert retwist for just $75 (Regular $85)',
-              id: `special-${retwistService.id}`
+              description: 'Wednesday Special: Professional shampoo and expert retwist for just $75 (Regular $85)',
             };
             updates.service = specialService;
+            updates.originalServiceId = retwistService.id; // Store original ID for DB queries
             updates.availableServices = [specialService];
+            updates.isWednesdaySpecial = true; // Enable Wednesday-only booking
             startStep = 'stylist'; // Skip to stylist selection
           }
         }
@@ -177,9 +183,9 @@ function BookingContent() {
   }
 
   return (
-    <div className="min-h-screen bg-amber-50 text-stone-900">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-xl border-b border-amber-200 sticky top-0 z-50 shadow-sm">
+      <header className="bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
@@ -187,11 +193,11 @@ function BookingContent() {
                 <span className="text-black font-black">K</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-sm text-stone-900">KELATIC</span>
-                <span className="text-[9px] tracking-widest text-amber-600">BOOKING</span>
+                <span className="font-bold text-sm text-white">KELATIC</span>
+                <span className="text-[9px] tracking-widest text-amber-400">BOOKING</span>
               </div>
             </Link>
-            <Link href="/" className="text-sm text-stone-600 hover:text-amber-600 transition-colors">
+            <Link href="/" className="text-sm text-white/60 hover:text-amber-400 transition-colors">
               ← Back to site
             </Link>
           </div>
@@ -200,7 +206,7 @@ function BookingContent() {
 
       {/* Progress Bar */}
       {currentStep !== 'confirmation' && (
-        <div className="bg-white/80 border-b border-amber-200 shadow-sm">
+        <div className="bg-zinc-900/80 border-b border-white/10">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               {STEPS.slice(0, -1).map((step, index) => {
@@ -223,7 +229,7 @@ function BookingContent() {
                             ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/30'
                             : isCompleted
                             ? 'bg-green-500 text-white'
-                            : 'bg-stone-200 text-stone-400'
+                            : 'bg-zinc-800 text-zinc-500'
                         }`}
                       >
                         {isCompleted ? (
@@ -236,7 +242,7 @@ function BookingContent() {
                       </div>
                       <span
                         className={`hidden sm:block text-sm font-medium ${
-                          isActive ? 'text-amber-600' : isCompleted ? 'text-green-600' : 'text-stone-400'
+                          isActive ? 'text-amber-400' : isCompleted ? 'text-green-400' : 'text-zinc-500'
                         }`}
                       >
                         {step.label}
@@ -245,7 +251,7 @@ function BookingContent() {
                     {index < STEPS.length - 2 && (
                       <div
                         className={`w-8 sm:w-16 h-0.5 mx-2 rounded-full ${
-                          index < currentStepIndex ? 'bg-green-500' : 'bg-stone-200'
+                          index < currentStepIndex ? 'bg-green-500' : 'bg-zinc-700'
                         }`}
                       />
                     )}
@@ -311,7 +317,7 @@ function BookingContent() {
 
         {currentStep === 'stylist' && (
           <StylistSelection
-            serviceId={bookingData.service?.id || bookingData.availableServices[0]?.id || ''}
+            serviceId={bookingData.originalServiceId || bookingData.service?.id || bookingData.availableServices[0]?.id || ''}
             selectedStylist={bookingData.stylist}
             anyAvailable={bookingData.anyAvailableStylist}
             onSelect={(stylist, anyAvailable) => {
@@ -324,10 +330,11 @@ function BookingContent() {
 
         {currentStep === 'datetime' && (
           <DateTimeSelection
-            serviceId={bookingData.service?.id || bookingData.availableServices[0]?.id || ''}
+            serviceId={bookingData.originalServiceId || bookingData.service?.id || bookingData.availableServices[0]?.id || ''}
             stylistId={bookingData.anyAvailableStylist ? undefined : bookingData.stylist?.id}
             selectedDate={bookingData.date}
             selectedSlot={bookingData.timeSlot}
+            wednesdayOnly={bookingData.isWednesdaySpecial}
             onSelect={(date, slot) => {
               updateBookingData({
                 date,

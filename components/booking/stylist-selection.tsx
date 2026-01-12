@@ -68,38 +68,38 @@ export function StylistSelection({
 
   return (
     <div>
-      <h2 className="text-2xl font-playfair font-bold text-stone-900 mb-2">Choose Your Preferred Stylist</h2>
-      <p className="text-stone-600 mb-8">Select your favorite stylist or let us find the next available expert</p>
+      <h2 className="text-2xl font-playfair font-bold text-white mb-2">Choose Your Preferred Stylist</h2>
+      <p className="text-white/60 mb-8">Select your favorite stylist or let us find the next available expert</p>
 
       {/* Any Available Option */}
       <button
         onClick={handleAnyAvailable}
         className={`w-full text-left p-6 rounded-xl border-2 transition-all mb-6 hover:shadow-lg ${
           selectAny
-            ? 'border-amber-500 bg-amber-50 shadow-lg'
-            : 'border-stone-200 bg-white hover:border-amber-300 hover:bg-amber-50'
+            ? 'border-amber-500 bg-amber-500/10 shadow-lg'
+            : 'border-white/20 bg-zinc-900 hover:border-amber-500/50 hover:bg-zinc-800'
         }`}
       >
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center">
-            <Sparkles className="w-8 h-8 text-amber-600" />
+          <div className="w-16 h-16 rounded-full bg-amber-500/20 flex items-center justify-center">
+            <Sparkles className="w-8 h-8 text-amber-400" />
           </div>
           <div className="flex-1">
-            <h3 className="font-semibold text-stone-900 text-lg">Any Available Stylist</h3>
-            <p className="text-stone-600 mt-1">
+            <h3 className="font-semibold text-white text-lg">Any Available Stylist</h3>
+            <p className="text-white/60 mt-1">
               Get the next available expert for faster booking
             </p>
-            <p className="text-amber-600 font-medium text-sm mt-2">✨ Recommended for quicker appointments</p>
+            <p className="text-amber-400 font-medium text-sm mt-2">✨ Recommended for quicker appointments</p>
           </div>
           <div
             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
               selectAny
                 ? 'border-amber-500 bg-amber-500'
-                : 'border-stone-300'
+                : 'border-white/30'
             }`}
           >
             {selectAny && (
-              <ArrowRight className="w-4 h-4 text-stone-900" />
+              <ArrowRight className="w-4 h-4 text-black" />
             )}
           </div>
         </div>
@@ -108,7 +108,7 @@ export function StylistSelection({
       {/* Divider */}
       <div className="flex items-center gap-4 my-6">
         <div className="flex-1 h-px bg-white/10" />
-        <span className="text-sm text-stone-900/40">or choose a stylist</span>
+        <span className="text-sm text-white/40">or choose a stylist</span>
         <div className="flex-1 h-px bg-white/10" />
       </div>
 
@@ -120,8 +120,8 @@ export function StylistSelection({
             onClick={() => handleStylistSelect(stylist)}
             className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
               selected?.id === stylist.id
-                ? 'border-amber-500 bg-amber-50'
-                : 'border-stone-200 bg-white hover:border-amber-300'
+                ? 'border-amber-500 bg-amber-500/10'
+                : 'border-white/20 bg-zinc-900 hover:border-amber-500/50'
             }`}
           >
             <div className="flex items-center gap-4">
@@ -134,8 +134,8 @@ export function StylistSelection({
                     className="w-16 h-16 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent border border-stone-200 flex items-center justify-center">
-                    <span className="text-xl font-bold text-stone-900/80">
+                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent border border-white/20 flex items-center justify-center">
+                    <span className="text-xl font-bold text-white/80">
                       {stylist.first_name[0]}
                       {stylist.last_name[0]}
                     </span>
@@ -145,21 +145,21 @@ export function StylistSelection({
 
               {/* Info */}
               <div className="flex-1">
-                <h3 className="font-semibold text-stone-900">
+                <h3 className="font-semibold text-white">
                   {stylist.first_name} {stylist.last_name}
                 </h3>
                 {stylist.specialties && stylist.specialties.length > 0 && (
-                  <p className="text-sm text-amber-600">
+                  <p className="text-sm text-amber-400">
                     {stylist.specialties.slice(0, 3).join(' • ')}
                   </p>
                 )}
                 {stylist.bio && (
-                  <p className="text-sm text-stone-900/50 mt-1 line-clamp-2">
+                  <p className="text-sm text-white/50 mt-1 line-clamp-2">
                     {stylist.bio}
                   </p>
                 )}
                 {stylist.instagram_handle && (
-                  <p className="text-sm text-amber-600/70 mt-1">
+                  <p className="text-sm text-amber-400/70 mt-1">
                     @{stylist.instagram_handle}
                   </p>
                 )}
@@ -185,8 +185,8 @@ export function StylistSelection({
       </div>
 
       {stylists.length === 0 && (
-        <div className="text-center py-8 bg-white rounded-xl border border-stone-200">
-          <p className="text-stone-900/50">No stylists available for this service</p>
+        <div className="text-center py-8 bg-zinc-900 rounded-xl border border-white/20">
+          <p className="text-white/50">No stylists available for this service</p>
         </div>
       )}
 
@@ -194,7 +194,7 @@ export function StylistSelection({
       <div className="flex gap-3 mt-8">
         <button
           onClick={onBack}
-          className="flex-1 py-3 bg-white border border-stone-200 text-stone-900 rounded-xl font-semibold hover:bg-white/10 transition-colors"
+          className="flex-1 py-3 bg-zinc-900 border border-white/20 text-white rounded-xl font-semibold hover:bg-zinc-800 transition-colors"
         >
           Back
         </button>
@@ -203,8 +203,8 @@ export function StylistSelection({
           disabled={!selected && !selectAny}
           className={`flex-1 py-3 rounded-xl font-bold transition-all ${
             selected || selectAny
-              ? 'bg-amber-500 text-white hover:bg-amber-600 hover:shadow-lg hover:shadow-amber-500/30'
-              : 'bg-white/10 text-stone-900/30 cursor-not-allowed'
+              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
+              : 'bg-white/10 text-white/30 cursor-not-allowed'
           }`}
         >
           Continue

@@ -107,15 +107,15 @@ export default function ServicesPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
-            <Briefcase className="w-8 h-8 text-amber-600" />
+          <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
+            <Briefcase className="w-8 h-8 text-amber-400" />
             Services
           </h1>
-          <p className="text-stone-600">Manage your service menu and pricing</p>
+          <p className="text-white/60">Manage your service menu and pricing</p>
         </div>
         <button
           onClick={() => openModal()}
-          className="px-4 py-2 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all flex items-center gap-2 w-fit"
+          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
         >
           <Plus className="w-5 h-5" />
           Add Service
@@ -128,8 +128,8 @@ export default function ServicesPage() {
           onClick={() => setActiveCategory('all')}
           className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
             activeCategory === 'all'
-              ? 'bg-amber-500 text-white shadow-lg'
-              : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
+              ? 'bg-amber-500 text-black shadow-lg'
+              : 'bg-zinc-900 text-white hover:bg-zinc-800 border border-white/10'
           }`}
         >
           All ({services.length})
@@ -140,8 +140,8 @@ export default function ServicesPage() {
             onClick={() => setActiveCategory(category)}
             className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
               activeCategory === category
-                ? 'bg-amber-500 text-white shadow-lg'
-                : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
+                ? 'bg-amber-500 text-black shadow-lg'
+                : 'bg-zinc-900 text-white hover:bg-zinc-800 border border-white/10'
             }`}
           >
             {CATEGORY_LABELS[category]} ({categoryCounts[category]})
@@ -152,15 +152,15 @@ export default function ServicesPage() {
       {/* Services Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
         </div>
       ) : filteredServices.length === 0 ? (
-        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-12 text-center">
-          <Briefcase className="w-12 h-12 mx-auto text-amber-300 mb-4" />
-          <p className="text-stone-600 mb-4">No services found</p>
+        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-12 text-center">
+          <Briefcase className="w-12 h-12 mx-auto text-amber-400/30 mb-4" />
+          <p className="text-white/60 mb-4">No services found</p>
           <button
             onClick={() => openModal()}
-            className="text-amber-600 hover:text-amber-700 font-medium"
+            className="text-amber-400 hover:text-amber-300 font-medium"
           >
             Create your first service →
           </button>
@@ -170,22 +170,22 @@ export default function ServicesPage() {
           {filteredServices.map((service) => (
             <div
               key={service.id}
-              className={`bg-white rounded-xl border border-amber-200 shadow-lg hover:shadow-xl transition-all p-6 ${
+              className={`bg-zinc-900 rounded-xl border border-white/10 shadow-lg hover:shadow-xl transition-all p-6 ${
                 !service.is_active ? 'opacity-60' : ''
               }`}
             >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <span className="text-xs font-medium text-amber-600 uppercase tracking-wide">
+                  <span className="text-xs font-medium text-amber-400 uppercase tracking-wide">
                     {CATEGORY_LABELS[service.category]}
                   </span>
-                  <h3 className="font-semibold text-stone-900 mt-1">
+                  <h3 className="font-semibold text-white mt-1">
                     {service.name}
                   </h3>
                 </div>
                 <div className="flex items-center gap-2">
                   {!service.is_active && (
-                    <span className="px-2 py-1 bg-stone-100 text-stone-600 text-xs rounded-full border border-stone-200">
+                    <span className="px-2 py-1 bg-white/10 text-white/60 text-xs rounded-full border border-white/20">
                       Inactive
                     </span>
                   )}
@@ -195,28 +195,28 @@ export default function ServicesPage() {
                         const menu = e.currentTarget.nextElementSibling;
                         menu?.classList.toggle('hidden');
                       }}
-                      className="p-1 text-stone-400 hover:text-stone-700"
+                      className="p-1 text-white/40 hover:text-white"
                     >
                       <MoreVertical className="w-5 h-5" />
                     </button>
-                    <div className="hidden absolute right-0 mt-1 w-36 bg-white rounded-xl shadow-lg border border-stone-200 py-1 z-10">
+                    <div className="hidden absolute right-0 mt-1 w-36 bg-zinc-800 rounded-xl shadow-lg border border-white/10 py-1 z-10">
                       <button
                         onClick={() => openModal(service)}
-                        className="w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-amber-50 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 flex items-center gap-2"
                       >
                         <Edit className="w-4 h-4" />
                         Edit
                       </button>
                       <button
                         onClick={() => handleToggleActive(service)}
-                        className="w-full text-left px-4 py-2 text-sm text-stone-700 hover:bg-amber-50 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-sm text-white hover:bg-white/10 flex items-center gap-2"
                       >
                         <Power className="w-4 h-4" />
                         {service.is_active ? 'Deactivate' : 'Activate'}
                       </button>
                       <button
                         onClick={() => handleDelete(service.id)}
-                        className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
+                        className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 flex items-center gap-2"
                       >
                         <Trash2 className="w-4 h-4" />
                         Delete
@@ -227,17 +227,17 @@ export default function ServicesPage() {
               </div>
 
               {service.description && (
-                <p className="text-sm text-stone-600 mb-4 line-clamp-2">
+                <p className="text-sm text-white/60 mb-4 line-clamp-2">
                   {service.description}
                 </p>
               )}
 
               <div className="flex items-center justify-between text-sm">
-                <span className="text-stone-600 flex items-center gap-1">
+                <span className="text-white/60 flex items-center gap-1">
                   <Clock className="w-4 h-4" />
                   {service.duration} min
                 </span>
-                <span className="font-semibold text-amber-600 flex items-center gap-1">
+                <span className="font-semibold text-amber-400 flex items-center gap-1">
                   <DollarSign className="w-4 h-4" />
                   {formatCurrency(service.base_price * 100)}
                 </span>

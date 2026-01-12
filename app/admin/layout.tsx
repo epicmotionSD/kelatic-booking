@@ -110,15 +110,15 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="min-h-screen bg-cream-50">
+    <div className="min-h-screen bg-black">
       {/* Skip Links */}
       <SkipLink href="#main-content">Skip to main content</SkipLink>
       <SkipLink href="#navigation">Skip to navigation</SkipLink>
       
       {/* Mobile menu button */}
-      <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-amber-200 shadow-sm">
+      <div className="lg:hidden flex items-center justify-between p-4 bg-zinc-900 border-b border-white/10">
         <Link href="/admin" className="flex items-center">
-          <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+          <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
             Kelatic Admin
           </h1>
         </Link>
@@ -127,7 +127,7 @@ export default function AdminLayout({
           aria-expanded={sidebarOpen}
           aria-controls="sidebar-navigation"
           aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          className="p-2 rounded-md text-stone-600 hover:bg-amber-50 hover:text-amber-600 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2"
+          className="p-2 rounded-md text-white/60 hover:bg-white/10 hover:text-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
         >
           {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -136,7 +136,7 @@ export default function AdminLayout({
       {/* Mobile sidebar overlay */}
       {sidebarOpen && isMobile && (
         <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
           aria-hidden="true"
         />
@@ -145,15 +145,15 @@ export default function AdminLayout({
       {/* Sidebar */}
       <aside
         id="sidebar-navigation"
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-amber-200 shadow-xl transform transition-transform lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-zinc-900 border-r border-white/10 transform transition-transform lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Main navigation"
       >
         {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-amber-200">
-          <Link href="/admin" className="flex items-center focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md">
-            <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
+        <div className="h-16 flex items-center px-6 border-b border-white/10">
+          <Link href="/admin" className="flex items-center focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 rounded-md">
+            <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
               Kelatic Admin
             </h1>
           </Link>
@@ -172,10 +172,10 @@ export default function AdminLayout({
                 href={item.href}
                 onClick={() => isMobile && setSidebarOpen(false)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
                   isActive
-                    ? 'bg-amber-500 text-white font-bold shadow-lg'
-                    : 'text-stone-700 hover:bg-amber-100 hover:text-amber-900 hover:shadow-md'
+                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold shadow-lg shadow-amber-500/20'
+                    : 'text-white/70 hover:bg-white/10 hover:text-amber-400'
                 }`}
               >
                 {item.icon}
@@ -186,17 +186,17 @@ export default function AdminLayout({
         </nav>
 
         {/* User Profile */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-amber-200">
-          <div className="flex items-center gap-3 px-4 py-3 bg-cream-50 rounded-xl border border-amber-200">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-sm text-white font-bold">K</span>
+        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
+          <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-xl border border-white/10">
+            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <span className="text-sm text-black font-bold">K</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-stone-900 font-bold truncate">Admin</p>
-              <p className="text-xs text-stone-600 truncate">kelatic@admin.com</p>
+              <p className="text-sm text-white font-bold truncate">Admin</p>
+              <p className="text-xs text-white/50 truncate">kelatic@admin.com</p>
             </div>
             <button
-              className="text-xs text-red-600 hover:text-red-700 transition-colors font-medium"
+              className="text-xs text-red-400 hover:text-red-300 transition-colors font-medium"
               onClick={async () => {
                 const supabase = (await import('@/lib/supabase/client')).createClient();
                 await supabase.auth.signOut();
@@ -212,12 +212,12 @@ export default function AdminLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top Bar */}
-        <header className="h-16 bg-white border-b border-amber-200 shadow-sm flex items-center px-4 lg:px-8 sticky top-0 z-30">
+        <header className="h-16 bg-zinc-900 border-b border-white/10 flex items-center px-4 lg:px-8 sticky top-0 z-30">
           {/* Mobile menu button */}
           <button
             onClick={handleSidebarToggle}
             aria-label="Open navigation menu"
-            className="p-2 -ml-2 text-stone-600 hover:text-amber-900 lg:hidden focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md"
+            className="p-2 -ml-2 text-white/60 hover:text-amber-400 lg:hidden focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 rounded-md"
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -230,7 +230,7 @@ export default function AdminLayout({
             <Link
               href="/"
               target="_blank"
-              className="text-sm text-stone-600 hover:text-amber-600 transition-colors hidden sm:block font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md px-2 py-1"
+              className="text-sm text-white/60 hover:text-amber-400 transition-colors hidden sm:block font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 rounded-md px-2 py-1"
               rel="noopener noreferrer"
             >
               View Site

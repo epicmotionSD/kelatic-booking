@@ -37,12 +37,12 @@ interface Appointment {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-100 text-amber-700 border-amber-200',
-  confirmed: 'bg-green-100 text-green-700 border-green-200',
-  in_progress: 'bg-blue-100 text-blue-700 border-blue-200',
-  completed: 'bg-stone-100 text-stone-600 border-stone-200',
-  cancelled: 'bg-red-100 text-red-700 border-red-200',
-  no_show: 'bg-red-100 text-red-700 border-red-200',
+  pending: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  confirmed: 'bg-green-500/20 text-green-400 border-green-500/30',
+  in_progress: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  completed: 'bg-white/10 text-white/60 border-white/20',
+  cancelled: 'bg-red-500/20 text-red-400 border-red-500/30',
+  no_show: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
 
 export default function AppointmentsPage() {
@@ -114,15 +114,15 @@ export default function AppointmentsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
-            <Calendar className="w-8 h-8 text-amber-600" />
+          <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
+            <Calendar className="w-8 h-8 text-amber-400" />
             Appointments
           </h1>
-          <p className="text-stone-600">{formatDate(filters.date)}</p>
+          <p className="text-white/60">{formatDate(filters.date)}</p>
         </div>
         <Link
           href="/admin/appointments/new"
-          className="px-4 py-2 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all flex items-center gap-2 w-fit"
+          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
         >
           <Plus className="w-5 h-5" />
           New Appointment
@@ -130,11 +130,11 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl border border-amber-200 p-4 mb-6 shadow-sm">
+      <div className="bg-zinc-900 rounded-xl border border-white/10 p-4 mb-6 shadow-sm">
         <div className="flex flex-wrap gap-4">
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Date
             </label>
             <div className="flex gap-2">
@@ -144,12 +144,12 @@ export default function AppointmentsPage() {
                 onChange={(e) =>
                   setFilters({ ...filters, date: e.target.value || 'all' })
                 }
-                className="px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
               />
               <button
                 type="button"
                 onClick={() => setFilters({ ...filters, date: 'all' })}
-                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${filters.date === 'all' ? 'bg-amber-500 text-white border-amber-500' : 'bg-white text-stone-700 border-stone-300 hover:bg-amber-50'}`}
+                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${filters.date === 'all' ? 'bg-amber-500 text-black border-amber-500' : 'bg-zinc-800 text-white border-white/20 hover:bg-zinc-700'}`}
               >
                 All Dates
               </button>
@@ -158,7 +158,7 @@ export default function AppointmentsPage() {
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Status
             </label>
             <select
@@ -166,7 +166,7 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              className="px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+              className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
@@ -180,7 +180,7 @@ export default function AppointmentsPage() {
 
           {/* Stylist */}
           <div>
-            <label className="block text-sm font-medium text-stone-700 mb-1">
+            <label className="block text-sm font-medium text-white/70 mb-1">
               Stylist
             </label>
             <select
@@ -188,7 +188,7 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, stylist: e.target.value })
               }
-              className="px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+              className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
             >
               <option value="all">All Stylists</option>
               {stylists.map((s) => (
@@ -206,7 +206,7 @@ export default function AppointmentsPage() {
                 const today = new Date().toISOString().split('T')[0];
                 setFilters({ ...filters, date: today });
               }}
-              className="px-4 py-2 bg-stone-100 text-stone-700 rounded-xl hover:bg-stone-200 transition-colors border border-stone-300"
+              className="px-4 py-2 bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/20"
             >
               Today
             </button>
@@ -216,7 +216,7 @@ export default function AppointmentsPage() {
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 setFilters({ ...filters, date: tomorrow.toISOString().split('T')[0] });
               }}
-              className="px-4 py-2 bg-stone-100 text-stone-700 rounded-xl hover:bg-stone-200 transition-colors border border-stone-300"
+              className="px-4 py-2 bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/20"
             >
               Tomorrow
             </button>
@@ -225,7 +225,7 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Appointments List */}
-      <div className="bg-white rounded-xl border border-stone-200 overflow-hidden">
+      <div className="bg-zinc-900 rounded-xl border border-white/10 overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
@@ -233,7 +233,7 @@ export default function AppointmentsPage() {
         ) : appointments.length === 0 ? (
           <div className="text-center py-12">
             <svg
-              className="w-12 h-12 mx-auto text-stone-200 mb-4"
+              className="w-12 h-12 mx-auto text-white/20 mb-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -245,10 +245,10 @@ export default function AppointmentsPage() {
                 d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <p className="text-stone-400">No appointments found</p>
+            <p className="text-white/40">No appointments found</p>
             <Link
               href="/admin/appointments/new"
-              className="text-amber-600 hover:text-amber-700 mt-2 inline-block"
+              className="text-amber-400 hover:text-amber-300 mt-2 inline-block"
             >
               Create one →
             </Link>
@@ -257,75 +257,75 @@ export default function AppointmentsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-stone-100 border-b border-stone-200">
-                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                <tr className="bg-white/5 border-b border-white/10">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Time
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Client
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Service
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Stylist
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Price
                   </th>
-                  <th className="text-left px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="text-right px-6 py-3 text-xs font-medium text-stone-500 uppercase tracking-wider">
+                  <th className="text-right px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-200">
+              <tbody className="divide-y divide-white/10">
                 {appointments.map((apt) => (
-                  <tr key={apt.id} className="hover:bg-stone-50 transition-colors">
+                  <tr key={apt.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-stone-900">
+                      <div className="text-sm font-medium text-white">
                         {formatTime(apt.start_time)}
                       </div>
-                      <div className="text-xs text-stone-500">
+                      <div className="text-xs text-white/50">
                         - {formatTime(apt.end_time)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-stone-900">
+                      <div className="text-sm font-medium text-white">
                         {apt.client_name || 'Walk-in'}
                       </div>
                       {apt.client_phone && (
-                        <div className="text-xs text-stone-500">
+                        <div className="text-xs text-white/50">
                           {apt.client_phone}
                         </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-stone-900">
+                      <div className="text-sm text-white">
                         {apt.service_name}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-stone-900">
+                      <div className="text-sm text-white">
                         {apt.stylist_name}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-stone-900">
+                      <div className="text-sm font-medium text-white">
                         {formatCurrency(apt.quoted_price * 100)}
                       </div>
                       {apt.deposit_paid > 0 && (
-                        <div className="text-xs text-green-700">
+                        <div className="text-xs text-green-400">
                           {formatCurrency(apt.deposit_paid * 100)} deposit
                         </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          STATUS_COLORS[apt.status] || 'bg-stone-100 text-stone-400'
+                        className={`px-2 py-1 rounded-full text-xs font-medium border ${
+                          STATUS_COLORS[apt.status] || 'bg-white/10 text-white/40'
                         }`}
                       >
                         {apt.status.replace('_', ' ')}
@@ -336,7 +336,7 @@ export default function AppointmentsPage() {
                         {apt.status === 'pending' && (
                           <button
                             onClick={() => updateStatus(apt.id, 'confirmed')}
-                            className="text-green-700 hover:text-green-800 text-sm"
+                            className="text-green-400 hover:text-green-300 text-sm"
                           >
                             Confirm
                           </button>

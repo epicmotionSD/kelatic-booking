@@ -189,10 +189,10 @@ export default function NotificationSettings() {
     return (
       <div className="max-w-4xl mx-auto p-6">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+          <div className="h-8 bg-zinc-800 rounded w-1/3 mb-6"></div>
           <div className="space-y-4">
             {[...Array(6)].map((_, i) => (
-              <div key={i} className="h-20 bg-gray-200 rounded"></div>
+              <div key={i} className="h-20 bg-zinc-800 rounded"></div>
             ))}
           </div>
         </div>
@@ -204,32 +204,32 @@ export default function NotificationSettings() {
     <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-          <Bell className="w-6 h-6 text-blue-500" />
+        <h1 className="text-2xl font-bold text-white flex items-center gap-2">
+          <Bell className="w-6 h-6 text-amber-400" />
           Notification Settings
         </h1>
-        <p className="text-gray-600 mt-2">
+        <p className="text-white/60 mt-2">
           Manage how and when you receive notifications
         </p>
       </div>
 
       {/* Global Settings */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Global Notification Channels</h2>
-        <p className="text-gray-600 text-sm mb-6">
+      <div className="bg-zinc-900 rounded-xl border border-white/10 p-6 mb-6">
+        <h2 className="text-lg font-semibold text-white mb-4">Global Notification Channels</h2>
+        <p className="text-white/60 text-sm mb-6">
           Turn off any channel to disable all notifications of that type
         </p>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Email */}
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-white/10 rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Mail className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                <Mail className="w-5 h-5 text-blue-400" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">Email</h3>
-                <p className="text-sm text-gray-500">Detailed notifications</p>
+                <h3 className="font-medium text-white">Email</h3>
+                <p className="text-sm text-white/50">Detailed notifications</p>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -239,19 +239,19 @@ export default function NotificationSettings() {
                 checked={settings.global.email}
                 onChange={(e) => updateGlobal('email', e.target.checked)}
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-white/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
             </label>
           </div>
 
           {/* SMS */}
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-white/10 rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <MessageSquare className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+                <MessageSquare className="w-5 h-5 text-green-400" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">SMS</h3>
-                <p className="text-sm text-gray-500">Quick alerts</p>
+                <h3 className="font-medium text-white">SMS</h3>
+                <p className="text-sm text-white/50">Quick alerts</p>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -261,25 +261,25 @@ export default function NotificationSettings() {
                 checked={settings.global.sms}
                 onChange={(e) => updateGlobal('sms', e.target.checked)}
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-green-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600"></div>
+              <div className="w-11 h-6 bg-white/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
             </label>
           </div>
 
           {/* Push */}
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-white/10 rounded-lg">
             <div className="flex items-center gap-3">
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                pushSupported ? 'bg-purple-100' : 'bg-gray-100'
+                pushSupported ? 'bg-purple-500/20' : 'bg-white/10'
               }`}>
                 <Smartphone className={`w-5 h-5 ${
-                  pushSupported ? 'text-purple-600' : 'text-gray-400'
+                  pushSupported ? 'text-purple-400' : 'text-white/40'
                 }`} />
               </div>
               <div>
-                <h3 className={`font-medium ${pushSupported ? 'text-gray-900' : 'text-gray-400'}`}>
+                <h3 className={`font-medium ${pushSupported ? 'text-white' : 'text-white/40'}`}>
                   Push
                 </h3>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-white/50">
                   {pushSupported ? 'Instant notifications' : 'Not supported'}
                 </p>
               </div>
@@ -299,22 +299,22 @@ export default function NotificationSettings() {
                     }
                   }}
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                <div className="w-11 h-6 bg-white/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
               </label>
             ) : (
-              <div className="w-11 h-6 bg-gray-100 rounded-full"></div>
+              <div className="w-11 h-6 bg-white/10 rounded-full"></div>
             )}
           </div>
 
           {/* In-App */}
-          <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg">
+          <div className="flex items-center justify-between p-4 border border-white/10 rounded-lg">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Monitor className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 bg-orange-500/20 rounded-lg flex items-center justify-center">
+                <Monitor className="w-5 h-5 text-orange-400" />
               </div>
               <div>
-                <h3 className="font-medium text-gray-900">In-App</h3>
-                <p className="text-sm text-gray-500">Dashboard alerts</p>
+                <h3 className="font-medium text-white">In-App</h3>
+                <p className="text-sm text-white/50">Dashboard alerts</p>
               </div>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
@@ -324,17 +324,17 @@ export default function NotificationSettings() {
                 checked={settings.global.in_app}
                 onChange={(e) => updateGlobal('in_app', e.target.checked)}
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+              <div className="w-11 h-6 bg-white/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
             </label>
           </div>
         </div>
 
         {/* Marketing Toggle */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+        <div className="mt-6 p-4 bg-zinc-800 rounded-lg">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium text-gray-900">Marketing Communications</h3>
-              <p className="text-sm text-gray-500">Promotional emails, newsletters, and special offers</p>
+              <h3 className="font-medium text-white">Marketing Communications</h3>
+              <p className="text-sm text-white/50">Promotional emails, newsletters, and special offers</p>
             </div>
             <label className="relative inline-flex items-center cursor-pointer">
               <input
@@ -343,7 +343,7 @@ export default function NotificationSettings() {
                 checked={settings.global.marketing}
                 onChange={(e) => updateGlobal('marketing', e.target.checked)}
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              <div className="w-11 h-6 bg-white/20 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-amber-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
             </label>
           </div>
         </div>
@@ -357,8 +357,8 @@ export default function NotificationSettings() {
       {/* Detailed Preferences */}
       <div className="space-y-6">
         {Object.entries(groupedTypes).map(([category, types]) => (
-          <div key={category} className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">{category}</h2>
+          <div key={category} className="bg-zinc-900 rounded-xl border border-white/10 p-6">
+            <h2 className="text-lg font-semibold text-white mb-4">{category}</h2>
             
             <div className="space-y-4">
               {types.map((item) => {
@@ -370,20 +370,20 @@ export default function NotificationSettings() {
                 };
 
                 return (
-                  <div key={item.type} className="border border-gray-200 rounded-lg p-4">
+                  <div key={item.type} className="border border-white/10 rounded-lg p-4">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-medium text-gray-900">{item.label}</h3>
-                        <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+                        <h3 className="font-medium text-white">{item.label}</h3>
+                        <p className="text-sm text-white/50 mt-1">{item.description}</p>
                       </div>
                       
                       <div className="flex gap-2 ml-4">
                         {/* Email */}
                         <label className="flex flex-col items-center gap-1 cursor-pointer">
-                          <Mail className="w-4 h-4 text-blue-500" />
+                          <Mail className="w-4 h-4 text-blue-400" />
                           <input
                             type="checkbox"
-                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            className="rounded border-white/30 text-amber-500 focus:ring-amber-500 bg-zinc-800"
                             checked={prefs.email && settings.global.email}
                             disabled={!settings.global.email}
                             onChange={(e) => updatePreference(item.type, 'email', e.target.checked)}
@@ -392,10 +392,10 @@ export default function NotificationSettings() {
 
                         {/* SMS */}
                         <label className="flex flex-col items-center gap-1 cursor-pointer">
-                          <MessageSquare className="w-4 h-4 text-green-500" />
+                          <MessageSquare className="w-4 h-4 text-green-400" />
                           <input
                             type="checkbox"
-                            className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                            className="rounded border-white/30 text-amber-500 focus:ring-amber-500 bg-zinc-800"
                             checked={prefs.sms && settings.global.sms}
                             disabled={!settings.global.sms}
                             onChange={(e) => updatePreference(item.type, 'sms', e.target.checked)}
@@ -404,10 +404,10 @@ export default function NotificationSettings() {
 
                         {/* Push */}
                         <label className="flex flex-col items-center gap-1 cursor-pointer">
-                          <Smartphone className={`w-4 h-4 ${pushSupported ? 'text-purple-500' : 'text-gray-300'}`} />
+                          <Smartphone className={`w-4 h-4 ${pushSupported ? 'text-purple-400' : 'text-white/30'}`} />
                           <input
                             type="checkbox"
-                            className="rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                            className="rounded border-white/30 text-amber-500 focus:ring-amber-500 bg-zinc-800"
                             checked={prefs.push && settings.global.push && pushSupported}
                             disabled={!settings.global.push || !pushSupported}
                             onChange={(e) => updatePreference(item.type, 'push', e.target.checked)}
@@ -416,10 +416,10 @@ export default function NotificationSettings() {
 
                         {/* In-App */}
                         <label className="flex flex-col items-center gap-1 cursor-pointer">
-                          <Monitor className="w-4 h-4 text-orange-500" />
+                          <Monitor className="w-4 h-4 text-orange-400" />
                           <input
                             type="checkbox"
-                            className="rounded border-gray-300 text-orange-600 focus:ring-orange-500"
+                            className="rounded border-white/30 text-amber-500 focus:ring-amber-500 bg-zinc-800"
                             checked={prefs.in_app && settings.global.in_app}
                             disabled={!settings.global.in_app}
                             onChange={(e) => updatePreference(item.type, 'in_app', e.target.checked)}
@@ -440,14 +440,14 @@ export default function NotificationSettings() {
         <button
           onClick={saveSettings}
           disabled={saving}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white shadow-lg transition-all ${
+          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-black shadow-lg transition-all ${
             saved 
               ? 'bg-green-500' 
-              : 'bg-blue-600 hover:bg-blue-700 active:scale-95'
+              : 'bg-gradient-to-r from-amber-400 to-yellow-500 hover:shadow-amber-500/30'
           } ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {saving ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
           ) : saved ? (
             <Check className="w-5 h-5" />
           ) : (

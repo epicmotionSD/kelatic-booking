@@ -204,11 +204,11 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
-            <Settings className="w-8 h-8 text-amber-600" />
+          <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
+            <Settings className="w-8 h-8 text-amber-400" />
             Settings
           </h1>
-          <p className="text-stone-600">Manage your business settings and preferences</p>
+          <p className="text-white/60">Manage your business settings and preferences</p>
         </div>
         <button
           onClick={handleSave}
@@ -235,15 +235,15 @@ export default function SettingsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-stone-200 mb-6">
+      <div className="flex gap-2 border-b border-white/10 mb-6">
         {(['general', 'hours', 'booking', 'integrations'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 font-medium transition-colors border-b-2 -mb-px flex items-center gap-2 ${
               activeTab === tab
-                ? 'text-amber-600 border-amber-600'
-                : 'text-stone-600 border-transparent hover:text-amber-600'
+                ? 'text-amber-400 border-amber-400'
+                : 'text-white/60 border-transparent hover:text-amber-400'
             }`}
           >
             {tab === 'general' && <Settings className="w-4 h-4" />}
@@ -257,56 +257,56 @@ export default function SettingsPage() {
 
       {/* General Settings */}
       {activeTab === 'general' && (
-        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6 space-y-6">
-          <h2 className="font-playfair font-semibold text-stone-900">Business Information</h2>
+        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 space-y-6">
+          <h2 className="font-playfair font-semibold text-white">Business Information</h2>
 
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 Business Name
               </label>
               <input
                 type="text"
                 value={settings.name}
                 onChange={(e) => setSettings({ ...settings, name: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 Email
               </label>
               <input
                 type="email"
                 value={settings.email}
                 onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                 placeholder="kelatic@gmail.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 Phone
               </label>
               <input
                 type="tel"
                 value={settings.phone}
                 onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                 placeholder="(713) 485-4000"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 Timezone
               </label>
               <select
                 value={settings.timezone}
                 onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
               >
                 <option value="America/New_York">Eastern Time</option>
                 <option value="America/Chicago">Central Time</option>
@@ -316,14 +316,14 @@ export default function SettingsPage() {
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-stone-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 Address
               </label>
               <input
                 type="text"
                 value={settings.address}
                 onChange={(e) => setSettings({ ...settings, address: e.target.value })}
-                className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                 placeholder="9430 Richmond Ave, Houston, TX 77063"
               />
             </div>
@@ -333,8 +333,8 @@ export default function SettingsPage() {
 
       {/* Business Hours */}
       {activeTab === 'hours' && (
-        <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6 space-y-6">
-          <h2 className="font-playfair font-semibold text-stone-900">Business Hours</h2>
+        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 space-y-6">
+          <h2 className="font-playfair font-semibold text-white">Business Hours</h2>
 
           <div className="space-y-4">
             {DAYS.map((day, index) => {
@@ -346,7 +346,7 @@ export default function SettingsPage() {
                   key={day}
                   className="flex items-center gap-4 py-3 border-b border-white/10 last:border-0"
                 >
-                  <div className="w-28 font-medium text-stone-900">{day}</div>
+                  <div className="w-28 font-medium text-white">{day}</div>
 
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -355,7 +355,7 @@ export default function SettingsPage() {
                       onChange={() => toggleClosedDay(index)}
                       className="w-4 h-4 rounded border-white/30 bg-transparent text-amber-400 focus:ring-amber-400/50"
                     />
-                    <span className="text-sm text-stone-900/60">Open</span>
+                    <span className="text-sm text-white/60">Open</span>
                   </label>
 
                   {!isClosed && hours && (
@@ -372,9 +372,9 @@ export default function SettingsPage() {
                             },
                           })
                         }
-                        className="px-3 py-1 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                        className="px-3 py-1 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                       />
-                      <span className="text-stone-600">to</span>
+                      <span className="text-white/60">to</span>
                       <input
                         type="time"
                         value={hours.close}
@@ -387,13 +387,13 @@ export default function SettingsPage() {
                             },
                           })
                         }
-                        className="px-3 py-1 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                        className="px-3 py-1 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                       />
                     </div>
                   )}
 
                   {isClosed && (
-                    <span className="text-sm text-stone-900/40 ml-auto">Closed</span>
+                    <span className="text-sm text-white/40 ml-auto">Closed</span>
                   )}
                 </div>
               );
@@ -405,12 +405,12 @@ export default function SettingsPage() {
       {/* Booking Settings */}
       {activeTab === 'booking' && (
         <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6 space-y-6">
-            <h2 className="font-playfair font-semibold text-stone-900">Booking Rules</h2>
+          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 space-y-6">
+            <h2 className="font-playfair font-semibold text-white">Booking Rules</h2>
 
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">
+                <label className="block text-sm font-medium text-white/70 mb-1">
                   Minimum Lead Time (hours)
                 </label>
                 <input
@@ -420,15 +420,15 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setSettings({ ...settings, bookingLeadTime: parseInt(e.target.value) })
                   }
-                  className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                 />
-                <p className="text-sm text-stone-900/40 mt-1">
+                <p className="text-sm text-white/40 mt-1">
                   How far in advance clients must book
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-stone-700 mb-1">
+                <label className="block text-sm font-medium text-white/70 mb-1">
                   Booking Window (days)
                 </label>
                 <input
@@ -438,20 +438,20 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setSettings({ ...settings, bookingWindowDays: parseInt(e.target.value) })
                   }
-                  className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                  className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
                 />
-                <p className="text-sm text-stone-900/40 mt-1">
+                <p className="text-sm text-white/40 mt-1">
                   How far ahead clients can book
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6 space-y-6">
-            <h2 className="font-playfair font-semibold text-stone-900">Policies</h2>
+          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 space-y-6">
+            <h2 className="font-playfair font-semibold text-white">Policies</h2>
 
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 Cancellation Policy
               </label>
               <textarea
@@ -460,12 +460,12 @@ export default function SettingsPage() {
                   setSettings({ ...settings, cancellationPolicy: e.target.value })
                 }
                 rows={3}
-                className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-stone-700 mb-1">
+              <label className="block text-sm font-medium text-white/70 mb-1">
                 Deposit Policy
               </label>
               <textarea
@@ -474,7 +474,7 @@ export default function SettingsPage() {
                   setSettings({ ...settings, depositPolicy: e.target.value })
                 }
                 rows={3}
-                className="w-full px-4 py-2 bg-white border border-stone-300 rounded-xl text-stone-900 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500"
+                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
               />
             </div>
           </div>
@@ -485,17 +485,17 @@ export default function SettingsPage() {
       {activeTab === 'integrations' && (
         <div className="space-y-6">
           {/* Stripe */}
-          <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-[#635BFF] rounded-xl flex items-center justify-center">
-                  <svg className="w-8 h-8 text-stone-900" viewBox="0 0 24 24" fill="currentColor">
+                  <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409 0-.831.683-1.305 1.901-1.305 2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0 9.667 0 7.589.654 6.104 1.872 4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219 2.585.92 3.445 1.574 3.445 2.583 0 .98-.84 1.545-2.354 1.545-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813 1.664-1.305 2.525-3.236 2.525-5.732 0-4.128-2.524-5.851-6.591-7.305z"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-stone-900">Stripe</h3>
-                  <p className="text-sm text-stone-600">Payment processing & POS</p>
+                  <h3 className="font-semibold text-white">Stripe</h3>
+                  <p className="text-sm text-white/60">Payment processing & POS</p>
                 </div>
               </div>
               <span className="px-3 py-1 bg-green-500/20 text-green-400 text-sm rounded-full">
@@ -507,28 +507,28 @@ export default function SettingsPage() {
                 href="https://dashboard.stripe.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 bg-white/5 text-stone-900 rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10"
+                className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10"
               >
                 Open Dashboard
               </a>
-              <button className="px-4 py-2 bg-white/5 text-stone-900 rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10">
+              <button className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10">
                 Manage Terminal
               </button>
             </div>
           </div>
 
           {/* SMS/Email */}
-          <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
-                  <svg className="w-6 h-6 text-stone-900/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-stone-900">SMS & Email</h3>
-                  <p className="text-sm text-stone-600">Appointment reminders & confirmations</p>
+                  <h3 className="font-semibold text-white">SMS & Email</h3>
+                  <p className="text-sm text-white/60">Appointment reminders & confirmations</p>
                 </div>
               </div>
               <span className={`px-3 py-1 text-sm rounded-full ${

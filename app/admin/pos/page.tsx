@@ -81,14 +81,14 @@ export default function POSPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-2xl border border-amber-200 shadow-lg px-6 py-4">
+      <div className="bg-zinc-900 rounded-2xl border border-white/10 shadow-lg px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
-              <CreditCard className="w-8 h-8 text-amber-600" />
+            <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
+              <CreditCard className="w-8 h-8 text-amber-400" />
               Point of Sale
             </h1>
-            <p className="text-stone-600 mt-1">
+            <p className="text-white/60 mt-1">
               {new Date().toLocaleDateString('en-US', {
                 weekday: 'long',
                 month: 'long',
@@ -113,8 +113,8 @@ export default function POSPage() {
               onClick={() => setFilter(tab.key as typeof filter)}
               className={`px-4 py-2 rounded-xl font-medium transition-all ${
                 filter === tab.key
-                  ? 'bg-amber-500 text-white shadow-lg'
-                  : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
+                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg'
+                  : 'bg-zinc-900 text-white/70 hover:bg-zinc-800 border border-white/10'
               }`}
             >
               {tab.label}
@@ -128,28 +128,28 @@ export default function POSPage() {
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
           </div>
         ) : filteredAppointments.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-amber-200 shadow-sm">
-            <p className="text-stone-600">No appointments found</p>
+          <div className="text-center py-12 bg-zinc-900 rounded-xl border border-white/10 shadow-sm">
+            <p className="text-white/60">No appointments found</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredAppointments.map((apt) => (
               <div
                 key={apt.id}
-                className="bg-white rounded-xl border border-amber-200 shadow-lg hover:shadow-xl transition-all overflow-hidden"
+                className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg hover:shadow-xl transition-all overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="px-4 py-3 border-b border-amber-100 flex items-center justify-between">
-                  <span className="font-medium text-stone-900 flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-amber-600" />
+                <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                  <span className="font-medium text-white flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-400" />
                     {formatTime(apt.start_time)}
                   </span>
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium border ${
-                      apt.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200' :
-                      apt.status === 'in_progress' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                      apt.status === 'completed' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                      'bg-gray-50 text-gray-700 border-gray-200'
+                      apt.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
+                      apt.status === 'in_progress' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                      apt.status === 'completed' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
+                      'bg-white/10 text-white/60 border-white/20'
                     }`}
                   >
                     {apt.status.replace('_', ' ')}
@@ -160,22 +160,22 @@ export default function POSPage() {
                 <div className="p-4">
                   {/* Client Info */}
                   <div className="mb-3">
-                    <p className="font-semibold text-stone-900 flex items-center gap-2">
-                      <Users className="w-4 h-4 text-amber-600" />
+                    <p className="font-semibold text-white flex items-center gap-2">
+                      <Users className="w-4 h-4 text-amber-400" />
                       {apt.is_walk_in
                         ? apt.walk_in_name || 'Walk-in'
                         : `${apt.client?.first_name} ${apt.client?.last_name}`}
                     </p>
                     {apt.client?.phone && (
-                      <p className="text-sm text-stone-600">{apt.client.phone}</p>
+                      <p className="text-sm text-white/60">{apt.client.phone}</p>
                     )}
                   </div>
 
                   {/* Service Info */}
                   <div className="mb-3">
-                    <p className="text-sm text-stone-900">{apt.service?.name}</p>
+                    <p className="text-sm text-white">{apt.service?.name}</p>
                     {apt.addons && apt.addons.length > 0 && (
-                      <p className="text-xs text-stone-600">
+                      <p className="text-xs text-white/60">
                         + {apt.addons.map((a) => a.service?.name).join(', ')}
                       </p>
                     )}
@@ -183,7 +183,7 @@ export default function POSPage() {
 
                   {/* Stylist */}
                   <div className="mb-4">
-                    <p className="text-sm text-stone-600">
+                    <p className="text-sm text-white/60">
                       with {apt.stylist?.first_name}
                     </p>
                   </div>
@@ -191,11 +191,11 @@ export default function POSPage() {
                   {/* Price & Actions */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-lg font-bold text-amber-600">
+                      <p className="text-lg font-bold text-amber-400">
                         {formatCurrency((apt.final_price || apt.quoted_price) * 100)}
                       </p>
                       {apt.payments?.some((p) => p.is_deposit && p.status === 'paid') && (
-                        <p className="text-xs text-green-600 flex items-center gap-1">
+                        <p className="text-xs text-green-400 flex items-center gap-1">
                           <CheckCircle className="w-3 h-3" />
                           Deposit paid
                         </p>
@@ -205,7 +205,7 @@ export default function POSPage() {
                     {apt.status !== 'completed' && apt.status !== 'cancelled' && (
                       <button
                         onClick={() => handleCheckout(apt)}
-                        className="px-4 py-2 bg-amber-500 text-white rounded-xl font-medium hover:bg-amber-600 transition-all flex items-center gap-2"
+                        className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2"
                       >
                         <CreditCard className="w-4 h-4" />
                         Checkout
@@ -222,7 +222,7 @@ export default function POSPage() {
         <div className="fixed bottom-6 right-6">
           <button
             onClick={() => setIsWalkInOpen(true)}
-            className="px-6 py-3 bg-amber-500 text-white rounded-full font-semibold shadow-lg hover:shadow-xl hover:bg-amber-600 transition-all flex items-center gap-2"
+            className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-semibold shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all flex items-center gap-2"
           >
             <UserPlus className="w-5 h-5" />
             Walk-in

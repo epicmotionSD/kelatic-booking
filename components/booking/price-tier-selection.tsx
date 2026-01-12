@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { formatCurrency } from '@/lib/currency';
-import type { Service, Profile } from '@/types/database';
-import { Clock, Users, Sparkles, Crown, Star } from 'lucide-react';
+import type { Service, Profile, ServiceCategory } from '@/types/database';
+import { Clock, Users, Sparkles, Crown, Star, ChevronDown, ChevronRight, Scissors } from 'lucide-react';
 
 interface PriceTier {
   id: string;
@@ -14,6 +14,7 @@ interface PriceTier {
   maxPrice: number;
   icon: React.ElementType;
   color: string;
+  bgColor: string;
   features: string[];
 }
 
@@ -22,12 +23,13 @@ const PRICE_TIERS: PriceTier[] = [
     id: 'essential',
     name: 'Essential',
     description: 'Quick maintenance & touch-ups',
-    priceRange: '$50 - $99',
-    minPrice: 50,
-    maxPrice: 99,
+    priceRange: 'Under $100',
+    minPrice: 0,
+    maxPrice: 99.99,
     icon: Sparkles,
-    color: 'from-emerald-400 to-teal-500',
-    features: ['Retwist maintenance', 'Quick touch-ups', '60-90 min sessions'],
+    color: 'text-emerald-400',
+    bgColor: 'bg-emerald-500/10 border-emerald-500/30',
+    features: ['Consultations', 'Quick touch-ups', 'Basic maintenance'],
   },
   {
     id: 'standard',
@@ -35,9 +37,10 @@ const PRICE_TIERS: PriceTier[] = [
     description: 'Full service treatments',
     priceRange: '$100 - $199',
     minPrice: 100,
-    maxPrice: 199,
+    maxPrice: 199.99,
     icon: Star,
-    color: 'from-amber-400 to-yellow-500',
+    color: 'text-amber-400',
+    bgColor: 'bg-amber-500/10 border-amber-500/30',
     features: ['Full retwist & style', 'Loc repairs', 'Detox treatments'],
   },
   {
@@ -46,12 +49,25 @@ const PRICE_TIERS: PriceTier[] = [
     description: 'Complete transformations',
     priceRange: '$200+',
     minPrice: 200,
-    maxPrice: 9999,
+    maxPrice: 99999,
     icon: Crown,
-    color: 'from-purple-400 to-pink-500',
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-500/10 border-purple-500/30',
     features: ['Starter locs', 'Extensions', 'Major repairs', 'Color services'],
   },
 ];
+
+// Category display names and icons
+const CATEGORY_CONFIG: Record<string, { name: string; icon: string; description: string }> = {
+  locs: { name: 'Locs', icon: '🔒', description: 'Retwists, maintenance & styling' },
+  braids: { name: 'Braids', icon: '✨', description: 'Protective braided styles' },
+  natural: { name: 'Natural Hair', icon: '🌿', description: 'Natural hair care & styling' },
+  color: { name: 'Color Services', icon: '🎨', description: 'Professional color treatments' },
+  treatments: { name: 'Treatments', icon: '💆', description: 'Deep conditioning & repairs' },
+  barber: { name: 'Barber Services', icon: '💈', description: 'Cuts, fades & grooming' },
+  other: { name: 'Other Services', icon: '⭐', description: 'Additional services' },
+  silk_press: { name: 'Silk Press', icon: '✨', description: 'Silky smooth straightening' },
+};
 
 interface PriceTierSelectionProps {
   onSelectTier: (tier: PriceTier, services: Service[]) => void;
@@ -62,8 +78,9 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'price' | 'stylist'>('price');
-  const [selectedTier, setSelectedTier] = useState<PriceTier | null>(null);
+  const [viewMode, setViewMode] = useState<'services' | 'stylist'>('services');
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  const [expandedTier, setExpandedTier] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -92,15 +109,56 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
     }
   }
 
-  function getServicesForTier(tier: PriceTier): Service[] {
-    return services.filter(
-      (s) => s.base_price >= tier.minPrice && s.base_price <= tier.maxPrice
+  // Organize services by category → price tier
+  const servicesByCategory = useMemo(() => {
+    const grouped: Record<string, { 
+      category: string; 
+      config: typeof CATEGORY_CONFIG[string];
+      tiers: Record<string, Service[]>;
+      totalCount: number;
+    }> = {};
+
+    services.forEach((service) => {
+      const cat = service.category || 'other';
+      if (!grouped[cat]) {
+        grouped[cat] = {
+          category: cat,
+          config: CATEGORY_CONFIG[cat] || { name: cat, icon: '📋', description: '' },
+          tiers: { essential: [], standard: [], premium: [] },
+          totalCount: 0,
+        };
+      }
+
+      // Determine which tier this service belongs to
+      const tier = PRICE_TIERS.find(
+        (t) => service.base_price >= t.minPrice && service.base_price <= t.maxPrice
+      );
+      if (tier) {
+        grouped[cat].tiers[tier.id].push(service);
+        grouped[cat].totalCount++;
+      }
+    });
+
+    // Sort categories by total service count (most popular first)
+    return Object.values(grouped).sort((a, b) => b.totalCount - a.totalCount);
+  }, [services]);
+
+  function handleServiceSelect(service: Service) {
+    const tier = PRICE_TIERS.find(
+      (t) => service.base_price >= t.minPrice && service.base_price <= t.maxPrice
     );
+    if (tier) {
+      onSelectTier(tier, [service]);
+    }
   }
 
-  function handleTierSelect(tier: PriceTier) {
-    const tierServices = getServicesForTier(tier);
-    onSelectTier(tier, tierServices);
+  function toggleCategory(category: string) {
+    setExpandedCategory(expandedCategory === category ? null : category);
+    setExpandedTier(null);
+  }
+
+  function toggleTier(tierId: string) {
+    setExpandedTier(expandedTier === tierId ? null : tierId);
   }
 
   if (loading) {
@@ -114,96 +172,185 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
   return (
     <div>
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-stone-900 mb-2">Book Your Appointment</h2>
-        <p className="text-stone-600 mb-6">Choose how you'd like to start your booking</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Book Your Appointment</h2>
+        <p className="text-white/60 mb-6">Choose how you'd like to start your booking</p>
       </div>
 
       {/* Quick Booking Options */}
-      <div className="mb-8 p-6 bg-white border border-amber-200 rounded-2xl shadow-lg">
-        <h3 className="text-lg font-semibold text-stone-900 mb-4 flex items-center gap-2">
-          <Clock className="w-5 h-5 text-amber-600" />
+      <div className="mb-8 p-6 bg-zinc-900 border border-white/10 rounded-2xl">
+        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-amber-400" />
           Popular Services
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {services.filter(s => ['$75 Shampoo Retwist', 'Consultaton', 'Shampoo Retwist w/style'].includes(s.name)).slice(0, 4).map((service) => (
-            <button
-              key={service.id}
-              onClick={() => {
-                const tier = PRICE_TIERS.find(t => service.base_price >= t.minPrice && service.base_price <= t.maxPrice);
-                if (tier) {
-                  onSelectTier(tier, [service]);
-                }
-              }}
-              className="text-left p-4 bg-amber-50 border border-amber-200 rounded-xl hover:border-amber-400 hover:bg-amber-100 transition-all shadow-sm"
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-semibold text-stone-900">{service.name}</h4>
-                  <p className="text-sm text-stone-600">{service.duration} min</p>
+          {services
+            .filter(s => s.base_price >= 75 && s.base_price <= 150)
+            .sort((a, b) => a.base_price - b.base_price)
+            .slice(0, 4)
+            .map((service) => (
+              <button
+                key={service.id}
+                onClick={() => handleServiceSelect(service)}
+                className="text-left p-4 bg-white/5 border border-white/10 rounded-xl hover:border-amber-400/50 hover:bg-amber-500/10 transition-all"
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <h4 className="font-semibold text-white text-sm">{service.name}</h4>
+                    <p className="text-xs text-white/50">{service.duration} min</p>
+                  </div>
+                  <span className="text-amber-400 font-bold">{formatCurrency(service.base_price * 100)}</span>
                 </div>
-                <span className="text-amber-600 font-bold">{formatCurrency(service.base_price * 100)}</span>
-              </div>
-            </button>
-          ))}
+              </button>
+            ))}
         </div>
       </div>
 
       {/* View Mode Toggle */}
       <div className="flex gap-2 mb-8">
         <button
+          onClick={() => setViewMode('services')}
+          className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
+            viewMode === 'services'
+              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
+              : 'bg-zinc-900 text-white/60 hover:bg-zinc-800 border border-white/10'
+          }`}
+        >
+          <Scissors className="w-5 h-5 inline-block mr-2" />
+          Browse Services
+        </button>
+        <button
           onClick={() => setViewMode('stylist')}
           className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
             viewMode === 'stylist'
               ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-              : 'bg-white text-stone-600 hover:bg-amber-50 border border-amber-200 shadow-sm'
+              : 'bg-zinc-900 text-white/60 hover:bg-zinc-800 border border-white/10'
           }`}
         >
           <Users className="w-5 h-5 inline-block mr-2" />
           Choose Stylist First
         </button>
-        <button
-          onClick={() => setViewMode('price')}
-          className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
-            viewMode === 'price'
-              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-              : 'bg-white text-stone-600 hover:bg-amber-50 border border-amber-200 shadow-sm'
-          }`}
-        >
-          <Sparkles className="w-5 h-5 inline-block mr-2" />
-          Browse by Price Range
-        </button>
       </div>
 
-      {viewMode === 'stylist' ? (
+      {viewMode === 'services' ? (
+        /* Category → Price Tier → Service Selection */
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold text-white mb-4">Browse by Service Category</h3>
+          
+          {servicesByCategory.map(({ category, config, tiers, totalCount }) => (
+            <div key={category} className="border border-white/10 rounded-xl overflow-hidden bg-zinc-900">
+              {/* Category Header */}
+              <button
+                onClick={() => toggleCategory(category)}
+                className="w-full text-left p-4 hover:bg-white/5 transition-colors flex items-center gap-4"
+              >
+                <span className="text-2xl">{config.icon}</span>
+                <div className="flex-1">
+                  <h4 className="font-bold text-white">{config.name}</h4>
+                  <p className="text-sm text-white/50">{config.description}</p>
+                </div>
+                <span className="text-sm text-white/40 mr-2">{totalCount} services</span>
+                {expandedCategory === category ? (
+                  <ChevronDown className="w-5 h-5 text-amber-400" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-white/40" />
+                )}
+              </button>
+
+              {/* Expanded Category - Show Tiers */}
+              {expandedCategory === category && (
+                <div className="border-t border-white/10 bg-black/30 p-4 space-y-3">
+                  {PRICE_TIERS.map((tier) => {
+                    const tierServices = tiers[tier.id] || [];
+                    if (tierServices.length === 0) return null;
+
+                    const Icon = tier.icon;
+                    const tierKey = `${category}-${tier.id}`;
+
+                    return (
+                      <div key={tier.id} className={`rounded-lg border ${tier.bgColor} overflow-hidden`}>
+                        {/* Tier Header */}
+                        <button
+                          onClick={() => toggleTier(tierKey)}
+                          className="w-full text-left p-3 flex items-center gap-3 hover:opacity-90 transition-opacity"
+                        >
+                          <Icon className={`w-5 h-5 ${tier.color}`} />
+                          <div className="flex-1">
+                            <span className={`font-semibold ${tier.color}`}>{tier.name}</span>
+                            <span className="text-white/50 text-sm ml-2">({tier.priceRange})</span>
+                          </div>
+                          <span className="text-xs text-white/50">{tierServices.length} options</span>
+                          {expandedTier === tierKey ? (
+                            <ChevronDown className={`w-4 h-4 ${tier.color}`} />
+                          ) : (
+                            <ChevronRight className="w-4 h-4 text-white/40" />
+                          )}
+                        </button>
+
+                        {/* Expanded Tier - Show Services */}
+                        {expandedTier === tierKey && (
+                          <div className="border-t border-white/10 p-2 space-y-2">
+                            {tierServices
+                              .sort((a, b) => a.base_price - b.base_price)
+                              .map((service) => (
+                                <button
+                                  key={service.id}
+                                  onClick={() => handleServiceSelect(service)}
+                                  className="w-full text-left p-3 bg-black/40 rounded-lg hover:bg-black/60 transition-all border border-white/10 hover:border-amber-500/50"
+                                >
+                                  <div className="flex justify-between items-start">
+                                    <div className="flex-1">
+                                      <h5 className="font-medium text-white">{service.name}</h5>
+                                      <p className="text-xs text-white/50 mt-1">
+                                        {service.duration} min
+                                        {service.description && ` • ${service.description.slice(0, 50)}${service.description.length > 50 ? '...' : ''}`}
+                                      </p>
+                                    </div>
+                                    <span className="font-bold text-amber-400 ml-4">
+                                      {formatCurrency(service.base_price * 100)}
+                                    </span>
+                                  </div>
+                                </button>
+                              ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
         /* Stylist Selection */
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-stone-900 mb-4">Select Your Stylist</h3>
+          <h3 className="text-lg font-semibold text-white mb-4">Select Your Stylist</h3>
           {stylists.map((stylist) => (
             <button
               key={stylist.id}
               onClick={() => onSelectStylist(stylist)}
-              className="w-full text-left p-4 rounded-xl border-2 border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50 transition-all shadow-lg"
+              className="w-full text-left p-4 rounded-xl border border-white/10 bg-zinc-900 hover:border-amber-400/50 hover:bg-zinc-800 transition-all"
             >
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center border border-amber-200">
-                  <span className="text-2xl font-black text-stone-700">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center border border-white/10">
+                  <span className="text-2xl font-black text-amber-400">
                     {stylist.first_name.charAt(0)}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-stone-900 text-lg">
+                  <h4 className="font-semibold text-white text-lg">
                     {stylist.first_name} {stylist.last_name}
                   </h4>
                   {stylist.specialties && stylist.specialties.length > 0 && (
-                    <p className="text-amber-600 text-sm">
+                    <p className="text-amber-400 text-sm">
                       {stylist.specialties.slice(0, 3).join(' • ')}
                     </p>
                   )}
                   {stylist.bio && (
-                    <p className="text-stone-600 text-sm mt-1 line-clamp-1">{stylist.bio}</p>
+                    <p className="text-white/50 text-sm mt-1 line-clamp-1">{stylist.bio}</p>
                   )}
                 </div>
-                <div className="text-amber-600">
+                <div className="text-amber-400">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -215,17 +362,17 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
           {/* Any Available Option */}
           <button
             onClick={() => onSelectStylist({ id: 'any', first_name: 'Any', last_name: 'Available' } as Profile)}
-            className="w-full text-left p-4 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 hover:border-amber-400 hover:bg-amber-100 transition-all"
+            className="w-full text-left p-4 rounded-xl border border-dashed border-amber-500/50 bg-amber-500/10 hover:border-amber-400 hover:bg-amber-500/20 transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-transparent flex items-center justify-center border border-amber-200">
-                <Users className="w-8 h-8 text-amber-600" />
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center border border-amber-500/30">
+                <Users className="w-8 h-8 text-amber-400" />
               </div>
               <div className="flex-1">
-                <h4 className="font-semibold text-stone-900 text-lg">Any Available Stylist</h4>
-                <p className="text-stone-600 text-sm">First available appointment</p>
+                <h4 className="font-semibold text-white text-lg">Any Available Stylist</h4>
+                <p className="text-white/50 text-sm">First available appointment</p>
               </div>
-              <div className="text-amber-600">
+              <div className="text-amber-400">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -233,52 +380,11 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
             </div>
           </button>
         </div>
-      ) : (
-        /* Price Tier Selection */
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-stone-900 mb-4">Select Your Service Level</h3>
-          {PRICE_TIERS.map((tier) => {
-            const tierServices = getServicesForTier(tier);
-            const Icon = tier.icon;
-
-            return (
-              <button
-                key={tier.id}
-                onClick={() => handleTierSelect(tier)}
-                className="w-full text-left p-5 rounded-xl border-2 border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50 transition-all group shadow-lg"
-              >
-                <div className="flex items-start gap-4">
-                  <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center shadow-lg`}>
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="font-bold text-stone-900 text-lg">{tier.name}</h4>
-                      <span className="text-xl font-black text-amber-600">{tier.priceRange}</span>
-                    </div>
-                    <p className="text-stone-600 text-sm mb-3">{tier.description}</p>
-                    <div className="flex flex-wrap gap-2">
-                      {tier.features.map((feature, idx) => (
-                        <span
-                          key={idx}
-                          className="px-2 py-1 bg-amber-50 border border-amber-200 rounded-full text-xs text-stone-700"
-                        >
-                          {feature}
-                        </span>
-                      ))}
-                    </div>
-                    {tierServices.length > 0 && (
-                      <p className="text-stone-500 text-xs mt-3">
-                        {tierServices.length} service{tierServices.length !== 1 ? 's' : ''} available
-                      </p>
-                    )}
-                  </div>
-                </div>
-              </button>
-            );
-          })}
-        </div>
       )}
     </div>
   );
 }
+
+// Export PRICE_TIERS for use in other components
+export { PRICE_TIERS };
+export type { PriceTier };
