@@ -46,6 +46,21 @@ function convertHoursToDb(frontendHours: Record<string | number, any>): Record<s
   return result;
 }
 
+// Derive closedDays from business_hours - days with null/empty hours are closed
+function getClosedDaysFromHours(hours: Record<number, any>): number[] {
+  const closedDays: number[] = [];
+  for (let i = 0; i <= 6; i++) {
+    const dayHours = hours[i];
+    // Day is closed if null, undefined, or has "00:00" for both open/close
+    if (!dayHours || 
+        (dayHours.open === '00:00' && dayHours.close === '00:00') ||
+        (dayHours.open === '' && dayHours.close === '')) {
+      closedDays.push(i);
+    }
+  }
+  return closedDays;
+}
+
 export async function GET() {
   try {
     const business = await requireBusiness();
@@ -67,6 +82,9 @@ export async function GET() {
     // Map DB columns to settings object
     let settings;
     if (row) {
+      const businessHours = convertHoursFromDb(row.business_hours);
+      const closedDays = getClosedDaysFromHours(businessHours);
+      
       settings = {
         name: business.name,
         address: business.address || '',
@@ -78,8 +96,8 @@ export async function GET() {
         bookingWindowDays: row.booking_advance_days ?? 60,
         cancellationPolicy: row.cancellation_policy || '24 hours notice required for cancellations.',
         depositPolicy: row.deposit_policy || 'A deposit may be required to secure your appointment.',
-        closedDays: [0, 1], // Default closed on Sunday and Monday
-        businessHours: convertHoursFromDb(row.business_hours),
+        closedDays: closedDays,
+        businessHours: businessHours,
         googleCalendarConnected: false, // Not in DB yet
         smsEmailEnabled: row.send_booking_confirmations ?? false,
         stripeConnected: true, // Assume connected for Kelatic
