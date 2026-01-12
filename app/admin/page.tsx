@@ -80,19 +80,8 @@ export default function AdminDashboard() {
     
     if (!setupStatus) return insights;
 
-    if (!setupStatus.googleCalendar || !setupStatus.smsEmail) {
-      insights.push({
-        type: 'action',
-        title: 'Complete Your Setup',
-        description: `${!setupStatus.googleCalendar ? 'Google Calendar' : ''}${!setupStatus.googleCalendar && !setupStatus.smsEmail ? ' and ' : ''}${!setupStatus.smsEmail ? 'SMS notifications' : ''} ${(!setupStatus.googleCalendar && !setupStatus.smsEmail) ? 'are' : 'is'} not connected.`,
-        action: {
-          label: 'Complete Setup',
-          href: '/admin/settings?tab=integrations',
-          variant: 'primary'
-        },
-        icon: <Settings className="w-5 h-5" />
-      });
-    }
+    // Note: Google Calendar integration is not yet available
+    // SMS/Email is configured via environment variables (SENDGRID_API_KEY, TWILIO credentials)
 
     if (metrics) {
       if ((metrics.pendingDeposits || 0) > 0) {

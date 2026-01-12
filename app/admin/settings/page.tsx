@@ -52,12 +52,10 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
   const [activeTab, setActiveTab] = useState<'general' | 'hours' | 'booking' | 'integrations'>(initialTab);
-  const [integrationStatus, setIntegrationStatus] = useState({
-    googleCalendar: false,
-    smsEmail: false,
-    stripe: true
-  });
-  const [setupLoading, setSetupLoading] = useState<string | null>(null);
+  // Integration status is now handled server-side via environment variables
+  // SMS/Email: SENDGRID_API_KEY, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN
+  // Stripe: Already connected
+  // Google Calendar: Coming soon
 
   // Load settings on component mount
   useEffect(() => {
@@ -71,11 +69,7 @@ export default function SettingsPage() {
       
       if (data.success && data.settings) {
         setSettings(data.settings);
-        setIntegrationStatus({
-          googleCalendar: data.settings.googleCalendarConnected || false,
-          smsEmail: data.settings.smsEmailEnabled || false,
-          stripe: data.settings.stripeConnected || true
-        });
+        // Integration status is handled server-side, not via per-tenant settings
       }
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -94,10 +88,7 @@ export default function SettingsPage() {
         },
         body: JSON.stringify({
           settings: {
-            ...settings,
-            googleCalendarConnected: integrationStatus.googleCalendar,
-            smsEmailEnabled: integrationStatus.smsEmail,
-            stripeConnected: integrationStatus.stripe
+            ...settings
           }
         }),
       });
@@ -118,67 +109,8 @@ export default function SettingsPage() {
     }
   }
 
-  async function handleConnectGoogle() {
-    setSetupLoading('google-calendar');
-    try {
-      const response = await fetch('/api/admin/integrations/connect', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ provider: 'google-calendar' }),
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setIntegrationStatus(prev => ({ ...prev, googleCalendar: true }));
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
-      } else {
-        throw new Error(data.error || 'Failed to connect Google Calendar');
-      }
-    } catch (error) {
-      console.error('Failed to connect Google Calendar:', error);
-    } finally {
-      setSetupLoading(null);
-    }
-  }
-
-  async function handleSetupNotifications() {
-    setSetupLoading('notifications');
-    try {
-      const response = await fetch('/api/admin/notifications/setup', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          type: 'sms-email',
-          settings: {
-            sms: true,
-            email: true,
-            reminders: true,
-            confirmations: true
-          }
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (data.success) {
-        setIntegrationStatus(prev => ({ ...prev, smsEmail: true }));
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
-      } else {
-        throw new Error(data.error || 'Failed to setup notifications');
-      }
-    } catch (error) {
-      console.error('Failed to setup notifications:', error);
-    } finally {
-      setSetupLoading(null);
-    }
-  }
+  // Note: handleConnectGoogle and handleSetupNotifications removed
+  // These integrations are now handled at the platform level via environment variables
 
   function toggleClosedDay(day: number) {
     const newClosedDays = settings.closedDays.includes(day)
@@ -521,8 +453,8 @@ export default function SettingsPage() {
           <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
-                  <svg className="w-6 h-6 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center border border-green-500/30">
+                  <svg className="w-6 h-6 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
                   </svg>
                 </div>
@@ -531,68 +463,50 @@ export default function SettingsPage() {
                   <p className="text-sm text-white/60">Appointment reminders & confirmations</p>
                 </div>
               </div>
-              <span className={`px-3 py-1 text-sm rounded-full ${
-                integrationStatus.smsEmail 
-                  ? 'bg-green-500/20 text-green-400' 
-                  : 'bg-white/10 text-stone-600'
-              }`}>
-                {integrationStatus.smsEmail ? 'Enabled' : 'Not Configured'}
+              <span className="px-3 py-1 text-sm rounded-full bg-green-500/20 text-green-400">
+                Active
               </span>
             </div>
-            <button 
-              onClick={handleSetupNotifications}
-              disabled={setupLoading === 'notifications' || integrationStatus.smsEmail}
-              className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {setupLoading === 'notifications' ? 'Setting Up...' : 
-               integrationStatus.smsEmail ? 'Configured' : 'Set Up Notifications'}
-            </button>
+            <p className="text-sm text-white/50">
+              Powered by SendGrid (email) and Twilio (SMS). Configured at the platform level.
+            </p>
           </div>
 
           {/* Google Calendar */}
-          <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 opacity-60">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
-                  <svg className="w-6 h-6 text-stone-900/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-stone-900">Google Calendar</h3>
-                  <p className="text-sm text-stone-600">Sync appointments with Google</p>
+                  <h3 className="font-semibold text-white">Google Calendar</h3>
+                  <p className="text-sm text-white/60">Sync appointments with Google</p>
                 </div>
               </div>
-              <span className={`px-3 py-1 text-sm rounded-full ${
-                integrationStatus.googleCalendar 
-                  ? 'bg-green-500/20 text-green-400' 
-                  : 'bg-white/10 text-stone-600'
-              }`}>
-                {integrationStatus.googleCalendar ? 'Connected' : 'Not Connected'}
+              <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-sm rounded-full">
+                Coming Soon
               </span>
             </div>
-            <button 
-              onClick={handleConnectGoogle}
-              disabled={setupLoading === 'google-calendar' || integrationStatus.googleCalendar}
-              className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {setupLoading === 'google-calendar' ? 'Connecting...' : 
-               integrationStatus.googleCalendar ? 'Connected' : 'Connect Google'}
-            </button>
+            <p className="text-sm text-white/50">
+              Two-way calendar sync will be available in a future update.
+            </p>
           </div>
 
           {/* Instagram */}
-          <div className="bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 opacity-60">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-xl flex items-center justify-center">
-                  <svg className="w-6 h-6 text-stone-900" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                   </svg>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-stone-900">Instagram</h3>
-                  <p className="text-sm text-stone-600">@kelatic_</p>
+                  <h3 className="font-semibold text-white">Instagram</h3>
+                  <p className="text-sm text-white/60">@kelatic_</p>
                 </div>
               </div>
               <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-sm rounded-full">
