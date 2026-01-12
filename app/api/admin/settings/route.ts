@@ -2,6 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 
+// Map between numeric day keys (frontend) and string day names (database)
+const DAY_NAMES = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+
+// Convert database format (string day names) to frontend format (numeric keys 0-6)
+function convertHoursFromDb(dbHours: Record<string, any> | null): Record<number, any> {
+  if (!dbHours) {
+    return {
+      0: null, 1: null,
+      2: { open: '10:00', close: '19:00' },
+      3: { open: '10:00', close: '19:00' },
+      4: { open: '10:00', close: '19:00' },
+      5: { open: '10:00', close: '19:00' },
+      6: { open: '09:00', close: '17:00' },
+    };
+  }
+  
+  const result: Record<number, any> = {};
+  DAY_NAMES.forEach((name, index) => {
+    result[index] = dbHours[name] ?? null;
+  });
+  return result;
+}
+
+// Convert frontend format (numeric keys 0-6) to database format (string day names)
+function convertHoursToDb(frontendHours: Record<string | number, any>): Record<string, any> {
+  const result: Record<string, any> = {};
+  DAY_NAMES.forEach((name, index) => {
+    result[name] = frontendHours[index] ?? frontendHours[String(index)] ?? null;
+  });
+  return result;
+}
+
 export async function GET() {
   try {
     const business = await requireBusiness();
@@ -28,25 +60,17 @@ export async function GET() {
         address: business.address || '',
         phone: business.phone || '',
         email: business.email || '',
-        timezone: row.timezone || 'America/Chicago',
-        currency: row.currency || 'USD',
+        timezone: 'America/Chicago', // Not in DB yet, use default
+        currency: 'USD', // Not in DB yet, use default
         bookingLeadTime: row.booking_min_notice_hours ?? 2,
         bookingWindowDays: row.booking_advance_days ?? 60,
         cancellationPolicy: row.cancellation_policy || '24 hours notice required for cancellations.',
         depositPolicy: row.deposit_policy || 'A deposit may be required to secure your appointment.',
-        closedDays: row.closed_days || [0, 1],
-        businessHours: row.business_hours || {
-          0: null,
-          1: null,
-          2: { open: '10:00', close: '19:00' },
-          3: { open: '10:00', close: '19:00' },
-          4: { open: '10:00', close: '19:00' },
-          5: { open: '10:00', close: '19:00' },
-          6: { open: '09:00', close: '17:00' },
-        },
-        googleCalendarConnected: row.google_calendar_connected ?? false,
-        smsEmailEnabled: row.sms_email_enabled ?? false,
-        stripeConnected: row.stripe_connected ?? false,
+        closedDays: [0, 1], // Default closed on Sunday and Monday
+        businessHours: convertHoursFromDb(row.business_hours),
+        googleCalendarConnected: false, // Not in DB yet
+        smsEmailEnabled: row.send_booking_confirmations ?? false,
+        stripeConnected: true, // Assume connected for Kelatic
         // Add more fields as needed from business_settings
       };
     } else {
@@ -102,21 +126,18 @@ export async function POST(request: NextRequest) {
 
 
     // Map settings object to DB columns
+    // Only include columns that exist in the current schema
     const upsertData: any = {
       business_id: business.id,
       updated_at: new Date().toISOString(),
-      timezone: settings.timezone,
-      currency: settings.currency,
       booking_min_notice_hours: settings.bookingLeadTime,
       booking_advance_days: settings.bookingWindowDays,
       cancellation_policy: settings.cancellationPolicy,
       deposit_policy: settings.depositPolicy,
-      closed_days: settings.closedDays,
-      business_hours: settings.businessHours,
-      google_calendar_connected: settings.googleCalendarConnected,
-      sms_email_enabled: settings.smsEmailEnabled,
-      stripe_connected: settings.stripeConnected,
-      // Add more fields as needed
+      business_hours: convertHoursToDb(settings.businessHours),
+      send_booking_confirmations: settings.smsEmailEnabled,
+      // Note: timezone, currency, closed_days, google_calendar_connected, stripe_connected
+      // are not in the current schema - would need a migration to add them
     };
 
     const { error } = await supabase
