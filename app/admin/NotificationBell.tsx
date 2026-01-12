@@ -1,199 +1,79 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bell, X, Check, Clock, AlertCircle, Calendar, CreditCard, User, Settings } from 'lucide-react';
-import type { InAppNotification } from '@/types/database';
+import { Bell, X, Calendar, Clock, User, ChevronRight } from 'lucide-react';
+import { format, isToday, isTomorrow, parseISO } from 'date-fns';
 
-interface NotificationData extends InAppNotification {
-  timeAgo?: string;
-  isNew?: boolean;
-}
-
-interface SetupStatus {
-  googleCalendar: boolean;
-  smsEmail: boolean;
-  businessHours: boolean;
-  businessInfo: boolean;
+interface Appointment {
+  id: string;
+  start_time: string;
+  status: string;
+  clients?: { first_name: string; last_name: string } | null;
+  services?: { name: string } | null;
+  business_members?: { display_name: string } | null;
 }
 
 export default function NotificationBell() {
   const [open, setOpen] = useState(false);
-  const [notifications, setNotifications] = useState<NotificationData[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(false);
-  const [markingAsRead, setMarkingAsRead] = useState<string | null>(null);
-  const [setupStatus, setSetupStatus] = useState<SetupStatus>({
-    googleCalendar: false,
-    smsEmail: false,
-    businessHours: true, // Assume completed
-    businessInfo: true   // Assume completed
-  });
-  const [setupLoading, setSetupLoading] = useState(true);
   const bellRef = useRef<HTMLButtonElement>(null);
 
-  // Check setup completion status
-  const checkSetupStatus = async () => {
-    setSetupLoading(true);
-    try {
-      const response = await fetch('/api/admin/settings');
-      const data = await response.json();
-      
-      if (data.success && data.settings) {
-        setSetupStatus({
-          googleCalendar: data.settings.googleCalendarConnected || false,
-          smsEmail: data.settings.smsEmailEnabled || false,
-          businessHours: true, // Always true since it has defaults
-          businessInfo: !!(data.settings.name && data.settings.email && data.settings.phone)
-        });
-      }
-    } catch (error) {
-      console.error('Failed to check setup status:', error);
-    } finally {
-      setSetupLoading(false);
-    }
-  };
-
-  // Check if setup is incomplete
-  const isSetupIncomplete = !setupLoading && (!setupStatus.googleCalendar || !setupStatus.smsEmail);
-
-  // Fetch notifications
-  const fetchNotifications = async () => {
+  // Fetch upcoming appointments
+  const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/notifications/in-app');
+      // Fetch pending and today's confirmed appointments
+      const response = await fetch('/api/admin/appointments?status=all&limit=20');
       const data = await response.json();
       
       if (data.success) {
-        const notificationsWithTime = data.notifications.map((n: InAppNotification) => ({
-          ...n,
-          timeAgo: formatTimeAgo(n.created_at),
-          isNew: !n.is_read && isRecent(n.created_at)
-        }));
-        setNotifications(notificationsWithTime);
+        // Filter to pending + upcoming confirmed (today/tomorrow)
+        const now = new Date();
+        const filtered = data.appointments.filter((apt: Appointment) => {
+          const aptDate = parseISO(apt.start_time);
+          const isPending = apt.status === 'pending';
+          const isUpcoming = apt.status === 'confirmed' && (isToday(aptDate) || isTomorrow(aptDate)) && aptDate > now;
+          return isPending || isUpcoming;
+        });
+        
+        // Sort by start_time
+        filtered.sort((a: Appointment, b: Appointment) => 
+          new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
+        );
+        
+        setAppointments(filtered.slice(0, 10)); // Max 10
       }
     } catch (error) {
-      console.error('Failed to fetch notifications:', error);
+      console.error('Failed to fetch appointments:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Mark notification as read
-  const markAsRead = async (notificationId: string) => {
-    setMarkingAsRead(notificationId);
-    try {
-      await fetch('/api/notifications/in-app/mark-read', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ notificationId })
-      });
-      
-      // Update local state
-      setNotifications(prev => 
-        prev.map(n => 
-          n.id === notificationId 
-            ? { ...n, is_read: true, isNew: false }
-            : n
-        )
-      );
-    } catch (error) {
-      console.error('Failed to mark as read:', error);
-    } finally {
-      setMarkingAsRead(null);
+  // Format date for display
+  const formatAppointmentTime = (dateString: string) => {
+    const date = parseISO(dateString);
+    if (isToday(date)) {
+      return `Today at ${format(date, 'h:mm a')}`;
+    } else if (isTomorrow(date)) {
+      return `Tomorrow at ${format(date, 'h:mm a')}`;
     }
-  };
-
-  // Mark all as read
-  const markAllAsRead = async () => {
-    try {
-      await fetch('/api/notifications/in-app/mark-all-read', {
-        method: 'POST'
-      });
-      
-      setNotifications(prev => 
-        prev.map(n => ({ ...n, is_read: true, isNew: false }))
-      );
-    } catch (error) {
-      console.error('Failed to mark all as read:', error);
-    }
-  };
-
-  // Handle notification click
-  const handleNotificationClick = (notification: NotificationData) => {
-    if (!notification.is_read) {
-      markAsRead(notification.id);
-    }
-    
-    if (notification.action_url) {
-      window.location.href = notification.action_url;
-    }
-  };
-
-  // Get priority color
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent': return 'text-red-400 bg-red-500/10 border-red-500/20';
-      case 'high': return 'text-orange-400 bg-orange-500/10 border-orange-500/20';
-      case 'medium': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-      case 'low': return 'text-gray-400 bg-gray-500/10 border-gray-500/20';
-      default: return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-    }
-  };
-
-  // Get type icon
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case 'booking_confirmation': 
-      case 'booking_cancellation':
-      case 'booking_reschedule':
-        return <Calendar className="w-4 h-4" />;
-      case 'payment_received':
-      case 'payment_failed':
-        return <CreditCard className="w-4 h-4" />;
-      case 'reminder_24hr':
-      case 'reminder_2hr':
-      case 'reminder_30min':
-        return <Clock className="w-4 h-4" />;
-      case 'stylist_assigned':
-      case 'stylist_unavailable':
-        return <User className="w-4 h-4" />;
-      default:
-        return <Bell className="w-4 h-4" />;
-    }
-  };
-
-  // Utility functions
-  const formatTimeAgo = (timestamp: string) => {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diff = now.getTime() - time.getTime();
-    
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-    
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    if (days < 7) return `${days}d ago`;
-    return time.toLocaleDateString();
-  };
-
-  const isRecent = (timestamp: string) => {
-    const now = new Date();
-    const time = new Date(timestamp);
-    const diff = now.getTime() - time.getTime();
-    return diff < 24 * 60 * 60 * 1000; // 24 hours
+    return format(date, 'MMM d, h:mm a');
   };
 
   // Effects
   useEffect(() => {
-    checkSetupStatus(); // Check setup status on mount
+    fetchAppointments(); // Initial fetch
+    
+    // Refresh every 2 minutes
+    const interval = setInterval(fetchAppointments, 120000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     if (open) {
-      fetchNotifications();
-      checkSetupStatus(); // Refresh setup status when opening
+      fetchAppointments();
     }
   }, [open]);
 
@@ -210,21 +90,10 @@ export default function NotificationBell() {
     }
   }, [open]);
 
-  // Poll for new notifications every 30 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (open) {
-        fetchNotifications();
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
-  }, [open]);
-
-  // Show indicator if there are unread notifications or setup is incomplete
-  const unreadCount = notifications.filter(n => !n.is_read).length;
-  const hasUrgent = notifications.some(n => !n.is_read && n.priority === 'urgent');
-  const shouldShowIndicator = unreadCount > 0 || isSetupIncomplete;
+  // Count pending appointments
+  const pendingCount = appointments.filter(a => a.status === 'pending').length;
+  const upcomingCount = appointments.filter(a => a.status === 'confirmed').length;
+  const totalCount = pendingCount + upcomingCount;
 
   return (
     <div className="relative">
@@ -234,192 +103,141 @@ export default function NotificationBell() {
         onClick={() => setOpen(!open)}
         aria-label="Notifications"
       >
-        <Bell className={`w-5 h-5 ${hasUrgent || isSetupIncomplete ? 'text-red-500 animate-pulse' : ''}`} />
-        {shouldShowIndicator && (
+        <Bell className={`w-5 h-5 ${pendingCount > 0 ? 'text-amber-500' : ''}`} />
+        {totalCount > 0 && (
           <span className={`absolute -top-1 -right-1 min-w-[1.25rem] h-5 flex items-center justify-center rounded-full text-xs font-bold text-white ${
-            hasUrgent || isSetupIncomplete ? 'bg-red-500 animate-pulse' : 'bg-blue-500'
+            pendingCount > 0 ? 'bg-amber-500' : 'bg-blue-500'
           }`}>
-            {isSetupIncomplete && unreadCount === 0 ? '!' : unreadCount > 99 ? '99+' : unreadCount}
+            {totalCount > 99 ? '99+' : totalCount}
           </span>
         )}
       </button>
 
       {open && (
         <div className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
-          {/* Setup Status Alert */}
-          {isSetupIncomplete && (
-            <div className="p-4 bg-amber-50 border-b border-amber-200">
-              <div className="flex items-start gap-3">
-                <Settings className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <h4 className="font-medium text-amber-900 text-sm">
-                    Complete Your Setup
-                  </h4>
-                  <p className="text-amber-700 text-sm mt-1">
-                    Some integrations are not configured:
-                  </p>
-                  <ul className="mt-2 space-y-1 text-sm">
-                    {!setupStatus.googleCalendar && (
-                      <li className="flex items-center gap-2 text-amber-700">
-                        <Calendar className="w-3 h-3" />
-                        Google Calendar
-                      </li>
-                    )}
-                    {!setupStatus.smsEmail && (
-                      <li className="flex items-center gap-2 text-amber-700">
-                        <Bell className="w-3 h-3" />
-                        SMS & Email Notifications
-                      </li>
-                    )}
-                  </ul>
-                  <button
-                    onClick={() => {
-                      setOpen(false);
-                      window.location.href = '/admin/settings?tab=integrations';
-                    }}
-                    className="mt-2 text-xs font-medium text-amber-800 hover:text-amber-900 underline"
-                  >
-                    Go to Settings →
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Header */}
           <div className="p-4 border-b bg-gray-50">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-                <Bell className="w-4 h-4" />
-                Notifications
-                {unreadCount > 0 && (
-                  <span className="text-sm text-gray-500">({unreadCount} unread)</span>
-                )}
+                <Calendar className="w-4 h-4" />
+                Appointments
               </h3>
-              <div className="flex gap-2">
-                {unreadCount > 0 && (
-                  <button
-                    onClick={markAllAsRead}
-                    className="text-xs text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    Mark all read
-                  </button>
-                )}
-                <button
-                  onClick={() => setOpen(false)}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
+              <button
+                onClick={() => setOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
+            {(pendingCount > 0 || upcomingCount > 0) && (
+              <div className="flex gap-3 mt-2 text-xs">
+                {pendingCount > 0 && (
+                  <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full font-medium">
+                    {pendingCount} pending
+                  </span>
+                )}
+                {upcomingCount > 0 && (
+                  <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full font-medium">
+                    {upcomingCount} upcoming
+                  </span>
+                )}
+              </div>
+            )}
           </div>
 
-          {/* Notifications List */}
+          {/* Appointments List */}
           <div className="max-h-96 overflow-y-auto">
             {loading ? (
               <div className="p-8 text-center">
                 <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                <p className="text-gray-500 mt-2">Loading notifications...</p>
+                <p className="text-gray-500 mt-2">Loading...</p>
               </div>
-            ) : notifications.length === 0 ? (
+            ) : appointments.length === 0 ? (
               <div className="p-8 text-center">
-                <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 font-medium">No notifications</p>
+                <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <p className="text-gray-500 font-medium">No upcoming appointments</p>
                 <p className="text-gray-400 text-sm">You're all caught up!</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-100">
-                {notifications.map((notification) => (
-                  <div
-                    key={notification.id}
-                    className={`p-4 hover:bg-gray-50 cursor-pointer transition-colors ${
-                      !notification.is_read ? 'bg-blue-50/50' : ''
+                {appointments.map((appointment) => (
+                  <a
+                    key={appointment.id}
+                    href={`/admin/appointments?highlight=${appointment.id}`}
+                    className={`block p-4 hover:bg-gray-50 transition-colors ${
+                      appointment.status === 'pending' ? 'bg-amber-50/50' : ''
                     }`}
-                    onClick={() => handleNotificationClick(notification)}
+                    onClick={() => setOpen(false)}
                   >
                     <div className="flex items-start gap-3">
-                      {/* Type Icon */}
-                      <div className={`flex-shrink-0 w-8 h-8 rounded-lg border flex items-center justify-center ${
-                        getPriorityColor(notification.priority)
+                      {/* Status Icon */}
+                      <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                        appointment.status === 'pending' 
+                          ? 'bg-amber-100 text-amber-600' 
+                          : 'bg-blue-100 text-blue-600'
                       }`}>
-                        {getTypeIcon(notification.type)}
+                        {appointment.status === 'pending' ? (
+                          <Clock className="w-5 h-5" />
+                        ) : (
+                          <Calendar className="w-5 h-5" />
+                        )}
                       </div>
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-start justify-between gap-2">
-                          <h4 className={`font-medium text-sm ${
-                            !notification.is_read ? 'text-gray-900' : 'text-gray-700'
-                          }`}>
-                            {notification.title}
-                            {notification.isNew && (
-                              <span className="inline-block ml-2 w-2 h-2 bg-blue-500 rounded-full"></span>
-                            )}
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="font-medium text-sm text-gray-900 truncate">
+                            {appointment.clients 
+                              ? `${appointment.clients.first_name} ${appointment.clients.last_name}`
+                              : 'Unknown Client'
+                            }
                           </h4>
-                          <span className="text-xs text-gray-500 flex-shrink-0">
-                            {notification.timeAgo}
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                            appointment.status === 'pending'
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-green-100 text-green-700'
+                          }`}>
+                            {appointment.status === 'pending' ? 'Pending' : 'Confirmed'}
                           </span>
                         </div>
                         
-                        <p className={`text-sm mt-1 ${
-                          !notification.is_read ? 'text-gray-600' : 'text-gray-500'
-                        }`}>
-                          {notification.message}
+                        <p className="text-sm text-gray-600 truncate mt-0.5">
+                          {appointment.services?.name || 'Service'}
                         </p>
-
-                        {/* Action Button */}
-                        {notification.action_label && notification.action_url && (
-                          <div className="mt-2">
-                            <span className="inline-flex items-center text-xs font-medium text-blue-600 hover:text-blue-800">
-                              {notification.action_label}
-                              <svg className="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                              </svg>
+                        
+                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {formatAppointmentTime(appointment.start_time)}
+                          </span>
+                          {appointment.business_members?.display_name && (
+                            <span className="flex items-center gap-1">
+                              <User className="w-3 h-3" />
+                              {appointment.business_members.display_name}
                             </span>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </div>
 
-                      {/* Mark as read button */}
-                      {!notification.is_read && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            markAsRead(notification.id);
-                          }}
-                          disabled={markingAsRead === notification.id}
-                          className="flex-shrink-0 p-1 text-gray-400 hover:text-gray-600 disabled:opacity-50"
-                        >
-                          {markingAsRead === notification.id ? (
-                            <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
-                          ) : (
-                            <Check className="w-4 h-4" />
-                          )}
-                        </button>
-                      )}
+                      <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             )}
           </div>
 
           {/* Footer */}
-          {notifications.length > 0 && (
-            <div className="p-3 border-t bg-gray-50">
-              <button
-                onClick={() => {
-                  setOpen(false);
-                  window.location.href = '/admin/notifications';
-                }}
-                className="w-full text-center text-sm text-gray-600 hover:text-gray-800 font-medium flex items-center justify-center gap-2"
-              >
-                <Settings className="w-4 h-4" />
-                View all notifications & settings
-              </button>
-            </div>
-          )}
+          <div className="p-3 border-t bg-gray-50">
+            <a
+              href="/admin/appointments"
+              onClick={() => setOpen(false)}
+              className="w-full text-center text-sm text-gray-600 hover:text-gray-800 font-medium flex items-center justify-center gap-2"
+            >
+              <Calendar className="w-4 h-4" />
+              View all appointments
+            </a>
+          </div>
         </div>
       )}
     </div>
