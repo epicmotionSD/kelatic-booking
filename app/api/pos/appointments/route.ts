@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const supabase = await createServerSupabaseClient();
+    const supabase = await createClient();
+    const business = await requireBusiness();
+    const business_id = business.id;
 
     // Get today's date range
     const today = new Date();
@@ -50,6 +53,7 @@ export async function GET() {
           is_deposit
         )
       `)
+      .eq('business_id', business_id)
       .gte('start_time', today.toISOString())
       .lt('start_time', tomorrow.toISOString())
       .order('start_time', { ascending: true });

@@ -26,6 +26,7 @@ interface WalkInModalProps {
 export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Stylist[]>([]);
+  const [allStylists, setAllStylists] = useState<Stylist[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,11 +49,33 @@ export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
     }
   }, [isOpen]);
 
+  // When service changes, fetch stylists who can perform that service
+  useEffect(() => {
+    if (selectedService) {
+      fetchStylistsForService(selectedService);
+    } else {
+      setStylists(allStylists);
+    }
+    // Clear stylist selection when service changes
+    setSelectedStylist('');
+  }, [selectedService, allStylists]);
+
+  async function fetchStylistsForService(serviceId: string) {
+    try {
+      const res = await fetch(`/api/stylists?serviceId=${serviceId}`);
+      const data = await res.json();
+      setStylists(data.stylists || []);
+    } catch (err) {
+      console.error('Failed to fetch stylists for service:', err);
+      setStylists(allStylists);
+    }
+  }
+
   async function fetchData() {
     setLoading(true);
     try {
       const [servicesRes, stylistsRes] = await Promise.all([
-        fetch('/api/services'),
+        fetch('/api/admin/services'), // Use admin API to get all services for POS
         fetch('/api/stylists'),
       ]);
 
@@ -60,6 +83,7 @@ export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
       const stylistsData = await stylistsRes.json();
 
       setServices(servicesData.services || []);
+      setAllStylists(stylistsData.stylists || []);
       setStylists(stylistsData.stylists || []);
     } catch (err) {
       console.error('Failed to fetch data:', err);
@@ -211,24 +235,34 @@ export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stylist *
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {stylists.map((stylist) => (
-                    <button
-                      key={stylist.id}
-                      type="button"
-                      onClick={() => setSelectedStylist(stylist.id)}
-                      className={`px-4 py-3 rounded-lg border transition-colors ${
-                        selectedStylist === stylist.id
-                          ? 'border-purple-600 bg-purple-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <p className="font-medium text-gray-900">
-                        {stylist.first_name} {stylist.last_name}
-                      </p>
-                    </button>
-                  ))}
-                </div>
+                {!selectedService ? (
+                  <p className="text-sm text-gray-500 italic py-4 text-center bg-gray-50 rounded-lg">
+                    Select a service first to see available stylists
+                  </p>
+                ) : stylists.length === 0 ? (
+                  <p className="text-sm text-amber-600 italic py-4 text-center bg-amber-50 rounded-lg">
+                    No stylists available for this service
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-2 gap-2">
+                    {stylists.map((stylist) => (
+                      <button
+                        key={stylist.id}
+                        type="button"
+                        onClick={() => setSelectedStylist(stylist.id)}
+                        className={`px-4 py-3 rounded-lg border transition-colors ${
+                          selectedStylist === stylist.id
+                            ? 'border-purple-600 bg-purple-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <p className="font-medium text-gray-900">
+                          {stylist.first_name} {stylist.last_name}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Summary */}

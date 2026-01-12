@@ -83,6 +83,7 @@ function NewAppointmentContent() {
   // Data
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Stylist[]>([]);
+  const [allStylists, setAllStylists] = useState<Stylist[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [slots, setSlots] = useState<TimeSlot[]>([]);
 
@@ -102,6 +103,17 @@ function NewAppointmentContent() {
     fetchStylists();
     fetchClients();
   }, []);
+
+  // Fetch stylists for selected service
+  useEffect(() => {
+    if (selectedService) {
+      fetchStylistsForService(selectedService.id);
+    } else {
+      setStylists(allStylists);
+    }
+    setSelectedStylist(null);
+    setSelectedSlot(null);
+  }, [selectedService, allStylists]);
 
   // Pre-select client if passed in URL
   useEffect(() => {
@@ -134,9 +146,21 @@ function NewAppointmentContent() {
     try {
       const res = await fetch('/api/stylists');
       const data = await res.json();
+      setAllStylists(data.stylists || []);
       setStylists(data.stylists || []);
     } catch (err) {
       console.error('Failed to fetch stylists:', err);
+    }
+  }
+
+  async function fetchStylistsForService(serviceId: string) {
+    try {
+      const res = await fetch(`/api/stylists?serviceId=${serviceId}`);
+      const data = await res.json();
+      setStylists(data.stylists || []);
+    } catch (err) {
+      console.error('Failed to fetch stylists for service:', err);
+      setStylists(allStylists);
     }
   }
 

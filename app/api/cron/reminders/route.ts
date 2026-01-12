@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
             duration
           ),
           appointment_addons (
-            addon:service_addons (
+            service:services (
               name
             )
           )
@@ -129,7 +129,7 @@ export async function GET(request: NextRequest) {
             appointment_date: startTime.toISOString().split('T')[0],
             appointment_time: startTime.toTimeString().slice(0, 5),
             total_amount: appointment.total_amount || 0,
-            add_ons: appointment.appointment_addons?.map((a: any) => a.addon?.name).filter(Boolean),
+            add_ons: appointment.appointment_addons?.map((a: any) => a.service?.name).filter(Boolean),
             notes: appointment.notes || undefined,
           };
 

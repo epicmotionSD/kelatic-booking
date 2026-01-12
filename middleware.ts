@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
+
 // Root domain for the platform
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
 
@@ -73,11 +74,18 @@ export async function middleware(request: NextRequest) {
     response.headers.set('x-tenant-slug', subdomain);
   }
 
-  // Create Supabase client
+
+  // Create Supabase client with legacy cookie helpers for Next.js 13/14/15
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { cookies: { get: (name: string) => request.cookies.get(name)?.value } }
+    {
+      cookies: {
+        get: (name: string) => request.cookies.get(name)?.value,
+        set: (name: string, value: string, options: any) => response.cookies.set(name, value, options),
+        remove: (name: string, options: any) => response.cookies.set(name, '', { ...options, maxAge: 0 }),
+      },
+    }
   );
 
   const {

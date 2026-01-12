@@ -46,11 +46,13 @@ interface Appointment {
     email: string;
   };
   appointment_addons?: Array<{
-    addon: {
+    service: {
       id: string;
       name: string;
-      price: number;
+      base_price: number;
     };
+    price: number;
+    duration: number;
   }>;
 }
 
@@ -281,7 +283,7 @@ export default function AppointmentPage() {
                   <div className="flex flex-wrap gap-2">
                     {appointment.appointment_addons.map((addon, idx) => (
                       <span key={idx} className="px-3 py-1 bg-purple-50 text-purple-700 rounded-full text-sm">
-                        {addon.addon.name} (+${addon.addon.price})
+                        {addon.service.name} (+${addon.price})
                       </span>
                     ))}
                   </div>

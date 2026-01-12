@@ -1,46 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerSupabaseClient } from '@/lib/supabase/client';
-
-// Helper function to check if user has permission to manage services
-async function checkServicePermissions(supabase: any) {
-  const { data: { user }, error: authError } = await supabase.auth.getUser();
-  
-  if (authError || !user) {
-    return { hasPermission: false, error: 'Authentication required' };
-  }
-
-  // Check if user has admin, owner, or stylist role in any business
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role, business_id')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile) {
-    return { hasPermission: false, error: 'Profile not found' };
-  }
-
-  // Allow admin, owner, and stylist (locticians) roles
-  if (!['admin', 'owner', 'stylist'].includes(profile.role)) {
-    return { hasPermission: false, error: 'Insufficient permissions - only admins, owners, and stylists can manage services' };
-  }
-
-  return { hasPermission: true, profile };
-}
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export async function GET() {
   try {
-    const supabase = await createServerSupabaseClient();
-
-    // Check permissions for authenticated access
-    const { hasPermission, error: permissionError } = await checkServicePermissions(supabase);
-    if (!hasPermission) {
-      return NextResponse.json({ error: permissionError }, { status: 401 });
-    }
+    const business = await requireBusiness();
+    const supabase = await createClient();
 
     const { data: services, error } = await supabase
       .from('services')
       .select('*')
+      .eq('business_id', business.id)
       .order('category')
       .order('sort_order');
 
@@ -58,20 +28,16 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const business = await requireBusiness();
     const body = await request.json();
-    const supabase = await createServerSupabaseClient();
+    const supabase = await createClient();
 
-    // Check permissions
-    const { hasPermission, error: permissionError, profile } = await checkServicePermissions(supabase);
-    if (!hasPermission) {
-      return NextResponse.json({ error: permissionError }, { status: 401 });
-    }
-
-    // Get max sort_order for category
+    // Get max sort_order for category within this business
     const { data: existing } = await supabase
       .from('services')
       .select('sort_order')
       .eq('category', body.category)
+      .eq('business_id', business.id)
       .order('sort_order', { ascending: false })
       .limit(1);
 
@@ -92,7 +58,7 @@ export async function POST(request: NextRequest) {
         deposit_amount: body.deposit_amount,
         sort_order: sortOrder,
         is_active: true,
-        business_id: profile?.business_id, // Associate with user's business
+        business_id: business.id,
       })
       .select()
       .single();
@@ -107,7 +73,7 @@ export async function POST(request: NextRequest) {
       const assignments = body.stylistIds.map((stylistId: string) => ({
         service_id: service.id,
         stylist_id: stylistId,
-        business_id: profile?.business_id,
+        business_id: business.id,
         is_active: true
       }));
 

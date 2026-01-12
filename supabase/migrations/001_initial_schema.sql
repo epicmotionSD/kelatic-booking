@@ -8,50 +8,67 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ENUMS
 -- ============================================
 
-CREATE TYPE user_role AS ENUM ('client', 'stylist', 'admin', 'owner');
-CREATE TYPE appointment_status AS ENUM ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show');
-CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'partial', 'refunded', 'failed');
-CREATE TYPE payment_method AS ENUM ('card_online', 'card_terminal', 'cash', 'other');
-CREATE TYPE service_category AS ENUM ('locs', 'braids', 'natural', 'silk_press', 'color', 'treatments', 'other');
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_role') THEN
+        CREATE TYPE user_role AS ENUM ('client', 'stylist', 'admin', 'owner');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'appointment_status') THEN
+        CREATE TYPE appointment_status AS ENUM ('pending', 'confirmed', 'in_progress', 'completed', 'cancelled', 'no_show');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'payment_status') THEN
+        CREATE TYPE payment_status AS ENUM ('pending', 'paid', 'partial', 'refunded', 'failed');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'payment_method') THEN
+        CREATE TYPE payment_method AS ENUM ('card_online', 'card_terminal', 'cash', 'other');
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'service_category') THEN
+        CREATE TYPE service_category AS ENUM ('locs', 'braids', 'natural', 'silk_press', 'color', 'treatments', 'other');
+    END IF;
+END $$;
 
 -- ============================================
 -- CORE TABLES
 -- ============================================
 
 -- Profiles (extends Supabase auth.users)
-CREATE TABLE profiles (
-    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-    email TEXT UNIQUE NOT NULL,
-    first_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    phone TEXT,
-    avatar_url TEXT,
-    role user_role DEFAULT 'client',
-    
-    -- Client-specific fields
-    notes TEXT,                          -- Internal notes about client
-    hair_type TEXT,                      -- e.g., "4C", "3B"
-    hair_texture TEXT,                   -- e.g., "Coarse", "Fine"
-    scalp_sensitivity TEXT,              -- e.g., "Normal", "Sensitive"
-    preferred_products TEXT[],           -- Array of product preferences
-    allergies TEXT[],                    -- Known allergies
-    
-    -- Stylist-specific fields
-    bio TEXT,
-    specialties TEXT[],
-    instagram_handle TEXT,
-    is_active BOOLEAN DEFAULT true,
-    commission_rate DECIMAL(5,2),        -- e.g., 60.00 for 60%
-    
-    -- Metadata
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW(),
-    last_visit_at TIMESTAMPTZ,
-    
-    -- Amelia migration tracking
-    amelia_user_id INTEGER,              -- Original Amelia ID for migration
-    migrated_at TIMESTAMPTZ
-);
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'profiles') THEN
+        CREATE TABLE profiles (
+            id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+            email TEXT UNIQUE NOT NULL,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
+            phone TEXT,
+            avatar_url TEXT,
+
+            -- Client-specific fields
+            notes TEXT,                          -- Internal notes about client
+            hair_type TEXT,                      -- e.g., "4C", "3B"
+            hair_texture TEXT,                   -- e.g., "Coarse", "Fine"
+            scalp_sensitivity TEXT,              -- e.g., "Normal", "Sensitive"
+            preferred_products TEXT[],           -- Array of product preferences
+            allergies TEXT[],                    -- Known allergies
+
+            -- Stylist-specific fields
+            bio TEXT,
+            specialties TEXT[],
+            instagram_handle TEXT,
+            is_active BOOLEAN DEFAULT true,
+            commission_rate DECIMAL(5,2),        -- e.g., 60.00 for 60%
+
+            -- Metadata
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            updated_at TIMESTAMPTZ DEFAULT NOW(),
+            last_visit_at TIMESTAMPTZ,
+
+            -- Amelia migration tracking
+            amelia_user_id INTEGER,              -- Original Amelia ID for migration
+            migrated_at TIMESTAMPTZ
+        );
+    END IF;
+END $$;
 
 -- Services offered
 CREATE TABLE services (
@@ -64,7 +81,6 @@ CREATE TABLE services (
     base_price DECIMAL(10,2) NOT NULL,
     price_varies BOOLEAN DEFAULT false,  -- True if price depends on length/complexity
     min_price DECIMAL(10,2),
-    max_price DECIMAL(10,2),
     
     -- Duration (in minutes)
     duration INTEGER NOT NULL,           -- Base duration
@@ -85,7 +101,6 @@ CREATE TABLE services (
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     
     -- Amelia migration
-    amelia_service_id INTEGER
 );
 
 -- Which stylists can perform which services
@@ -105,7 +120,6 @@ CREATE TABLE stylist_services (
 );
 
 -- Stylist availability/schedule
-CREATE TABLE stylist_schedules (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     stylist_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
     
@@ -123,9 +137,6 @@ CREATE TABLE stylist_schedules (
 CREATE TABLE stylist_time_off (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     stylist_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    
-    start_datetime TIMESTAMPTZ NOT NULL,
-    end_datetime TIMESTAMPTZ NOT NULL,
     reason TEXT,
     is_recurring BOOLEAN DEFAULT false,
     
@@ -179,7 +190,6 @@ CREATE TABLE appointments (
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     
-    -- Amelia migration
     amelia_appointment_id INTEGER
 );
 
@@ -196,9 +206,6 @@ CREATE TABLE appointment_addons (
 );
 
 -- ============================================
--- PAYMENTS
--- ============================================
-
 CREATE TABLE payments (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
@@ -238,11 +245,7 @@ CREATE TABLE payments (
 
 -- Client hair history / visit log
 CREATE TABLE client_hair_history (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    client_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
-    appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
     
-    -- What was done
     service_performed TEXT NOT NULL,
     products_used TEXT[],
     techniques_used TEXT[],
@@ -269,7 +272,6 @@ CREATE TABLE rebooking_reminders (
     reminder_date DATE NOT NULL,
     
     sent_at TIMESTAMPTZ,
-    booked_at TIMESTAMPTZ,
     dismissed_at TIMESTAMPTZ,
     
     created_at TIMESTAMPTZ DEFAULT NOW()
@@ -291,9 +293,6 @@ CREATE TABLE chat_conversations (
     appointment_id UUID REFERENCES appointments(id) ON DELETE SET NULL,
     
     created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
 CREATE TABLE chat_messages (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     conversation_id UUID REFERENCES chat_conversations(id) ON DELETE CASCADE,
@@ -333,9 +332,6 @@ CREATE TABLE academy_courses (
     supplies_list TEXT[],
     
     is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
 
 CREATE TABLE academy_class_sessions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),

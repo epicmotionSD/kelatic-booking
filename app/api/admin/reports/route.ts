@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,7 +9,10 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const range = searchParams.get('range') || '30d';
 
-    const supabase = createAdminClient();
+    const supabase = await createClient();
+    const business = await requireBusiness();
+    const business_id = business.id;
+    
     const now = new Date();
 
     // Calculate date range based on range parameter
@@ -48,6 +52,7 @@ export async function GET(request: NextRequest) {
         services(id, name, category),
         stylist:profiles!appointments_stylist_id_fkey(id, first_name, last_name)
       `)
+      .eq('business_id', business_id)
       .gte('start_time', startDate.toISOString())
       .lte('start_time', endDate.toISOString());
 
@@ -55,6 +60,7 @@ export async function GET(request: NextRequest) {
     const { data: previousAppointments } = await supabase
       .from('appointments')
       .select('id, status, quoted_price')
+      .eq('business_id', business_id)
       .gte('start_time', previousStartDate.toISOString())
       .lt('start_time', previousEndDate.toISOString());
 
@@ -63,6 +69,7 @@ export async function GET(request: NextRequest) {
       .from('profiles')
       .select('id')
       .eq('role', 'client')
+      .eq('business_id', business_id)
       .gte('created_at', startDate.toISOString());
 
     // Previous period new clients
@@ -70,6 +77,7 @@ export async function GET(request: NextRequest) {
       .from('profiles')
       .select('id')
       .eq('role', 'client')
+      .eq('business_id', business_id)
       .gte('created_at', previousStartDate.toISOString())
       .lt('created_at', previousEndDate.toISOString());
 

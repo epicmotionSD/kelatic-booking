@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export async function GET() {
   try {
+    const business = await requireBusiness();
     const supabase = await createClient();
-    
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
-    // Get business settings - this could be from a dedicated table or profile
-    const { data: settings, error } = await supabase
+
+    // Get business settings row
+    const { data: row, error } = await supabase
       .from('business_settings')
       .select('*')
-      .eq('owner_id', user.id)
+      .eq('business_id', business.id)
       .single();
 
     if (error && error.code !== 'PGRST116') { // Not found error is ok
@@ -23,36 +20,66 @@ export async function GET() {
       return NextResponse.json({ error: 'Failed to fetch settings' }, { status: 500 });
     }
 
-    // Default settings if none exist
-    const defaultSettings = {
-      name: 'Your Business',
-      address: '',
-      phone: '',
-      email: user.email,
-      timezone: 'America/Chicago',
-      currency: 'USD',
-      bookingLeadTime: 2,
-      bookingWindowDays: 60,
-      cancellationPolicy: '24 hours notice required for cancellations.',
-      depositPolicy: 'A deposit may be required to secure your appointment.',
-      closedDays: [0, 1], // Sunday and Monday
-      businessHours: {
-        0: null, // Closed
-        1: null, // Closed
-        2: { open: '10:00', close: '19:00' },
-        3: { open: '10:00', close: '19:00' },
-        4: { open: '10:00', close: '19:00' },
-        5: { open: '10:00', close: '19:00' },
-        6: { open: '09:00', close: '17:00' },
-      },
-      googleCalendarConnected: false,
-      smsEmailEnabled: false,
-      stripeConnected: false,
-    };
+    // Map DB columns to settings object
+    let settings;
+    if (row) {
+      settings = {
+        name: business.name,
+        address: business.address || '',
+        phone: business.phone || '',
+        email: business.email || '',
+        timezone: row.timezone || 'America/Chicago',
+        currency: row.currency || 'USD',
+        bookingLeadTime: row.booking_min_notice_hours ?? 2,
+        bookingWindowDays: row.booking_advance_days ?? 60,
+        cancellationPolicy: row.cancellation_policy || '24 hours notice required for cancellations.',
+        depositPolicy: row.deposit_policy || 'A deposit may be required to secure your appointment.',
+        closedDays: row.closed_days || [0, 1],
+        businessHours: row.business_hours || {
+          0: null,
+          1: null,
+          2: { open: '10:00', close: '19:00' },
+          3: { open: '10:00', close: '19:00' },
+          4: { open: '10:00', close: '19:00' },
+          5: { open: '10:00', close: '19:00' },
+          6: { open: '09:00', close: '17:00' },
+        },
+        googleCalendarConnected: row.google_calendar_connected ?? false,
+        smsEmailEnabled: row.sms_email_enabled ?? false,
+        stripeConnected: row.stripe_connected ?? false,
+        // Add more fields as needed from business_settings
+      };
+    } else {
+      settings = {
+        name: business.name,
+        address: business.address || '',
+        phone: business.phone || '',
+        email: business.email || '',
+        timezone: 'America/Chicago',
+        currency: 'USD',
+        bookingLeadTime: 2,
+        bookingWindowDays: 60,
+        cancellationPolicy: '24 hours notice required for cancellations.',
+        depositPolicy: 'A deposit may be required to secure your appointment.',
+        closedDays: [0, 1],
+        businessHours: {
+          0: null,
+          1: null,
+          2: { open: '10:00', close: '19:00' },
+          3: { open: '10:00', close: '19:00' },
+          4: { open: '10:00', close: '19:00' },
+          5: { open: '10:00', close: '19:00' },
+          6: { open: '09:00', close: '17:00' },
+        },
+        googleCalendarConnected: false,
+        smsEmailEnabled: false,
+        stripeConnected: false,
+      };
+    }
 
     return NextResponse.json({
       success: true,
-      settings: settings?.settings || defaultSettings
+      settings
     });
 
   } catch (error) {
@@ -63,13 +90,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const business = await requireBusiness();
     const supabase = await createClient();
-    
-    // Get current user
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
-    if (userError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
 
     const body = await request.json();
     const { settings } = body;
@@ -78,15 +100,29 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Settings data required' }, { status: 400 });
     }
 
-    // Upsert business settings
+
+    // Map settings object to DB columns
+    const upsertData: any = {
+      business_id: business.id,
+      updated_at: new Date().toISOString(),
+      timezone: settings.timezone,
+      currency: settings.currency,
+      booking_min_notice_hours: settings.bookingLeadTime,
+      booking_advance_days: settings.bookingWindowDays,
+      cancellation_policy: settings.cancellationPolicy,
+      deposit_policy: settings.depositPolicy,
+      closed_days: settings.closedDays,
+      business_hours: settings.businessHours,
+      google_calendar_connected: settings.googleCalendarConnected,
+      sms_email_enabled: settings.smsEmailEnabled,
+      stripe_connected: settings.stripeConnected,
+      // Add more fields as needed
+    };
+
     const { error } = await supabase
       .from('business_settings')
-      .upsert({
-        owner_id: user.id,
-        settings: settings,
-        updated_at: new Date().toISOString()
-      }, {
-        onConflict: 'owner_id'
+      .upsert(upsertData, {
+        onConflict: 'business_id'
       });
 
     if (error) {

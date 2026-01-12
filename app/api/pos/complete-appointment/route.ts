@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +13,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await createClient();
+    const business = await requireBusiness();
+    const business_id = business.id;
 
     // Get the appointment with client info
     const { data: appointment } = await supabase
@@ -23,6 +26,7 @@ export async function POST(request: NextRequest) {
         service:services (id, name)
       `)
       .eq('id', appointmentId)
+      .eq('business_id', business_id)
       .single();
 
     if (!appointment) {

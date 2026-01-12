@@ -114,14 +114,14 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
   return (
     <div>
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Book Your Appointment</h2>
-        <p className="text-white/60 mb-6">Choose how you'd like to start your booking</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-stone-900 mb-2">Book Your Appointment</h2>
+        <p className="text-stone-600 mb-6">Choose how you'd like to start your booking</p>
       </div>
 
       {/* Quick Booking Options */}
-      <div className="mb-8 p-6 bg-white/5 border border-white/10 rounded-2xl">
-        <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-          <Clock className="w-5 h-5 text-amber-400" />
+      <div className="mb-8 p-6 bg-white border border-amber-200 rounded-2xl shadow-lg">
+        <h3 className="text-lg font-semibold text-stone-900 mb-4 flex items-center gap-2">
+          <Clock className="w-5 h-5 text-amber-600" />
           Popular Services
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -134,14 +134,14 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
                   onSelectTier(tier, [service]);
                 }
               }}
-              className="text-left p-4 bg-white/5 border border-white/10 rounded-xl hover:border-amber-400/50 hover:bg-amber-400/5 transition-all"
+              className="text-left p-4 bg-amber-50 border border-amber-200 rounded-xl hover:border-amber-400 hover:bg-amber-100 transition-all shadow-sm"
             >
               <div className="flex justify-between items-center">
                 <div>
-                  <h4 className="font-semibold text-white">{service.name}</h4>
-                  <p className="text-sm text-white/50">{service.duration} min</p>
+                  <h4 className="font-semibold text-stone-900">{service.name}</h4>
+                  <p className="text-sm text-stone-600">{service.duration} min</p>
                 </div>
-                <span className="text-amber-400 font-bold">{formatCurrency(service.base_price * 100)}</span>
+                <span className="text-amber-600 font-bold">{formatCurrency(service.base_price * 100)}</span>
               </div>
             </button>
           ))}
@@ -155,7 +155,7 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
           className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
             viewMode === 'stylist'
               ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-              : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+              : 'bg-white text-stone-600 hover:bg-amber-50 border border-amber-200 shadow-sm'
           }`}
         >
           <Users className="w-5 h-5 inline-block mr-2" />
@@ -166,7 +166,7 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
           className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${
             viewMode === 'price'
               ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-              : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+              : 'bg-white text-stone-600 hover:bg-amber-50 border border-amber-200 shadow-sm'
           }`}
         >
           <Sparkles className="w-5 h-5 inline-block mr-2" />
@@ -177,33 +177,33 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
       {viewMode === 'stylist' ? (
         /* Stylist Selection */
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white mb-4">Select Your Stylist</h3>
+          <h3 className="text-lg font-semibold text-stone-900 mb-4">Select Your Stylist</h3>
           {stylists.map((stylist) => (
             <button
               key={stylist.id}
               onClick={() => onSelectStylist(stylist)}
-              className="w-full text-left p-4 rounded-xl border-2 border-white/10 bg-white/5 hover:border-amber-400/50 hover:bg-white/10 transition-all"
+              className="w-full text-left p-4 rounded-xl border-2 border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50 transition-all shadow-lg"
             >
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center border border-white/10">
-                  <span className="text-2xl font-black text-white/80">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center border border-amber-200">
+                  <span className="text-2xl font-black text-stone-700">
                     {stylist.first_name.charAt(0)}
                   </span>
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-white text-lg">
+                  <h4 className="font-semibold text-stone-900 text-lg">
                     {stylist.first_name} {stylist.last_name}
                   </h4>
                   {stylist.specialties && stylist.specialties.length > 0 && (
-                    <p className="text-amber-400 text-sm">
+                    <p className="text-amber-600 text-sm">
                       {stylist.specialties.slice(0, 3).join(' • ')}
                     </p>
                   )}
                   {stylist.bio && (
-                    <p className="text-white/50 text-sm mt-1 line-clamp-1">{stylist.bio}</p>
+                    <p className="text-stone-600 text-sm mt-1 line-clamp-1">{stylist.bio}</p>
                   )}
                 </div>
-                <div className="text-amber-400">
+                <div className="text-amber-600">
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
@@ -215,17 +215,17 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
           {/* Any Available Option */}
           <button
             onClick={() => onSelectStylist({ id: 'any', first_name: 'Any', last_name: 'Available' } as Profile)}
-            className="w-full text-left p-4 rounded-xl border-2 border-dashed border-white/20 bg-white/5 hover:border-amber-400/50 hover:bg-white/10 transition-all"
+            className="w-full text-left p-4 rounded-xl border-2 border-dashed border-amber-300 bg-amber-50 hover:border-amber-400 hover:bg-amber-100 transition-all"
           >
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-white/10 to-transparent flex items-center justify-center border border-white/10">
-                <Users className="w-8 h-8 text-white/50" />
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-100 to-transparent flex items-center justify-center border border-amber-200">
+                <Users className="w-8 h-8 text-amber-600" />
               </div>
               <div className="flex-1">
-                <h4 className="font-semibold text-white text-lg">Any Available Stylist</h4>
-                <p className="text-white/50 text-sm">First available appointment</p>
+                <h4 className="font-semibold text-stone-900 text-lg">Any Available Stylist</h4>
+                <p className="text-stone-600 text-sm">First available appointment</p>
               </div>
-              <div className="text-amber-400">
+              <div className="text-amber-600">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
@@ -236,7 +236,7 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
       ) : (
         /* Price Tier Selection */
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold text-white mb-4">Select Your Service Level</h3>
+          <h3 className="text-lg font-semibold text-stone-900 mb-4">Select Your Service Level</h3>
           {PRICE_TIERS.map((tier) => {
             const tierServices = getServicesForTier(tier);
             const Icon = tier.icon;
@@ -245,7 +245,7 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
               <button
                 key={tier.id}
                 onClick={() => handleTierSelect(tier)}
-                className="w-full text-left p-5 rounded-xl border-2 border-white/10 bg-white/5 hover:border-amber-400/50 hover:bg-white/10 transition-all group"
+                className="w-full text-left p-5 rounded-xl border-2 border-amber-200 bg-white hover:border-amber-400 hover:bg-amber-50 transition-all group shadow-lg"
               >
                 <div className="flex items-start gap-4">
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tier.color} flex items-center justify-center shadow-lg`}>
@@ -253,22 +253,22 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-1">
-                      <h4 className="font-bold text-white text-lg">{tier.name}</h4>
-                      <span className="text-xl font-black text-amber-400">{tier.priceRange}</span>
+                      <h4 className="font-bold text-stone-900 text-lg">{tier.name}</h4>
+                      <span className="text-xl font-black text-amber-600">{tier.priceRange}</span>
                     </div>
-                    <p className="text-white/60 text-sm mb-3">{tier.description}</p>
+                    <p className="text-stone-600 text-sm mb-3">{tier.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {tier.features.map((feature, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-white/70"
+                          className="px-2 py-1 bg-amber-50 border border-amber-200 rounded-full text-xs text-stone-700"
                         >
                           {feature}
                         </span>
                       ))}
                     </div>
                     {tierServices.length > 0 && (
-                      <p className="text-white/40 text-xs mt-3">
+                      <p className="text-stone-500 text-xs mt-3">
                         {tierServices.length} service{tierServices.length !== 1 ? 's' : ''} available
                       </p>
                     )}

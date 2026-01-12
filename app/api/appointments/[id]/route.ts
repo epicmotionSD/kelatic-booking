@@ -38,11 +38,13 @@ export async function GET(
           email
         ),
         appointment_addons (
-          addon:service_addons (
+          service:services (
             id,
             name,
-            price
-          )
+            base_price
+          ),
+          price,
+          duration
         )
       `)
       .eq('id', id)

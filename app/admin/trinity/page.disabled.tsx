@@ -154,25 +154,25 @@ export default function TrinityDashboard() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-white">AI Marketing Automation</h1>
-        <p className="text-white/50 mt-1">
+        <h1 className="text-2xl font-bold text-stone-900">AI Marketing Automation</h1>
+        <p className="text-stone-600 mt-1">
           Powered by x3o.ai&apos;s Board of Directors - Create marketing content for your business
         </p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
-          <div className="text-3xl font-bold text-purple-400">
+        <div className="bg-white rounded-xl p-6 border border-stone-200 shadow-sm">
+          <div className="text-3xl font-bold text-purple-600">
             {loading ? '...' : stats?.totalGenerations || 0}
           </div>
-          <div className="text-white/50 text-sm mt-1">Total Generations</div>
+          <div className="text-stone-600 text-sm mt-1">Total Generations</div>
         </div>
-        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
-          <div className="text-3xl font-bold text-purple-400">
+        <div className="bg-white rounded-xl p-6 border border-stone-200 shadow-sm">
+          <div className="text-3xl font-bold text-purple-600">
             {loading ? '...' : stats?.thisMonth || 0}
           </div>
-          <div className="text-white/50 text-sm mt-1">This Month</div>
+          <div className="text-stone-600 text-sm mt-1">This Month</div>
         </div>
         <div className="bg-gradient-to-r from-purple-600 to-purple-700 rounded-xl p-6 text-white">
           <div className="text-3xl font-bold">Active</div>
@@ -182,21 +182,21 @@ export default function TrinityDashboard() {
 
       {/* Marketing Builder */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">
-          Marketing Builder
+        <h2 className="text-lg font-semibold text-stone-900 mb-4">
+          🎨 Marketing Builder
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {marketingTools.map((tool) => (
             <button
               key={tool.id}
               onClick={() => setSelectedTool(tool)}
-              className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all group text-left"
+              className="bg-white rounded-xl p-6 border border-stone-200 hover:border-purple-300 hover:bg-purple-50 transition-all group text-left shadow-sm"
             >
               <div className="text-3xl mb-3">{tool.icon}</div>
-              <h3 className="font-semibold text-white group-hover:text-purple-400 transition-colors">
+              <h3 className="font-semibold text-stone-900 group-hover:text-purple-600 transition-colors">
                 {tool.name}
               </h3>
-              <p className="text-white/50 text-sm mt-1">{tool.description}</p>
+              <p className="text-stone-600 text-sm mt-1">{tool.description}</p>
             </button>
           ))}
         </div>
@@ -204,21 +204,21 @@ export default function TrinityDashboard() {
 
       {/* Content Creation Builder */}
       <div>
-        <h2 className="text-lg font-semibold text-white mb-4">
-          Content Creation Builder
+        <h2 className="text-lg font-semibold text-stone-900 mb-4">
+          ✨ Content Creation Builder
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {contentTools.map((tool) => (
             <button
               key={tool.id}
               onClick={() => setSelectedTool(tool)}
-              className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10 hover:border-purple-500/50 hover:bg-white/10 transition-all group text-left"
+              className="bg-white rounded-xl p-6 border border-stone-200 hover:border-purple-300 hover:bg-purple-50 transition-all group text-left shadow-sm"
             >
               <div className="text-3xl mb-3">{tool.icon}</div>
-              <h3 className="font-semibold text-white group-hover:text-purple-400 transition-colors">
+              <h3 className="font-semibold text-stone-900 group-hover:text-purple-600 transition-colors">
                 {tool.name}
               </h3>
-              <p className="text-white/50 text-sm mt-1">{tool.description}</p>
+              <p className="text-stone-600 text-sm mt-1">{tool.description}</p>
             </button>
           ))}
         </div>
@@ -226,20 +226,20 @@ export default function TrinityDashboard() {
 
       {/* Generation Modal */}
       {selectedTool && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white border border-stone-200 rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col shadow-xl">
             {/* Modal Header */}
-            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+            <div className="p-6 border-b border-stone-200 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <span className="text-2xl">{selectedTool.icon}</span>
                 <div>
-                  <h2 className="text-lg font-bold text-white">{selectedTool.name}</h2>
-                  <p className="text-white/50 text-sm">{selectedTool.description}</p>
+                  <h2 className="text-lg font-bold text-stone-900">{selectedTool.name}</h2>
+                  <p className="text-stone-600 text-sm">{selectedTool.description}</p>
                 </div>
               </div>
               <button
                 onClick={closeModal}
-                className="p-2 text-white/50 hover:text-white transition-colors"
+                className="p-2 text-stone-400 hover:text-stone-600 transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -253,21 +253,21 @@ export default function TrinityDashboard() {
                 <div className="space-y-6">
                   {/* Topic Input */}
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-sm font-medium text-stone-700 mb-2">
                       What do you want to create?
                     </label>
                     <textarea
                       value={topic}
                       onChange={(e) => setTopic(e.target.value)}
                       placeholder={selectedTool.placeholder}
-                      className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all resize-none"
+                      className="w-full px-4 py-3 bg-stone-50 border border-stone-300 rounded-xl text-stone-900 placeholder-stone-500 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all resize-none"
                       rows={3}
                     />
                   </div>
 
                   {/* Tone Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-white/70 mb-2">
+                    <label className="block text-sm font-medium text-stone-700 mb-2">
                       Tone
                     </label>
                     <div className="flex flex-wrap gap-2">
@@ -278,7 +278,7 @@ export default function TrinityDashboard() {
                           className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                             tone === t
                               ? 'bg-purple-500 text-white'
-                              : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                              : 'bg-white text-stone-700 hover:bg-stone-50 border border-stone-300'
                           }`}
                         >
                           {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -288,7 +288,7 @@ export default function TrinityDashboard() {
                   </div>
 
                   {error && (
-                    <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm">
+                    <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
                       {error}
                     </div>
                   )}
@@ -347,7 +347,7 @@ export default function TrinityDashboard() {
                       </button>
                       <button
                         onClick={() => setResult(null)}
-                        className="px-4 py-2 bg-purple-500/20 text-purple-400 rounded-xl text-sm hover:bg-purple-500/30 transition-colors"
+                        className="px-4 py-2 bg-purple-100 text-purple-700 rounded-xl text-sm hover:bg-purple-200 transition-colors"
                       >
                         Generate Another
                       </button>
@@ -355,8 +355,8 @@ export default function TrinityDashboard() {
                   </div>
 
                   {/* Generated Content */}
-                  <div className="bg-black/50 border border-white/10 rounded-xl p-6">
-                    <pre className="whitespace-pre-wrap text-white/90 font-sans text-sm leading-relaxed">
+                  <div className="bg-stone-50 border border-stone-300 rounded-xl p-6">
+                    <pre className="whitespace-pre-wrap text-stone-900 font-sans text-sm leading-relaxed">
                       {result.content}
                     </pre>
                   </div>

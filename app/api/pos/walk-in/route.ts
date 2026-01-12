@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,12 +22,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await createClient();
+    const business = await requireBusiness();
+    const business_id = business.id;
 
     // Create the walk-in appointment
     const { data: appointment, error } = await supabase
       .from('appointments')
       .insert({
+        business_id,
         service_id,
         stylist_id,
         start_time,

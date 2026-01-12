@@ -10,21 +10,25 @@ export async function GET() {
     const weekStart = new Date(todayStart.getTime() - 7 * 24 * 60 * 60 * 1000);
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // Today's appointments count
+    // Today's appointments count (exclude walk-ins, require service_id)
     const { count: todayAppointments } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
       .gte('start_time', todayStart.toISOString())
       .lt('start_time', todayEnd.toISOString())
-      .not('status', 'in', '("cancelled","no_show")');
+      .not('status', 'in', '("cancelled","no_show")')
+      .eq('is_walk_in', false)
+      .not('service_id', 'is', null);
 
-    // This week's appointments
+    // This week's appointments (exclude walk-ins, require service_id)
     const { count: weekAppointments } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
       .gte('start_time', weekStart.toISOString())
       .lt('start_time', todayEnd.toISOString())
-      .not('status', 'in', '("cancelled","no_show")');
+      .not('status', 'in', '("cancelled","no_show")')
+      .eq('is_walk_in', false)
+      .not('service_id', 'is', null);
 
     // Today's revenue
     const { data: todayPayments } = await supabase

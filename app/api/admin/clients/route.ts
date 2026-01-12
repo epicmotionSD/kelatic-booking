@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export async function GET() {
   try {
-    const supabase = createAdminClient();
+    const business = await requireBusiness();
+    const supabase = await createClient();
 
-    // Get clients with aggregate data
+    // Get clients with aggregate data - filtered by business_id
     const { data: clients, error } = await supabase
       .from('profiles')
       .select(`
@@ -27,6 +29,7 @@ export async function GET() {
         referral_source
       `)
       .eq('role', 'client')
+      .eq('business_id', business.id)
       .order('last_visit_at', { ascending: false, nullsFirst: false });
 
     if (error) {
@@ -41,17 +44,19 @@ export async function GET() {
       return NextResponse.json({ clients: [] });
     }
 
-    // Get completed appointments count and total spent
+    // Get completed appointments count and total spent - filtered by business
     const { data: appointmentStats } = await supabase
       .from('appointments')
       .select('client_id')
       .in('client_id', clientIds)
+      .eq('business_id', business.id)
       .eq('status', 'completed');
 
     const { data: paymentStats } = await supabase
       .from('payments')
-      .select('appointments!inner(client_id), total_amount')
+      .select('appointments!inner(client_id, business_id), total_amount')
       .in('appointments.client_id', clientIds)
+      .eq('appointments.business_id', business.id)
       .eq('status', 'paid');
 
     // Calculate stats per client
@@ -84,17 +89,19 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const business = await requireBusiness();
     const body = await request.json();
-    const supabase = createAdminClient();
+    const supabase = await createClient();
 
     const email = body.email?.toLowerCase()?.trim() || null;
 
-    // Check if email already exists (only if email provided)
+    // Check if email already exists in this business (only if email provided)
     if (email) {
       const { data: existing } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', email)
+        .eq('business_id', business.id)
         .single();
 
       if (existing) {
@@ -110,6 +117,7 @@ export async function POST(request: NextRequest) {
         email: email,
         phone: body.phone || null,
         role: 'client',
+        business_id: business.id,
         hair_type: body.hair_type || null,
         texture: body.texture || null,
         scalp_sensitivity: body.scalp_sensitivity || null,

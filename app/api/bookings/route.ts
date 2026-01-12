@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 import { createPaymentIntent } from '@/lib/stripe';
 import { toCents } from '@/lib/currency';
 
@@ -37,6 +38,7 @@ interface BookingRequestBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const business = await requireBusiness();
     const body: BookingRequestBody = await request.json();
 
     // Validate required fields
@@ -47,13 +49,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = createAdminClient();
+    const supabase = await createClient();
 
-    // Get service details
+    // Get service details (filtered by business)
     const { data: service, error: serviceError } = await supabase
       .from('services')
       .select('*')
       .eq('id', body.service_id)
+      .eq('business_id', business.id)
       .single();
 
     if (serviceError || !service) {
@@ -67,12 +70,13 @@ export async function POST(request: NextRequest) {
     let totalDuration = service.duration;
     let totalPrice = service.base_price;
 
-    // Add add-ons
+    // Add add-ons (filtered by business)
     if (body.addon_ids?.length) {
       const { data: addons } = await supabase
         .from('services')
         .select('id, base_price, duration')
-        .in('id', body.addon_ids);
+        .in('id', body.addon_ids)
+        .eq('business_id', business.id);
 
       if (addons) {
         for (const addon of addons) {
@@ -85,11 +89,12 @@ export async function POST(request: NextRequest) {
     const startTime = new Date(body.start_time);
     const endTime = new Date(startTime.getTime() + totalDuration * 60000);
 
-    // Check for conflicts
+    // Check for conflicts (within business)
     const { data: conflicts } = await supabase
       .from('appointments')
       .select('id')
       .eq('stylist_id', body.stylist_id)
+      .eq('business_id', business.id)
       .lt('start_time', endTime.toISOString())
       .gt('end_time', startTime.toISOString())
       .not('status', 'in', '("cancelled","no_show")')
@@ -105,11 +110,12 @@ export async function POST(request: NextRequest) {
     // Find or create client profile
     let clientId: string | null = null;
 
-    // Check if client exists by email
+    // Check if client exists by email (within business)
     const { data: existingClient } = await supabase
       .from('profiles')
       .select('id')
       .eq('email', body.client.email.toLowerCase())
+      .eq('business_id', business.id)
       .single();
 
     if (existingClient) {
@@ -122,14 +128,34 @@ export async function POST(request: NextRequest) {
           .update({ phone: body.client.phone })
           .eq('id', clientId);
       }
+    } else {
+      // Create new client profile for this business
+      const { data: newClient, error: clientError } = await supabase
+        .from('profiles')
+        .insert({
+          first_name: body.client.first_name,
+          last_name: body.client.last_name,
+          email: body.client.email.toLowerCase(),
+          phone: body.client.phone || null,
+          role: 'client',
+          business_id: business.id,
+        })
+        .select('id')
+        .single();
+
+      if (clientError) {
+        console.error('Error creating client:', clientError);
+        // Continue without client_id, store as walk-in
+      } else {
+        clientId = newClient.id;
+      }
     }
-    // Note: For new clients without auth, we'll store their info in the appointment
-    // They can create an account later and we'll link their appointments
 
     // Create appointment
     const appointmentData: any = {
       service_id: body.service_id,
       stylist_id: body.stylist_id,
+      business_id: business.id,
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
       quoted_price: totalPrice,
@@ -140,7 +166,7 @@ export async function POST(request: NextRequest) {
     if (clientId) {
       appointmentData.client_id = clientId;
     } else {
-      // Store as walk-in with contact info
+      // Store as walk-in with contact info if client creation failed
       appointmentData.is_walk_in = true;
       appointmentData.walk_in_name = `${body.client.first_name} ${body.client.last_name}`;
       appointmentData.walk_in_phone = body.client.phone;

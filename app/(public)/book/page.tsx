@@ -69,7 +69,7 @@ function BookingContent() {
   const searchParams = useSearchParams();
   const preselectedStylistId = searchParams.get('stylist');
   const preselectedServiceId = searchParams.get('service');
-  const specialOffer = searchParams.get('special'); // For special offers like "tuesday75"
+  const specialOffer = searchParams.get('special'); // For special offers like "wednesday75"
 
   const [currentStep, setCurrentStep] = useState<BookingStep>('browse');
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
@@ -91,8 +91,8 @@ function BookingContent() {
         const servicesData = await servicesRes.json();
         const allServices = servicesData.services || [];
 
-        // Handle special offers (e.g., ?special=tuesday75)
-        if (specialOffer === 'tuesday75') {
+        // Handle special offers (e.g., ?special=wednesday75)
+        if (specialOffer === 'wednesday75') {
           // Find the retwist service or create a special offer service
           const retwistService = allServices.find((s: Service) =>
             s.name.toLowerCase().includes('retwist') ||
@@ -177,9 +177,9 @@ function BookingContent() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-amber-50 text-stone-900">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+      <header className="bg-white/80 backdrop-blur-xl border-b border-amber-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
@@ -187,11 +187,11 @@ function BookingContent() {
                 <span className="text-black font-black">K</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-sm">KELATIC</span>
-                <span className="text-[9px] tracking-widest text-amber-400">BOOKING</span>
+                <span className="font-bold text-sm text-stone-900">KELATIC</span>
+                <span className="text-[9px] tracking-widest text-amber-600">BOOKING</span>
               </div>
             </Link>
-            <Link href="/" className="text-sm text-white/50 hover:text-amber-400 transition-colors">
+            <Link href="/" className="text-sm text-stone-600 hover:text-amber-600 transition-colors">
               ← Back to site
             </Link>
           </div>
@@ -200,7 +200,7 @@ function BookingContent() {
 
       {/* Progress Bar */}
       {currentStep !== 'confirmation' && (
-        <div className="bg-black/30 border-b border-white/5">
+        <div className="bg-white/80 border-b border-amber-200 shadow-sm">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               {STEPS.slice(0, -1).map((step, index) => {
@@ -223,7 +223,7 @@ function BookingContent() {
                             ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/30'
                             : isCompleted
                             ? 'bg-green-500 text-white'
-                            : 'bg-white/10 text-white/40'
+                            : 'bg-stone-200 text-stone-400'
                         }`}
                       >
                         {isCompleted ? (
@@ -236,7 +236,7 @@ function BookingContent() {
                       </div>
                       <span
                         className={`hidden sm:block text-sm font-medium ${
-                          isActive ? 'text-amber-400' : isCompleted ? 'text-green-400' : 'text-white/40'
+                          isActive ? 'text-amber-600' : isCompleted ? 'text-green-600' : 'text-stone-400'
                         }`}
                       >
                         {step.label}
@@ -245,7 +245,7 @@ function BookingContent() {
                     {index < STEPS.length - 2 && (
                       <div
                         className={`w-8 sm:w-16 h-0.5 mx-2 rounded-full ${
-                          index < currentStepIndex ? 'bg-green-500' : 'bg-white/10'
+                          index < currentStepIndex ? 'bg-green-500' : 'bg-stone-200'
                         }`}
                       />
                     )}

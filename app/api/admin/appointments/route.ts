@@ -1,16 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
+    const business = await requireBusiness();
     const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
     const status = searchParams.get('status');
     const stylistId = searchParams.get('stylist_id');
+    const includeWalkIns = searchParams.get('include_walkins');
 
-    const supabase = createAdminClient();
+    const supabase = await createClient();
+
 
     let query = supabase
       .from('appointments')
@@ -25,12 +29,23 @@ export async function GET(request: NextRequest) {
         client:profiles!appointments_client_id_fkey(first_name, last_name, phone),
         walk_in_name,
         walk_in_phone,
+        is_walk_in,
+        service_id,
         payments(total_amount, is_deposit, status)
       `)
+      .eq('business_id', business.id)
       .order('start_time');
 
-    // Filter by date
-    if (date) {
+    // Exclude walk-ins by default unless explicitly included
+    if (!includeWalkIns || includeWalkIns === 'false') {
+      query = query.eq('is_walk_in', false);
+    }
+
+    // Only include appointments with a valid service_id
+    query = query.not('service_id', 'is', null);
+
+    // Filter by date (if not 'all')
+    if (date && date !== 'all') {
       const startOfDay = new Date(date + 'T00:00:00');
       const endOfDay = new Date(date + 'T23:59:59');
       query = query
