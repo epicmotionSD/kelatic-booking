@@ -84,29 +84,19 @@ export default function AdminDashboard() {
     // SMS/Email is configured via environment variables (SENDGRID_API_KEY, TWILIO credentials)
 
     if (metrics) {
-      if ((metrics.pendingDeposits || 0) > 0) {
-        insights.push({
-          type: 'warning',
-          title: 'Pending Payments',
-          description: `${metrics.pendingDeposits} appointment${metrics.pendingDeposits !== 1 ? 's' : ''} awaiting payment confirmation.`,
-          action: {
-            label: 'View Pending',
-            href: '/admin/appointments?status=pending',
-            variant: 'secondary'
-          },
-          icon: <AlertTriangle className="w-5 h-5" />
-        });
-      }
+      // Show pending appointments insight if there are any awaiting confirmation
+      // Note: pendingDeposits may be stale data, so we don't show this insight anymore
+      // The notification bell handles pending appointments display
 
       if ((metrics.todayAppointments || 0) === 0 && new Date().getHours() > 10) {
         insights.push({
           type: 'info',
           title: 'No Appointments Today',
-          description: 'Reach out to your clients or create a promotion.',
+          description: 'Your schedule is open. Reach out to clients or create a promotion.',
           action: {
-            label: 'Create Appointment',
-            href: '/admin/appointments/new',
-            variant: 'primary'
+            label: 'View Schedule',
+            href: '/admin/appointments',
+            variant: 'secondary'
           },
           icon: <Target className="w-5 h-5" />
         });
