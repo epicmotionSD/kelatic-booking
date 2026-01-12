@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         end_time,
         status,
         quoted_price,
-        services!inner(name),
+        services(name),
         stylist:profiles!appointments_stylist_id_fkey(first_name, last_name),
         client:profiles!appointments_client_id_fkey(first_name, last_name, phone),
         walk_in_name,
@@ -41,8 +41,8 @@ export async function GET(request: NextRequest) {
       query = query.eq('is_walk_in', false);
     }
 
-    // Only include appointments with a valid service_id
-    query = query.not('service_id', 'is', null);
+    // Note: We include all appointments, even those with null service_id
+    // This ensures pending/incomplete bookings are visible
 
     // Filter by date (if not 'all')
     if (date && date !== 'all') {
@@ -81,13 +81,13 @@ export async function GET(request: NextRequest) {
         end_time: apt.end_time,
         status: apt.status,
         quoted_price: apt.quoted_price,
-        service_name: apt.services?.name,
+        service_name: apt.services?.name || 'Unknown Service',
         stylist_name: apt.stylist
           ? `${apt.stylist.first_name} ${apt.stylist.last_name}`
           : 'Unassigned',
         client_name: apt.client
           ? `${apt.client.first_name} ${apt.client.last_name}`
-          : apt.walk_in_name,
+          : apt.walk_in_name || 'Unknown',
         client_phone: apt.client?.phone || apt.walk_in_phone,
         deposit_paid: depositPayment?.total_amount || 0,
       };
