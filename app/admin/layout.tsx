@@ -22,52 +22,52 @@ import { SkipLink, useAriaLiveRegion } from '@/lib/accessibility';
 
 const NAV_ITEMS = [
   {
-    label: 'Divine Throne',
+    label: 'Dashboard',
     href: '/admin',
     icon: <Home className="w-5 h-5" />,
   },
   {
-    label: 'Divine Marketing',
+    label: 'Marketing',
     href: '/admin/trinity',
     icon: <Zap className="w-5 h-5" />,
   },
   {
-    label: 'Sacred Sessions',
+    label: 'Appointments',
     href: '/admin/appointments',
     icon: <Calendar className="w-5 h-5" />,
   },
   {
-    label: 'Divine Till',
+    label: 'Point of Sale',
     href: '/admin/pos',
     icon: <CreditCard className="w-5 h-5" />,
   },
   {
-    label: 'Sacred Arts',
+    label: 'Services',
     href: '/admin/services',
     icon: <Briefcase className="w-5 h-5" />,
   },
   {
-    label: 'Divine Locticians',
+    label: 'Stylists',
     href: '/admin/stylists',
     icon: <Users className="w-5 h-5" />,
   },
   {
-    label: 'Blessed Disciples',
+    label: 'Clients',
     href: '/admin/clients',
     icon: <UserCheck className="w-5 h-5" />,
   },
   {
-    label: 'Divine Insights',
+    label: 'Reports',
     href: '/admin/reports',
     icon: <BarChart3 className="w-5 h-5" />,
   },
   {
-    label: 'Divine Config',
+    label: 'Settings',
     href: '/admin/settings',
     icon: <Settings className="w-5 h-5" />,
   },
   {
-    label: 'Divine Wisdom',
+    label: 'Help',
     href: '/admin/help',
     icon: <HelpCircle className="w-5 h-5" />,
   },
@@ -119,7 +119,7 @@ export default function AdminLayout({
       <div className="lg:hidden flex items-center justify-between p-4 bg-white border-b border-amber-200 shadow-sm">
         <Link href="/admin" className="flex items-center">
           <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-            ✨ Loctician Gods
+            Kelatic Admin
           </h1>
         </Link>
         <button
@@ -154,7 +154,7 @@ export default function AdminLayout({
         <div className="h-16 flex items-center px-6 border-b border-amber-200">
           <Link href="/admin" className="flex items-center focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md">
             <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-              ✨ Loctician Gods
+              Kelatic Admin
             </h1>
           </Link>
         </div>
@@ -185,15 +185,15 @@ export default function AdminLayout({
           })}
         </nav>
 
-        {/* Divine User Profile */}
+        {/* User Profile */}
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-amber-200">
           <div className="flex items-center gap-3 px-4 py-3 bg-cream-50 rounded-xl border border-amber-200">
             <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-400 rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-sm text-white font-bold">✨</span>
+              <span className="text-sm text-white font-bold">K</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-stone-900 font-bold truncate">Divine Admin</p>
-              <p className="text-xs text-stone-600 truncate">kelatic@gods.com</p>
+              <p className="text-sm text-stone-900 font-bold truncate">Admin</p>
+              <p className="text-xs text-stone-600 truncate">kelatic@admin.com</p>
             </div>
             <button
               className="text-xs text-red-600 hover:text-red-700 transition-colors font-medium"
@@ -211,7 +211,7 @@ export default function AdminLayout({
 
       {/* Main content */}
       <div className="lg:pl-64">
-        {/* Divine Top Bar */}
+        {/* Top Bar */}
         <header className="h-16 bg-white border-b border-amber-200 shadow-sm flex items-center px-4 lg:px-8 sticky top-0 z-30">
           {/* Mobile menu button */}
           <button
@@ -225,7 +225,7 @@ export default function AdminLayout({
           {/* Page title - populated by page */}
           <div className="flex-1" />
 
-          {/* Divine Quick Actions */}
+          {/* Quick Actions */}
           <div className="flex items-center gap-4">
             <Link
               href="/"
@@ -233,7 +233,7 @@ export default function AdminLayout({
               className="text-sm text-stone-600 hover:text-amber-600 transition-colors hidden sm:block font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 rounded-md px-2 py-1"
               rel="noopener noreferrer"
             >
-              View Divine Site ✨
+              View Site
             </Link>
             <NotificationBell />
           </div>

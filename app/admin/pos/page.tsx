@@ -86,7 +86,7 @@ export default function POSPage() {
           <div>
             <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
               <CreditCard className="w-8 h-8 text-amber-600" />
-              Divine Till
+              Point of Sale
             </h1>
             <p className="text-stone-600 mt-1">
               {new Date().toLocaleDateString('en-US', {

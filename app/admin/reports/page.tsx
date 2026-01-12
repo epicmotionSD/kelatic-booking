@@ -57,7 +57,7 @@ export default function ReportsPage() {
         <div>
           <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
             <BarChart3 className="w-8 h-8 text-amber-600" />
-            Divine Insights
+            Reports
           </h1>
           <p className="text-stone-600">Track your business performance</p>
         </div>

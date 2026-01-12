@@ -109,7 +109,7 @@ export default function ServicesPage() {
         <div>
           <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
             <Briefcase className="w-8 h-8 text-amber-600" />
-            Sacred Arts
+            Services
           </h1>
           <p className="text-stone-600">Manage your service menu and pricing</p>
         </div>

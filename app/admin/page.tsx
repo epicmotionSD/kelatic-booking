@@ -83,10 +83,10 @@ export default function AdminDashboard() {
     if (!setupStatus.googleCalendar || !setupStatus.smsEmail) {
       insights.push({
         type: 'action',
-        title: 'Complete Your Divine Setup',
-        description: `${!setupStatus.googleCalendar ? 'Divine Calendar' : ''}${!setupStatus.googleCalendar && !setupStatus.smsEmail ? ' and ' : ''}${!setupStatus.smsEmail ? 'Sacred SMS notifications' : ''} ${(!setupStatus.googleCalendar && !setupStatus.smsEmail) ? 'are' : 'is'} not connected to your divine throne.`,
+        title: 'Complete Your Setup',
+        description: `${!setupStatus.googleCalendar ? 'Google Calendar' : ''}${!setupStatus.googleCalendar && !setupStatus.smsEmail ? ' and ' : ''}${!setupStatus.smsEmail ? 'SMS notifications' : ''} ${(!setupStatus.googleCalendar && !setupStatus.smsEmail) ? 'are' : 'is'} not connected.`,
         action: {
-          label: 'Ascend to Completion',
+          label: 'Complete Setup',
           href: '/admin/settings?tab=integrations',
           variant: 'primary'
         },
@@ -98,10 +98,10 @@ export default function AdminDashboard() {
       if ((metrics.pendingDeposits || 0) > 0) {
         insights.push({
           type: 'warning',
-          title: 'Divine Offerings Pending',
-          description: `${metrics.pendingDeposits} sacred session${metrics.pendingDeposits !== 1 ? 's' : ''} awaiting golden payment confirmation.`,
+          title: 'Pending Payments',
+          description: `${metrics.pendingDeposits} appointment${metrics.pendingDeposits !== 1 ? 's' : ''} awaiting payment confirmation.`,
           action: {
-            label: 'Collect Divine Offerings',
+            label: 'View Pending',
             href: '/admin/appointments?status=pending',
             variant: 'secondary'
           },
@@ -112,10 +112,10 @@ export default function AdminDashboard() {
       if ((metrics.todayAppointments || 0) === 0 && new Date().getHours() > 10) {
         insights.push({
           type: 'info',
-          title: 'No Divine Sessions Today',
-          description: 'Reach out to your disciples or bless them with a divine promotion.',
+          title: 'No Appointments Today',
+          description: 'Reach out to your clients or create a promotion.',
           action: {
-            label: 'Create Divine Session',
+            label: 'Create Appointment',
             href: '/admin/appointments/new',
             variant: 'primary'
           },
@@ -126,8 +126,8 @@ export default function AdminDashboard() {
       if ((metrics.newClients || 0) > 5) {
         insights.push({
           type: 'success',
-          title: 'Divine Disciples Growing',
-          description: `${metrics.newClients} new disciples have joined your sacred craft this month! Your divine reign expands.`,
+          title: 'Client Growth',
+          description: `${metrics.newClients} new clients have joined this month!`,
           icon: <TrendingUp className="w-5 h-5" />
         });
       }
@@ -151,7 +151,7 @@ export default function AdminDashboard() {
 
   const stats = [
     {
-      label: "Today's Divine Sessions",
+      label: "Today's Appointments",
       value: metrics?.todayAppointments || 0,
       icon: <Calendar className="w-6 h-6" />,
       color: 'from-gold-400 to-amber-500',
@@ -160,7 +160,7 @@ export default function AdminDashboard() {
       trend: (metrics?.todayAppointments || 0) > ((metrics?.weekAppointments || 0) / 7) ? 'up' : 'down'
     },
     {
-      label: "Today's Golden Revenue",
+      label: "Today's Revenue",
       value: formatCurrency((metrics?.todayRevenue || 0) * 100),
       icon: <CreditCard className="w-6 h-6" />,
       color: 'from-emerald-400 to-green-500',
@@ -169,17 +169,17 @@ export default function AdminDashboard() {
       trend: weeklyGrowth > 0 ? 'up' : 'down'
     },
     {
-      label: 'This Divine Week',
+      label: 'This Week',
       value: metrics?.weekAppointments || 0,
-      subtitle: 'blessed appointments',
+      subtitle: 'appointments',
       icon: <TrendingUp className="w-6 h-6" />,
       color: 'from-orange-400 to-amber-500',
       bgColor: 'bg-gradient-to-br from-orange-500/20 to-amber-400/20'
     },
     {
-      label: 'New Disciples',
+      label: 'New Clients',
       value: metrics?.newClients || 0,
-      subtitle: 'joining the divine craft',
+      subtitle: 'this month',
       icon: <Users className="w-6 h-6" />,
       color: 'from-purple-400 to-pink-500',
       bgColor: 'bg-gradient-to-br from-purple-500/20 to-pink-400/20'
@@ -194,7 +194,7 @@ export default function AdminDashboard() {
           <div className="flex-1">
             <h1 className="text-4xl font-playfair font-bold mb-3">
               <span className="bg-gradient-to-r from-amber-600 via-orange-600 to-amber-600 bg-clip-text text-transparent">
-                ✨ Welcome back, Divine Loctician! 
+                Welcome back!
               </span>
             </h1>
             <p className="text-stone-700 text-lg font-medium">
@@ -213,18 +213,18 @@ export default function AdminDashboard() {
               className="px-8 py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white rounded-2xl font-bold hover:shadow-xl hover:shadow-amber-500/30 transition-all flex items-center gap-3 hover:scale-105 transform shadow-lg"
             >
               <Calendar className="w-6 h-6" />
-              New Divine Appointment
+              New Appointment
             </Link>
           </div>
         </div>
       </div>
 
-      {/* Divine Business Insights */}
+      {/* Business Insights */}
       {insights.length > 0 && (
         <div className="space-y-6">
           <h2 className="text-2xl font-playfair font-bold text-gray-900 flex items-center gap-3">
             <Zap className="w-6 h-6 text-amber-600" />
-            Divine Business Insights
+            Business Insights
           </h2>
           <div className="grid gap-4">
             {insights.map((insight, index) => (
@@ -278,7 +278,7 @@ export default function AdminDashboard() {
         </div>
       )}
 
-      {/* Divine Performance Metrics */}
+      {/* Performance Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {stats.map((stat, index) => (
           <div
@@ -317,20 +317,20 @@ export default function AdminDashboard() {
         ))}
       </div>
 
-      {/* Divine Content Grid */}
+      {/* Content Grid */}
       <div className="grid lg:grid-cols-2 gap-8">
-        {/* Divine Upcoming Sessions */}
+        {/* Upcoming Appointments */}
         <div className="bg-white rounded-2xl border border-amber-200 shadow-lg">
           <div className="p-6 border-b border-amber-200 flex items-center justify-between">
             <h2 className="text-xl font-playfair font-bold text-stone-900 flex items-center gap-3">
               <Clock className="w-6 h-6 text-amber-600" />
-              Divine Sessions Today
+              Today's Appointments
             </h2>
             <Link
               href="/admin/appointments"
               className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1 font-medium"
             >
-              View All Sacred Sessions
+              View All Appointments
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>
@@ -387,18 +387,18 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Divine Revenue */}
+        {/* Revenue */}
         <div className="stats-card backdrop-blur-xl rounded-2xl border border-white/20 shadow-xl">
           <div className="p-6 border-b border-white/20 flex items-center justify-between">
             <h2 className="text-xl font-playfair font-bold text-white flex items-center gap-3">
               <CreditCard className="w-6 h-6 text-emerald-400" />
-              Divine Revenue
+              Revenue
             </h2>
             <Link
               href="/admin/reports"
               className="text-sm text-amber-600 hover:text-amber-700 flex items-center gap-1 font-medium"
             >
-              View Sacred Reports
+              View Reports
               <ArrowUpRight className="w-4 h-4" />
             </Link>
           </div>

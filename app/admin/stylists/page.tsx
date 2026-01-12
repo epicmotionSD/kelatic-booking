@@ -111,7 +111,7 @@ export default function StylistsPage() {
         <div>
           <h1 className="text-3xl font-playfair font-bold text-stone-900 flex items-center gap-3">
             <Users className="w-8 h-8 text-amber-600" />
-            Divine Stylists
+            Stylists
           </h1>
           <p className="text-stone-600">Manage your talented team</p>
         </div>
