@@ -100,10 +100,22 @@ export async function GET() {
         businessHours: businessHours,
         googleCalendarConnected: false, // Not in DB yet
         smsEmailEnabled: row.send_booking_confirmations ?? false,
-        stripeConnected: true, // Assume connected for Kelatic
+        stripeConnected: !!business.stripe_account_id, // Check if business has Stripe connected
         // Add more fields as needed from business_settings
       };
     } else {
+      // No settings row exists yet - use sensible defaults
+      const defaultHours: Record<number, any> = {
+        0: null,
+        1: null,
+        2: { open: '10:00', close: '19:00' },
+        3: { open: '10:00', close: '19:00' },
+        4: { open: '10:00', close: '19:00' },
+        5: { open: '10:00', close: '19:00' },
+        6: { open: '10:00', close: '19:00' },
+      };
+      const defaultClosedDays = getClosedDaysFromHours(defaultHours);
+      
       settings = {
         name: business.name,
         address: business.address || '',
@@ -115,19 +127,11 @@ export async function GET() {
         bookingWindowDays: 60,
         cancellationPolicy: '24 hours notice required for cancellations.',
         depositPolicy: 'A deposit may be required to secure your appointment.',
-        closedDays: [0, 1],
-        businessHours: {
-          0: null,
-          1: null,
-          2: { open: '10:00', close: '19:00' },
-          3: { open: '10:00', close: '19:00' },
-          4: { open: '10:00', close: '19:00' },
-          5: { open: '10:00', close: '19:00' },
-          6: { open: '09:00', close: '17:00' },
-        },
+        closedDays: defaultClosedDays,
+        businessHours: defaultHours,
         googleCalendarConnected: false,
         smsEmailEnabled: false,
-        stripeConnected: false,
+        stripeConnected: !!business.stripe_account_id,
       };
     }
 
