@@ -285,7 +285,11 @@ export default function AppointmentsPage() {
               </thead>
               <tbody className="divide-y divide-white/10">
                 {appointments.map((apt) => (
-                  <tr key={apt.id} className="hover:bg-white/5 transition-colors">
+                  <tr 
+                    key={apt.id} 
+                    className="hover:bg-white/5 transition-colors cursor-pointer"
+                    onClick={() => window.location.href = `/admin/appointments/${apt.id}`}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-white">
                         {formatTime(apt.start_time)}
