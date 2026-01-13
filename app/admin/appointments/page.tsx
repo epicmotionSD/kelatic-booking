@@ -15,8 +15,10 @@ const formatDate = (dateStr: string) => {
   });
 };
 
-const formatTime = (timeStr: string) => {
-  return new Date(`2000-01-01T${timeStr}`).toLocaleTimeString('en-US', {
+const formatTime = (dateStr: string) => {
+  const date = new Date(dateStr);
+  if (isNaN(date.getTime())) return 'N/A';
+  return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true
