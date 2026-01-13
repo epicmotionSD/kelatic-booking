@@ -2,8 +2,20 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { 
+  DollarSign, 
+  Users, 
+  MessageSquare, 
+  Calendar, 
+  ArrowRight, 
+  CheckCircle,
+  Zap,
+  TrendingUp,
+  Clock,
+  AlertTriangle
+} from 'lucide-react';
 
-type Step = 'business' | 'branding' | 'services' | 'integrations' | 'board' | 'complete';
+type Step = 'audit' | 'leaks' | 'estimate' | 'sprint' | 'complete';
 
 interface BusinessData {
   name: string;
@@ -11,15 +23,17 @@ interface BusinessData {
   email: string;
   phone: string;
   businessType: string;
-  address: string;
   city: string;
   state: string;
-  zip: string;
   timezone: string;
-  primaryColor: string;
-  secondaryColor: string;
-  tagline: string;
-  instagramHandle: string;
+  // Revenue audit questions
+  monthlyClients: string;
+  averageTicket: string;
+  repeatRate: string;
+  currentSystem: string;
+  biggestPain: string[];
+  // Contact preferences
+  contactMethod: string;
 }
 
 const businessTypes = [
@@ -28,28 +42,36 @@ const businessTypes = [
   { value: 'spa', label: 'Spa & Wellness', icon: '🧖' },
   { value: 'nails', label: 'Nail Salon', icon: '💅' },
   { value: 'lashes', label: 'Lash Studio', icon: '👁️' },
-  { value: 'other', label: 'Other', icon: '✨' },
+  { value: 'other', label: 'Other Beauty', icon: '✨' },
 ];
 
 const timezones = [
-  { value: 'America/New_York', label: 'Eastern Time (ET)' },
-  { value: 'America/Chicago', label: 'Central Time (CT)' },
-  { value: 'America/Denver', label: 'Mountain Time (MT)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
+  { value: 'America/New_York', label: 'Eastern Time' },
+  { value: 'America/Chicago', label: 'Central Time' },
+  { value: 'America/Denver', label: 'Mountain Time' },
+  { value: 'America/Los_Angeles', label: 'Pacific Time' },
 ];
 
-const colorPresets = [
-  { primary: '#f59e0b', secondary: '#eab308', name: 'Gold' },
-  { primary: '#8b5cf6', secondary: '#a78bfa', name: 'Violet' },
-  { primary: '#ec4899', secondary: '#f472b6', name: 'Pink' },
-  { primary: '#10b981', secondary: '#34d399', name: 'Emerald' },
-  { primary: '#3b82f6', secondary: '#60a5fa', name: 'Blue' },
-  { primary: '#000000', secondary: '#374151', name: 'Black' },
+const currentSystems = [
+  { value: 'square', label: 'Square Appointments' },
+  { value: 'vagaro', label: 'Vagaro' },
+  { value: 'fresha', label: 'Fresha' },
+  { value: 'acuity', label: 'Acuity/Squarespace' },
+  { value: 'boulevard', label: 'Boulevard' },
+  { value: 'dms', label: 'DMs Only (No System)' },
+  { value: 'other', label: 'Other' },
+];
+
+const painPoints = [
+  { value: 'ghosts', label: 'Clients disappear after 1-2 visits', icon: Users },
+  { value: 'dms', label: 'DMs go unanswered or drop off', icon: MessageSquare },
+  { value: 'cancellations', label: 'Last-minute cancellations hurt', icon: Clock },
+  { value: 'notime', label: 'No time to follow up with everyone', icon: Calendar },
 ];
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const [step, setStep] = useState<Step>('business');
+  const [step, setStep] = useState<Step>('audit');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<BusinessData>({
     name: '',
@@ -57,23 +79,41 @@ export default function OnboardingPage() {
     email: '',
     phone: '',
     businessType: 'salon',
-    address: '',
     city: '',
     state: '',
-    zip: '',
     timezone: 'America/Chicago',
-    primaryColor: '#8b5cf6',
-    secondaryColor: '#a78bfa',
-    tagline: '',
-    instagramHandle: '',
+    monthlyClients: '',
+    averageTicket: '',
+    repeatRate: '',
+    currentSystem: '',
+    biggestPain: [],
+    contactMethod: 'email',
   });
 
-  const updateData = (field: keyof BusinessData, value: string) => {
+  // Calculate estimated revenue leak
+  const calculateLeak = () => {
+    const clients = parseInt(data.monthlyClients) || 100;
+    const ticket = parseInt(data.averageTicket) || 75;
+    const repeatRate = parseInt(data.repeatRate) || 30;
+    const churnRate = 100 - repeatRate;
+    
+    // Lost clients per month * ticket = monthly leak
+    const lostClients = Math.round(clients * (churnRate / 100));
+    const monthlyLeak = lostClients * ticket;
+    
+    return {
+      lostClients,
+      monthlyLeak,
+      yearlyLeak: monthlyLeak * 12,
+      recoverableMonthly: Math.round(monthlyLeak * 0.35), // 35% recoverable
+    };
+  };
+
+  const updateData = (field: keyof BusinessData, value: string | string[]) => {
     setData((prev) => ({ ...prev, [field]: value }));
 
-    // Auto-generate slug from name
     if (field === 'name') {
-      const slug = value
+      const slug = (value as string)
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-|-$/g, '');
@@ -81,13 +121,20 @@ export default function OnboardingPage() {
     }
   };
 
-  const steps: { key: Step; label: string; icon: string }[] = [
-    { key: 'business', label: 'Business Info', icon: '🏪' },
-    { key: 'branding', label: 'Branding', icon: '🎨' },
-    { key: 'services', label: 'Services', icon: '📋' },
-    { key: 'integrations', label: 'Integrations', icon: '🔗' },
-    { key: 'board', label: 'AI Board', icon: '🤖' },
-    { key: 'complete', label: 'Complete', icon: '🎉' },
+  const togglePain = (pain: string) => {
+    setData((prev) => ({
+      ...prev,
+      biggestPain: prev.biggestPain.includes(pain)
+        ? prev.biggestPain.filter((p) => p !== pain)
+        : [...prev.biggestPain, pain],
+    }));
+  };
+
+  const steps: { key: Step; label: string }[] = [
+    { key: 'audit', label: 'Your Business' },
+    { key: 'leaks', label: 'Revenue Leaks' },
+    { key: 'estimate', label: 'Your Estimate' },
+    { key: 'sprint', label: 'Start Sprint' },
   ];
 
   const currentStepIndex = steps.findIndex((s) => s.key === step);
@@ -99,7 +146,16 @@ export default function OnboardingPage() {
       const response = await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          // Map to expected API fields
+          address: '',
+          zip: '',
+          primaryColor: '#10b981',
+          secondaryColor: '#06b6d4',
+          tagline: '',
+          instagramHandle: '',
+        }),
       });
 
       if (!response.ok) {
@@ -109,14 +165,14 @@ export default function OnboardingPage() {
       setStep('complete');
     } catch (error) {
       console.error('Onboarding error:', error);
-      alert('Failed to create business. Please try again.');
+      alert('Something went wrong. Please try again or contact hey@x3o.ai');
     } finally {
       setLoading(false);
     }
   };
 
   const goToNext = () => {
-    const stepOrder: Step[] = ['business', 'branding', 'services', 'integrations', 'board', 'complete'];
+    const stepOrder: Step[] = ['audit', 'leaks', 'estimate', 'sprint', 'complete'];
     const currentIndex = stepOrder.indexOf(step);
     if (currentIndex < stepOrder.length - 1) {
       setStep(stepOrder[currentIndex + 1]);
@@ -124,12 +180,14 @@ export default function OnboardingPage() {
   };
 
   const goToPrev = () => {
-    const stepOrder: Step[] = ['business', 'branding', 'services', 'integrations', 'board', 'complete'];
+    const stepOrder: Step[] = ['audit', 'leaks', 'estimate', 'sprint', 'complete'];
     const currentIndex = stepOrder.indexOf(step);
     if (currentIndex > 0) {
       setStep(stepOrder[currentIndex - 1]);
     }
   };
+
+  const leak = calculateLeak();
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -137,12 +195,12 @@ export default function OnboardingPage() {
       <div className="border-b border-zinc-800">
         <div className="max-w-4xl mx-auto px-4 py-6">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-fuchsia-500 rounded-xl flex items-center justify-center font-bold">
+            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-cyan-500 rounded-xl flex items-center justify-center font-bold">
               x3
             </div>
             <div>
-              <h1 className="text-xl font-bold">Set Up Your Platform</h1>
-              <p className="text-sm text-zinc-500">Let's get your booking system ready</p>
+              <h1 className="text-xl font-bold">7-Day Revenue Sprint</h1>
+              <p className="text-sm text-zinc-500">Let's find your revenue leaks</p>
             </div>
           </div>
         </div>
@@ -157,17 +215,25 @@ export default function OnboardingPage() {
                 <div
                   className={`flex items-center gap-2 px-3 py-2 rounded-lg transition ${
                     index <= currentStepIndex
-                      ? 'bg-violet-500/10 text-violet-400'
+                      ? 'bg-emerald-500/10 text-emerald-400'
                       : 'text-zinc-500'
                   }`}
                 >
-                  <span>{s.icon}</span>
+                  <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                    index < currentStepIndex 
+                      ? 'bg-emerald-500 text-white' 
+                      : index === currentStepIndex 
+                        ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500' 
+                        : 'bg-zinc-800 text-zinc-500'
+                  }`}>
+                    {index < currentStepIndex ? '✓' : index + 1}
+                  </span>
                   <span className="hidden sm:inline text-sm font-medium">{s.label}</span>
                 </div>
                 {index < steps.length - 1 && (
                   <div
                     className={`w-8 h-0.5 mx-2 ${
-                      index < currentStepIndex ? 'bg-violet-500' : 'bg-zinc-700'
+                      index < currentStepIndex ? 'bg-emerald-500' : 'bg-zinc-700'
                     }`}
                   />
                 )}
@@ -179,12 +245,12 @@ export default function OnboardingPage() {
 
       {/* Content */}
       <div className="max-w-2xl mx-auto px-4 py-12">
-        {/* Step 1: Business Info */}
-        {step === 'business' && (
+        {/* Step 1: Business Audit */}
+        {step === 'audit' && (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Tell us about your business</h2>
-              <p className="text-zinc-400">This information will appear on your booking site.</p>
+              <h2 className="text-2xl font-bold mb-2">Let's audit your revenue</h2>
+              <p className="text-zinc-400">First, tell us about your business so we can find your leaks.</p>
             </div>
 
             <div className="space-y-6">
@@ -195,28 +261,12 @@ export default function OnboardingPage() {
                   value={data.name}
                   onChange={(e) => updateData('name', e.target.value)}
                   placeholder="e.g., Bella's Hair Studio"
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition"
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Your URL</label>
-                <div className="flex items-center">
-                  <input
-                    type="text"
-                    value={data.slug}
-                    onChange={(e) => updateData('slug', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-                    placeholder="your-business"
-                    className="flex-1 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-l-lg focus:outline-none focus:border-violet-500 transition"
-                  />
-                  <span className="px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-r-lg text-zinc-400">
-                    .x3o.ai
-                  </span>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Business Type *</label>
+                <label className="block text-sm font-medium mb-2">What type of business?</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {businessTypes.map((type) => (
                     <button
@@ -224,7 +274,7 @@ export default function OnboardingPage() {
                       onClick={() => updateData('businessType', type.value)}
                       className={`p-4 rounded-lg border transition text-left ${
                         data.businessType === type.value
-                          ? 'bg-violet-500/10 border-violet-500 text-violet-400'
+                          ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
                           : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
                       }`}
                     >
@@ -237,67 +287,57 @@ export default function OnboardingPage() {
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email *</label>
+                  <label className="block text-sm font-medium mb-2">Your Email *</label>
                   <input
                     type="email"
                     value={data.email}
                     onChange={(e) => updateData('email', e.target.value)}
-                    placeholder="hello@yourbusiness.com"
-                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition"
+                    placeholder="you@email.com"
+                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Phone</label>
+                  <label className="block text-sm font-medium mb-2">Phone (for sprint updates)</label>
                   <input
                     type="tel"
                     value={data.phone}
                     onChange={(e) => updateData('phone', e.target.value)}
                     placeholder="(555) 123-4567"
-                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition"
+                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Address</label>
-                <input
-                  type="text"
-                  value={data.address}
-                  onChange={(e) => updateData('address', e.target.value)}
-                  placeholder="123 Main St"
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition mb-3"
-                />
-                <div className="grid grid-cols-3 gap-3">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">City</label>
                   <input
                     type="text"
                     value={data.city}
                     onChange={(e) => updateData('city', e.target.value)}
-                    placeholder="City"
-                    className="px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition"
+                    placeholder="Atlanta"
+                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
                   />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">State</label>
                   <input
                     type="text"
                     value={data.state}
                     onChange={(e) => updateData('state', e.target.value)}
-                    placeholder="State"
-                    className="px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition"
-                  />
-                  <input
-                    type="text"
-                    value={data.zip}
-                    onChange={(e) => updateData('zip', e.target.value)}
-                    placeholder="ZIP"
-                    className="px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition"
+                    placeholder="GA"
+                    className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Timezone</label>
+                <label className="block text-sm font-medium mb-2" id="timezone-label">Timezone</label>
                 <select
                   value={data.timezone}
                   onChange={(e) => updateData('timezone', e.target.value)}
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition"
+                  aria-labelledby="timezone-label"
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
                 >
                   {timezones.map((tz) => (
                     <option key={tz.value} value={tz.value}>
@@ -310,337 +350,353 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 2: Branding */}
-        {step === 'branding' && (
+        {/* Step 2: Revenue Leaks */}
+        {step === 'leaks' && (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Customize Your Brand</h2>
-              <p className="text-zinc-400">Make it yours with custom colors and messaging.</p>
+              <h2 className="text-2xl font-bold mb-2">Where are you losing money?</h2>
+              <p className="text-zinc-400">Help us understand your current situation.</p>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-3">Brand Colors</label>
-                <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-                  {colorPresets.map((preset) => (
+                <label className="block text-sm font-medium mb-2" id="monthly-clients-label">How many clients do you see per month?</label>
+                <select
+                  value={data.monthlyClients}
+                  onChange={(e) => updateData('monthlyClients', e.target.value)}
+                  aria-labelledby="monthly-clients-label"
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
+                >
+                  <option value="">Select...</option>
+                  <option value="30">Less than 50</option>
+                  <option value="75">50-100</option>
+                  <option value="150">100-200</option>
+                  <option value="300">200-400</option>
+                  <option value="500">400+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" id="avg-ticket-label">What's your average service price?</label>
+                <select
+                  value={data.averageTicket}
+                  onChange={(e) => updateData('averageTicket', e.target.value)}
+                  aria-labelledby="avg-ticket-label"
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
+                >
+                  <option value="">Select...</option>
+                  <option value="35">Under $50</option>
+                  <option value="65">$50-$80</option>
+                  <option value="100">$80-$120</option>
+                  <option value="150">$120-$180</option>
+                  <option value="225">$180-$250</option>
+                  <option value="350">$250+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2" id="repeat-rate-label">What percent of clients come back within 8 weeks?</label>
+                <select
+                  value={data.repeatRate}
+                  onChange={(e) => updateData('repeatRate', e.target.value)}
+                  aria-labelledby="repeat-rate-label"
+                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-emerald-500 transition"
+                >
+                  <option value="">Select...</option>
+                  <option value="20">Less than 25%</option>
+                  <option value="35">25-40%</option>
+                  <option value="50">40-60%</option>
+                  <option value="70">60-80%</option>
+                  <option value="85">80%+</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">What booking system do you use now?</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {currentSystems.map((system) => (
                     <button
-                      key={preset.name}
-                      onClick={() => {
-                        updateData('primaryColor', preset.primary);
-                        updateData('secondaryColor', preset.secondary);
-                      }}
-                      className={`aspect-square rounded-xl border-2 transition ${
-                        data.primaryColor === preset.primary
-                          ? 'border-white'
-                          : 'border-transparent hover:border-zinc-600'
+                      key={system.value}
+                      onClick={() => updateData('currentSystem', system.value)}
+                      className={`p-3 rounded-lg border transition text-left text-sm ${
+                        data.currentSystem === system.value
+                          ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                          : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
                       }`}
-                      style={{
-                        background: `linear-gradient(135deg, ${preset.primary} 0%, ${preset.secondary} 100%)`,
-                      }}
-                      title={preset.name}
-                    />
+                    >
+                      {system.label}
+                    </button>
                   ))}
                 </div>
-                <div className="mt-4 flex items-center gap-4">
-                  <div className="flex-1">
-                    <label className="block text-xs text-zinc-500 mb-1">Primary</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={data.primaryColor}
-                        onChange={(e) => updateData('primaryColor', e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={data.primaryColor}
-                        onChange={(e) => updateData('primaryColor', e.target.value)}
-                        className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <label className="block text-xs text-zinc-500 mb-1">Secondary</label>
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="color"
-                        value={data.secondaryColor}
-                        onChange={(e) => updateData('secondaryColor', e.target.value)}
-                        className="w-10 h-10 rounded cursor-pointer"
-                      />
-                      <input
-                        type="text"
-                        value={data.secondaryColor}
-                        onChange={(e) => updateData('secondaryColor', e.target.value)}
-                        className="flex-1 px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm"
-                      />
-                    </div>
-                  </div>
-                </div>
+                <p className="text-xs text-zinc-500 mt-2">
+                  ✓ Trinity works alongside your existing system—no migration needed
+                </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Tagline</label>
-                <input
-                  type="text"
-                  value={data.tagline}
-                  onChange={(e) => updateData('tagline', e.target.value)}
-                  placeholder="e.g., Where beauty meets artistry"
-                  className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-violet-500 transition"
-                />
-                <p className="text-xs text-zinc-500 mt-1">Appears on your booking page and emails</p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Instagram Handle</label>
-                <div className="flex items-center">
-                  <span className="px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-l-lg text-zinc-400">
-                    @
-                  </span>
-                  <input
-                    type="text"
-                    value={data.instagramHandle}
-                    onChange={(e) => updateData('instagramHandle', e.target.value.replace('@', ''))}
-                    placeholder="yourbusiness"
-                    className="flex-1 px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-r-lg focus:outline-none focus:border-violet-500 transition"
-                  />
-                </div>
-              </div>
-
-              {/* Preview */}
-              <div>
-                <label className="block text-sm font-medium mb-3">Preview</label>
-                <div
-                  className="rounded-xl border border-zinc-800 overflow-hidden"
-                  style={{
-                    background: `linear-gradient(135deg, ${data.primaryColor}20 0%, ${data.secondaryColor}10 100%)`,
-                  }}
-                >
-                  <div
-                    className="p-6 text-center"
-                    style={{
-                      borderBottom: `2px solid ${data.primaryColor}`,
-                    }}
-                  >
-                    <h3 className="text-xl font-bold">{data.name || 'Your Business'}</h3>
-                    {data.tagline && <p className="text-sm text-zinc-400 mt-1">{data.tagline}</p>}
-                  </div>
-                  <div className="p-4 text-center">
-                    <button
-                      className="px-6 py-2 rounded-full font-medium"
-                      style={{
-                        background: `linear-gradient(135deg, ${data.primaryColor} 0%, ${data.secondaryColor} 100%)`,
-                      }}
-                    >
-                      Book Now
-                    </button>
-                  </div>
+                <label className="block text-sm font-medium mb-3">What's hurting your revenue most? (select all)</label>
+                <div className="space-y-3">
+                  {painPoints.map((pain) => {
+                    const Icon = pain.icon;
+                    const isSelected = data.biggestPain.includes(pain.value);
+                    return (
+                      <button
+                        key={pain.value}
+                        onClick={() => togglePain(pain.value)}
+                        className={`w-full p-4 rounded-lg border transition text-left flex items-center gap-4 ${
+                          isSelected
+                            ? 'bg-red-500/10 border-red-500/50'
+                            : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                        }`}
+                      >
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          isSelected ? 'bg-red-500/20' : 'bg-zinc-800'
+                        }`}>
+                          <Icon className={`w-5 h-5 ${isSelected ? 'text-red-400' : 'text-zinc-400'}`} />
+                        </div>
+                        <span className={isSelected ? 'text-red-300' : 'text-zinc-300'}>{pain.label}</span>
+                        {isSelected && (
+                          <CheckCircle className="w-5 h-5 text-red-400 ml-auto" />
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* Step 3: Services */}
-        {step === 'services' && (
+        {/* Step 3: Revenue Estimate */}
+        {step === 'estimate' && (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Add Your Services</h2>
-              <p className="text-zinc-400">You can add more services later from your dashboard.</p>
+              <h2 className="text-2xl font-bold mb-2">Your Revenue Leak Report</h2>
+              <p className="text-zinc-400">Based on your numbers, here's what we found.</p>
             </div>
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 text-center">
-              <div className="text-4xl mb-4">📋</div>
-              <h3 className="font-semibold mb-2">Services Setup</h3>
-              <p className="text-zinc-400 text-sm mb-4">
-                We'll set up a few starter services for you based on your business type.
-                You can customize them in your dashboard.
+            {/* Big Number */}
+            <div className="bg-gradient-to-br from-red-500/10 to-red-500/5 border border-red-500/20 rounded-2xl p-8 text-center">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <AlertTriangle className="w-6 h-6 text-red-400" />
+                <span className="text-red-400 font-medium">Estimated Monthly Revenue Leak</span>
+              </div>
+              <div className="text-6xl font-bold text-red-400 mb-2">
+                ${leak.monthlyLeak.toLocaleString()}
+              </div>
+              <p className="text-zinc-400">
+                ~{leak.lostClients} clients not returning × ${data.averageTicket || 75} avg ticket
               </p>
-              <div className="inline-flex items-center gap-2 text-violet-400 text-sm">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
-                </svg>
-                Default services will be created for {businessTypes.find((t) => t.value === data.businessType)?.label || 'your business'}
+            </div>
+
+            {/* Breakdown */}
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+                <div className="text-sm text-zinc-500 mb-1">Yearly Impact</div>
+                <div className="text-3xl font-bold text-red-400">${leak.yearlyLeak.toLocaleString()}</div>
+                <p className="text-xs text-zinc-500 mt-1">Lost revenue per year</p>
+              </div>
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-6">
+                <div className="text-sm text-emerald-400 mb-1">Recoverable</div>
+                <div className="text-3xl font-bold text-emerald-400">${leak.recoverableMonthly.toLocaleString()}/mo</div>
+                <p className="text-xs text-zinc-500 mt-1">What Trinity can bring back</p>
+              </div>
+            </div>
+
+            {/* Pain Points Selected */}
+            {data.biggestPain.length > 0 && (
+              <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
+                <h3 className="font-semibold mb-4">Trinity will attack these leaks:</h3>
+                <div className="space-y-3">
+                  {data.biggestPain.map((pain) => {
+                    const painInfo = painPoints.find((p) => p.value === pain);
+                    if (!painInfo) return null;
+                    const Icon = painInfo.icon;
+                    return (
+                      <div key={pain} className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-emerald-400" />
+                        </div>
+                        <span className="text-zinc-300">{painInfo.label}</span>
+                        <ArrowRight className="w-4 h-4 text-zinc-600" />
+                        <span className="text-emerald-400 text-sm">
+                          {pain === 'ghosts' && 'AI reactivation campaigns'}
+                          {pain === 'dms' && '24/7 DM response & booking'}
+                          {pain === 'cancellations' && 'Instant waitlist filling'}
+                          {pain === 'notime' && 'Automated follow-ups'}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Guarantee */}
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4 flex items-start gap-3">
+              <div className="text-2xl">💰</div>
+              <div>
+                <h4 className="font-semibold text-emerald-400">Revenue Recovery Guarantee</h4>
+                <p className="text-sm text-zinc-300">
+                  If Trinity doesn't recover at least $500 in your 7-Day Sprint, you get a full refund.
+                </p>
               </div>
             </div>
           </div>
         )}
 
-        {/* Step 4: Integrations */}
-        {step === 'integrations' && (
+        {/* Step 4: Start Sprint */}
+        {step === 'sprint' && (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Connect Your Tools</h2>
-              <p className="text-zinc-400">Optional integrations to supercharge your business.</p>
+              <h2 className="text-2xl font-bold mb-2">Start Your 7-Day Revenue Sprint</h2>
+              <p className="text-zinc-400">Here's exactly what happens next.</p>
             </div>
 
+            {/* Sprint Timeline */}
             <div className="space-y-4">
               {[
-                {
-                  name: 'Stripe',
-                  description: 'Accept payments online and in-person',
-                  icon: '💳',
-                  status: 'Set up after launch',
-                },
-                {
-                  name: 'SendGrid',
-                  description: 'Send branded email notifications',
-                  icon: '📧',
-                  status: 'Uses platform default',
-                },
-                {
-                  name: 'Twilio',
-                  description: 'SMS reminders and notifications',
-                  icon: '📱',
-                  status: 'Uses platform default',
-                },
-              ].map((integration) => (
-                <div
-                  key={integration.name}
-                  className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="text-2xl">{integration.icon}</div>
-                    <div>
-                      <h3 className="font-medium">{integration.name}</h3>
-                      <p className="text-sm text-zinc-400">{integration.description}</p>
+                { day: 'Today', title: 'Kickoff Call Scheduled', desc: 'We\'ll connect your systems and set up Trinity in 30 min.' },
+                { day: 'Day 1-2', title: 'Database Analysis', desc: 'We identify your ghost clients and dead conversations.' },
+                { day: 'Day 3-5', title: 'Trinity Goes Live', desc: 'AI starts reactivating clients and responding to DMs.' },
+                { day: 'Day 6-7', title: 'Results & Strategy', desc: 'You see recovered revenue + recommendations for scale.' },
+              ].map((item, index) => (
+                <div key={index} className="flex gap-4">
+                  <div className="flex flex-col items-center">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
+                      index === 0 ? 'bg-emerald-500 text-white' : 'bg-zinc-800 text-zinc-400'
+                    }`}>
+                      {index === 0 ? <Zap className="w-5 h-5" /> : index + 1}
                     </div>
+                    {index < 3 && <div className="w-0.5 h-full bg-zinc-800 mt-2" />}
                   </div>
-                  <span className="text-xs text-zinc-500 bg-zinc-800 px-3 py-1 rounded-full">
-                    {integration.status}
-                  </span>
+                  <div className="pb-6">
+                    <div className="text-emerald-400 text-sm font-medium">{item.day}</div>
+                    <h4 className="font-semibold">{item.title}</h4>
+                    <p className="text-sm text-zinc-400">{item.desc}</p>
+                  </div>
                 </div>
               ))}
             </div>
 
-            <div className="bg-violet-500/10 border border-violet-500/20 rounded-xl p-4">
-              <p className="text-sm text-zinc-300">
-                Don't worry! You can connect all integrations from your dashboard after setup.
-                Your platform will work with our default settings until then.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Step 5: AI Board of Directors */}
-        {step === 'board' && (
-          <div className="space-y-8">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Meet Your AI Board of Directors</h2>
-              <p className="text-zinc-400">Four AI agents work 24/7 to grow and optimize your business.</p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              {[
-                {
-                  name: 'Atlas',
-                  role: 'CEO',
-                  icon: '🎯',
-                  color: '#22c55e',
-                  description: 'Strategic planning, task delegation, and decision approval.',
-                },
-                {
-                  name: 'Nova',
-                  role: 'CTO',
-                  icon: '🔧',
-                  color: '#3b82f6',
-                  description: 'Platform management, template deployment, and tech operations.',
-                },
-                {
-                  name: 'Pulse',
-                  role: 'CMO',
-                  icon: '📈',
-                  color: '#a855f7',
-                  description: 'Growth marketing, campaign optimization, and lead generation.',
-                },
-                {
-                  name: 'Apex',
-                  role: 'CFO',
-                  icon: '💰',
-                  color: '#f59e0b',
-                  description: 'Revenue analytics, subscription management, and forecasting.',
-                },
-              ].map((agent) => (
-                <div
-                  key={agent.name}
-                  className="bg-zinc-900 border rounded-xl p-5 transition-all hover:scale-[1.02]"
-                  style={{ borderColor: `${agent.color}30` }}
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
-                      style={{ backgroundColor: `${agent.color}20` }}
-                    >
-                      {agent.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-lg">{agent.name}</h3>
-                      <span
-                        className="text-xs font-medium px-2 py-0.5 rounded-full"
-                        style={{ backgroundColor: `${agent.color}20`, color: agent.color }}
-                      >
-                        {agent.role}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="text-zinc-400 text-sm">{agent.description}</p>
-                </div>
-              ))}
-            </div>
-
-            <div className="bg-cyan-500/10 border border-cyan-500/20 rounded-xl p-5">
-              <div className="flex items-start gap-3">
-                <div className="text-2xl">✨</div>
+            {/* Investment */}
+            <div className="bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/30 rounded-xl p-6">
+              <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h4 className="font-semibold text-cyan-400 mb-1">Always Working for You</h4>
-                  <p className="text-sm text-zinc-300">
-                    Your AI Board of Directors monitors your business 24/7, making smart decisions
-                    and sending you approval requests for critical actions. Access the Command Center
-                    from your dashboard anytime.
-                  </p>
+                  <h3 className="font-semibold text-lg">7-Day Revenue Sprint</h3>
+                  <p className="text-sm text-zinc-400">One-time investment</p>
+                </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold text-emerald-400">$1,500</div>
+                  <div className="text-xs text-zinc-500">Money-back guarantee</div>
                 </div>
               </div>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {[
+                  'Full database analysis',
+                  'Ghost client campaigns',
+                  'Trinity AI (7 days)',
+                  'Cancellation recovery',
+                  'Revenue dashboard',
+                  'Strategy call',
+                ].map((item, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                    <span className="text-zinc-300">{item}</span>
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {/* Preferred Contact */}
+            <div>
+              <label className="block text-sm font-medium mb-3">How should we reach you for kickoff?</label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => updateData('contactMethod', 'email')}
+                  className={`p-4 rounded-lg border transition ${
+                    data.contactMethod === 'email'
+                      ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                      : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">📧</div>
+                  <div className="font-medium">Email</div>
+                  <div className="text-xs text-zinc-500">{data.email || 'your@email.com'}</div>
+                </button>
+                <button
+                  onClick={() => updateData('contactMethod', 'phone')}
+                  className={`p-4 rounded-lg border transition ${
+                    data.contactMethod === 'phone'
+                      ? 'bg-emerald-500/10 border-emerald-500 text-emerald-400'
+                      : 'bg-zinc-900 border-zinc-800 hover:border-zinc-700'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">📱</div>
+                  <div className="font-medium">Phone/Text</div>
+                  <div className="text-xs text-zinc-500">{data.phone || 'Add phone above'}</div>
+                </button>
+              </div>
+            </div>
+
+            {/* Fine Print */}
+            <p className="text-xs text-zinc-500 text-center">
+              After clicking "Start Sprint", you'll be redirected to secure checkout. 
+              Your kickoff call will be scheduled within 24 hours.
+            </p>
           </div>
         )}
 
         {/* Step 5: Complete */}
         {step === 'complete' && (
           <div className="text-center space-y-8">
-            <div className="text-6xl">🎉</div>
+            <div className="text-6xl">🚀</div>
             <div>
-              <h2 className="text-2xl font-bold mb-2">You're All Set!</h2>
+              <h2 className="text-2xl font-bold mb-2">You're In!</h2>
               <p className="text-zinc-400">
-                Your platform is ready at{' '}
-                <span className="text-violet-400 font-medium">{data.slug}.x3o.ai</span>
+                We're preparing your Revenue Sprint for{' '}
+                <span className="text-emerald-400 font-medium">{data.name}</span>
               </p>
             </div>
 
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 text-left">
-              <h3 className="font-semibold mb-4">Next Steps:</h3>
-              <ul className="space-y-3">
+              <h3 className="font-semibold mb-4 flex items-center gap-2">
+                <Zap className="w-5 h-5 text-emerald-400" />
+                What Happens Next:
+              </h3>
+              <ul className="space-y-4">
                 {[
-                  'Add your team members',
-                  'Customize your services and pricing',
-                  'Connect Stripe to accept payments',
-                  'Upload your logo',
-                  'Share your booking link!',
+                  { time: 'Within 1 hour', action: 'Check your email for kickoff call booking link' },
+                  { time: 'On the call', action: 'We\'ll connect your systems (takes ~30 min)' },
+                  { time: 'Day 1', action: 'Trinity starts analyzing your client database' },
+                  { time: 'Day 3', action: 'First reactivation messages go out' },
+                  { time: 'Day 7', action: 'You get your Revenue Recovery Report' },
                 ].map((item, index) => (
-                  <li key={index} className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-violet-500/20 rounded-full flex items-center justify-center text-violet-400 text-sm font-medium">
+                  <li key={index} className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-emerald-500/20 rounded-full flex items-center justify-center text-emerald-400 text-xs font-bold flex-shrink-0 mt-0.5">
                       {index + 1}
                     </div>
-                    <span className="text-zinc-300">{item}</span>
+                    <div>
+                      <span className="text-emerald-400 text-sm font-medium">{item.time}</span>
+                      <p className="text-zinc-300">{item.action}</p>
+                    </div>
                   </li>
                 ))}
               </ul>
             </div>
 
+            <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
+              <p className="text-sm text-zinc-300">
+                Questions? Reply to your confirmation email or text us at{' '}
+                <span className="text-emerald-400 font-medium">(555) 123-4567</span>
+              </p>
+            </div>
+
             <button
-              onClick={() => window.location.href = `https://${data.slug}.x3o.ai/admin`}
-              className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 px-8 py-3 rounded-lg font-semibold transition"
+              onClick={() => window.location.href = `mailto:hey@x3o.ai?subject=Sprint%20Kickoff%20-%20${data.name}`}
+              className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 px-8 py-3 rounded-lg font-semibold transition"
             >
-              Go to Dashboard
+              Contact Us Now
             </button>
           </div>
         )}
@@ -650,30 +706,38 @@ export default function OnboardingPage() {
           <div className="flex items-center justify-between mt-12 pt-8 border-t border-zinc-800">
             <button
               onClick={goToPrev}
-              disabled={step === 'business'}
+              disabled={step === 'audit'}
               className={`px-6 py-3 rounded-lg font-medium transition ${
-                step === 'business'
+                step === 'audit'
                   ? 'text-zinc-600 cursor-not-allowed'
                   : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
               }`}
             >
               Back
             </button>
-            {step === 'board' ? (
+            {step === 'sprint' ? (
               <button
                 onClick={handleSubmit}
-                disabled={loading || !data.name || !data.slug || !data.email}
-                className="bg-gradient-to-r from-cyan-500 to-violet-600 hover:from-cyan-400 hover:to-violet-500 px-8 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={loading || !data.name || !data.email}
+                className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 px-8 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                {loading ? 'Creating...' : 'Launch My Platform'}
+                {loading ? (
+                  'Processing...'
+                ) : (
+                  <>
+                    <Zap className="w-5 h-5" />
+                    Start Sprint — $1,500
+                  </>
+                )}
               </button>
             ) : (
               <button
                 onClick={goToNext}
-                disabled={step === 'business' && (!data.name || !data.slug || !data.email)}
-                className="bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 px-8 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={step === 'audit' && (!data.name || !data.email)}
+                className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 px-8 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                Continue
+                {step === 'leaks' ? 'See My Revenue Leak' : 'Continue'}
+                <ArrowRight className="w-5 h-5" />
               </button>
             )}
           </div>
