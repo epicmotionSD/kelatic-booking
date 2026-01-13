@@ -12,12 +12,16 @@ function extractSubdomain(hostname: string): string | null {
   // Remove port if present
   const host = hostname.split(':')[0];
 
-  // Local development: tenant.localhost
+  // Local development: tenant.localhost or just localhost
   if (host.includes('localhost') || host.includes('127.0.0.1')) {
     const parts = host.split('.');
-    // Only treat as subdomain if format is: tenant.localhost
+    // Format: tenant.localhost - return tenant
     if (parts.length === 2 && parts[1] === 'localhost' && parts[0] !== 'www') {
       return parts[0];
+    }
+    // Plain localhost in dev - default to 'kelatic' for easier testing
+    if (process.env.NODE_ENV === 'development' && (host === 'localhost' || host === '127.0.0.1')) {
+      return 'kelatic';
     }
     return null;
   }

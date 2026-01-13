@@ -67,7 +67,7 @@ export default function AppointmentsPage() {
         ...(filters.date !== 'all' && { date: filters.date }),
         ...(filters.status !== 'all' && { status: filters.status }),
         ...(filters.stylist !== 'all' && { stylist_id: filters.stylist }),
-        include_walkins: 'false',
+        include_walkins: 'true',
       });
       const res = await fetch(`/api/admin/appointments?${params}`);
       const data = await res.json();
