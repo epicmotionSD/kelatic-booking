@@ -7,8 +7,8 @@ export async function GET() {
     const business = await requireBusiness();
     const supabase = await createClient();
 
-    // Get clients with aggregate data - filtered by business_id
-    const { data: clients, error } = await supabase
+    // Get clients from profiles table (authenticated users)
+    const { data: profileClients, error: profileError } = await supabase
       .from('profiles')
       .select(`
         id,
@@ -32,58 +32,86 @@ export async function GET() {
       .eq('business_id', business.id)
       .order('last_visit_at', { ascending: false, nullsFirst: false });
 
-    if (error) {
-      console.error('Error fetching clients:', error);
-      return NextResponse.json({ error: 'Failed to fetch clients' }, { status: 500 });
+    if (profileError) {
+      console.error('Error fetching profile clients:', profileError);
     }
 
-    // Get visit counts and total spent for each client
-    const clientIds = clients?.map((c) => c.id) || [];
-
-    if (clientIds.length === 0) {
-      return NextResponse.json({ clients: [] });
-    }
-
-    // Get completed appointments count and total spent - filtered by business
-    const { data: appointmentStats } = await supabase
-      .from('appointments')
-      .select('client_id')
-      .in('client_id', clientIds)
+    // Get clients from clients table (imported from Amelia / walk-ins)
+    const { data: importedClients, error: importedError } = await supabase
+      .from('clients')
+      .select(`
+        id,
+        first_name,
+        last_name,
+        email,
+        phone,
+        created_at,
+        notes,
+        birthday,
+        source,
+        amelia_id
+      `)
       .eq('business_id', business.id)
-      .eq('status', 'completed');
+      .order('created_at', { ascending: false });
 
-    const { data: paymentStats } = await supabase
-      .from('payments')
-      .select('appointments!inner(client_id, business_id), total_amount')
-      .in('appointments.client_id', clientIds)
-      .eq('appointments.business_id', business.id)
-      .eq('status', 'paid');
+    if (importedError) {
+      console.error('Error fetching imported clients:', importedError);
+    }
 
-    // Calculate stats per client
-    const visitCounts: Record<string, number> = {};
-    const totalSpent: Record<string, number> = {};
+    // Combine both lists, marking the source
+    const allClients = [
+      ...(profileClients || []).map(c => ({ 
+        ...c, 
+        source: 'registered',
+        visit_count: 0,
+        total_spent: 0 
+      })),
+      ...(importedClients || []).map(c => ({ 
+        ...c, 
+        source: c.source || 'imported',
+        last_visit_at: null,
+        hair_type: null,
+        texture: null,
+        allergies: null,
+        zip_code: null,
+        preferred_contact: null,
+        sms_opt_in: true,
+        marketing_opt_in: false,
+        referral_source: null,
+        visit_count: 0,
+        total_spent: 0 
+      })),
+    ];
 
-    appointmentStats?.forEach((apt: any) => {
-      visitCounts[apt.client_id] = (visitCounts[apt.client_id] || 0) + 1;
-    });
+    // Get visit counts for profile clients
+    const profileIds = (profileClients || []).map((c) => c.id);
+    if (profileIds.length > 0) {
+      const { data: appointmentStats } = await supabase
+        .from('appointments')
+        .select('client_id')
+        .in('client_id', profileIds)
+        .eq('business_id', business.id)
+        .eq('status', 'completed');
 
-    paymentStats?.forEach((payment: any) => {
-      const clientId = payment.appointments?.client_id;
-      if (clientId) {
-        totalSpent[clientId] = (totalSpent[clientId] || 0) + payment.total_amount;
-      }
-    });
+      const visitCounts: Record<string, number> = {};
+      appointmentStats?.forEach((apt: any) => {
+        visitCounts[apt.client_id] = (visitCounts[apt.client_id] || 0) + 1;
+      });
 
-    const enrichedClients = clients?.map((client) => ({
-      ...client,
-      visit_count: visitCounts[client.id] || 0,
-      total_spent: totalSpent[client.id] || 0,
-    })) || [];
+      allClients.forEach(client => {
+        if (visitCounts[client.id]) {
+          client.visit_count = visitCounts[client.id];
+        }
+      });
+    }
 
-    return NextResponse.json({ clients: enrichedClients });
-  } catch (error) {
-    console.error('Clients error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ clients: allClients });
+  } catch (error: any) {
+    console.error('Clients error:', error?.message || error);
+    return NextResponse.json({ 
+      error: 'Internal server error', 
+      details: error?.message || String(error) 
+    }, { status: 500 });
   }
 }
 
