@@ -330,7 +330,11 @@ export default function AdminDashboard() {
               </div>
             ) : (
               metrics?.upcomingAppointments?.slice(0, 5).map((appointment) => (
-                <div key={appointment.id} className="p-4 hover:bg-white/5 transition-colors">
+                <Link 
+                  key={appointment.id} 
+                  href={`/admin/appointments/${appointment.id}`}
+                  className="block p-4 hover:bg-white/5 transition-colors"
+                >
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-gradient-to-br from-blue-400/20 to-purple-500/20 rounded-full flex items-center justify-center border border-blue-400/30">
                       <span className="text-sm text-blue-400 font-bold">
@@ -360,7 +364,7 @@ export default function AdminDashboard() {
                       </span>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </div>

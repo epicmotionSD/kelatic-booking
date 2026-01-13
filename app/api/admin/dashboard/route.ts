@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
+import { requireBusiness } from '@/lib/tenant/server';
 
 export async function GET() {
   try {
-    const supabase = createAdminClient();
+    const business = await requireBusiness();
+    const supabase = await createClient();
     const now = new Date();
     const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
@@ -14,6 +16,7 @@ export async function GET() {
     const { count: todayAppointments } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
+      .eq('business_id', business.id)
       .gte('start_time', todayStart.toISOString())
       .lt('start_time', todayEnd.toISOString())
       .not('status', 'in', '("cancelled","no_show")')
@@ -23,28 +26,31 @@ export async function GET() {
     const { count: weekAppointments } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
+      .eq('business_id', business.id)
       .gte('start_time', weekStart.toISOString())
       .lt('start_time', todayEnd.toISOString())
       .not('status', 'in', '("cancelled","no_show")')
       .not('service_id', 'is', null);
 
-    // Today's revenue
+    // Today's revenue from completed appointments
     const { data: todayPayments } = await supabase
       .from('payments')
-      .select('total_amount')
+      .select('total_amount, appointments!inner(business_id)')
       .gte('created_at', todayStart.toISOString())
       .lt('created_at', todayEnd.toISOString())
-      .eq('status', 'paid');
+      .eq('status', 'paid')
+      .eq('appointments.business_id', business.id);
 
     const todayRevenue = todayPayments?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
 
     // Week revenue
     const { data: weekPayments } = await supabase
       .from('payments')
-      .select('total_amount')
+      .select('total_amount, appointments!inner(business_id)')
       .gte('created_at', weekStart.toISOString())
       .lt('created_at', todayEnd.toISOString())
-      .eq('status', 'paid');
+      .eq('status', 'paid')
+      .eq('appointments.business_id', business.id);
 
     const weekRevenue = weekPayments?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
 
@@ -52,6 +58,7 @@ export async function GET() {
     const { count: newClients } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
+      .eq('business_id', business.id)
       .eq('role', 'client')
       .gte('created_at', monthStart.toISOString());
 
@@ -59,6 +66,7 @@ export async function GET() {
     const { count: pendingDeposits } = await supabase
       .from('appointments')
       .select('*', { count: 'exact', head: true })
+      .eq('business_id', business.id)
       .eq('status', 'pending')
       .gte('start_time', todayStart.toISOString());
 
@@ -74,6 +82,7 @@ export async function GET() {
         client:profiles!appointments_client_id_fkey(first_name, last_name),
         walk_in_name
       `)
+      .eq('business_id', business.id)
       .gte('start_time', now.toISOString())
       .lt('start_time', todayEnd.toISOString())
       .not('status', 'in', '("cancelled","no_show","completed")')
@@ -106,11 +115,13 @@ export async function GET() {
         method,
         created_at,
         appointments!inner(
+          business_id,
           services!inner(name),
           client:profiles!appointments_client_id_fkey(first_name, last_name),
           walk_in_name
         )
       `)
+      .eq('appointments.business_id', business.id)
       .eq('status', 'succeeded')
       .order('created_at', { ascending: false })
       .limit(5);
@@ -147,6 +158,7 @@ export async function GET() {
     const { data: topServicesRaw } = await supabase
       .from('appointments')
       .select('services!inner(name)')
+      .eq('business_id', business.id)
       .gte('start_time', weekStart.toISOString())
       .lt('start_time', todayEnd.toISOString())
       .eq('status', 'completed');
