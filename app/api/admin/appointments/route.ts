@@ -54,6 +54,9 @@ export async function GET(request: NextRequest) {
       query = query
         .gte('start_time', startOfDay.toISOString())
         .lte('start_time', endOfDay.toISOString());
+    } else {
+      // When showing all, only show upcoming appointments (from now onwards)
+      query = query.gte('start_time', new Date().toISOString());
     }
 
     // Filter by status
