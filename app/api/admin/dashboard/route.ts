@@ -54,13 +54,21 @@ export async function GET() {
 
     const weekRevenue = weekPayments?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
 
-    // New clients this month
-    const { count: newClients } = await supabase
+    // New clients this month (from both profiles and clients tables)
+    const { count: newProfileClients } = await supabase
       .from('profiles')
       .select('*', { count: 'exact', head: true })
       .eq('business_id', business.id)
       .eq('role', 'client')
       .gte('created_at', monthStart.toISOString());
+
+    const { count: newTableClients } = await supabase
+      .from('clients')
+      .select('*', { count: 'exact', head: true })
+      .eq('business_id', business.id)
+      .gte('created_at', monthStart.toISOString());
+
+    const newClients = (newProfileClients || 0) + (newTableClients || 0);
 
     // Pending deposits
     const { count: pendingDeposits } = await supabase
