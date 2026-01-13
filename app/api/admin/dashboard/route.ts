@@ -2,15 +2,52 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 
+// Helper to get date boundaries in a specific timezone
+function getDateBoundaries(timezone: string) {
+  const now = new Date();
+  
+  // Get current time in the business timezone
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: timezone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+  const todayStr = formatter.format(now); // YYYY-MM-DD in business timezone
+  
+  // Create date boundaries using the business's local date
+  const [year, month, day] = todayStr.split('-').map(Number);
+  
+  // Get the offset for the timezone to calculate UTC times
+  const tempDate = new Date(`${todayStr}T00:00:00`);
+  const utcOffset = getTimezoneOffset(timezone, tempDate);
+  
+  // Today start/end in UTC (accounting for timezone offset)
+  const todayStart = new Date(`${todayStr}T00:00:00.000Z`);
+  todayStart.setMinutes(todayStart.getMinutes() + utcOffset);
+  
+  const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
+  const weekStart = new Date(todayStart.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const monthStart = new Date(Date.UTC(year, month - 1, 1) + utcOffset * 60 * 1000);
+  
+  return { now, todayStart, todayEnd, weekStart, monthStart };
+}
+
+// Get timezone offset in minutes
+function getTimezoneOffset(timezone: string, date: Date): number {
+  const utcDate = new Date(date.toLocaleString('en-US', { timeZone: 'UTC' }));
+  const tzDate = new Date(date.toLocaleString('en-US', { timeZone: timezone }));
+  return (utcDate.getTime() - tzDate.getTime()) / 60000;
+}
+
 export async function GET() {
   try {
     const business = await requireBusiness();
     const supabase = await createClient();
-    const now = new Date();
-    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const todayEnd = new Date(todayStart.getTime() + 24 * 60 * 60 * 1000);
-    const weekStart = new Date(todayStart.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    // Use business timezone for date calculations (default to UTC if not set)
+    const timezone = business.timezone || 'UTC';
+    const { now, todayStart, todayEnd, weekStart, monthStart } = getDateBoundaries(timezone);
 
     // Today's appointments count (include walk-ins, require service_id)
     const { count: todayAppointments } = await supabase
