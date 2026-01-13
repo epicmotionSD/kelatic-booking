@@ -1,8 +1,13 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'x3o.ai | White-Label Booking Platform',
-  description: 'Launch your own branded booking system with AI-powered content generation. Built for salons, barbershops, and beauty businesses.',
+  title: 'x3o.ai | Revenue Injection Engine for Salons',
+  description: 'Stop losing money to ghost clients and empty chairs. Our AI workforce reactivates dormant clients, fills last-minute cancellations, and recovers lost revenue—while you work.',
+  openGraph: {
+    title: 'x3o.ai | Revenue Injection Engine',
+    description: 'Your clients are leaking revenue. Ghost clients. Dead DMs. Empty chairs. We plug the leaks. You keep the money.',
+    type: 'website',
+  },
 };
 
 export default function PlatformLayout({
