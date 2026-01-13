@@ -68,6 +68,8 @@ export async function GET() {
       .select('*', { count: 'exact', head: true })
       .eq('business_id', business.id)
       .eq('status', 'pending')
+      .not('service_id', 'is', null)
+      .not('start_time', 'is', null)
       .gte('start_time', todayStart.toISOString());
 
     // Upcoming appointments today
