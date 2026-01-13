@@ -238,6 +238,7 @@ export default function PlatformLandingPage() {
             <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 mb-6">
               <Sparkles className="w-4 h-4 text-emerald-400" />
               <span className="text-emerald-400 font-medium">Revenue Injection Engine</span>
+            </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Meet <span className="text-emerald-400">Trinity</span> — Your AI Revenue Agent
             </h2>
