@@ -307,7 +307,7 @@ export default function LandingPage() {
 
           <div className="text-center mt-12">
             <a
-              href="https://instagram.com/kelatic"
+              href="https://instagram.com/kelatichairlounge_"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 backdrop-blur border border-white/20 rounded-full font-semibold hover:bg-white/10 hover:border-amber-400/30 transition-all"
@@ -481,7 +481,7 @@ export default function LandingPage() {
                   Get Notified
                 </a>
                 <a
-                  href="https://www.instagram.com/kelatic"
+                  href="https://www.instagram.com/kelatichairlounge_"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition-colors"
@@ -523,7 +523,7 @@ export default function LandingPage() {
                   { icon: MapPin, label: 'Address', value: '9430 Richmond Ave, Houston, TX 77063', href: 'https://maps.google.com/?q=9430+Richmond+Ave+Houston+TX+77063' },
                   { icon: Phone, label: 'Phone', value: '(713) 485-4000', href: 'tel:+17134854000' },
                   { icon: Mail, label: 'Email', value: 'kelatic@gmail.com', href: 'mailto:kelatic@gmail.com' },
-                  { icon: Instagram, label: 'Instagram', value: '@kelatic', href: 'https://instagram.com/kelatic' },
+                  { icon: Instagram, label: 'Instagram', value: '@kelatichairlounge_', href: 'https://instagram.com/kelatichairlounge_' },
                 ].map((item, idx) => (
                   <a key={idx} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined} className="flex items-center gap-4 group">
                     <div className="w-14 h-14 bg-amber-400/10 rounded-xl flex items-center justify-center group-hover:bg-amber-400/20 transition-colors">
@@ -595,7 +595,7 @@ export default function LandingPage() {
             <div>
               <h4 className="font-bold mb-6">Connect</h4>
               <div className="flex items-center gap-3">
-                <a href="https://instagram.com/kelatic" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
+                <a href="https://instagram.com/kelatichairlounge_" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
                   <Instagram className="w-5 h-5" />
                 </a>
                 <a href="tel:+17134854000" aria-label="Call us" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
