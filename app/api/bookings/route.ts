@@ -7,8 +7,9 @@ import { toCents } from '@/lib/currency';
 // Helper to send confirmation notifications
 async function sendConfirmationNotifications(appointmentId: string) {
   try {
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
     console.log('[BookingAPI] Sending confirmation notification for appointment:', appointmentId);
-    const res = await fetch('/api/notifications', {
+    const res = await fetch(`${baseUrl}/api/notifications`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
