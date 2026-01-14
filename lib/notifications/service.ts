@@ -186,7 +186,7 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails, ctx: Business
                       <tr>
                         <td style="padding-top: 16px;">
                           <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Total</p>
-                          <p style="margin: 4px 0 0; color: ${business.primary_color}; font-size: 24px; font-weight: 700;">$${appointment.total_amount.toFixed(2)}</p>
+                          <p style="margin: 4px 0 0; color: ${business.primary_color}; font-size: 24px; font-weight: 700;">$${(appointment.total_amount ?? 0).toFixed(2)}</p>
                         </td>
                       </tr>
                     </table>
