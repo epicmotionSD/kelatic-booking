@@ -10,9 +10,11 @@ import {
 // POST - Send notification for a specific appointment
 export async function POST(request: NextRequest) {
   try {
+    console.log('[NotificationsAPI] Received POST to /api/notifications');
     const { appointmentId, type } = await request.json();
 
     if (!appointmentId || !type) {
+      console.error('[NotificationsAPI] Missing appointmentId or type', { appointmentId, type });
       return NextResponse.json(
         { error: 'Missing appointmentId or type' },
         { status: 400 }
@@ -21,6 +23,7 @@ export async function POST(request: NextRequest) {
 
     const validTypes = ['confirmation', 'cancellation', 'reminder'];
     if (!validTypes.includes(type)) {
+      console.error('[NotificationsAPI] Invalid notification type', { type });
       return NextResponse.json(
         { error: 'Invalid notification type' },
         { status: 400 }
@@ -66,6 +69,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error || !appointment) {
+      console.error('[NotificationsAPI] Appointment not found', { error, appointmentId });
       return NextResponse.json(
         { error: 'Appointment not found' },
         { status: 404 }
@@ -101,6 +105,7 @@ export async function POST(request: NextRequest) {
     };
 
     let result;
+    console.log('[NotificationsAPI] Sending notification type:', type, 'for appointment:', appointmentId);
 
     // TODO: In multi-tenant, fetch business context from appointment
     const defaultCtx = {
@@ -155,6 +160,7 @@ export async function POST(request: NextRequest) {
       recipient_email: appointmentDetails.client_email,
       recipient_phone: appointmentDetails.client_phone,
     });
+    console.log('[NotificationsAPI] Notification result:', result);
 
     return NextResponse.json({
       success: true,
@@ -162,7 +168,7 @@ export async function POST(request: NextRequest) {
       sms: result?.sms || false,
     });
   } catch (error) {
-    console.error('Notification error:', error);
+    console.error('[NotificationsAPI] Notification error:', error);
     return NextResponse.json(
       { error: 'Failed to send notification' },
       { status: 500 }
