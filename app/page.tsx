@@ -111,10 +111,9 @@ export default function LandingPage() {
             <div className="hidden md:flex items-center gap-10">
               <Link href="/services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</Link>
               <Link href="/special-offers" className="text-sm font-medium text-amber-400 hover:text-yellow-400 transition-colors animate-pulse">$75 Wednesday Special</Link>
-              <a href="#team" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Team</a>
+              <a href="#gallery" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Gallery</a>
               <Link href="/blog" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Blog</Link>
               <Link href="/barber-block" className="text-sm font-medium text-white/70 hover:text-red-400 transition-colors">Barber Block</Link>
-              <a href="#academy" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Academy</a>
               <a href="#contact" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Contact</a>
               <Link
                 href="/book"
@@ -142,10 +141,9 @@ export default function LandingPage() {
             <div className="flex flex-col gap-4 px-6">
               <Link href="/services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Services</Link>
               <Link href="/special-offers" onClick={() => setMobileMenuOpen(false)} className="text-amber-400 py-2 text-lg animate-pulse">$75 Wednesday Special</Link>
-              <a href="#team" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Team</a>
+              <a href="#gallery" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Gallery</a>
               <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Blog</Link>
               <Link href="/barber-block" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg hover:text-red-400">Barber Block</Link>
-              <a href="#academy" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Academy</a>
               <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Contact</a>
               <Link
                 href="/book"
@@ -282,55 +280,41 @@ export default function LandingPage() {
       {/* Video Carousel Section */}
       <StylistCarousel />
 
-      {/* Team Section - Featured Near Top */}
-      <section id="team" className="py-24 bg-black">
+      {/* Gallery Section */}
+      <section id="gallery" className="py-24 bg-zinc-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Our Stylists</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-2">Meet The Team</h2>
+            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Our Work</span>
+            <h2 className="text-4xl md:text-5xl font-black mt-2">The Craft</h2>
+            <p className="text-white/50 mt-4 max-w-2xl mx-auto">Every loc tells a story. Here's a glimpse of the artistry and care we put into every client's crown.</p>
           </div>
 
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {featuredStylists.map((stylist) => (
-              <div key={stylist.id} className="group">
-                <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/5 overflow-hidden relative mb-5 group-hover:border-amber-400/30 transition-colors">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-28 h-28 rounded-full bg-gradient-to-br from-amber-400/20 to-transparent flex items-center justify-center backdrop-blur-sm border border-white/10">
-                      <span className="text-4xl font-black text-white/80">
-                        {stylist.first_name.charAt(0)}{stylist.last_name ? stylist.last_name.charAt(0) : ''}
-                      </span>
-                    </div>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-6">
-                    {stylist.instagram_handle && (
-                      <a
-                        href={`https://instagram.com/${stylist.instagram_handle}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-2 text-white hover:text-amber-400 transition-colors"
-                      >
-                        <Instagram className="w-5 h-5" />
-                        @{stylist.instagram_handle}
-                      </a>
-                    )}
-                  </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map((num) => (
+              <div key={num} className="group relative aspect-square rounded-2xl overflow-hidden bg-zinc-900 border border-white/5 hover:border-amber-400/30 transition-all duration-300">
+                <img
+                  src={`/gallery/image${num}.jpg`}
+                  alt={`Loc styling work ${num}`}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="text-white font-medium">Loc Artistry</span>
                 </div>
-                <h3 className="text-xl font-bold mb-1">
-                  {stylist.first_name} {stylist.last_name}
-                </h3>
-                {stylist.specialties && (
-                  <p className="text-amber-400 text-sm mb-2">{stylist.specialties.join(', ')}</p>
-                )}
-                <p className="text-white/50 text-sm line-clamp-2 mb-4">{stylist.bio}</p>
-                <Link
-                  href={`/book?stylist=${stylist.id}`}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full text-sm font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Book with {stylist.first_name}
-                </Link>
               </div>
             ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <a
+              href="https://instagram.com/kelatic"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 backdrop-blur border border-white/20 rounded-full font-semibold hover:bg-white/10 hover:border-amber-400/30 transition-all"
+            >
+              <Instagram className="w-5 h-5" />
+              See More on Instagram
+            </a>
           </div>
         </div>
       </section>
