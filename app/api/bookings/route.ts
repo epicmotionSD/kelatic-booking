@@ -249,13 +249,10 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Send confirmation notifications (don't await to avoid blocking response)
-    // Only send if no deposit required (confirmed status) or after payment succeeds (handled in webhook)
-    if (!service.deposit_required) {
-      sendConfirmationNotifications(appointment.id).catch((err) => {
-        console.error('Error sending confirmation notifications:', err);
-      });
-    }
+    // Send confirmation notifications for all bookings (don't await to avoid blocking response)
+    sendConfirmationNotifications(appointment.id).catch((err) => {
+      console.error('Error sending confirmation notifications:', err);
+    });
 
     return NextResponse.json({
       appointment,
