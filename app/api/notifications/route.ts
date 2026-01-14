@@ -43,7 +43,6 @@ export async function POST(request: NextRequest) {
       .select(`
         id,
         start_time,
-        total_amount,
         notes,
         client:profiles!appointments_client_id_fkey (
           id,
