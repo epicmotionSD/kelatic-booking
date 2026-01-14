@@ -53,7 +53,7 @@ export interface AppointmentDetails {
   service_duration: number;
   appointment_date: string;
   appointment_time: string;
-  total_amount: number;
+  total_amount?: number;
   add_ons?: string[];
   notes?: string;
 }
