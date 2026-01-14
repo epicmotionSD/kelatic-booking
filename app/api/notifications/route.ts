@@ -12,6 +12,10 @@ export async function POST(request: NextRequest) {
   try {
     console.log('[NotificationsAPI] Received POST to /api/notifications');
     const { appointmentId, type } = await request.json();
+    console.log('[NotificationsAPI][DEBUG] ENV:', {
+      SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      SERVICE_ROLE: process.env.SUPABASE_SERVICE_ROLE_KEY?.slice(0, 8) + '...'
+    });
 
     if (!appointmentId || !type) {
       console.error('[NotificationsAPI] Missing appointmentId or type', { appointmentId, type });
@@ -30,7 +34,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    const { createAdminClient } = await import('@/lib/supabase/server');
+    const supabase = createAdminClient();
 
     // Fetch appointment with client and service details
     const { data: appointment, error } = await supabase
@@ -67,6 +72,8 @@ export async function POST(request: NextRequest) {
       `)
       .eq('id', appointmentId)
       .single();
+
+    console.log('[NotificationsAPI][DEBUG] Query result:', { error, appointment, appointmentId });
 
     if (error || !appointment) {
       console.error('[NotificationsAPI] Appointment not found', { error, appointmentId });
