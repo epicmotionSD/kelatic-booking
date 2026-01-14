@@ -66,6 +66,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
+
+    // Fetch stylist profile to determine deposit amount
+    const { data: stylistProfile, error: stylistError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name, email')
+      .eq('id', body.stylist_id)
+      .eq('business_id', business.id)
+      .single();
+
     // Calculate end time
     let totalDuration = service.duration;
     let totalPrice = service.base_price;
@@ -205,11 +214,19 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create payment intent if deposit required
+    // Create payment intent if deposit required (per stylist logic)
     let paymentIntent = null;
-    if (service.deposit_required && service.deposit_amount) {
+    let depositAmount = null;
+    if (service.deposit_required) {
+      // Determine deposit amount by stylist
+      if (stylistProfile && stylistProfile.first_name && stylistProfile.first_name.trim().toLowerCase() === 'rockal') {
+        depositAmount = 50;
+      } else {
+        depositAmount = 25;
+      }
+
       paymentIntent = await createPaymentIntent({
-        amount: toCents(service.deposit_amount),
+        amount: toCents(depositAmount),
         appointmentId: appointment.id,
         isDeposit: true,
         metadata: {
@@ -222,9 +239,9 @@ export async function POST(request: NextRequest) {
       await supabase.from('payments').insert({
         appointment_id: appointment.id,
         client_id: clientId,
-        amount: service.deposit_amount,
+        amount: depositAmount,
         tip_amount: 0,
-        total_amount: service.deposit_amount,
+        total_amount: depositAmount,
         status: 'pending',
         method: 'card_online',
         stripe_payment_intent_id: paymentIntent.id,

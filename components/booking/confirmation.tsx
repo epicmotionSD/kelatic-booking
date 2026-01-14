@@ -195,7 +195,7 @@ export function Confirmation({ bookingData }: ConfirmationProps) {
         <h4 className="font-semibold text-amber-400 mb-2">Before Your Appointment</h4>
         <ul className="text-sm text-white/70 space-y-1">
           <li>• Please arrive 5-10 minutes early</li>
-          <li>• Come with clean, product-free hair (unless otherwise specified)</li>
+          <li>• Come with your dirty locs, we will get them squeaky clean. Please, no perfume or cologne is preferred—we are all natural and sensitive to smells.</li>
           <li>• Bring inspiration photos if you have a specific style in mind</li>
           <li>• Contact us at least 24 hours in advance to reschedule</li>
         </ul>
