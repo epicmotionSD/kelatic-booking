@@ -497,7 +497,7 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx
   const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
 
   try {
-    await sgMail.send({
+    const [response] = await sgMail.send({
       to: appointment.client_email,
       from: {
         email: fromEmail,
@@ -507,6 +507,12 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx
       html: getConfirmationEmailHtml(appointment, ctx),
     });
     console.log(`[Email] Confirmation sent to ${appointment.client_email}`);
+    if (response && response.headers) {
+      console.log('[Email] SendGrid response headers:', response.headers);
+      if (response.headers['x-message-id']) {
+        console.log('[Email] SendGrid message ID:', response.headers['x-message-id']);
+      }
+    }
     return true;
   } catch (error) {
     console.error('[Email] Failed to send confirmation:', error);
