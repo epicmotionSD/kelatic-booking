@@ -43,7 +43,6 @@ export async function POST(request: NextRequest) {
       .select(`
         id,
         start_time,
-        notes,
         client:profiles!appointments_client_id_fkey (
           id,
           first_name,
@@ -106,7 +105,6 @@ export async function POST(request: NextRequest) {
       appointment_date: startTime.toISOString().split('T')[0],
       appointment_time: startTime.toTimeString().slice(0, 5),
       add_ons: appointment.appointment_addons?.map((a: any) => a.service?.name).filter(Boolean),
-      notes: appointment.notes || undefined,
     };
 
     let result;
