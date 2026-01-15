@@ -1,0 +1,59 @@
+import { NextRequest, NextResponse } from 'next/server';
+import * as sgMail from '@sendgrid/mail';
+
+export async function GET(request: NextRequest) {
+  const testEmail = request.nextUrl.searchParams.get('email');
+  
+  const hasApiKey = !!process.env.SENDGRID_API_KEY;
+  const apiKeyPrefix = process.env.SENDGRID_API_KEY?.substring(0, 10) || 'NOT SET';
+  const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'NOT SET';
+  
+  const diagnostics = {
+    hasApiKey,
+    apiKeyPrefix: apiKeyPrefix === 'SG.xxx' ? '⚠️ PLACEHOLDER KEY' : apiKeyPrefix,
+    fromEmail,
+    testEmail: testEmail || 'No test email provided (add ?email=your@email.com)',
+  };
+
+  if (!testEmail) {
+    return NextResponse.json({
+      message: 'SendGrid Diagnostics - Add ?email=your@email.com to send a test',
+      diagnostics,
+    });
+  }
+
+  if (!hasApiKey || process.env.SENDGRID_API_KEY === 'SG.xxx') {
+    return NextResponse.json({
+      error: 'SendGrid API key not configured properly',
+      diagnostics,
+    }, { status: 500 });
+  }
+
+  try {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
+    
+    await sgMail.send({
+      to: testEmail,
+      from: { email: fromEmail, name: 'KeLatic Hair Lounge' },
+      subject: '✅ Test Email - KeLatic Notifications Working!',
+      html: `
+        <div style="font-family: sans-serif; padding: 20px;">
+          <h1 style="color: #9333ea;">🎉 Email Test Successful!</h1>
+          <p>If you're reading this, SendGrid is properly configured.</p>
+          <p><strong>From:</strong> ${fromEmail}</p>
+          <p><strong>Sent at:</strong> ${new Date().toISOString()}</p>
+        </div>
+      `,
+    });
+
+    return NextResponse.json({ success: true, message: `Test email sent to ${testEmail}`, diagnostics });
+  } catch (error: any) {
+    return NextResponse.json({
+      error: 'Failed to send test email',
+      message: error.message,
+      code: error.code,
+      details: error.response?.body || 'No additional details',
+      diagnostics,
+    }, { status: 500 });
+  }
+}
