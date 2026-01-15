@@ -8,8 +8,10 @@ import { toCents } from '@/lib/currency';
 async function sendConfirmationNotifications(appointmentId: string) {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const url = `${baseUrl}/api/notifications`;
     console.log('[BookingAPI] Sending confirmation notification for appointment:', appointmentId);
-    const res = await fetch(`${baseUrl}/api/notifications`, {
+    console.log('[BookingAPI][DEBUG] Notification API URL:', url);
+    const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -18,7 +20,11 @@ async function sendConfirmationNotifications(appointmentId: string) {
       }),
     });
     const text = await res.text();
-    console.log('[BookingAPI] Notification API response:', res.status, text);
+    console.log('[BookingAPI][DEBUG] Notification API fetch result:', {
+      status: res.status,
+      statusText: res.statusText,
+      body: text,
+    });
   } catch (error) {
     console.error('[BookingAPI] Failed to send notification:', error);
   }
