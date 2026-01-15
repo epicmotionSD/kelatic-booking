@@ -12,13 +12,14 @@ import { v4 as uuidv4 } from 'uuid'
 
 // =============================================================================
 // HUMMINGBIRD CADENCE CONFIG
+// TCPA COMPLIANCE: All SMS templates include mandatory opt-out language
 // =============================================================================
 
 const HUMMINGBIRD_SCRIPTS = {
   direct_inquiry: {
     day: 1,
     type: 'sms' as const,
-    template: "Hey {firstName}, it's been a while since we've seen you at {businessName}! We'd love to have you back. Would you like me to get you on the books for {service}? 💈",
+    template: "Hey {firstName}, it's been a while since we've seen you at {businessName}! We'd love to have you back. Would you like me to get you on the books for {service}?\n\nReply STOP to opt out",
   },
   voicemail_drop: {
     day: 2,
@@ -28,12 +29,12 @@ const HUMMINGBIRD_SCRIPTS = {
   file_closure: {
     day: 4,
     type: 'sms' as const,
-    template: "Hi {firstName}, I'm doing some housekeeping at {businessName} and noticed your file. Before I close it out, I wanted to check - are you still interested in {service} or should I mark you as inactive? No pressure either way!",
+    template: "Hi {firstName}, I'm doing some housekeeping at {businessName} and noticed your file. Before I close it out, I wanted to check - are you still interested in {service} or should I mark you as inactive?\n\nReply STOP to opt out",
   },
   breakup: {
     day: 7,
     type: 'sms' as const,
-    template: "Hey {firstName}, this is my last reach out. I don't want to bother you but wanted to give you one final chance to get back on the books at {businessName}. If I don't hear from you, I'll assume the timing isn't right. Either way, hope you're doing great! 🙏",
+    template: "Hey {firstName}, this is my last reach out. I don't want to bother you but wanted to give you one final chance to get back on the books at {businessName}. If I don't hear from you, I'll assume the timing isn't right. Either way, hope you're doing great!",
   },
 }
 

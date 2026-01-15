@@ -39,6 +39,22 @@ async function decryptCredential(encrypted: string): Promise<string> {
 }
 
 // =============================================================================
+// COMPLIANCE: Auto-append opt-out language if missing
+// TCPA requires clear opt-out instructions in all marketing SMS
+// =============================================================================
+
+const OPT_OUT_FOOTER = '\n\nReply STOP to opt out'
+
+function ensureOptOutLanguage(body: string): string {
+  const hasOptOut = /\b(stop|unsubscribe|opt.?out)\b/i.test(body.toLowerCase())
+  if (hasOptOut) {
+    return body // Already contains opt-out language
+  }
+  // Append opt-out footer for TCPA compliance
+  return body + OPT_OUT_FOOTER
+}
+
+// =============================================================================
 // SEND SMS
 // =============================================================================
 
@@ -49,6 +65,9 @@ export async function sendCampaignSMS(params: SendCampaignSMSParams): Promise<Tw
   const decryptedSid = await decryptCredential(accountSid)
   const decryptedToken = await decryptCredential(authToken)
   
+  // COMPLIANCE: Ensure message has opt-out language
+  const compliantBody = ensureOptOutLanguage(body)
+  
   // Initialize Twilio client with tenant credentials
   const client = twilio(decryptedSid, decryptedToken)
   
@@ -56,7 +75,7 @@ export async function sendCampaignSMS(params: SendCampaignSMSParams): Promise<Tw
     const message = await client.messages.create({
       to: formatE164(to),
       from: formatE164(from),
-      body: body,
+      body: compliantBody, // COMPLIANCE: Use message with guaranteed opt-out language
       statusCallback: statusCallback || `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/twilio/status`,
     })
     
@@ -123,6 +142,9 @@ export async function sendCampaignSMSBatch(
       .replace(/{lastName}/g, lead.lastName || '')
       .replace(/{businessName}/g, businessConfig.businessName)
       .replace(/{service}/g, businessConfig.service || 'your appointment')
+    
+    // COMPLIANCE: Ensure opt-out language is present
+    const compliantMessage = ensureOptOutLanguage(personalizedMessage)
     
     if (dryRun) {
       // Simulate send

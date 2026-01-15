@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-
 
 // Root domain for the platform
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
@@ -27,13 +25,10 @@ function extractSubdomain(hostname: string): string | null {
   }
 
   // Vercel preview URLs (non-production deployments)
-  // Format: project-xxx.vercel.app or kelatic-booking-xxx.vercel.app
   if (host.endsWith('.vercel.app')) {
-    // Subdomain format: tenant---project.vercel.app
     if (host.includes('---')) {
       return host.split('---')[0] || null;
     }
-    // Regular Vercel preview URL - treat as platform root
     return null;
   }
 
@@ -78,24 +73,6 @@ export async function middleware(request: NextRequest) {
     response.headers.set('x-tenant-slug', subdomain);
   }
 
-
-  // Create Supabase client with legacy cookie helpers for Next.js 13/14/15
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get: (name: string) => request.cookies.get(name)?.value,
-        set: (name: string, value: string, options: any) => response.cookies.set(name, value, options),
-        remove: (name: string, options: any) => response.cookies.set(name, '', { ...options, maxAge: 0 }),
-      },
-    }
-  );
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
   // ============================================
   // PLATFORM ROOT (x3o.ai) - No subdomain
   // ============================================
@@ -110,29 +87,23 @@ export async function middleware(request: NextRequest) {
       return response;
     }
 
-    // Platform-level admin routes (Command Center, etc.) - allow through
-    if (pathname.startsWith('/admin/command-center')) {
-      // Require auth for Command Center
-      if (!user) {
-        const loginUrl = new URL('/login', request.url);
-        loginUrl.searchParams.set('redirect', pathname);
-        return NextResponse.redirect(loginUrl);
-      }
+    // Dashboard routes - allow through (auth checked at page level)
+    if (pathname.startsWith('/dashboard')) {
       return response;
     }
 
-    // In development, allow direct admin access on main domain
-    if (process.env.NODE_ENV === 'development' && pathname.startsWith('/admin')) {
-      if (!user) {
-        const loginUrl = new URL('/login', request.url);
-        loginUrl.searchParams.set('redirect', pathname);
-        return NextResponse.redirect(loginUrl);
-      }
+    // Admin routes - allow through (auth checked at page level)
+    if (pathname.startsWith('/admin')) {
+      return response;
+    }
+
+    // API routes handled separately
+    if (pathname.startsWith('/api')) {
       return response;
     }
 
     // Redirect tenant-only routes to platform landing
-    if (pathname.startsWith('/admin') || pathname.startsWith('/book') || pathname.startsWith('/stylist')) {
+    if (pathname.startsWith('/book') || pathname.startsWith('/stylist')) {
       return NextResponse.redirect(new URL('/', request.url));
     }
 
@@ -143,8 +114,7 @@ export async function middleware(request: NextRequest) {
   // TENANT SUBDOMAIN (kelatic.x3o.ai)
   // ============================================
 
-  // Resolve business from subdomain (lightweight check via cookie or header)
-  // Full resolution happens in the BusinessProvider
+  // Resolve business from subdomain
   const isCustomDomain = subdomain.startsWith('custom:');
   const tenantSlug = isCustomDomain ? subdomain.replace('custom:', '') : subdomain;
 
@@ -156,37 +126,8 @@ export async function middleware(request: NextRequest) {
     path: '/',
   });
 
-  // Protect /admin routes
-  if (pathname.startsWith('/admin')) {
-    if (!user) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-
-    // Check if user is business admin (will be verified in page with full context)
-    // For now, allow through - page will handle authorization
-  }
-
-  // Protect /stylist routes
-  if (pathname.startsWith('/stylist')) {
-    if (!user) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      loginUrl.searchParams.set('type', 'stylist');
-      return NextResponse.redirect(loginUrl);
-    }
-  }
-
-  // Protect /account routes
-  if (pathname.startsWith('/account')) {
-    if (!user) {
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirect', pathname);
-      loginUrl.searchParams.set('type', 'client');
-      return NextResponse.redirect(loginUrl);
-    }
-  }
+  // Auth is now checked at the page level for protected routes
+  // This avoids the Supabase SSR edge runtime issues
 
   return response;
 }

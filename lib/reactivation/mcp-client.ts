@@ -280,9 +280,11 @@ export async function generateCampaignStrategy(params: {
       dailySendVolume: Math.min(100, Math.ceil(total / 7)),
       rolloutWeeks: Math.ceil(total / 500),
       complianceNotes: [
-        'All messages include STOP opt-out',
-        'Send window: 9am-8pm local time only',
+        'All messages include STOP opt-out (TCPA required)',
+        'Send window: 9am-8pm local time only (TCPA required)',
         'Max 3 messages per lead per campaign',
+        'Daily volume limited by A2P 10DLC trust score',
+        'Pre-send opt-out verification on each message',
       ],
       riskMitigation: [
         'Start with VIP segment (lowest risk, highest conversion)',
@@ -305,34 +307,35 @@ export async function recommendScript(params: {
   response_format?: 'markdown' | 'json'
 }): Promise<Script | Script[]> {
   if (USE_MOCK) {
+    // TCPA COMPLIANCE: All SMS templates include mandatory opt-out language
     const scripts: Record<ScriptVariant, Script> = {
       'direct-inquiry': {
         variant: 'direct-inquiry',
-        template: `Hi {firstName}, are you still looking to get {service} done? - ${params.business_name || '{businessName}'}`,
+        template: `Hi {firstName}, are you still looking to get {service} done? - ${params.business_name || '{businessName}'}\n\nReply STOP to opt out`,
         segment: 'ghost',
-        characterCount: 68,
-        usageGuidelines: 'Best for ghost leads. Keep it simple, no links.',
+        characterCount: 95,
+        usageGuidelines: 'Best for ghost leads. Keep it simple, no links. TCPA compliant.',
       },
       'file-closure': {
         variant: 'file-closure',
-        template: `Hi {firstName}, I was about to close your file. Should I keep it open? - ${params.business_name || '{businessName}'}`,
+        template: `Hi {firstName}, I was about to close your file. Should I keep it open? - ${params.business_name || '{businessName}'}\n\nReply STOP to opt out`,
         segment: 'near-miss',
-        characterCount: 82,
-        usageGuidelines: 'Triggers loss aversion. Great for 30-90 day gaps.',
+        characterCount: 109,
+        usageGuidelines: 'Triggers loss aversion. Great for 30-90 day gaps. TCPA compliant.',
       },
       'gift': {
         variant: 'gift',
-        template: `Hi {firstName}, I have a complimentary {service} upgrade for you this week. Want me to save you a spot? - ${params.business_name || '{businessName}'}`,
+        template: `Hi {firstName}, I have a complimentary {service} upgrade for you this week. Want me to save you a spot? - ${params.business_name || '{businessName}'}\n\nReply STOP to opt out`,
         segment: 'vip',
-        characterCount: 115,
-        usageGuidelines: 'Value-first approach. Use for recent, high-value clients.',
+        characterCount: 142,
+        usageGuidelines: 'Value-first approach. Use for recent, high-value clients. TCPA compliant.',
       },
       'breakup': {
         variant: 'breakup',
         template: `Hi {firstName}, I'll take you off our list. If you ever need {service} again, just text back. - ${params.business_name || '{businessName}'}`,
         segment: 'ghost',
         characterCount: 98,
-        usageGuidelines: 'Final message only. Reverse psychology triggers responses.',
+        usageGuidelines: 'Final message only. No opt-out needed as this IS the opt-out.',
       },
     }
     

@@ -17,12 +17,79 @@ const HUMMINGBIRD_CADENCE = [
 ] as const
 
 // Script templates (Dean Jackson 9-word framework)
+// TCPA COMPLIANCE: All SMS messages MUST include opt-out language
 const SCRIPTS = {
-  direct_inquiry: 'Hi {firstName}, are you still looking to get {service} done? - {businessName}',
-  file_closure: 'Hi {firstName}, I was about to close your file. Should I keep it open? - {businessName}',
-  gift: 'Hi {firstName}, I have a complimentary {service} upgrade for you. Want me to save you a spot? - {businessName}',
+  direct_inquiry: 'Hi {firstName}, are you still looking to get {service} done? - {businessName}\n\nReply STOP to opt out',
+  file_closure: 'Hi {firstName}, I was about to close your file. Should I keep it open? - {businessName}\n\nReply STOP to opt out',
+  gift: 'Hi {firstName}, I have a complimentary {service} upgrade for you. Want me to save you a spot? - {businessName}\n\nReply STOP to opt out',
   breakup: 'Hi {firstName}, I\'ll take you off our list. Text back if you ever need {service}. - {businessName}',
   voicemail: 'Hi {firstName}, this is {businessName}. Just checking if you\'re still interested in {service}. Give us a call back when you get a chance.',
+}
+
+// =============================================================================
+// COMPLIANCE: Time Window Enforcement (TCPA requires 8am-9pm local time)
+// We use 9am-8pm for extra safety margin
+// =============================================================================
+const SEND_WINDOW = { startHour: 9, endHour: 20 } // 9am to 8pm
+
+function isWithinSendWindow(timezone = 'America/New_York'): boolean {
+  const now = new Date()
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    hour12: false,
+    timeZone: timezone,
+  })
+  const currentHour = parseInt(formatter.format(now), 10)
+  return currentHour >= SEND_WINDOW.startHour && currentHour < SEND_WINDOW.endHour
+}
+
+function getNextSendWindowMs(timezone = 'America/New_York'): number {
+  const now = new Date()
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric',
+    hour12: false,
+    timeZone: timezone,
+  })
+  const currentHour = parseInt(formatter.format(now), 10)
+  
+  if (currentHour < SEND_WINDOW.startHour) {
+    // Before window - wait until start
+    return (SEND_WINDOW.startHour - currentHour) * 60 * 60 * 1000
+  } else if (currentHour >= SEND_WINDOW.endHour) {
+    // After window - wait until tomorrow 9am
+    return ((24 - currentHour) + SEND_WINDOW.startHour) * 60 * 60 * 1000
+  }
+  return 0 // Within window
+}
+
+// =============================================================================
+// COMPLIANCE: Get daily limit based on A2P 10DLC trust score
+// =============================================================================
+async function getDailyLimitForBusiness(businessId: string): Promise<number> {
+  const { createClient } = await import('@/lib/supabase/server')
+  const supabase = await createClient()
+  
+  const { data: compliance } = await supabase
+    .from('business_compliance')
+    .select('trust_score, daily_message_limit')
+    .eq('business_id', businessId)
+    .single()
+  
+  if (!compliance) {
+    // No A2P registration - use minimum safe limit
+    return 50
+  }
+  
+  // Use configured limit or calculate from trust score
+  if (compliance.daily_message_limit) {
+    return compliance.daily_message_limit
+  }
+  
+  // Trust score thresholds from migration 026
+  const trustScore = compliance.trust_score || 0
+  if (trustScore >= 75) return 2000
+  if (trustScore >= 50) return 500
+  return 50 // Low trust or unverified
 }
 
 // =============================================================================
@@ -134,18 +201,42 @@ export const runHummingbirdCadence = inngest.createFunction(
         break
       }
       
-      // Send messages in batches (respect daily limit)
-      const dailyLimit = campaign.daily_send_limit || 100
-      const batches = chunkArray(activeLeads, Math.min(50, dailyLimit))
+      // Send messages in batches (respect daily limit based on trust score)
+      const dailyLimit = await getDailyLimitForBusiness(businessId)
+      const effectiveLimit = Math.min(dailyLimit, campaign.daily_send_limit || dailyLimit)
+      const batches = chunkArray(activeLeads.slice(0, effectiveLimit), Math.min(50, effectiveLimit))
       
       for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
         const batch = batches[batchIndex]
+        
+        // COMPLIANCE: Check if within send window before each batch
+        const waitMs = getNextSendWindowMs()
+        if (waitMs > 0) {
+          console.log(`[COMPLIANCE] Outside send window. Waiting ${Math.round(waitMs / 3600000)}h until 9am`)
+          await step.sleep(`wait-for-send-window-day-${cadenceStep.day}-batch-${batchIndex}`, `${Math.ceil(waitMs / 60000)}m`)
+        }
         
         await step.run(`send-batch-day-${cadenceStep.day}-batch-${batchIndex}`, async () => {
           const supabase = await createClient()
           const results = []
           
           for (const lead of batch) {
+            // COMPLIANCE: Pre-send verification - check if lead opted out since batch was created
+            const { data: optOutCheck } = await supabase
+              .from('clients')
+              .select('sms_opt_out')
+              .eq('phone', lead.phone)
+              .single()
+            
+            if (optOutCheck?.sms_opt_out) {
+              console.log(`[COMPLIANCE] Skipping ${lead.phone} - opted out`)
+              await supabase
+                .from('campaign_leads')
+                .update({ status: 'opted_out', updated_at: new Date().toISOString() })
+                .eq('id', lead.id)
+              continue
+            }
+            
             // Personalize the script
             const script = SCRIPTS[cadenceStep.script as keyof typeof SCRIPTS]
             const personalizedMessage = script

@@ -92,15 +92,33 @@ export async function POST(req: NextRequest) {
       console.error('Failed to save inbound message:', messageError)
     }
     
-    // Step 5: Handle opt-out
-    if (isOptOut && campaignLead) {
+    // Step 5: Handle opt-out - TCPA COMPLIANCE CRITICAL
+    if (isOptOut) {
+      // Update campaign lead if exists
+      if (campaignLead) {
+        await supabase
+          .from('campaign_leads')
+          .update({
+            status: 'opted_out',
+            opted_out_at: new Date().toISOString(),
+          })
+          .eq('id', campaignLead.id)
+      }
+      
+      // COMPLIANCE: Also update the master clients table to prevent future messages
+      const normalizedPhone = normalizePhone(from)
       await supabase
-        .from('campaign_leads')
+        .from('clients')
         .update({
-          status: 'opted_out',
-          opted_out_at: new Date().toISOString(),
+          sms_opt_out: true,
+          sms_opt_out_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
         })
-        .eq('id', campaignLead.id)
+        .eq('phone', normalizedPhone)
+        .eq('business_id', business.id)
+      
+      // Log opt-out for compliance audit trail
+      console.log(`[COMPLIANCE] Opt-out processed: ${normalizedPhone} for business ${business.id}`)
       
       // Auto-reply confirming opt-out (required by TCPA)
       return new NextResponse(
