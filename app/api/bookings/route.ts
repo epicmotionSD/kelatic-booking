@@ -259,7 +259,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send confirmation notifications for all bookings (don't await to avoid blocking response)
-    console.log('[BookingAPI] Triggering sendConfirmationNotifications for appointment:', appointment.id);
+    console.log('[BookingAPI][DEBUG] About to call sendConfirmationNotifications for:', appointment.id);
     sendConfirmationNotifications(appointment.id).catch((err) => {
       console.error('[BookingAPI] Error sending confirmation notifications:', err);
     });
