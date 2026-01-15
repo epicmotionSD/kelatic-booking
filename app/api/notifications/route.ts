@@ -38,11 +38,16 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
 
     // Fetch appointment with client and service details
+    // Includes walk-in fields for new client bookings without profiles
     const { data: appointment, error } = await supabase
       .from('appointments')
       .select(`
         id,
         start_time,
+        is_walk_in,
+        walk_in_name,
+        walk_in_email,
+        walk_in_phone,
         client:profiles!appointments_client_id_fkey (
           id,
           first_name,
@@ -92,13 +97,29 @@ export async function POST(request: NextRequest) {
       ? appointment.service[0]
       : appointment.service;
 
+    // Fall back to walk-in data when no client profile exists
+    // This ensures new clients without profiles still receive confirmation emails
+    const clientName = client
+      ? `${client.first_name} ${client.last_name}`
+      : appointment.walk_in_name || 'Guest';
+    const clientEmail = client?.email || appointment.walk_in_email;
+    const clientPhone = client?.phone || appointment.walk_in_phone;
+
+    // Log for debugging
+    console.log('[NotificationsAPI] Client details:', {
+      isWalkIn: appointment.is_walk_in,
+      hasClientProfile: !!client,
+      clientName,
+      clientEmail: clientEmail ? '***@***' : 'MISSING',
+    });
+
     // Build appointment details object
     const startTime = new Date(appointment.start_time);
     const appointmentDetails: AppointmentDetails = {
       id: appointment.id,
-      client_name: `${client?.first_name} ${client?.last_name}`,
-      client_email: client?.email,
-      client_phone: client?.phone || undefined,
+      client_name: clientName,
+      client_email: clientEmail,
+      client_phone: clientPhone || undefined,
       stylist_name: `${stylist?.first_name} ${stylist?.last_name}`,
       service_name: service?.name || 'Service',
       service_duration: service?.duration || 60,

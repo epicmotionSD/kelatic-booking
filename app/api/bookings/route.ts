@@ -184,9 +184,10 @@ export async function POST(request: NextRequest) {
     if (clientId) {
       appointmentData.client_id = clientId;
     } else {
-      // Store as walk-in with contact info if client creation failed
+      // Store as walk-in with contact info (including email for notifications)
       appointmentData.is_walk_in = true;
       appointmentData.walk_in_name = `${body.client.first_name} ${body.client.last_name}`;
+      appointmentData.walk_in_email = body.client.email;
       appointmentData.walk_in_phone = body.client.phone;
     }
 
