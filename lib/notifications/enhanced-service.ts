@@ -30,7 +30,7 @@ const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_T
 // Configure web push
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
-    'mailto:' + (process.env.VAPID_EMAIL || 'notifications@kelatic.com'),
+    'mailto:' + (process.env.VAPID_EMAIL || 'kelatic@gmail.com'),
     process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
   );
@@ -195,7 +195,7 @@ export class NotificationService {
       const result = await sgMail.send({
         to: user.email,
         from: {
-          email: process.env.SENDGRID_FROM_EMAIL || 'notifications@kelatic.com',
+          email: process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com',
           name: variables.business_name || 'KeLatic'
         },
         subject,

@@ -1,3 +1,4 @@
+import FooterClient from '@/components/layout/footer-client';
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import { GoogleAnalytics } from '@next/third-parties/google';
@@ -104,6 +105,9 @@ export default async function RootLayout({
         </BusinessProvider>
         {/* Dynamic Google Analytics/Ads - optimized for Vercel */}
         {analyticsId && <GoogleAnalytics gaId={analyticsId} />}
+         {/* Shared Footer for all tenant/public pages */}
+         {business && <FooterClient />}
+      import dynamic from 'next/dynamic';
       </body>
     </html>
   );

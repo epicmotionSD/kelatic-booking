@@ -30,7 +30,7 @@ export default function PrivacyPolicy() {
         <li>Request information about how your data is used</li>
       </ul>
       <h2 className="text-xl font-semibold mt-8 mb-2">Contact Us</h2>
-      <p>If you have any questions about this Privacy Policy, please contact us at info@kelatic.com.</p>
+      <p>If you have any questions about this Privacy Policy, please contact us at kelatic@gmail.com.</p>
     </div>
   );
 }
