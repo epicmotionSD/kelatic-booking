@@ -7,6 +7,7 @@
 import { inngest } from '../client'
 import { createClient } from '@/lib/supabase/server'
 import { sendCampaignSMS } from '@/lib/twilio/campaign-sms'
+import * as sgMail from '@sendgrid/mail'
 
 // Hummingbird cadence schedule (fallback)
 const HUMMINGBIRD_CADENCE = [
@@ -67,6 +68,36 @@ function buildCadenceConfig(campaign: { cadence_config?: unknown; script_variant
     template: SCRIPTS[step.script as keyof typeof SCRIPTS],
     scriptVariant: step.script,
   }))
+}
+
+async function sendCampaignEmail(params: {
+  to: string
+  from: string
+  subject: string
+  html: string
+}): Promise<{ status: string; messageId?: string; errorMessage?: string } > {
+  if (!process.env.SENDGRID_API_KEY) {
+    return { status: 'failed', errorMessage: 'SendGrid API key not configured' }
+  }
+
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
+
+  try {
+    const [response] = await sgMail.send({
+      to: params.to,
+      from: params.from,
+      subject: params.subject,
+      html: params.html,
+    })
+
+    return {
+      status: response?.statusCode === 202 ? 'sent' : 'failed',
+      messageId: response?.headers?.['x-message-id'] || response?.headers?.['X-Message-Id'],
+    }
+  } catch (error) {
+    const err = error as { message?: string }
+    return { status: 'failed', errorMessage: err.message || 'SendGrid error' }
+  }
 }
 
 // =============================================================================
@@ -282,11 +313,6 @@ export const runHummingbirdCadence = inngest.createFunction(
               continue
             }
             
-            if (cadenceStep.channel !== 'sms') {
-              console.log(`[CADENCE] Skipping non-SMS step on day ${cadenceStep.day}`)
-              continue
-            }
-
             // Personalize the script
             const personalizedMessage = cadenceStep.template
               .replace('{firstName}', lead.first_name || 'there')
@@ -294,32 +320,81 @@ export const runHummingbirdCadence = inngest.createFunction(
               .replace('{businessName}', business.name)
             
             try {
-              // Send SMS via Twilio
-              const twilioResult = await sendCampaignSMS({
-                to: lead.phone,
-                from: business.twilio_phone_number,
-                body: personalizedMessage,
-                accountSid: business.twilio_account_sid_encrypted, // Decrypt in function
-                authToken: business.twilio_auth_token_encrypted,
-              })
-              
-              // Record the message
-              await supabase.from('campaign_messages').insert({
-                campaign_id: campaignId,
-                campaign_lead_id: lead.id,
-                business_id: businessId,
-                direction: 'outbound',
-                channel: cadenceStep.channel,
-                to_phone: lead.phone,
-                from_phone: business.twilio_phone_number,
-                body: personalizedMessage,
-                cadence_day: cadenceStep.day,
-                script_variant: cadenceStep.scriptVariant || campaign.script_variant,
-                status: twilioResult.status === 'queued' ? 'sent' : 'failed',
-                twilio_sid: twilioResult.sid,
-                sent_at: new Date().toISOString(),
-                price: twilioResult.price,
-              })
+              let sendResult: { status: string; messageId?: string; errorMessage?: string } | null = null
+
+              if (cadenceStep.channel === 'sms') {
+                const twilioResult = await sendCampaignSMS({
+                  to: lead.phone,
+                  from: business.twilio_phone_number,
+                  body: personalizedMessage,
+                  accountSid: business.twilio_account_sid_encrypted, // Decrypt in function
+                  authToken: business.twilio_auth_token_encrypted,
+                })
+
+                sendResult = {
+                  status: twilioResult.status === 'queued' ? 'sent' : 'failed',
+                  messageId: twilioResult.sid,
+                  errorMessage: twilioResult.errorMessage,
+                }
+
+                await supabase.from('campaign_messages').insert({
+                  campaign_id: campaignId,
+                  campaign_lead_id: lead.id,
+                  business_id: businessId,
+                  direction: 'outbound',
+                  channel: 'sms',
+                  to_phone: lead.phone,
+                  from_phone: business.twilio_phone_number,
+                  body: personalizedMessage,
+                  cadence_day: cadenceStep.day,
+                  script_variant: cadenceStep.scriptVariant || campaign.script_variant,
+                  status: sendResult.status,
+                  twilio_sid: sendResult.messageId,
+                  error_message: sendResult.errorMessage,
+                  sent_at: new Date().toISOString(),
+                })
+              } else if (cadenceStep.channel === 'email') {
+                if (!lead.email) {
+                  console.log(`[CADENCE] Skipping email for lead ${lead.id} - missing email`)
+                  continue
+                }
+
+                const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com'
+                const subject = `We miss you at ${business.name}`
+                const html = `
+                  <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+                    <p>${personalizedMessage.replace(/\n/g, '<br/>')}</p>
+                    <p><a href="https://kelatic.com/special-offers">Book your special offer</a></p>
+                  </div>
+                `
+
+                sendResult = await sendCampaignEmail({
+                  to: lead.email,
+                  from: fromEmail,
+                  subject,
+                  html,
+                })
+
+                await supabase.from('campaign_messages').insert({
+                  campaign_id: campaignId,
+                  campaign_lead_id: lead.id,
+                  business_id: businessId,
+                  direction: 'outbound',
+                  channel: 'email',
+                  to_email: lead.email,
+                  from_email: fromEmail,
+                  body: personalizedMessage,
+                  cadence_day: cadenceStep.day,
+                  script_variant: cadenceStep.scriptVariant || campaign.script_variant,
+                  status: sendResult.status,
+                  twilio_sid: sendResult.messageId,
+                  error_message: sendResult.errorMessage,
+                  sent_at: new Date().toISOString(),
+                })
+              } else {
+                console.log(`[CADENCE] Skipping unsupported channel ${cadenceStep.channel}`)
+                continue
+              }
               
               // Update lead status
               await supabase
@@ -331,7 +406,7 @@ export const runHummingbirdCadence = inngest.createFunction(
                 })
                 .eq('id', lead.id)
               
-              results.push({ leadId: lead.id, success: true, sid: twilioResult.sid })
+              results.push({ leadId: lead.id, success: sendResult?.status === 'sent', sid: sendResult?.messageId })
               
             } catch (error) {
               console.error(`Failed to send to ${lead.phone}:`, error)
@@ -342,9 +417,11 @@ export const runHummingbirdCadence = inngest.createFunction(
                 campaign_lead_id: lead.id,
                 business_id: businessId,
                 direction: 'outbound',
-                channel: cadenceStep.channel,
-                to_phone: lead.phone,
-                from_phone: business.twilio_phone_number,
+                channel: cadenceStep.channel === 'email' ? 'email' : 'sms',
+                to_phone: cadenceStep.channel === 'sms' ? lead.phone : null,
+                from_phone: cadenceStep.channel === 'sms' ? business.twilio_phone_number : null,
+                to_email: cadenceStep.channel === 'email' ? lead.email : null,
+                from_email: cadenceStep.channel === 'email' ? process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com' : null,
                 body: personalizedMessage,
                 cadence_day: cadenceStep.day,
                 script_variant: cadenceStep.scriptVariant || campaign.script_variant,
