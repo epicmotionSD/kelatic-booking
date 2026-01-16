@@ -31,8 +31,8 @@ const nextConfig = {
     formats: ['image/webp'],
   },
 
-  // Output configuration for deployment
-  output: 'standalone',
+  // Remove standalone for Vercel - it auto-optimizes
+  // output: 'standalone', // Only use for self-hosted deployments
   
   // Disable complex webpack optimizations temporarily
   webpack: (config, { isServer }) => {
