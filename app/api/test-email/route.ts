@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import * as sgMail from '@sendgrid/mail';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+function jsonNoStore(payload: unknown, init?: { status?: number }) {
+  const response = NextResponse.json(payload, init);
+  response.headers.set('Cache-Control', 'no-store, max-age=0');
+  return response;
+}
+
 export async function GET(request: NextRequest) {
   const testEmail = request.nextUrl.searchParams.get('email');
   
@@ -16,14 +25,14 @@ export async function GET(request: NextRequest) {
   };
 
   if (!testEmail) {
-    return NextResponse.json({
+    return jsonNoStore({
       message: 'SendGrid Diagnostics - Add ?email=your@email.com to send a test',
       diagnostics,
     });
   }
 
   if (!hasApiKey || process.env.SENDGRID_API_KEY === 'SG.xxx') {
-    return NextResponse.json({
+    return jsonNoStore({
       error: 'SendGrid API key not configured properly',
       diagnostics,
     }, { status: 500 });
@@ -52,14 +61,14 @@ export async function GET(request: NextRequest) {
       requestId: response?.headers?.['x-request-id'] || response?.headers?.['X-Request-Id'],
     };
 
-    return NextResponse.json({
+    return jsonNoStore({
       success: true,
       message: `Test email sent to ${testEmail}`,
       diagnostics,
       sendgridResponse,
     });
   } catch (error: any) {
-    return NextResponse.json({
+    return jsonNoStore({
       error: 'Failed to send test email',
       message: error.message,
       code: error.code,
