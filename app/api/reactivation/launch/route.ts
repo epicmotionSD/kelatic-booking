@@ -83,8 +83,13 @@ export async function POST(req: NextRequest) {
         business_id: businessId,
         name: `Revenue Sprint - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
         status: dryRun ? 'draft' : 'active',
-        segment: segment || 'cold',
-        script_variant: 'hummingbird',
+        segment: segment || 'ghost',
+        script_variant: 'direct_inquiry',
+        script_template: HUMMINGBIRD_SCRIPTS.direct_inquiry.template,
+        script_variables: {
+          service: service || 'your appointment',
+        },
+        cadence_type: 'hummingbird',
         cadence_config: cadenceConfig,
         total_leads: leads.length,
         started_at: dryRun ? null : new Date().toISOString(),
@@ -114,11 +119,14 @@ export async function POST(req: NextRequest) {
       last_name: lead.lastName,
       phone: lead.phone,
       email: lead.email,
-      segment: lead.segment || segment || 'cold',
-      days_since_last_visit: lead.daysSinceContact,
-      lifetime_value: lead.estimatedValue,
+      segment: lead.segment || segment || 'ghost',
+      days_since_contact: lead.daysSinceContact,
+      estimated_value: lead.estimatedValue,
+      source_platform: 'graveyard',
+      original_first_contact: lead.firstContact || null,
+      original_last_contact: lead.lastContact || null,
       status: 'pending' as const,
-      tcpa_consent: true, // Assume consent for imported leads
+      tcpa_compliant: true, // Assume consent for imported leads
     }))
     
     const { error: leadsError } = await supabase
