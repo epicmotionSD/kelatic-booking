@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/client'
 import { inngest } from '@/lib/inngest/client'
 import type { SegmentedLead, Segment } from '@/types/reactivation'
 import { v4 as uuidv4 } from 'uuid'
@@ -40,6 +41,11 @@ const HUMMINGBIRD_SCRIPTS = {
 
 export async function POST(req: NextRequest) {
   try {
+    const authHeader = req.headers.get('authorization')
+    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     const body = await req.json()
     
     const {
@@ -65,7 +71,7 @@ export async function POST(req: NextRequest) {
       )
     }
     
-    const supabase = await createClient()
+    const supabase = createAdminClient()
     
     // Step 1: Create the campaign record
     const campaignId = uuidv4()
