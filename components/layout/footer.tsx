@@ -45,6 +45,7 @@ export function Footer() {
                 <Link href="/blog" className="block text-white/50 hover:text-amber-400 transition-colors">Blog</Link>
                 <Link href="/barber-block" className="block text-white/50 hover:text-red-400 transition-colors">Barber Block</Link>
                 <Link href="/book" className="block text-white/50 hover:text-amber-400 transition-colors">Book Now</Link>
+                <Link href="/privacy-policy" className="block text-white/50 hover:text-amber-400 transition-colors">Privacy Policy</Link>
               </div>
             </div>
 
