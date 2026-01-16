@@ -128,10 +128,15 @@ export function generateTenantMetadata(business: Business, settings: BusinessSet
     ? `https://${business.custom_domain}`
     : `https://${business.slug}.${ROOT_DOMAIN}`;
 
+  // Improved SEO title: prefer meta_title, else business name + city, else business name
+  let seoTitle = settings?.meta_title
+    || (business.city ? `${business.name} ${business.city}` : business.name)
+    || `${business.name} | Book Online`;
+
   return {
     metadataBase: new URL(siteUrl),
     title: {
-      default: settings?.meta_title || `${business.name} | Book Online`,
+      default: seoTitle,
       template: `%s | ${business.name}`,
     },
     description: settings?.meta_description || `Book your appointment at ${business.name}. ${business.tagline || ''}`,
@@ -140,7 +145,7 @@ export function generateTenantMetadata(business: Business, settings: BusinessSet
       apple: business.favicon_url || '/favicon.svg',
     },
     openGraph: {
-      title: settings?.meta_title || business.name,
+      title: seoTitle,
       description: settings?.meta_description || business.tagline || '',
       url: siteUrl,
       siteName: business.name,
@@ -153,12 +158,44 @@ export function generateTenantMetadata(business: Business, settings: BusinessSet
 /**
  * Generate JSON-LD structured data for tenant
  */
-export function generateTenantJsonLd(business: Business, settings: BusinessSettings | null) {
+import type { Service } from '@/types/database';
+
+export function generateTenantJsonLd(
+  business: Business,
+  settings: BusinessSettings | null,
+  services?: Service[]
+) {
   const siteUrl = business.custom_domain
     ? `https://${business.custom_domain}`
     : `https://${business.slug}.${ROOT_DOMAIN}`;
 
   const businessType = business.business_type === 'barbershop' ? 'BarberShop' : 'HairSalon';
+
+  const offerCatalog = services && services.length > 0
+    ? {
+        '@type': 'OfferCatalog',
+        name: `${business.name} Services`,
+        itemListElement: services.map((service) => ({
+          '@type': 'Offer',
+          itemOffered: {
+            '@type': 'Service',
+            name: service.name,
+            description: service.description,
+            category: service.category,
+            provider: {
+              '@type': businessType,
+              name: business.name,
+            },
+            duration: service.duration ? `${service.duration} minutes` : undefined,
+            offers: {
+              '@type': 'Offer',
+              price: service.base_price,
+              priceCurrency: 'USD',
+            },
+          },
+        })),
+      }
+    : undefined;
 
   return {
     '@context': 'https://schema.org',
@@ -184,5 +221,6 @@ export function generateTenantJsonLd(business: Business, settings: BusinessSetti
     sameAs: business.instagram_handle
       ? [`https://instagram.com/${business.instagram_handle.replace('@', '')}`]
       : [],
+    hasOfferCatalog: offerCatalog,
   };
 }

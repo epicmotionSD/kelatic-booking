@@ -40,7 +40,7 @@ Key information:
 Popular loc services:
 - Loc Retwist: $75-125 (90 min)
 - Starter Locs: $200-900 (3+ hrs)
-- Loc Detox: $150 (2 hrs)
+- Loc Clarifying Treatment: $150 (2 hrs)
 - Loc Repair/Reconstruction: varies
 - Loc Styling (updos, etc): varies
 

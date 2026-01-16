@@ -27,6 +27,7 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [agreedToPolicy, setAgreedToPolicy] = useState(false);
+  const [smsConsent, setSmsConsent] = useState(false);
 
   function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -58,6 +59,9 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
     }
     if (!agreedToPolicy) {
       newErrors.policy = 'Please agree to the cancellation policy';
+    }
+    if (!smsConsent) {
+      newErrors.smsConsent = 'Please consent to receive SMS and communications';
     }
 
     setErrors(newErrors);
@@ -304,7 +308,7 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
         </div>
 
         {/* Cancellation Policy */}
-        <div className="bg-zinc-900 border border-white/20 rounded-xl p-4">
+        <div className="bg-zinc-900 border border-white/20 rounded-xl p-4 space-y-3">
           <label className="flex items-start gap-3 cursor-pointer">
             <input
               type="checkbox"
@@ -319,6 +323,20 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
           </label>
           {errors.policy && (
             <p className="text-red-400 text-sm mt-2">{errors.policy}</p>
+          )}
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={smsConsent}
+              onChange={(e) => setSmsConsent(e.target.checked)}
+              className="mt-1 w-4 h-4 rounded border-white/30 bg-transparent text-amber-500 focus:ring-amber-500"
+            />
+            <span className="text-sm text-white/60">
+              I consent to receive SMS and other communications about my appointments, reminders, and special offers. Message & data rates may apply. You can opt out at any time.
+            </span>
+          </label>
+          {errors.smsConsent && (
+            <p className="text-red-400 text-sm mt-2">{errors.smsConsent}</p>
           )}
         </div>
 

@@ -73,7 +73,7 @@ export default function LandingPage() {
   const featuredServices = services.length > 0 ? services : [
     { id: '1', name: 'Loc Retwist', category: 'locs', base_price: 85, duration: 90, description: 'Maintain your locs with our expert retwist service' },
     { id: '2', name: 'Starter Locs', category: 'locs', base_price: 200, duration: 180, description: 'Begin your loc journey with us' },
-    { id: '3', name: 'Loc Detox', category: 'locs', base_price: 150, duration: 120, description: 'Deep cleanse and rejuvenate your locs' },
+    { id: '3', name: 'Loc Clarifying Treatment', category: 'locs', base_price: 150, duration: 120, description: 'Deep cleanse and rejuvenate your locs' },
     { id: '4', name: 'Loc Extensions', category: 'locs', base_price: 300, duration: 240, description: 'Add length and fullness to your locs' },
     { id: '5', name: 'Loc Repair', category: 'locs', base_price: 100, duration: 90, description: 'Fix thinning, breakage, or damaged locs' },
     { id: '6', name: 'Loc Styling', category: 'locs', base_price: 75, duration: 60, description: 'Updos, styles, and special occasion looks' },
@@ -82,14 +82,14 @@ export default function LandingPage() {
   const featuredStylists = stylists.length > 0 ? stylists : [
     { id: '1', first_name: 'Kel', last_name: '', bio: 'Master loctician with 15+ years of experience. Known as "The Loc Gawd" for expert loc installation and maintenance.', specialties: ['Starter Locs', 'Retwists', 'Loc Repair'], instagram_handle: 'kelatic' },
     { id: '2', first_name: 'Destiny', last_name: '', bio: 'Skilled loctician specializing in loc styling and creative loc designs.', specialties: ['Loc Styling', 'Retwists', 'Color'], instagram_handle: '' },
-    { id: '3', first_name: 'Shoop', last_name: '', bio: 'Loc specialist with a keen eye for detail and a passion for healthy locs.', specialties: ['Retwists', 'Loc Detox', 'Maintenance'], instagram_handle: '' },
+    { id: '3', first_name: 'Shoop', last_name: '', bio: 'Loc specialist with a keen eye for detail and a passion for healthy locs.', specialties: ['Retwists', 'Loc Clarifying Treatment', 'Maintenance'], instagram_handle: '' },
   ];
 
   const testimonials = [
     { name: 'Aisha M.', text: 'Best loc retwist I\'ve ever had! Kel really knows his craft. My locs have never looked better.', rating: 5 },
     { name: 'Terrence W.', text: 'Started my loc journey here 2 years ago. The team is amazing and my locs are thriving!', rating: 5 },
     { name: 'Marcus J.', text: 'Finally found a salon that understands men\'s locs. Professional service every time.', rating: 5 },
-    { name: 'Keisha R.', text: 'The loc detox was amazing. My scalp feels so clean and my locs are thriving!', rating: 5 },
+    { name: 'Keisha R.', text: 'The loc clarifying treatment was amazing. My scalp feels so clean and my locs are thriving!', rating: 5 },
   ];
 
   return (

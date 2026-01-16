@@ -4,6 +4,8 @@ import { GoogleAnalytics } from '@next/third-parties/google';
 import { headers } from 'next/headers';
 import './globals.css';
 import { getTenantContext, generateTenantMetadata, generateTenantJsonLd } from '@/lib/tenant/server';
+import { createAdminClient } from '@/lib/supabase/server';
+import type { Service } from '@/types/database';
 import { BusinessProvider, BusinessThemeStyle } from '@/lib/tenant/context';
 import { getAnalyticsId, getGoogleAdsConfig } from '@/lib/tenant-config';
 
@@ -59,14 +61,26 @@ export default async function RootLayout({
   // Get the incoming hostname for analytics
   const headersList = await headers();
   const host = headersList.get('host');
-  
+
   // Get the correct analytics ID for this tenant/domain
   const analyticsId = getAnalyticsId(host);
   const googleAdsConfig = getGoogleAdsConfig(host);
 
+  // Fetch all active services for the tenant (for schema markup)
+  let services: Service[] = [];
+  if (business) {
+    const adminClient = createAdminClient();
+    const { data } = await adminClient
+      .from('services')
+      .select('*')
+      .eq('business_id', business.id)
+      .eq('is_active', true);
+    services = data || [];
+  }
+
   // Generate JSON-LD for tenant or platform
   const jsonLd = business
-    ? generateTenantJsonLd(business, settings)
+    ? generateTenantJsonLd(business, settings, services)
     : {
         '@context': 'https://schema.org',
         '@type': 'SoftwareApplication',
@@ -88,7 +102,6 @@ export default async function RootLayout({
         <BusinessProvider business={business} settings={settings}>
           {children}
         </BusinessProvider>
-        
         {/* Dynamic Google Analytics/Ads - optimized for Vercel */}
         {analyticsId && <GoogleAnalytics gaId={analyticsId} />}
       </body>
