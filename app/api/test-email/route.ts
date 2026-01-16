@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
   try {
     sgMail.setApiKey(process.env.SENDGRID_API_KEY!);
     
-    await sgMail.send({
+    const [response] = await sgMail.send({
       to: testEmail,
       from: { email: fromEmail, name: 'KeLatic Hair Lounge' },
       subject: '✅ Test Email - KeLatic Notifications Working!',
@@ -46,7 +46,18 @@ export async function GET(request: NextRequest) {
       `,
     });
 
-    return NextResponse.json({ success: true, message: `Test email sent to ${testEmail}`, diagnostics });
+    const sendgridResponse = {
+      statusCode: response?.statusCode,
+      messageId: response?.headers?.['x-message-id'] || response?.headers?.['X-Message-Id'],
+      requestId: response?.headers?.['x-request-id'] || response?.headers?.['X-Request-Id'],
+    };
+
+    return NextResponse.json({
+      success: true,
+      message: `Test email sent to ${testEmail}`,
+      diagnostics,
+      sendgridResponse,
+    });
   } catch (error: any) {
     return NextResponse.json({
       error: 'Failed to send test email',
