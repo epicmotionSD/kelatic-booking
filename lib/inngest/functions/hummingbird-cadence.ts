@@ -31,7 +31,7 @@ type CadenceStepConfig = {
   delayHours: number
   channel: 'sms' | 'voice' | 'email'
   template: string
-  scriptVariant?: string
+  scriptVariant: string
 }
 
 function buildCadenceConfig(campaign: { cadence_config?: unknown; script_variant?: string }) {
@@ -54,7 +54,7 @@ function buildCadenceConfig(campaign: { cadence_config?: unknown; script_variant
           delayHours,
           channel,
           template,
-          scriptVariant: step.script || campaign.script_variant,
+          scriptVariant: step.script || campaign.script_variant || 'direct_inquiry',
         } satisfies CadenceStepConfig
       })
       .filter((step): step is CadenceStepConfig => Boolean(step))
