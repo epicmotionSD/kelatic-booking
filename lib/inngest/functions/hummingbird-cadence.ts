@@ -8,7 +8,7 @@ import { inngest } from '../client'
 import { createClient } from '@/lib/supabase/server'
 import { sendCampaignSMS } from '@/lib/twilio/campaign-sms'
 
-// Hummingbird cadence schedule
+// Hummingbird cadence schedule (fallback)
 const HUMMINGBIRD_CADENCE = [
   { day: 1, delayHours: 0, script: 'direct_inquiry', channel: 'sms' },
   { day: 2, delayHours: 24, script: 'voicemail', channel: 'voice' },
@@ -24,6 +24,49 @@ const SCRIPTS = {
   gift: 'Hi {firstName}, I have a complimentary {service} upgrade for you. Want me to save you a spot? - {businessName}\n\nReply STOP to opt out',
   breakup: 'Hi {firstName}, I\'ll take you off our list. Text back if you ever need {service}. - {businessName}',
   voicemail: 'Hi {firstName}, this is {businessName}. Just checking if you\'re still interested in {service}. Give us a call back when you get a chance.',
+}
+
+type CadenceStepConfig = {
+  day: number
+  delayHours: number
+  channel: 'sms' | 'voice' | 'email'
+  template: string
+  scriptVariant?: string
+}
+
+function buildCadenceConfig(campaign: { cadence_config?: unknown; script_variant?: string }) {
+  const raw = Array.isArray(campaign.cadence_config) ? campaign.cadence_config : []
+
+  if (raw.length > 0) {
+    return raw
+      .map((step: any) => {
+        const day = Number(step.day)
+        const channel = (step.channel || step.type || 'sms') as CadenceStepConfig['channel']
+        const template = step.template || SCRIPTS[step.script as keyof typeof SCRIPTS]
+        const delayHours = Number(step.delayHours ?? (day > 0 ? (day - 1) * 24 : 0))
+
+        if (!day || !template) {
+          return null
+        }
+
+        return {
+          day,
+          delayHours,
+          channel,
+          template,
+          scriptVariant: step.script || campaign.script_variant,
+        } satisfies CadenceStepConfig
+      })
+      .filter((step): step is CadenceStepConfig => Boolean(step))
+  }
+
+  return HUMMINGBIRD_CADENCE.map((step) => ({
+    day: step.day,
+    delayHours: step.delayHours,
+    channel: step.channel,
+    template: SCRIPTS[step.script as keyof typeof SCRIPTS],
+    scriptVariant: step.script,
+  }))
 }
 
 // =============================================================================
@@ -160,8 +203,10 @@ export const runHummingbirdCadence = inngest.createFunction(
         .eq('id', campaignId)
     })
     
+    const cadenceConfig = buildCadenceConfig(campaign)
+
     // Step 3: Execute each day of the cadence
-    for (const cadenceStep of HUMMINGBIRD_CADENCE) {
+    for (const cadenceStep of cadenceConfig) {
       // Check if campaign was paused/cancelled
       const shouldContinue = await step.run(`check-status-day-${cadenceStep.day}`, async () => {
         const supabase = await createClient()
@@ -237,9 +282,13 @@ export const runHummingbirdCadence = inngest.createFunction(
               continue
             }
             
+            if (cadenceStep.channel !== 'sms') {
+              console.log(`[CADENCE] Skipping non-SMS step on day ${cadenceStep.day}`)
+              continue
+            }
+
             // Personalize the script
-            const script = SCRIPTS[cadenceStep.script as keyof typeof SCRIPTS]
-            const personalizedMessage = script
+            const personalizedMessage = cadenceStep.template
               .replace('{firstName}', lead.first_name || 'there')
               .replace('{service}', campaign.script_variables?.service || 'your appointment')
               .replace('{businessName}', business.name)
@@ -265,7 +314,7 @@ export const runHummingbirdCadence = inngest.createFunction(
                 from_phone: business.twilio_phone_number,
                 body: personalizedMessage,
                 cadence_day: cadenceStep.day,
-                script_variant: cadenceStep.script,
+                script_variant: cadenceStep.scriptVariant || campaign.script_variant,
                 status: twilioResult.status === 'queued' ? 'sent' : 'failed',
                 twilio_sid: twilioResult.sid,
                 sent_at: new Date().toISOString(),
@@ -298,7 +347,7 @@ export const runHummingbirdCadence = inngest.createFunction(
                 from_phone: business.twilio_phone_number,
                 body: personalizedMessage,
                 cadence_day: cadenceStep.day,
-                script_variant: cadenceStep.script,
+                script_variant: cadenceStep.scriptVariant || campaign.script_variant,
                 status: 'failed',
                 error_message: String(error),
                 failed_at: new Date().toISOString(),
