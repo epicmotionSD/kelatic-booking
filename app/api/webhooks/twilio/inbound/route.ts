@@ -62,6 +62,8 @@ export async function POST(req: NextRequest) {
     const isOptOut = sentiment === 'opt_out'
     const bookingIntent = extractBookingIntent(body)
     const isHotLead = sentiment === 'positive' || bookingIntent !== null
+    const normalizedBody = body.trim().toLowerCase()
+    const autoReply = getAutoReply(normalizedBody)
     
     // Step 4: Record the inbound message
     const messageData = {
@@ -129,6 +131,13 @@ export async function POST(req: NextRequest) {
         { headers: { 'Content-Type': 'text/xml' } }
       )
     }
+
+    if (autoReply) {
+      return new NextResponse(
+        buildTwimlMessage(autoReply),
+        { headers: { 'Content-Type': 'text/xml' } }
+      )
+    }
     
     // Step 6: If HOT LEAD, emit event for dashboard notification
     if (isHotLead && campaignLead) {
@@ -186,4 +195,55 @@ export async function POST(req: NextRequest) {
 function normalizePhone(phone: string): string {
   // Remove +1 and all non-digits to match stored format
   return phone.replace(/^\+1/, '').replace(/\D/g, '')
+}
+
+function buildTwimlMessage(message: string): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>${message}</Message>
+</Response>`
+}
+
+function getAutoReply(normalizedBody: string): string | null {
+  if (isPriceInquiry(normalizedBody)) {
+    return 'The $75 Wednesday Special requires a $25 deposit to lock it in. Book here: https://kelatic.com/special-offers'
+  }
+
+  if (isIdentityInquiry(normalizedBody)) {
+    return 'Kelatic VIP Concierge service. Book here: https://kelatic.com/special-offers'
+  }
+
+  return null
+}
+
+function isPriceInquiry(normalizedBody: string): boolean {
+  const priceKeywords = [
+    'price',
+    'cost',
+    'how much',
+    'rates',
+    'special',
+    '$75',
+    '75',
+    '$25',
+    '25',
+    'deposit',
+  ]
+
+  return priceKeywords.some((keyword) => normalizedBody.includes(keyword))
+}
+
+function isIdentityInquiry(normalizedBody: string): boolean {
+  const identityKeywords = [
+    'who is this',
+    'who are you',
+    'who is this?',
+    'who are you?',
+    'who dis',
+    'who this',
+    'what is this',
+    'kelatic',
+  ]
+
+  return identityKeywords.some((keyword) => normalizedBody.includes(keyword))
 }
