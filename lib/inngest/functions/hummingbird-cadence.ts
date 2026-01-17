@@ -177,7 +177,7 @@ export const runHummingbirdCadence = inngest.createFunction(
     name: 'Run Hummingbird Reactivation Cadence',
     retries: 3,
     concurrency: {
-      limit: 10, // Max 10 campaigns running simultaneously
+      limit: 5, // Max 5 campaigns running simultaneously (plan limit)
     },
   },
   { event: 'campaign/started' },
