@@ -6,6 +6,7 @@
 
 import { inngest } from '../client'
 import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/client'
 import { sendCampaignSMS } from '@/lib/twilio/campaign-sms'
 import * as sgMail from '@sendgrid/mail'
 
@@ -186,7 +187,7 @@ export const runHummingbirdCadence = inngest.createFunction(
     
     // Step 1: Load campaign and leads
     const { campaign, leads, business } = await step.run('load-campaign-data', async () => {
-      const supabase = await createClient()
+      const supabase = createAdminClient()
       
       const [campaignResult, leadsResult, businessResult] = await Promise.all([
         supabase
@@ -223,7 +224,7 @@ export const runHummingbirdCadence = inngest.createFunction(
     
     // Step 2: Mark campaign as active
     await step.run('activate-campaign', async () => {
-      const supabase = await createClient()
+      const supabase = createAdminClient()
       await supabase
         .from('campaigns')
         .update({
@@ -240,7 +241,7 @@ export const runHummingbirdCadence = inngest.createFunction(
     for (const cadenceStep of cadenceConfig) {
       // Check if campaign was paused/cancelled
       const shouldContinue = await step.run(`check-status-day-${cadenceStep.day}`, async () => {
-        const supabase = await createClient()
+        const supabase = createAdminClient()
         const { data } = await supabase
           .from('campaigns')
           .select('status')
@@ -261,7 +262,7 @@ export const runHummingbirdCadence = inngest.createFunction(
       
       // Get leads that haven't responded or opted out
       const activeLeads = await step.run(`get-active-leads-day-${cadenceStep.day}`, async () => {
-        const supabase = await createClient()
+        const supabase = createAdminClient()
         const { data } = await supabase
           .from('campaign_leads')
           .select('*')
@@ -293,7 +294,7 @@ export const runHummingbirdCadence = inngest.createFunction(
         }
         
         await step.run(`send-batch-day-${cadenceStep.day}-batch-${batchIndex}`, async () => {
-          const supabase = await createClient()
+          const supabase = createAdminClient()
           const results = []
           
           for (const lead of batch) {
@@ -448,7 +449,7 @@ export const runHummingbirdCadence = inngest.createFunction(
       
       // Update campaign progress
       await step.run(`update-progress-day-${cadenceStep.day}`, async () => {
-        const supabase = await createClient()
+        const supabase = createAdminClient()
         await supabase
           .from('campaigns')
           .update({ current_day: cadenceStep.day })
@@ -469,7 +470,7 @@ export const runHummingbirdCadence = inngest.createFunction(
     
     // Step 4: Mark campaign as complete
     const finalMetrics = await step.run('complete-campaign', async () => {
-      const supabase = await createClient()
+      const supabase = createAdminClient()
       
       // Get final metrics
       const { data: messages } = await supabase
