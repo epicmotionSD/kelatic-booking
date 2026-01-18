@@ -1,6 +1,7 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { getAvailability, createBooking } from '../booking/service';
+import { getAvailability } from '../booking/service';
 import { createAdminClient } from '../supabase/client';
+import { requireBusiness } from '@/lib/tenant/server';
 
 // Lazy initialize to avoid build-time errors
 let anthropicClient: Anthropic | null = null;
@@ -254,15 +255,115 @@ async function handleToolCall(
     }
 
     case 'create_booking': {
-      // For now, return a summary - actual booking requires client authentication
-      return `Booking request received:
-- Service: ${toolInput.service_id}
-- Stylist: ${toolInput.stylist_id}  
-- Time: ${formatTime(toolInput.start_time as string)}
-- Contact: ${toolInput.client_email}
-${toolInput.notes ? `- Notes: ${toolInput.notes}` : ''}
+      const business = await requireBusiness();
+      const supabase = createAdminClient();
 
-To complete this booking, the client will need to confirm via the booking link sent to their email.`;
+      const clientEmail = String(toolInput.client_email || '').toLowerCase();
+      const clientPhone = toolInput.client_phone ? String(toolInput.client_phone) : null;
+      const clientName = String(toolInput.client_name || '').trim();
+      const [firstName, ...lastParts] = clientName.split(' ');
+      const lastName = lastParts.join(' ') || 'Client';
+
+      if (!clientEmail || !toolInput.service_id || !toolInput.stylist_id || !toolInput.start_time) {
+        return 'I still need the service, stylist, time, and email to complete your booking.';
+      }
+
+      const { data: service } = await supabase
+        .from('services')
+        .select('id, name, duration, base_price, deposit_required')
+        .eq('id', toolInput.service_id)
+        .eq('business_id', business.id)
+        .single();
+
+      if (!service) {
+        return 'That service is no longer available. Want me to check another option?';
+      }
+
+      const startTime = new Date(String(toolInput.start_time));
+      const endTime = new Date(startTime.getTime() + service.duration * 60000);
+
+      const { data: conflicts } = await supabase
+        .from('appointments')
+        .select('id')
+        .eq('stylist_id', toolInput.stylist_id)
+        .eq('business_id', business.id)
+        .lt('start_time', endTime.toISOString())
+        .gt('end_time', startTime.toISOString())
+        .not('status', 'in', '("cancelled","no_show")')
+        .limit(1);
+
+      if (conflicts?.length) {
+        return 'That time just got booked. Want me to find the next available slot?';
+      }
+
+      let clientId: string | null = null;
+
+      const { data: existingClient } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('email', clientEmail)
+        .eq('business_id', business.id)
+        .single();
+
+      if (existingClient) {
+        clientId = existingClient.id;
+        if (clientPhone) {
+          await supabase.from('profiles').update({ phone: clientPhone }).eq('id', clientId);
+        }
+      } else {
+        const { data: newClient } = await supabase
+          .from('profiles')
+          .insert({
+            first_name: firstName || 'Client',
+            last_name: lastName,
+            email: clientEmail,
+            phone: clientPhone,
+            role: 'client',
+            business_id: business.id,
+          })
+          .select('id')
+          .single();
+
+        if (newClient?.id) {
+          clientId = newClient.id;
+        }
+      }
+
+      const appointmentData: Record<string, any> = {
+        service_id: toolInput.service_id,
+        stylist_id: toolInput.stylist_id,
+        business_id: business.id,
+        start_time: startTime.toISOString(),
+        end_time: endTime.toISOString(),
+        quoted_price: service.base_price,
+        client_notes: toolInput.notes ? String(toolInput.notes) : null,
+        status: service.deposit_required ? 'pending' : 'confirmed',
+      };
+
+      if (clientId) {
+        appointmentData.client_id = clientId;
+      } else {
+        appointmentData.is_walk_in = true;
+        appointmentData.walk_in_name = clientName || 'Client';
+        appointmentData.walk_in_email = clientEmail;
+        appointmentData.walk_in_phone = clientPhone;
+      }
+
+      const { data: appointment, error } = await supabase
+        .from('appointments')
+        .insert(appointmentData)
+        .select('id')
+        .single();
+
+      if (error || !appointment) {
+        return 'I had trouble booking that slot. Want me to try another time?';
+      }
+
+      const bookingUrl = process.env.PUBLIC_BOOKING_URL || 'https://kelatic.com/book';
+
+      return `You’re booked! I reserved your ${service.name} for ${formatTime(startTime.toISOString())}.
+
+If a deposit is required, we’ll send you a confirmation email with next steps. You can also manage or update your appointment here: ${bookingUrl}`;
     }
 
     default:

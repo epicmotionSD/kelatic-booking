@@ -20,10 +20,24 @@ export function ChatWidget() {
   const [loading, setLoading] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const autoOpenKey = 'kela_chat_auto_open_v1';
+  const autoOpenDelayMs = 5000;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    if (isOpen || typeof window === 'undefined') return;
+    if (window.sessionStorage.getItem(autoOpenKey)) return;
+
+    const timer = window.setTimeout(() => {
+      setIsOpen(true);
+      window.sessionStorage.setItem(autoOpenKey, '1');
+    }, autoOpenDelayMs);
+
+    return () => window.clearTimeout(timer);
+  }, [isOpen]);
 
   async function sendMessage() {
     if (!input.trim() || loading) return;
@@ -82,11 +96,21 @@ export function ChatWidget() {
     }
   }
 
+  function handleToggleOpen() {
+    setIsOpen((prev) => {
+      const next = !prev;
+      if (next && typeof window !== 'undefined') {
+        window.sessionStorage.setItem(autoOpenKey, '1');
+      }
+      return next;
+    });
+  }
+
   return (
     <>
       {/* Chat Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggleOpen}
         className={`fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-all z-50 ${
           isOpen
             ? 'bg-zinc-700 hover:bg-zinc-600'
@@ -159,6 +183,7 @@ export function ChatWidget() {
             <div className="px-4 pb-2 bg-zinc-950">
               <div className="flex flex-wrap gap-2">
                 {[
+                  'I want to book an appointment',
                   'What services do you offer?',
                   'Check availability',
                   'How much is a loc retwist?',
