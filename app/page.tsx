@@ -218,6 +218,40 @@ export default function LandingPage() {
                 </div>
               )}
             </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="pt-32 pb-24 bg-black relative overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-16 items-center">
+            {/* Left - Hero Content */}
+            <div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-amber-400">
+                Houston&apos;s Premier Loc Lounge
+              </div>
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mt-6">
+                Your Crown Deserves
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500">
+                  Expert Loc Care
+                </span>
+              </h1>
+              <p className="text-lg text-white/60 mt-6 max-w-xl">
+                From starter locs to precision retwists, Kelatic Hair Lounge delivers master-level loc artistry in Houston.
+              </p>
+              <div className="flex flex-wrap items-center gap-4 mt-8">
+                <Link
+                  href="/book"
+                  className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                >
+                  Book Your Appointment
+                </Link>
+                <a
+                  href="#gallery"
+                  className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 rounded-full text-sm font-semibold text-white/80 hover:text-amber-400 hover:border-amber-400/40 transition-all"
+                >
+                  <Play className="w-4 h-4" />
                   Watch Our Work
                 </a>
               </div>

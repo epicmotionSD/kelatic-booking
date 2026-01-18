@@ -28,6 +28,54 @@ const SCRIPTS = {
   voicemail: 'Hi {firstName}, this is {businessName}. Just checking if you\'re still interested in {service}. Give us a call back when you get a chance.',
 }
 
+const BOOKING_URL = process.env.PUBLIC_BOOKING_URL || 'https://kelatic.com/book'
+const OFFER_URL = process.env.PUBLIC_SPECIAL_OFFERS_URL || 'https://kelatic.com/special-offers'
+
+const EMAIL_TEMPLATES = {
+  direct_inquiry: {
+    subject: 'Still thinking about {service} at {businessName}?',
+    headline: 'Let\'s get you booked',
+    body: 'Hi {firstName}, if you\'re still interested in {service}, we\'d love to take care of you this week. You can grab the next available slot in minutes.',
+    ctaLabel: 'Book your appointment',
+    ctaUrl: BOOKING_URL,
+    secondaryLabel: 'View the $75 Wednesday Special',
+    secondaryUrl: OFFER_URL,
+  },
+  file_closure: {
+    subject: 'Quick check-in from {businessName}',
+    headline: 'Should we keep your spot open?',
+    body: 'Hi {firstName}, we were about to close your file for {service}. If you still want to come in, book below and we\'ll take care of the rest.',
+    ctaLabel: 'Keep my spot',
+    ctaUrl: BOOKING_URL,
+    secondaryLabel: 'See current offers',
+    secondaryUrl: OFFER_URL,
+  },
+  gift: {
+    subject: 'A complimentary upgrade for your next visit',
+    headline: 'We saved a bonus for you',
+    body: 'Hi {firstName}, we\'d love to gift you a complimentary {service} upgrade on your next visit. Book now and we\'ll apply it for you.',
+    ctaLabel: 'Claim the upgrade',
+    ctaUrl: BOOKING_URL,
+    secondaryLabel: 'Browse our specials',
+    secondaryUrl: OFFER_URL,
+  },
+  breakup: {
+    subject: 'Last check-in from {businessName}',
+    headline: 'We\'re here if you need us',
+    body: 'Hi {firstName}, we won\'t keep reaching out. If you ever want {service} again, you can book anytime below.',
+    ctaLabel: 'Book anytime',
+    ctaUrl: BOOKING_URL,
+    secondaryLabel: 'See current offers',
+    secondaryUrl: OFFER_URL,
+  },
+} as const
+
+function interpolateTemplate(template: string, variables: Record<string, string>) {
+  return Object.entries(variables).reduce((result, [key, value]) => {
+    return result.replace(new RegExp(`\\{${key}\\}`, 'g'), value)
+  }, template)
+}
+
 type CadenceStepConfig = {
   day: number
   delayHours: number
@@ -367,13 +415,36 @@ export const runHummingbirdCadence = inngest.createFunction(
                 }
 
                 const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com'
-                const subject = `We miss you at ${business.name}`
+                const emailTemplate = EMAIL_TEMPLATES[cadenceStep.scriptVariant as keyof typeof EMAIL_TEMPLATES] || EMAIL_TEMPLATES.direct_inquiry
+                const templateVars = {
+                  firstName: lead.first_name || 'there',
+                  service: campaign.script_variables?.service || 'your appointment',
+                  businessName: business.name,
+                }
+                const subject = interpolateTemplate(emailTemplate.subject, templateVars)
+                const headline = interpolateTemplate(emailTemplate.headline, templateVars)
+                const body = interpolateTemplate(emailTemplate.body, templateVars)
+                const ctaLabel = interpolateTemplate(emailTemplate.ctaLabel, templateVars)
+                const ctaUrl = emailTemplate.ctaUrl
+                const secondaryLabel = emailTemplate.secondaryLabel
+                  ? interpolateTemplate(emailTemplate.secondaryLabel, templateVars)
+                  : null
+                const secondaryUrl = emailTemplate.secondaryUrl
+
                 const html = `
-                  <div style="font-family: Arial, sans-serif; line-height: 1.5;">
-                    <p>${personalizedMessage.replace(/\n/g, '<br/>')}</p>
-                    <p><a href="https://kelatic.com/special-offers">Book your special offer</a></p>
+                  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
+                    <h2 style="margin: 0 0 12px; font-size: 22px;">${headline}</h2>
+                    <p style="margin: 0 0 16px;">${body}</p>
+                    <p style="margin: 24px 0;">
+                      <a href="${ctaUrl}" style="display: inline-block; padding: 12px 20px; background: #f59e0b; color: #111; text-decoration: none; border-radius: 999px; font-weight: 700;">
+                        ${ctaLabel}
+                      </a>
+                    </p>
+                    ${secondaryLabel && secondaryUrl ? `<p style=\"margin: 0 0 8px;\"><a href=\"${secondaryUrl}\" style=\"color: #f59e0b; text-decoration: none;\">${secondaryLabel}</a></p>` : ''}
+                    <p style="margin: 24px 0 0; color: #666; font-size: 12px;">If you no longer want to hear from us, you can ignore this email.</p>
                   </div>
                 `
+                const emailBodyText = `${headline}\n\n${body}\n\n${ctaLabel}: ${ctaUrl}${secondaryLabel && secondaryUrl ? `\n${secondaryLabel}: ${secondaryUrl}` : ''}`
 
                 const { data: emailMessage, error: emailMessageError } = await supabase
                   .from('campaign_messages')
@@ -385,7 +456,7 @@ export const runHummingbirdCadence = inngest.createFunction(
                     channel: 'email',
                     to_email: lead.email,
                     from_email: fromEmail,
-                    body: personalizedMessage,
+                    body: emailBodyText,
                     cadence_day: cadenceStep.day,
                     script_variant: cadenceStep.scriptVariant || campaign.script_variant,
                     status: 'queued',
