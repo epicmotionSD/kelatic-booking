@@ -431,27 +431,19 @@ export default function LandingPage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            [
-              { icon: Award, title: 'Master Trained', desc: 'All locticians trained by a 16-year loc master' },
-              { icon: Heart, title: 'Loc Scalp Treatment', desc: 'Healthy scalp care for lasting growth' },
-              { icon: Sparkles, title: 'Loc Knowledge', desc: 'Education and guidance for every journey' },
-              { icon: Shield, title: 'Growing Hands', desc: 'Techniques that protect and strengthen' },
-              { icon: Calendar, title: 'Good Vibes', desc: 'Warm, welcoming, and uplifting energy' },
-              { icon: Shield, title: 'Clean & Safe', desc: 'Sanitized tools and safe practices' },
-            ].map((item, idx) => (
-                <div className="relative">
-                  <div className="w-14 h-14 bg-amber-400/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-amber-400/20 transition-colors">
-                    <Sparkles className="w-7 h-7 text-amber-400" />
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{service.name}</h3>
-                  <p className="text-white/50 mb-5 line-clamp-2">{service.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-2xl font-black text-amber-400">${service.base_price}</span>
-                    <span className="text-sm text-white/40 flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {Math.floor(service.duration / 60)}h {service.duration % 60 > 0 ? `${service.duration % 60}m` : ''}
-                    </span>
-                  </div>
+            {featuredServices.map((service) => (
+              <div key={service.id} className="group bg-zinc-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-400/30 transition-colors">
+                <div className="w-14 h-14 bg-amber-400/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-amber-400/20 transition-colors">
+                  <Sparkles className="w-7 h-7 text-amber-400" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">{service.name}</h3>
+                <p className="text-white/50 mb-5 line-clamp-2">{service.description}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-2xl font-black text-amber-400">${service.base_price}</span>
+                  <span className="text-sm text-white/40 flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {Math.floor(service.duration / 60)}h {service.duration % 60 > 0 ? `${service.duration % 60}m` : ''}
+                  </span>
                 </div>
               </div>
             ))}
