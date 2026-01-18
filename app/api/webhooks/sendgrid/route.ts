@@ -24,12 +24,7 @@ export async function POST(req: NextRequest) {
       }
 
       const eventWebhook = new EventWebhook()
-      const isValid = eventWebhook.verifySignature({
-        publicKey,
-        payload: rawBody,
-        signature,
-        timestamp,
-      })
+      const isValid = eventWebhook.verifySignature(publicKey, rawBody, signature, timestamp)
 
       if (!isValid) {
         return NextResponse.json({ error: 'Invalid SendGrid signature' }, { status: 401 })
