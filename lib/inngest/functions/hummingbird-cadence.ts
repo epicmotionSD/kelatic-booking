@@ -332,9 +332,13 @@ export const runHummingbirdCadence = inngest.createFunction(
         break
       }
       
-      // Send messages in batches (respect daily limit based on trust score)
+      // Send messages in batches
+      // NOTE: A2P trust score limits apply to SMS/voice only, not email
       const dailyLimit = await getDailyLimitForBusiness(businessId)
-      const effectiveLimit = Math.min(dailyLimit, campaign.daily_send_limit || dailyLimit)
+      const channelLimit = cadenceStep.channel === 'email'
+        ? (campaign.daily_send_limit || activeLeads.length)
+        : Math.min(dailyLimit, campaign.daily_send_limit || dailyLimit)
+      const effectiveLimit = Math.max(1, Math.min(channelLimit, activeLeads.length))
       const batches = chunkArray(activeLeads.slice(0, effectiveLimit), Math.min(50, effectiveLimit))
       
       for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
