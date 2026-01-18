@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Suspense } from 'react';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 
 function UnsubscribeContent() {
   const searchParams = useSearchParams();
@@ -10,16 +11,29 @@ function UnsubscribeContent() {
   const error = searchParams.get('error');
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center p-4">
-      <div className="max-w-md w-full text-center">
-        {/* Logo */}
-        <Link href="/" className="inline-block mb-8">
-          <img
-            src="/logo.png"
-            alt="Kelatic Hair Lounge"
-            className="h-16 w-auto mx-auto"
-          />
-        </Link>
+    <div className="min-h-screen bg-zinc-950 text-white flex flex-col">
+      <header className="bg-black/50 backdrop-blur-xl border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-4 py-4">
+          <div className="flex items-center justify-between">
+            <Link href="/" className="flex items-center">
+              <img
+                src="/logo.png"
+                alt="Kelatic Hair Lounge"
+                className="h-10 w-auto"
+              />
+            </Link>
+            <div className="flex items-center gap-4">
+              <PublicAuthLinks />
+              <Link href="/" className="text-sm text-white/50 hover:text-amber-400 transition-colors">
+                ← Back to site
+              </Link>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex-1 flex items-center justify-center p-4">
+        <div className="max-w-md w-full text-center">
 
         {success === 'true' ? (
           <>
@@ -79,6 +93,7 @@ function UnsubscribeContent() {
               (713) 485-4000
             </a>
           </p>
+        </div>
         </div>
       </div>
     </div>

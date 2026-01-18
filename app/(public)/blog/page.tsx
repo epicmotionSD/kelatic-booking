@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ArrowLeft, Clock, Calendar } from 'lucide-react';
 import { blogPosts, type BlogPost } from '@/lib/blog-posts';
 import { Footer } from '@/components/layout/footer';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 
 const CATEGORY_LABELS: Record<BlogPost['category'], string> = {
   care: 'Loc Care',
@@ -50,13 +51,16 @@ export default function BlogPage() {
                 className="h-12 w-auto"
               />
             </Link>
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-sm text-white/50 hover:text-amber-400 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to site
-            </Link>
+            <div className="flex items-center gap-4">
+              <PublicAuthLinks />
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-sm text-white/50 hover:text-amber-400 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to site
+              </Link>
+            </div>
           </div>
         </div>
       </header>

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChatWidget } from '@/components/chat/chat-widget';
 import { StylistCarousel } from '@/components/home/stylist-carousel';
+import { Footer } from '@/components/layout/footer';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 import {
   Calendar,
   Star,
@@ -115,6 +116,7 @@ export default function LandingPage() {
               <Link href="/blog" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Blog</Link>
               <Link href="/barber-block" className="text-sm font-medium text-white/70 hover:text-red-400 transition-colors">Barber Block</Link>
               <a href="#contact" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Contact</a>
+              <PublicAuthLinks />
               <Link
                 href="/book"
                 className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
@@ -123,83 +125,99 @@ export default function LandingPage() {
               </Link>
             </div>
 
-            {/* Mobile Menu Button */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-white"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/10 py-6">
-            <div className="flex flex-col gap-4 px-6">
-              <Link href="/services" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Services</Link>
-              <Link href="/special-offers" onClick={() => setMobileMenuOpen(false)} className="text-amber-400 py-2 text-lg animate-pulse">$75 Wednesday Special</Link>
-              <a href="#gallery" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Gallery</a>
-              <Link href="/blog" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Blog</Link>
-              <Link href="/barber-block" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg hover:text-red-400">Barber Block</Link>
-              <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-white/70 py-2 text-lg">Contact</a>
-              <Link
-                href="/book"
-                className="mt-4 px-6 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-center"
+            {/* Mobile Menu */}
+            <div className="md:hidden relative">
+              <button
+                type="button"
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-white/10 text-white/80 hover:text-amber-400 hover:border-amber-400/40 transition-colors"
+                aria-expanded={mobileMenuOpen}
+                aria-label="Toggle menu"
               >
-                Book Now
-              </Link>
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </button>
+              {mobileMenuOpen && (
+                <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-white/10 bg-zinc-950/95 backdrop-blur shadow-xl overflow-hidden z-50">
+                  <div className="py-2">
+                    <Link
+                      href="/services"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Services
+                    </Link>
+                    <Link
+                      href="/special-offers"
+                      className="block px-4 py-2 text-sm text-amber-400 hover:text-yellow-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      $75 Wednesday Special
+                    </Link>
+                    <a
+                      href="#gallery"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Gallery
+                    </a>
+                    <Link
+                      href="/blog"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Blog
+                    </Link>
+                    <Link
+                      href="/barber-block"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-red-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Barber Block
+                    </Link>
+                    <a
+                      href="#contact"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Contact
+                    </a>
+                  </div>
+                  <div className="border-t border-white/10 py-2">
+                    <div className="px-4 py-1 text-[10px] uppercase tracking-widest text-white/40">Login</div>
+                    <Link
+                      href="/login?type=client&redirect=/account"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Client Login
+                    </Link>
+                    <Link
+                      href="/login?type=stylist&redirect=/stylist"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Stylist Login
+                    </Link>
+                    <Link
+                      href="/login?type=admin&redirect=/admin"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Admin Login
+                    </Link>
+                  </div>
+                  <div className="border-t border-white/10 p-3">
+                    <Link
+                      href="/book"
+                      className="block w-full text-center px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Book Now
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
-          </div>
-        )}
-      </nav>
-
-      {/* Hero Section */}
-      <section className="min-h-screen pt-20 relative overflow-hidden">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-900 to-black" />
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-amber-500/10 to-transparent" />
-        <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gradient-to-t from-black to-transparent" />
-
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-32">
-          <div className="grid lg:grid-cols-2 gap-16 items-center min-h-[80vh]">
-            {/* Left Content */}
-            <div className="space-y-8">
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur border border-white/10 rounded-full">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-                <span className="text-sm text-white/80">Now Booking in Houston</span>
-              </div>
-
-              {/* Heading */}
-              <div className="space-y-4">
-                <h1 className="text-5xl md:text-7xl font-black leading-[0.9] tracking-tight">
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500">
-                    STARTER LOCS, LOC RETWIST and MORE
-                  </span>
-                </h1>
-                <p className="text-xl text-white/60 max-w-md leading-relaxed">
-                  Houston&apos;s premier loc specialists. Expert loc installation, maintenance, and styling. Where every crown gets the royal treatment.
-                </p>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/book"
-                  className="group inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-lg hover:shadow-2xl hover:shadow-amber-500/30 transition-all hover:scale-105"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Book Appointment
-                  <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-                <a
-                  href="#video"
-                  className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white/5 backdrop-blur border border-white/20 rounded-full font-semibold text-lg hover:bg-white/10 transition-all"
-                >
-                  <Play className="w-5 h-5" />
                   Watch Our Work
                 </a>
               </div>
@@ -561,58 +579,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* AI Chat Widget */}
-      <ChatWidget />
-
-      {/* Footer */}
-      <footer className="py-16 bg-black border-t border-white/5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-12">
-            <div className="md:col-span-2">
-              <div className="mb-6">
-                <img
-                  src="/logo.png"
-                  alt="Kelatic Hair Lounge"
-                  className="h-16 w-auto"
-                />
-              </div>
-              <p className="text-white/50 max-w-sm">
-                Houston&apos;s premier loc specialists. Expert loc installation, maintenance, and styling.
-              </p>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-6">Quick Links</h4>
-              <div className="space-y-3">
-                <Link href="/services" className="block text-white/50 hover:text-amber-400 transition-colors">Services</Link>
-                <a href="#team" className="block text-white/50 hover:text-amber-400 transition-colors">Team</a>
-                <Link href="/blog" className="block text-white/50 hover:text-amber-400 transition-colors">Blog</Link>
-                <a href="#academy" className="block text-white/50 hover:text-amber-400 transition-colors">Academy</a>
-                <Link href="/book" className="block text-white/50 hover:text-amber-400 transition-colors">Book Now</Link>
-              </div>
-            </div>
-
-            <div>
-              <h4 className="font-bold mb-6">Connect</h4>
-              <div className="flex items-center gap-3">
-                <a href="https://instagram.com/kelatichairlounge_" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Instagram" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
-                  <Instagram className="w-5 h-5" />
-                </a>
-                <a href="tel:+17134854000" aria-label="Call us" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
-                  <Phone className="w-5 h-5" />
-                </a>
-                <a href="mailto:kelatic@gmail.com" aria-label="Email us" className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors">
-                  <Mail className="w-5 h-5" />
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div className="border-t border-white/5 mt-12 pt-8 text-center text-white/30 text-sm">
-            <p>© {new Date().getFullYear()} Kelatic Hair Lounge. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

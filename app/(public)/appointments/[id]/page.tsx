@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { formatDate, formatTime, formatDuration, formatDateForCal } from '@/lib/date-utils';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 import {
   Calendar,
   Clock,
@@ -205,10 +206,13 @@ export default function AppointmentPage() {
       {/* Header */}
       <div className="bg-white border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 py-6">
-          <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-4">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
+          <div className="flex items-center justify-between mb-4">
+            <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-purple-600">
+              <ArrowLeft className="w-4 h-4" />
+              Back to Home
+            </Link>
+            <PublicAuthLinks />
+          </div>
           <div className="flex items-center justify-between">
             <h1 className="text-2xl font-bold text-gray-900">Your Appointment</h1>
             {appointment && getStatusBadge(appointment.status)}

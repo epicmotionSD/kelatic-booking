@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Clock, Calendar, Share2 } from 'lucide-react';
 import { getBlogPost, getRecentPosts, type BlogPost } from '@/lib/blog-posts';
 import { notFound } from 'next/navigation';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 
 const CATEGORY_LABELS: Record<BlogPost['category'], string> = {
   care: 'Loc Care',
@@ -73,13 +74,16 @@ export default function BlogPostPage() {
                 <span className="text-sm font-medium">Back to Blog</span>
               </Link>
             </div>
-            <button
-              onClick={handleShare}
-              className="flex items-center gap-2 text-sm text-white/50 hover:text-amber-400 transition-colors"
-            >
-              <Share2 className="w-4 h-4" />
-              Share
-            </button>
+            <div className="flex items-center gap-4">
+              <PublicAuthLinks />
+              <button
+                onClick={handleShare}
+                className="flex items-center gap-2 text-sm text-white/50 hover:text-amber-400 transition-colors"
+              >
+                <Share2 className="w-4 h-4" />
+                Share
+              </button>
+            </div>
           </div>
         </div>
       </header>

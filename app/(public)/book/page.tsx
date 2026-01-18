@@ -9,6 +9,7 @@ import { DateTimeSelection } from '@/components/booking/datetime-selection';
 import { ClientInfo } from '@/components/booking/client-info';
 import { PaymentStep } from '@/components/booking/payment-step';
 import { Confirmation } from '@/components/booking/confirmation';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 import type { Service, Profile, TimeSlot, ServiceCategory } from '@/types/database';
 
 export type BookingStep = 'browse' | 'stylist' | 'datetime' | 'info' | 'payment' | 'confirmation';
@@ -197,9 +198,12 @@ function BookingContent() {
                 <span className="text-[9px] tracking-widest text-amber-400">BOOKING</span>
               </div>
             </Link>
-            <Link href="/" className="text-sm text-white/60 hover:text-amber-400 transition-colors">
-              ← Back to site
-            </Link>
+            <div className="flex items-center gap-4">
+              <PublicAuthLinks />
+              <Link href="/" className="text-sm text-white/60 hover:text-amber-400 transition-colors">
+                ← Back to site
+              </Link>
+            </div>
           </div>
         </div>
       </header>

@@ -29,7 +29,31 @@ interface ScriptArgs {
   segmentFilter: string
   estimatedValue: number
   token?: string
+  direct: boolean
   outputFile?: string
+}
+
+const HUMMINGBIRD_SCRIPTS = {
+  direct_inquiry: {
+    day: 1,
+    type: 'sms' as const,
+    template: "Hey {firstName}, it's been a while since we've seen you at {businessName}! We'd love to have you back. Would you like me to get you on the books for {service}?\n\nReply STOP to opt out",
+  },
+  voicemail_drop: {
+    day: 2,
+    type: 'voicemail' as const,
+    template: "Hi {firstName}, this is {businessName}. We noticed it's been a while and wanted to reach out personally. We miss seeing you and would love to get you scheduled. Give us a call back or just reply to this message!",
+  },
+  file_closure: {
+    day: 4,
+    type: 'sms' as const,
+    template: "Hi {firstName}, I'm doing some housekeeping at {businessName} and noticed your file. Before I close it out, I wanted to check - are you still interested in {service} or should I mark you as inactive?\n\nReply STOP to opt out",
+  },
+  breakup: {
+    day: 7,
+    type: 'sms' as const,
+    template: "Hey {firstName}, this is my last reach out. I don't want to bother you but wanted to give you one final chance to get back on the books at {businessName}. If I don't hear from you, I'll assume the timing isn't right. Either way, hope you're doing great!",
+  },
 }
 
 function parseArgs(argv: string[]): ScriptArgs {
@@ -59,6 +83,7 @@ function parseArgs(argv: string[]): ScriptArgs {
   const segmentFilter = (args.get('segmentFilter') || 'GRAVEYARD').toUpperCase()
   const estimatedValue = Number(args.get('estimatedValue') || '85')
   const token = args.get('token') || process.env.CRON_SECRET || undefined
+  const direct = (args.get('direct') || 'false').toLowerCase() === 'true'
   const outputFile = args.get('outputFile')
 
   return {
@@ -73,6 +98,7 @@ function parseArgs(argv: string[]): ScriptArgs {
     segmentFilter,
     estimatedValue,
     token,
+    direct,
     outputFile,
   }
 }
@@ -221,6 +247,88 @@ async function waitForDelay(hours: number): Promise<void> {
 }
 
 async function launchCampaign(args: ScriptArgs, leads: SegmentedLeadPayload[]): Promise<void> {
+  if (args.direct) {
+    const supabaseUrl = process.env.SUPABASE_URL
+    const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+
+    if (!supabaseUrl || !supabaseServiceRoleKey) {
+      throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY for direct mode')
+    }
+
+    const { createClient } = await import('@supabase/supabase-js')
+    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
+      auth: { persistSession: false },
+    })
+
+    const cadenceConfig = [
+      HUMMINGBIRD_SCRIPTS.direct_inquiry,
+      HUMMINGBIRD_SCRIPTS.voicemail_drop,
+      HUMMINGBIRD_SCRIPTS.file_closure,
+      HUMMINGBIRD_SCRIPTS.breakup,
+    ]
+
+    const campaignId = crypto.randomUUID()
+    const { error: campaignError } = await supabase
+      .from('campaigns')
+      .insert({
+        id: campaignId,
+        business_id: args.businessId,
+        name: `Revenue Sprint - ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`,
+        status: args.dryRun ? 'draft' : 'active',
+        segment: 'ghost',
+        script_variant: 'direct_inquiry',
+        script_template: HUMMINGBIRD_SCRIPTS.direct_inquiry.template,
+        script_variables: {
+          service: args.service,
+        },
+        cadence_type: 'hummingbird',
+        cadence_config: cadenceConfig,
+        total_leads: leads.length,
+        started_at: args.dryRun ? null : new Date().toISOString(),
+        metrics: {
+          sent: 0,
+          delivered: 0,
+          responded: 0,
+          booked: 0,
+          revenue: 0,
+        },
+      })
+
+    if (campaignError) {
+      throw new Error(`Failed to create campaign: ${campaignError.message}`)
+    }
+
+    const campaignLeads = leads.map((lead) => ({
+      id: crypto.randomUUID(),
+      campaign_id: campaignId,
+      business_id: args.businessId,
+      first_name: lead.firstName,
+      last_name: lead.lastName,
+      phone: lead.phone,
+      email: lead.email,
+      segment: 'ghost',
+      days_since_contact: lead.daysSinceContact,
+      estimated_value: lead.estimatedValue,
+      source_platform: 'graveyard',
+      original_first_contact: lead.firstContact || null,
+      original_last_contact: lead.lastContact || null,
+      status: 'pending',
+      tcpa_compliant: true,
+    }))
+
+    const { error: leadsError } = await supabase
+      .from('campaign_leads')
+      .insert(campaignLeads)
+
+    if (leadsError) {
+      await supabase.from('campaigns').delete().eq('id', campaignId)
+      throw new Error(`Failed to insert leads: ${leadsError.message}`)
+    }
+
+    console.log(`[direct] Campaign ${campaignId} created with ${leads.length} leads (dryRun=${args.dryRun})`)
+    return
+  }
+
   const endpoint = new URL('/api/reactivation/launch', args.baseUrl).toString()
 
   const payload = {

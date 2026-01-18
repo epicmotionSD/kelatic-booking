@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
 import { InstagramGallery } from '@/components/instagram/gallery';
 import { Footer } from '@/components/layout/footer';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 import type { Service, ServiceCategory, Profile } from '@/types/database';
 import { Clock, Users, Sparkles, Star, Crown, ArrowRight, Instagram } from 'lucide-react';
 
@@ -94,6 +95,7 @@ export default function ServicesPage() {
               </div>
             </Link>
             <div className="flex items-center gap-4">
+              <PublicAuthLinks />
               <Link 
                 href="/book"
                 className="px-6 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"

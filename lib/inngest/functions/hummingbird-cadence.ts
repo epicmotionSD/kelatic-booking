@@ -76,6 +76,7 @@ async function sendCampaignEmail(params: {
   from: string
   subject: string
   html: string
+  customArgs?: Record<string, string>
 }): Promise<{ status: string; messageId?: string; errorMessage?: string } > {
   if (!process.env.SENDGRID_API_KEY) {
     return { status: 'failed', errorMessage: 'SendGrid API key not configured' }
@@ -89,6 +90,11 @@ async function sendCampaignEmail(params: {
       from: params.from,
       subject: params.subject,
       html: params.html,
+      customArgs: params.customArgs,
+      trackingSettings: {
+        clickTracking: { enable: true },
+        openTracking: { enable: true },
+      },
     })
 
     return {
@@ -369,29 +375,52 @@ export const runHummingbirdCadence = inngest.createFunction(
                   </div>
                 `
 
+                const { data: emailMessage, error: emailMessageError } = await supabase
+                  .from('campaign_messages')
+                  .insert({
+                    campaign_id: campaignId,
+                    campaign_lead_id: lead.id,
+                    business_id: businessId,
+                    direction: 'outbound',
+                    channel: 'email',
+                    to_email: lead.email,
+                    from_email: fromEmail,
+                    body: personalizedMessage,
+                    cadence_day: cadenceStep.day,
+                    script_variant: cadenceStep.scriptVariant || campaign.script_variant,
+                    status: 'queued',
+                    queued_at: new Date().toISOString(),
+                  })
+                  .select('id')
+                  .single()
+
+                if (emailMessageError) {
+                  throw new Error(`Failed to create email message record: ${emailMessageError.message}`)
+                }
+
                 sendResult = await sendCampaignEmail({
                   to: lead.email,
                   from: fromEmail,
                   subject,
                   html,
+                  customArgs: {
+                    campaign_message_id: emailMessage.id,
+                    campaign_id: campaignId,
+                    campaign_lead_id: lead.id,
+                    business_id: businessId,
+                  },
                 })
 
-                await supabase.from('campaign_messages').insert({
-                  campaign_id: campaignId,
-                  campaign_lead_id: lead.id,
-                  business_id: businessId,
-                  direction: 'outbound',
-                  channel: 'email',
-                  to_email: lead.email,
-                  from_email: fromEmail,
-                  body: personalizedMessage,
-                  cadence_day: cadenceStep.day,
-                  script_variant: cadenceStep.scriptVariant || campaign.script_variant,
-                  status: sendResult.status,
-                  twilio_sid: sendResult.messageId,
-                  error_message: sendResult.errorMessage,
-                  sent_at: new Date().toISOString(),
-                })
+                await supabase
+                  .from('campaign_messages')
+                  .update({
+                    status: sendResult.status,
+                    sendgrid_message_id: sendResult.messageId,
+                    error_message: sendResult.errorMessage,
+                    sent_at: sendResult.status === 'sent' ? new Date().toISOString() : null,
+                    failed_at: sendResult.status === 'failed' ? new Date().toISOString() : null,
+                  })
+                  .eq('id', emailMessage.id)
               } else {
                 console.log(`[CADENCE] Skipping unsupported channel ${cadenceStep.channel}`)
                 continue

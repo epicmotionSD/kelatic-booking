@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Footer } from '@/components/layout/footer';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 import { 
   Calendar, 
   Clock, 
@@ -68,6 +69,7 @@ export default function SpecialOffersPage() {
               </div>
             </Link>
             <div className="flex items-center gap-4">
+              <PublicAuthLinks />
               <Link
                 href="/book?special=wednesday75"
                 className="px-6 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"

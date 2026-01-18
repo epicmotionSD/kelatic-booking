@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Calendar, Instagram, Scissors, ArrowLeft } from 'lucide-react';
+import { PublicAuthLinks } from '@/components/layout/public-auth-links';
 
 interface Barber {
   id: string;
@@ -53,13 +54,16 @@ export default function BarberBlockPage() {
               </div>
             </div>
 
-            <Link
-              href="/"
-              className="flex items-center gap-2 text-sm text-white/50 hover:text-red-400 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Kelatic
-            </Link>
+            <div className="flex items-center gap-4">
+              <PublicAuthLinks />
+              <Link
+                href="/"
+                className="flex items-center gap-2 text-sm text-white/50 hover:text-red-400 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Kelatic
+              </Link>
+            </div>
           </div>
         </div>
       </header>
