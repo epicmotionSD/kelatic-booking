@@ -317,8 +317,9 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
               className="mt-1 w-4 h-4 rounded border-white/30 bg-transparent text-amber-500 focus:ring-amber-500"
             />
             <span className="text-sm text-white/60">
-              I understand that deposits are non-refundable. Appointments can be rescheduled
-              with at least 24 hours notice. No-shows or late cancellations will forfeit the deposit.
+              I understand and agree to: <strong className="text-white">non-refundable deposit</strong>,{' '}
+              <strong className="text-white">be on time</strong>, and <strong className="text-white">no perfume/cologne</strong>.
+              Appointments can be rescheduled with at least 24 hours notice. No-shows or late cancellations will forfeit the deposit.
             </span>
           </label>
           {errors.policy && (

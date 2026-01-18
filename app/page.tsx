@@ -93,6 +93,8 @@ export default function LandingPage() {
     { name: 'Keisha R.', text: 'The loc clarifying treatment was amazing. My scalp feels so clean and my locs are thriving!', rating: 5 },
   ];
 
+  const stylistMenu = featuredStylists;
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Navigation */}
@@ -111,8 +113,29 @@ export default function LandingPage() {
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-10">
               <Link href="/services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</Link>
+              <div className="relative group">
+                <button
+                  type="button"
+                  className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors inline-flex items-center gap-1"
+                >
+                  Book a Stylist
+                  <ChevronRight className="w-4 h-4 rotate-90" />
+                </button>
+                <div className="absolute left-0 mt-3 w-56 rounded-2xl border border-white/10 bg-zinc-950/95 backdrop-blur shadow-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                  {stylistMenu.map((stylist) => (
+                    <Link
+                      key={stylist.id}
+                      href={`/book?stylist=${stylist.id}`}
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                    >
+                      {stylist.first_name} {stylist.last_name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
               <Link href="/special-offers" className="text-sm font-medium text-amber-400 hover:text-yellow-400 transition-colors animate-pulse">$75 Wednesday Special</Link>
-              <a href="#gallery" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Gallery</a>
+              <Link href="/gallery" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Gallery</Link>
+              <Link href="/loc-academy" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Loc Academy</Link>
               <Link href="/blog" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Blog</Link>
               <Link href="/barber-block" className="text-sm font-medium text-white/70 hover:text-red-400 transition-colors">Barber Block</Link>
               <a href="#contact" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Contact</a>
@@ -153,13 +176,20 @@ export default function LandingPage() {
                     >
                       $75 Wednesday Special
                     </Link>
-                    <a
-                      href="#gallery"
+                    <Link
+                      href="/gallery"
                       className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Gallery
-                    </a>
+                    </Link>
+                    <Link
+                      href="/loc-academy"
+                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Loc Academy
+                    </Link>
                     <Link
                       href="/blog"
                       className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
@@ -181,6 +211,19 @@ export default function LandingPage() {
                     >
                       Contact
                     </a>
+                  </div>
+                  <div className="border-t border-white/10 py-2">
+                    <div className="px-4 py-1 text-[10px] uppercase tracking-widest text-white/40">Book a Stylist</div>
+                    {stylistMenu.map((stylist) => (
+                      <Link
+                        key={stylist.id}
+                        href={`/book?stylist=${stylist.id}`}
+                        className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {stylist.first_name} {stylist.last_name}
+                      </Link>
+                    ))}
                   </div>
                   <div className="border-t border-white/10 py-2">
                     <div className="px-4 py-1 text-[10px] uppercase tracking-widest text-white/40">Login</div>
@@ -248,7 +291,7 @@ export default function LandingPage() {
                   Book Your Appointment
                 </Link>
                 <a
-                  href="#gallery"
+                  href="/gallery"
                   className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 rounded-full text-sm font-semibold text-white/80 hover:text-amber-400 hover:border-amber-400/40 transition-all"
                 >
                   <Play className="w-4 h-4" />
@@ -299,7 +342,7 @@ export default function LandingPage() {
                     </div>
                     <div>
                       <div className="font-bold">Open Today</div>
-                      <div className="text-sm text-white/50">9AM - 6PM</div>
+                      <div className="text-sm text-white/50">9AM - 7PM</div>
                     </div>
                   </div>
                 </div>
@@ -387,13 +430,15 @@ export default function LandingPage() {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredServices.map((service) => (
-              <div
-                key={service.id}
-                className="group relative bg-zinc-900/50 backdrop-blur border border-white/5 rounded-2xl p-6 hover:border-amber-400/50 hover:bg-zinc-900 transition-all duration-300"
-              >
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-amber-400/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            [
+              { icon: Award, title: 'Master Trained', desc: 'All locticians trained by a 16-year loc master' },
+              { icon: Heart, title: 'Loc Scalp Treatment', desc: 'Healthy scalp care for lasting growth' },
+              { icon: Sparkles, title: 'Loc Knowledge', desc: 'Education and guidance for every journey' },
+              { icon: Shield, title: 'Growing Hands', desc: 'Techniques that protect and strengthen' },
+              { icon: Calendar, title: 'Good Vibes', desc: 'Warm, welcoming, and uplifting energy' },
+              { icon: Shield, title: 'Clean & Safe', desc: 'Sanitized tools and safe practices' },
+            ].map((item, idx) => (
                 <div className="relative">
                   <div className="w-14 h-14 bg-amber-400/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-amber-400/20 transition-colors">
                     <Sparkles className="w-7 h-7 text-amber-400" />
@@ -448,6 +493,34 @@ export default function LandingPage() {
               </div>
             ))}
           </div>
+
+          <div className="text-center mt-10">
+            <Link
+              href="/gallery"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/20 rounded-full font-semibold text-white/80 hover:text-amber-400 hover:border-amber-400/40 transition-colors"
+            >
+              View Full Gallery
+              <ChevronRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Referral Section */}
+      <section className="py-16 bg-black">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl border border-amber-400/30 bg-gradient-to-r from-amber-400/10 to-yellow-500/10 p-10 text-center">
+            <h3 className="text-2xl md:text-3xl font-black mb-3">Refer a Friend, Get $10 Off</h3>
+            <p className="text-white/60 mb-6 max-w-2xl mx-auto">
+              Bring a friend to Kelatic and you both save $10 on your next visit. Share the love and keep your locs thriving.
+            </p>
+            <Link
+              href="/book"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+            >
+              Book & Refer
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -495,70 +568,22 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Academy Section */}
-      <section id="academy" className="py-24 bg-black relative overflow-hidden">
+      {/* Loc Academy Teaser */}
+      <section className="py-24 bg-black relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent" />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-amber-400/10 border border-amber-400/30 rounded-full text-amber-400 text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" />
-                Coming January 5th, 2025
-              </div>
-              <h2 className="text-4xl md:text-5xl font-black mb-6">
-                Loc Academy
-              </h2>
-              <p className="text-xl text-white/60 mb-8 leading-relaxed">
-                Learn from The Loc Gawd. Master the art of locs from starter to advanced techniques.
-              </p>
-              <ul className="space-y-4 mb-10">
-                {['Hands-on training with real clients', 'Certificate upon completion', 'Business & marketing guidance', 'Small class sizes'].map((item, idx) => (
-                  <li key={idx} className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-amber-400 rounded-full flex items-center justify-center flex-shrink-0">
-                      <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span className="text-white/70">{item}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <a
-                  href="mailto:kelatic@gmail.com?subject=Loc Academy Interest"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
-                >
-                  <Mail className="w-5 h-5" />
-                  Get Notified
-                </a>
-                <a
-                  href="https://www.instagram.com/kelatichairlounge_"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/5 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition-colors"
-                >
-                  <Instagram className="w-5 h-5" />
-                  Follow Updates
-                </a>
-              </div>
-            </div>
-
-            <div className="relative hidden lg:block">
-              <div className="aspect-square rounded-3xl bg-gradient-to-br from-zinc-900 to-zinc-950 border border-white/10 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-28 h-28 mx-auto bg-gradient-to-br from-amber-400 to-yellow-500 rounded-2xl flex items-center justify-center mb-6 shadow-xl shadow-amber-500/30">
-                    <Award className="w-14 h-14 text-black" />
-                  </div>
-                  <h3 className="text-2xl font-black mb-2">Get Certified</h3>
-                  <p className="text-white/50">Start your loc career</p>
-                </div>
-              </div>
-              <div className="absolute -top-4 -right-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full px-5 py-2 font-bold shadow-xl animate-float">
-                Limited Spots!
-              </div>
-            </div>
-          </div>
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Loc Academy</span>
+          <h2 className="text-4xl md:text-5xl font-black mt-3 mb-4">Train with The Loc Gawd</h2>
+          <p className="text-xl text-white/60 mb-8 max-w-2xl mx-auto">
+            Learn starter to advanced loc techniques, business guidance, and hands-on training with real clients.
+          </p>
+          <Link
+            href="/loc-academy"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+          >
+            Explore Loc Academy
+          </Link>
         </div>
       </section>
 
@@ -592,9 +617,9 @@ export default function LandingPage() {
               <div className="mt-10 pt-10 border-t border-white/10">
                 <h3 className="font-bold mb-4">Hours</h3>
                 <div className="space-y-2 text-white/60">
-                  <div className="flex justify-between"><span>Monday - Friday</span><span className="text-white">9AM - 6PM</span></div>
-                  <div className="flex justify-between"><span>Saturday</span><span className="text-white">9AM - 5PM</span></div>
-                  <div className="flex justify-between"><span>Sunday</span><span className="text-white/40">Closed</span></div>
+                  <div className="flex justify-between"><span>Monday - Friday</span><span className="text-white">9AM - 7PM</span></div>
+                  <div className="flex justify-between"><span>Saturday</span><span className="text-white">8AM - 6PM</span></div>
+                  <div className="flex justify-between"><span>Sunday</span><span className="text-white">10AM - 5PM</span></div>
                 </div>
               </div>
             </div>
