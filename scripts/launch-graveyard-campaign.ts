@@ -37,7 +37,7 @@ const HUMMINGBIRD_SCRIPTS = {
   direct_inquiry: {
     day: 1,
     type: 'sms' as const,
-    template: "Hey {firstName}, it's been a while since we've seen you at {businessName}! We'd love to have you back. Would you like me to get you on the books for {service}?\n\nReply STOP to opt out",
+    template: "Hey {firstName}, it's been a while since we've seen you at {businessName}! We'd love to have you back for {service}. Grab your spot here: https://kelatic.com/book\n\nReply STOP to opt out",
   },
   voicemail_drop: {
     day: 2,
@@ -47,7 +47,7 @@ const HUMMINGBIRD_SCRIPTS = {
   file_closure: {
     day: 4,
     type: 'sms' as const,
-    template: "Hi {firstName}, I'm doing some housekeeping at {businessName} and noticed your file. Before I close it out, I wanted to check - are you still interested in {service} or should I mark you as inactive?\n\nReply STOP to opt out",
+    template: "Hi {firstName}, I'm doing some housekeeping at {businessName} and noticed your file. If you still want {service}, grab your spot here: https://kelatic.com/book\n\nReply STOP to opt out",
   },
   breakup: {
     day: 7,

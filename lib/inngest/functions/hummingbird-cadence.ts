@@ -21,8 +21,8 @@ const HUMMINGBIRD_CADENCE = [
 // Script templates (Dean Jackson 9-word framework)
 // TCPA COMPLIANCE: All SMS messages MUST include opt-out language
 const SCRIPTS = {
-  direct_inquiry: 'Hi {firstName}, are you still looking to get {service} done? - {businessName}\n\nReply STOP to opt out',
-  file_closure: 'Hi {firstName}, I was about to close your file. Should I keep it open? - {businessName}\n\nReply STOP to opt out',
+  direct_inquiry: 'Hi {firstName}, are you still looking to get {service} done? Grab your spot here: https://kelatic.com/book - {businessName}\n\nReply STOP to opt out',
+  file_closure: 'Hi {firstName}, I was about to close your file. If you still want {service}, grab your spot here: https://kelatic.com/book - {businessName}\n\nReply STOP to opt out',
   gift: 'Hi {firstName}, I have a complimentary {service} upgrade for you. Want me to save you a spot? - {businessName}\n\nReply STOP to opt out',
   breakup: 'Hi {firstName}, I\'ll take you off our list. Text back if you ever need {service}. - {businessName}',
   voicemail: 'Hi {firstName}, this is {businessName}. Just checking if you\'re still interested in {service}. Give us a call back when you get a chance.',
