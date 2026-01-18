@@ -79,6 +79,7 @@ function BookingContent() {
   const [currentStep, setCurrentStep] = useState<BookingStep>('browse');
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
   const [initialized, setInitialized] = useState(false);
+  const [browseViewMode, setBrowseViewMode] = useState<'services' | 'stylist'>('services');
 
   const currentStepIndex = STEPS.findIndex((s) => s.key === currentStep);
 
@@ -138,7 +139,8 @@ function BookingContent() {
           if (stylist) {
             updates.stylist = stylist;
             updates.anyAvailableStylist = false;
-            // If we also have a service selected, go to datetime
+            setBrowseViewMode('services');
+            // If a service is already selected, go to datetime; otherwise pick service next
             startStep = updates.service ? 'datetime' : 'browse';
           }
         }
@@ -271,6 +273,8 @@ function BookingContent() {
       <main className="max-w-3xl mx-auto px-4 py-8">
         {currentStep === 'browse' && (
           <PriceTierSelection
+            viewMode={browseViewMode}
+            onViewModeChange={setBrowseViewMode}
             onSelectTier={(tier, services) => {
               updateBookingData({
                 priceTier: tier,
@@ -278,42 +282,22 @@ function BookingContent() {
                 // Select the first service from the tier as default
                 service: services.length > 0 ? services[0] : null
               });
-              goToStep('stylist');
+              if (bookingData.stylist || bookingData.anyAvailableStylist) {
+                goToStep('datetime');
+              } else {
+                goToStep('stylist');
+              }
             }}
-            onSelectStylist={async (stylist) => {
-              try {
-                // Fetch all services to set a default when booking by stylist
-                const res = await fetch('/api/services');
-                const data = await res.json();
-                const allServices = data.services || [];
-                
-                if (stylist.id === 'any') {
-                  updateBookingData({
-                    stylist: null,
-                    anyAvailableStylist: true,
-                    // Set default service and available services for "any stylist" bookings
-                    service: allServices.length > 0 ? allServices[0] : null,
-                    availableServices: allServices
-                  });
-                } else {
-                  updateBookingData({
-                    stylist,
-                    anyAvailableStylist: false,
-                    // Set default service and available services for specific stylist bookings
-                    service: allServices.length > 0 ? allServices[0] : null,
-                    availableServices: allServices
-                  });
-                }
+            onSelectStylist={(stylist) => {
+              if (stylist.id === 'any') {
+                updateBookingData({ stylist: null, anyAvailableStylist: true });
+              } else {
+                updateBookingData({ stylist, anyAvailableStylist: false });
+              }
+              if (bookingData.service) {
                 goToStep('datetime');
-              } catch (error) {
-                console.error('Failed to fetch services:', error);
-                // Fallback: still allow progression but without services
-                if (stylist.id === 'any') {
-                  updateBookingData({ stylist: null, anyAvailableStylist: true });
-                } else {
-                  updateBookingData({ stylist, anyAvailableStylist: false });
-                }
-                goToStep('datetime');
+              } else {
+                setBrowseViewMode('services');
               }
             }}
           />

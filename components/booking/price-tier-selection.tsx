@@ -72,13 +72,22 @@ const CATEGORY_CONFIG: Record<string, { name: string; icon: string; description:
 interface PriceTierSelectionProps {
   onSelectTier: (tier: PriceTier, services: Service[]) => void;
   onSelectStylist: (stylist: Profile) => void;
+  viewMode?: 'services' | 'stylist';
+  onViewModeChange?: (mode: 'services' | 'stylist') => void;
 }
 
-export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierSelectionProps) {
+export function PriceTierSelection({
+  onSelectTier,
+  onSelectStylist,
+  viewMode: controlledViewMode,
+  onViewModeChange,
+}: PriceTierSelectionProps) {
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'services' | 'stylist'>('services');
+  const [internalViewMode, setInternalViewMode] = useState<'services' | 'stylist'>('services');
+  const viewMode = controlledViewMode ?? internalViewMode;
+  const setViewMode = onViewModeChange ?? setInternalViewMode;
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [expandedTier, setExpandedTier] = useState<string | null>(null);
 
@@ -328,7 +337,10 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
           {stylists.map((stylist) => (
             <button
               key={stylist.id}
-              onClick={() => onSelectStylist(stylist)}
+              onClick={() => {
+                onSelectStylist(stylist);
+                setViewMode('services');
+              }}
               className="w-full text-left p-4 rounded-xl border border-white/10 bg-zinc-900 hover:border-amber-400/50 hover:bg-zinc-800 transition-all"
             >
               <div className="flex items-center gap-4">
@@ -361,7 +373,10 @@ export function PriceTierSelection({ onSelectTier, onSelectStylist }: PriceTierS
 
           {/* Any Available Option */}
           <button
-            onClick={() => onSelectStylist({ id: 'any', first_name: 'Any', last_name: 'Available' } as Profile)}
+            onClick={() => {
+              onSelectStylist({ id: 'any', first_name: 'Any', last_name: 'Available' } as Profile);
+              setViewMode('services');
+            }}
             className="w-full text-left p-4 rounded-xl border border-dashed border-amber-500/50 bg-amber-500/10 hover:border-amber-400 hover:bg-amber-500/20 transition-all"
           >
             <div className="flex items-center gap-4">
