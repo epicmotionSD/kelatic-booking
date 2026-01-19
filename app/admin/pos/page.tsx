@@ -16,9 +16,20 @@ export default function POSPage() {
   const [isWalkInOpen, setIsWalkInOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'ready' | 'completed'>('ready');
+  const [walkInRequests, setWalkInRequests] = useState<Array<{
+    id: string;
+    name: string;
+    phone: string;
+    heard_about: string | null;
+    preferred_stylist_name: string | null;
+    status: string;
+    created_at: string;
+  }>>([]);
+  const [walkInLoading, setWalkInLoading] = useState(true);
 
   useEffect(() => {
     fetchTodaysAppointments();
+    fetchWalkInRequests();
   }, []);
 
   async function fetchTodaysAppointments() {
@@ -31,6 +42,19 @@ export default function POSPage() {
       console.error('Failed to fetch appointments:', error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchWalkInRequests() {
+    setWalkInLoading(true);
+    try {
+      const res = await fetch('/api/pos/walk-in-requests');
+      const data = await res.json();
+      setWalkInRequests(data.requests || []);
+    } catch (error) {
+      console.error('Failed to fetch walk-in requests:', error);
+    } finally {
+      setWalkInLoading(false);
     }
   }
 
@@ -59,6 +83,7 @@ export default function POSPage() {
       console.error('Failed to fetch walk-in appointment:', error);
     }
     fetchTodaysAppointments();
+    fetchWalkInRequests();
   }
 
   const filteredAppointments = appointments.filter((apt) => {
@@ -101,6 +126,57 @@ export default function POSPage() {
       </div>
 
       <main className="space-y-6">
+        {/* Walk-in Requests */}
+        <div className="bg-zinc-900 rounded-2xl border border-white/10 shadow-lg px-6 py-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-white">Walk-in Check-ins</h2>
+              <p className="text-white/60 text-sm">Latest submissions from the public walk-in page</p>
+            </div>
+            <button
+              type="button"
+              onClick={fetchWalkInRequests}
+              className="px-3 py-2 rounded-lg text-sm font-medium bg-white/5 text-white/70 hover:bg-white/10"
+            >
+              Refresh
+            </button>
+          </div>
+
+          {walkInLoading ? (
+            <div className="text-white/50 text-sm">Loading walk-ins...</div>
+          ) : walkInRequests.length === 0 ? (
+            <div className="text-white/50 text-sm">No walk-in check-ins yet.</div>
+          ) : (
+            <div className="space-y-3">
+              {walkInRequests.map((req) => (
+                <div
+                  key={req.id}
+                  className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 rounded-xl border border-white/10 bg-black/40 px-4 py-3"
+                >
+                  <div>
+                    <p className="text-white font-medium">{req.name}</p>
+                    <p className="text-white/60 text-sm">{req.phone}</p>
+                    <div className="text-xs text-white/40 mt-1">
+                      {req.heard_about ? `Heard about us: ${req.heard_about}` : 'Heard about us: —'}
+                    </div>
+                  </div>
+                  <div className="text-sm text-white/70">
+                    Preferred stylist: {req.preferred_stylist_name || 'Any'}
+                  </div>
+                  <div className="text-xs text-white/50">
+                    {new Date(req.created_at).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Filter Tabs */}
         <div className="flex gap-2 mb-6">
           {[
