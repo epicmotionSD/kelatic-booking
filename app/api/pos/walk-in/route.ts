@@ -27,8 +27,34 @@ export async function POST(request: NextRequest) {
     if (!authData?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const business = await requireBusiness();
-    const business_id = business.id;
+    let business_id: string | null = null;
+
+    try {
+      const business = await requireBusiness();
+      business_id = business.id;
+    } catch (error) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('business_id')
+        .eq('id', authData.user.id)
+        .single();
+
+      business_id = profile?.business_id || null;
+
+      if (!business_id) {
+        const { data: member } = await supabase
+          .from('business_members')
+          .select('business_id')
+          .eq('user_id', authData.user.id)
+          .single();
+
+        business_id = member?.business_id || null;
+      }
+
+      if (!business_id) {
+        return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+      }
+    }
 
     // Create the walk-in appointment
     const insertPayload = {

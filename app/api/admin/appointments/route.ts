@@ -6,15 +6,47 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
-    const business = await requireBusiness();
+    const supabase = await createClient();
+    let businessId: string | null = null;
+
+    try {
+      const business = await requireBusiness();
+      businessId = business.id;
+    } catch (error) {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user;
+
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('business_id')
+        .eq('id', user.id)
+        .single();
+
+      businessId = profile?.business_id || null;
+
+      if (!businessId) {
+        const { data: member } = await supabase
+          .from('business_members')
+          .select('business_id')
+          .eq('user_id', user.id)
+          .single();
+
+        businessId = member?.business_id || null;
+      }
+
+      if (!businessId) {
+        return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+      }
+    }
     const { searchParams } = new URL(request.url);
     const date = searchParams.get('date');
     const status = searchParams.get('status');
     const stylistId = searchParams.get('stylist_id');
     const includeWalkIns = searchParams.get('include_walkins');
-
-    const supabase = await createClient();
-
 
     let query = supabase
       .from('appointments')
@@ -33,7 +65,7 @@ export async function GET(request: NextRequest) {
         service_id,
         payments(total_amount, is_deposit, status)
       `)
-      .eq('business_id', business.id)
+      .eq('business_id', businessId)
       .order('start_time');
 
     // Exclude walk-ins by default unless explicitly included

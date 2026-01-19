@@ -7,8 +7,41 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
   try {
     const supabase = await createClient();
-    const business = await requireBusiness();
-    const business_id = business.id;
+    let business_id: string | null = null;
+
+    try {
+      const business = await requireBusiness();
+      business_id = business.id;
+    } catch (error) {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user;
+
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('business_id')
+        .eq('id', user.id)
+        .single();
+
+      business_id = profile?.business_id || null;
+
+      if (!business_id) {
+        const { data: member } = await supabase
+          .from('business_members')
+          .select('business_id')
+          .eq('user_id', user.id)
+          .single();
+
+        business_id = member?.business_id || null;
+      }
+
+      if (!business_id) {
+        return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+      }
+    }
 
     // Get today's date range
     const today = new Date();
