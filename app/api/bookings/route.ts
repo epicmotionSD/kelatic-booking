@@ -5,9 +5,14 @@ import { createPaymentIntent } from '@/lib/stripe';
 import { toCents } from '@/lib/currency';
 
 // Helper to send confirmation notifications
-async function sendConfirmationNotifications(appointmentId: string) {
+async function sendConfirmationNotifications(appointmentId: string, request: NextRequest) {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const forwardedProto = request.headers.get('x-forwarded-proto');
+    const forwardedHost = request.headers.get('x-forwarded-host');
+    const host = forwardedHost || request.headers.get('host');
+    const baseUrl = host
+      ? `${forwardedProto || 'https'}://${host}`
+      : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
     const url = `${baseUrl}/api/notifications`;
     console.log('[BookingAPI] Sending confirmation notification for appointment:', appointmentId);
     console.log('[BookingAPI][DEBUG] Notification API URL:', url);
@@ -288,7 +293,7 @@ export async function POST(request: NextRequest) {
 
     // Send confirmation notifications for all bookings (don't await to avoid blocking response)
     console.log('[BookingAPI][DEBUG] About to call sendConfirmationNotifications for:', appointment.id);
-    sendConfirmationNotifications(appointment.id).catch((err) => {
+    sendConfirmationNotifications(appointment.id, request).catch((err) => {
       console.error('[BookingAPI] Error sending confirmation notifications:', err);
     });
 
@@ -311,6 +316,9 @@ export async function POST(request: NextRequest) {
 }
 
 function zonedDateTimeToUtc(dateTime: string, timeZone: string): Date {
+  if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(dateTime)) {
+    return new Date(dateTime);
+  }
   const [datePart, timePartRaw] = dateTime.split('T');
   const timePart = timePartRaw || '00:00:00';
   const [year, month, day] = datePart.split('-').map(Number);
