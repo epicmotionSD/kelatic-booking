@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 import { createPaymentIntent } from '@/lib/stripe';
 import { toCents } from '@/lib/currency';
@@ -47,7 +47,6 @@ interface BookingRequestBody {
 
 export async function POST(request: NextRequest) {
   try {
-    const business = await requireBusiness();
     const body: BookingRequestBody = await request.json();
 
     // Validate required fields
@@ -58,14 +57,35 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
+    const admin = createAdminClient();
+    let businessId: string | null = null;
+
+    try {
+      const business = await requireBusiness();
+      businessId = business.id;
+    } catch (error) {
+      const { data: serviceLookup } = await admin
+        .from('services')
+        .select('business_id')
+        .eq('id', body.service_id)
+        .single();
+
+      businessId = serviceLookup?.business_id || null;
+
+      if (!businessId) {
+        return NextResponse.json(
+          { error: 'Business not found' },
+          { status: 404 }
+        );
+      }
+    }
 
     // Get service details (filtered by business)
-    const { data: service, error: serviceError } = await supabase
+    const { data: service, error: serviceError } = await admin
       .from('services')
       .select('*')
       .eq('id', body.service_id)
-      .eq('business_id', business.id)
+      .eq('business_id', businessId)
       .single();
 
     if (serviceError || !service) {
@@ -77,11 +97,11 @@ export async function POST(request: NextRequest) {
 
 
     // Fetch stylist profile to determine deposit amount
-    const { data: stylistProfile, error: stylistError } = await supabase
+    const { data: stylistProfile, error: stylistError } = await admin
       .from('profiles')
       .select('id, first_name, last_name, email')
       .eq('id', body.stylist_id)
-      .eq('business_id', business.id)
+      .eq('business_id', businessId)
       .single();
 
     // Calculate end time
@@ -90,11 +110,11 @@ export async function POST(request: NextRequest) {
 
     // Add add-ons (filtered by business)
     if (body.addon_ids?.length) {
-      const { data: addons } = await supabase
+      const { data: addons } = await admin
         .from('services')
         .select('id, base_price, duration')
         .in('id', body.addon_ids)
-        .eq('business_id', business.id);
+        .eq('business_id', businessId);
 
       if (addons) {
         for (const addon of addons) {
@@ -108,11 +128,11 @@ export async function POST(request: NextRequest) {
     const endTime = new Date(startTime.getTime() + totalDuration * 60000);
 
     // Check for conflicts (within business)
-    const { data: conflicts } = await supabase
+    const { data: conflicts } = await admin
       .from('appointments')
       .select('id')
       .eq('stylist_id', body.stylist_id)
-      .eq('business_id', business.id)
+      .eq('business_id', businessId)
       .lt('start_time', endTime.toISOString())
       .gt('end_time', startTime.toISOString())
       .not('status', 'in', '("cancelled","no_show")')
@@ -129,11 +149,11 @@ export async function POST(request: NextRequest) {
     let clientId: string | null = null;
 
     // Check if client exists by email (within business)
-    const { data: existingClient } = await supabase
+    const { data: existingClient } = await admin
       .from('profiles')
       .select('id')
       .eq('email', body.client.email.toLowerCase())
-      .eq('business_id', business.id)
+      .eq('business_id', businessId)
       .single();
 
     if (existingClient) {
@@ -141,14 +161,14 @@ export async function POST(request: NextRequest) {
       
       // Update phone if provided
       if (body.client.phone) {
-        await supabase
+        await admin
           .from('profiles')
           .update({ phone: body.client.phone })
           .eq('id', clientId);
       }
     } else {
       // Create new client profile for this business
-      const { data: newClient, error: clientError } = await supabase
+      const { data: newClient, error: clientError } = await admin
         .from('profiles')
         .insert({
           first_name: body.client.first_name,
@@ -156,7 +176,7 @@ export async function POST(request: NextRequest) {
           email: body.client.email.toLowerCase(),
           phone: body.client.phone || null,
           role: 'client',
-          business_id: business.id,
+          business_id: businessId,
         })
         .select('id')
         .single();
@@ -173,7 +193,7 @@ export async function POST(request: NextRequest) {
     const appointmentData: any = {
       service_id: body.service_id,
       stylist_id: body.stylist_id,
-      business_id: business.id,
+      business_id: businessId,
       start_time: startTime.toISOString(),
       end_time: endTime.toISOString(),
       quoted_price: totalPrice,
@@ -191,7 +211,7 @@ export async function POST(request: NextRequest) {
       appointmentData.walk_in_phone = body.client.phone;
     }
 
-    const { data: appointment, error: appointmentError } = await supabase
+    const { data: appointment, error: appointmentError } = await admin
       .from('appointments')
       .insert(appointmentData)
       .select()
@@ -207,13 +227,13 @@ export async function POST(request: NextRequest) {
 
     // Create add-on records
     if (body.addon_ids?.length) {
-      const { data: addons } = await supabase
+      const { data: addons } = await admin
         .from('services')
         .select('id, base_price, duration')
         .in('id', body.addon_ids);
 
       if (addons?.length) {
-        await supabase.from('appointment_addons').insert(
+        await admin.from('appointment_addons').insert(
           addons.map((addon) => ({
             appointment_id: appointment.id,
             service_id: addon.id,
@@ -246,7 +266,7 @@ export async function POST(request: NextRequest) {
       });
 
       // Record pending payment
-      await supabase.from('payments').insert({
+      await admin.from('payments').insert({
         appointment_id: appointment.id,
         client_id: clientId,
         amount: depositAmount,
