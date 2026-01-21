@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient, createClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -11,10 +11,54 @@ type PageProps = {
 
 export default async function AppointmentDetailPage({ params }: PageProps) {
   const resolvedParams = params ? await params : { id: '' };
-  const business = await requireBusiness();
+  const admin = createAdminClient();
   const supabase = await createClient();
+  let business = null as any;
 
-  const { data: appointment, error } = await supabase
+  try {
+    business = await requireBusiness();
+  } catch (error) {
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user;
+
+    if (!user) {
+      notFound();
+    }
+
+    const { data: profile } = await admin
+      .from('profiles')
+      .select('business_id')
+      .eq('id', user.id)
+      .single();
+
+    let businessId = profile?.business_id || null;
+
+    if (!businessId) {
+      const { data: member } = await admin
+        .from('business_members')
+        .select('business_id')
+        .eq('user_id', user.id)
+        .single();
+
+      businessId = member?.business_id || null;
+    }
+
+    if (!businessId) {
+      notFound();
+    }
+
+    const { data: businessRow } = await admin
+      .from('businesses')
+      .select('*')
+      .eq('id', businessId)
+      .single();
+
+    business = businessRow;
+  }
+
+  const timezone = business?.timezone || 'America/Chicago';
+
+  const { data: appointment, error } = await admin
     .from('appointments')
     .select(`
       *,
@@ -115,6 +159,7 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
                       month: 'long',
                       day: 'numeric',
                       year: 'numeric',
+                      timeZone: timezone,
                     })}
                   </p>
                 </div>
@@ -125,6 +170,7 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
                       hour: 'numeric',
                       minute: '2-digit',
                       hour12: true,
+                      timeZone: timezone,
                     })}
                     {appointment.end_time && (
                       <>
@@ -133,6 +179,7 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
                           hour: 'numeric',
                           minute: '2-digit',
                           hour12: true,
+                          timeZone: timezone,
                         })}
                       </>
                     )}

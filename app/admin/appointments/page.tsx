@@ -6,22 +6,25 @@ import { formatCurrency } from '@/lib/currency';
 import { Plus, Calendar, Filter, Users, Clock } from 'lucide-react';
 
 // Utility functions
-const formatDate = (dateStr: string) => {
-  return new Date(dateStr).toLocaleDateString('en-US', { 
-    weekday: 'long', 
-    year: 'numeric', 
-    month: 'long', 
-    day: 'numeric' 
+const formatDate = (dateStr: string, timezone: string) => {
+  if (!dateStr || dateStr === 'all') return 'All Dates';
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: timezone,
   });
 };
 
-const formatTime = (dateStr: string) => {
+const formatTime = (dateStr: string, timezone: string) => {
   const date = new Date(dateStr);
   if (isNaN(date.getTime())) return 'N/A';
   return date.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true
+    hour12: true,
+    timeZone: timezone,
   });
 };
 
@@ -56,10 +59,12 @@ export default function AppointmentsPage() {
     stylist: 'all',
   });
   const [stylists, setStylists] = useState<{ id: string; name: string }[]>([]);
+  const [timezone, setTimezone] = useState('America/Chicago');
 
   useEffect(() => {
     fetchAppointments();
     fetchStylists();
+    fetchTimezone();
   }, [filters]);
 
   async function fetchAppointments() {
@@ -96,6 +101,18 @@ export default function AppointmentsPage() {
     }
   }
 
+  async function fetchTimezone() {
+    try {
+      const res = await fetch('/api/admin/settings');
+      const data = await res.json();
+      if (data?.settings?.timezone) {
+        setTimezone(data.settings.timezone);
+      }
+    } catch (error) {
+      console.error('Failed to fetch timezone:', error);
+    }
+  }
+
   async function updateStatus(id: string, status: string) {
     try {
       await fetch(`/api/admin/appointments/${id}`, {
@@ -120,7 +137,7 @@ export default function AppointmentsPage() {
             <Calendar className="w-8 h-8 text-amber-400" />
             Appointments
           </h1>
-          <p className="text-white/60">{formatDate(filters.date)}</p>
+          <p className="text-white/60">{formatDate(filters.date, timezone)}</p>
         </div>
         <Link
           href="/admin/appointments/new"
@@ -292,10 +309,10 @@ export default function AppointmentsPage() {
                   >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-white">
-                        {formatTime(apt.start_time)}
+                        {formatTime(apt.start_time, timezone)}
                       </div>
                       <div className="text-xs text-white/50">
-                        - {formatTime(apt.end_time)}
+                        - {formatTime(apt.end_time, timezone)}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
