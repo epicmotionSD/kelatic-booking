@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createAdminClient } from '@/lib/supabase/server';
+import { createAdminClient, createClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 
 // Map between numeric day keys (frontend) and string day names (database)
@@ -63,12 +63,54 @@ function getClosedDaysFromHours(hours: Record<number, any>): number[] {
 
 export async function GET() {
   try {
-    const business = await requireBusiness();
-    const supabase = createAdminClient();
+    const admin = createAdminClient();
+    const supabase = await createClient();
+    let business = null as any;
+
+    try {
+      business = await requireBusiness();
+    } catch (error) {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user;
+
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      const { data: profile } = await admin
+        .from('profiles')
+        .select('business_id')
+        .eq('id', user.id)
+        .single();
+
+      let businessId = profile?.business_id || null;
+
+      if (!businessId) {
+        const { data: member } = await admin
+          .from('business_members')
+          .select('business_id')
+          .eq('user_id', user.id)
+          .single();
+
+        businessId = member?.business_id || null;
+      }
+
+      if (!businessId) {
+        return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+      }
+
+      const { data: businessRow } = await admin
+        .from('businesses')
+        .select('*')
+        .eq('id', businessId)
+        .single();
+
+      business = businessRow;
+    }
 
 
     // Get business settings row
-    const { data: row, error } = await supabase
+    const { data: row, error } = await admin
       .from('business_settings')
       .select('*')
       .eq('business_id', business.id)
@@ -148,8 +190,50 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const business = await requireBusiness();
-    const supabase = createAdminClient();
+    const admin = createAdminClient();
+    const supabase = await createClient();
+    let business = null as any;
+
+    try {
+      business = await requireBusiness();
+    } catch (error) {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user;
+
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      const { data: profile } = await admin
+        .from('profiles')
+        .select('business_id')
+        .eq('id', user.id)
+        .single();
+
+      let businessId = profile?.business_id || null;
+
+      if (!businessId) {
+        const { data: member } = await admin
+          .from('business_members')
+          .select('business_id')
+          .eq('user_id', user.id)
+          .single();
+
+        businessId = member?.business_id || null;
+      }
+
+      if (!businessId) {
+        return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+      }
+
+      const { data: businessRow } = await admin
+        .from('businesses')
+        .select('*')
+        .eq('id', businessId)
+        .single();
+
+      business = businessRow;
+    }
 
     const body = await request.json();
     const { settings } = body;
@@ -174,13 +258,13 @@ export async function POST(request: NextRequest) {
 
     // Update timezone on the businesses table if provided
     if (settings.timezone) {
-      await supabase
+      await admin
         .from('businesses')
         .update({ timezone: settings.timezone, updated_at: new Date().toISOString() })
         .eq('id', business.id);
     }
 
-    const { error } = await supabase
+    const { error } = await admin
       .from('business_settings')
       .upsert(upsertData, {
         onConflict: 'business_id'

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient, createClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 
 // Helper to get date boundaries in a specific timezone
@@ -42,11 +42,53 @@ function getTimezoneOffset(timezone: string, date: Date): number {
 
 export async function GET() {
   try {
-    const business = await requireBusiness();
+    const admin = createAdminClient();
     const supabase = await createClient();
+    let business = null as any;
+
+    try {
+      business = await requireBusiness();
+    } catch (error) {
+      const { data: authData } = await supabase.auth.getUser();
+      const user = authData?.user;
+
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      const { data: profile } = await admin
+        .from('profiles')
+        .select('business_id')
+        .eq('id', user.id)
+        .single();
+
+      let businessId = profile?.business_id || null;
+
+      if (!businessId) {
+        const { data: member } = await admin
+          .from('business_members')
+          .select('business_id')
+          .eq('user_id', user.id)
+          .single();
+
+        businessId = member?.business_id || null;
+      }
+
+      if (!businessId) {
+        return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+      }
+
+      const { data: businessRow } = await admin
+        .from('businesses')
+        .select('*')
+        .eq('id', businessId)
+        .single();
+
+      business = businessRow;
+    }
     
-    // Use business timezone for date calculations (default to UTC if not set)
-    const timezone = business.timezone || 'UTC';
+    // Use business timezone for date calculations (default to Chicago if not set)
+    const timezone = business?.timezone || 'America/Chicago';
     const { now, todayStart, todayEnd, weekStart, monthStart } = getDateBoundaries(timezone);
 
     // Today's appointments count (include walk-ins, require service_id)
@@ -149,6 +191,7 @@ export async function GET() {
         hour: 'numeric',
         minute: '2-digit',
         hour12: true,
+        timeZone: timezone,
       }),
       status: apt.status,
     })) || [];
