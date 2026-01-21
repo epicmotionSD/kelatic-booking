@@ -124,7 +124,13 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const timezone = business?.timezone || 'America/Chicago';
+    const { data: businessRow } = await admin
+      .from('businesses')
+      .select('timezone')
+      .eq('id', businessId)
+      .single();
+
+    const timezone = businessRow?.timezone || 'America/Chicago';
     const startTime = zonedDateTimeToUtc(body.start_time, timezone);
     const endTime = new Date(startTime.getTime() + totalDuration * 60000);
 
