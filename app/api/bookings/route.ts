@@ -124,7 +124,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const startTime = new Date(body.start_time);
+    const timezone = business?.timezone || 'America/Chicago';
+    const startTime = zonedDateTimeToUtc(body.start_time, timezone);
     const endTime = new Date(startTime.getTime() + totalDuration * 60000);
 
     // Check for conflicts (within business)
@@ -301,4 +302,46 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+function zonedDateTimeToUtc(dateTime: string, timeZone: string): Date {
+  const [datePart, timePartRaw] = dateTime.split('T');
+  const timePart = timePartRaw || '00:00:00';
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hour, minute, second] = timePart.split(':').map((v) => Number(v));
+
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hour || 0, minute || 0, second || 0));
+  const offset = getTimezoneOffset(utcDate, timeZone);
+  return new Date(utcDate.getTime() - offset);
+}
+
+function getTimezoneOffset(date: Date, timeZone: string): number {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(date).reduce<Record<string, string>>((acc, part) => {
+    if (part.type !== 'literal') {
+      acc[part.type] = part.value;
+    }
+    return acc;
+  }, {});
+
+  const asUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour),
+    Number(parts.minute),
+    Number(parts.second)
+  );
+
+  return asUtc - date.getTime();
 }

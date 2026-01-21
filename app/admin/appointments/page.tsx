@@ -278,6 +278,9 @@ export default function AppointmentsPage() {
               <thead>
                 <tr className="bg-white/5 border-b border-white/10">
                   <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Time
                   </th>
                   <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
@@ -307,6 +310,15 @@ export default function AppointmentsPage() {
                     className="hover:bg-white/5 transition-colors cursor-pointer"
                     onClick={() => window.location.href = `/admin/appointments/${apt.id}`}
                   >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-white">
+                        {new Date(apt.start_time).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          timeZone: timezone,
+                        })}
+                      </div>
+                    </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-white">
                         {formatTime(apt.start_time, timezone)}
