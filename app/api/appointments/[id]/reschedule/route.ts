@@ -25,6 +25,7 @@ export async function POST(
       .select(`
         id,
         stylist_id,
+        business_id,
         status,
         start_time,
         end_time,
@@ -90,8 +91,14 @@ export async function POST(
       );
     }
 
-    // Calculate new end time
     const newStartTime = new Date(new_start_time);
+    const { data: businessRow } = await supabase
+      .from('businesses')
+      .select('timezone')
+      .eq('id', appointment.business_id)
+      .single();
+
+    const timezone = businessRow?.timezone || 'America/Chicago';
     const newEndTime = new Date(newStartTime.getTime() + totalDuration * 60000);
 
     // Check if new time is in the past
@@ -121,8 +128,9 @@ export async function POST(
     }
 
     // Check stylist availability (schedule and time off)
-    const dayOfWeek = newStartTime.getDay();
-    const timeStr = newStartTime.toTimeString().slice(0, 5);
+    const { weekday, hour, minute } = getZonedTimeParts(newStartTime, timezone);
+    const dayOfWeek = weekdayToNumber(weekday);
+    const timeStr = `${hour}:${minute}`;
 
     // Check if stylist works on this day/time
     const { data: schedules } = await supabase
@@ -220,4 +228,41 @@ export async function POST(
       { status: 500 }
     );
   }
+}
+
+function getZonedTimeParts(date: Date, timeZone: string) {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    weekday: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(date).reduce<Record<string, string>>((acc, part) => {
+    if (part.type !== 'literal') {
+      acc[part.type] = part.value;
+    }
+    return acc;
+  }, {});
+
+  return {
+    weekday: parts.weekday || 'Sun',
+    hour: parts.hour || '00',
+    minute: parts.minute || '00',
+  };
+}
+
+function weekdayToNumber(weekday: string) {
+  const map: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+
+  return map[weekday] ?? 0;
 }
