@@ -44,6 +44,7 @@ export async function POST(request: NextRequest) {
       .select(`
         id,
         start_time,
+        business_id,
         is_walk_in,
         walk_in_name,
         walk_in_email,
@@ -113,8 +114,28 @@ export async function POST(request: NextRequest) {
       clientEmail: clientEmail ? '***@***' : 'MISSING',
     });
 
-    // Build appointment details object
+    const { data: businessRow } = await supabase
+      .from('businesses')
+      .select('*')
+      .eq('id', appointment.business_id)
+      .single();
+
+    const { data: settingsRow } = await supabase
+      .from('business_settings')
+      .select('*')
+      .eq('business_id', appointment.business_id)
+      .single();
+
+    const timezone = businessRow?.timezone || 'America/Chicago';
     const startTime = new Date(appointment.start_time);
+    const appointmentDate = startTime.toLocaleDateString('en-CA', { timeZone: timezone });
+    const appointmentTime = startTime.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: timezone,
+    });
+
     const appointmentDetails: AppointmentDetails = {
       id: appointment.id,
       client_name: clientName,
@@ -123,32 +144,29 @@ export async function POST(request: NextRequest) {
       stylist_name: `${stylist?.first_name} ${stylist?.last_name}`,
       service_name: service?.name || 'Service',
       service_duration: service?.duration || 60,
-      appointment_date: startTime.toISOString().split('T')[0],
-      appointment_time: startTime.toTimeString().slice(0, 5),
+      appointment_date: appointmentDate,
+      appointment_time: appointmentTime,
       add_ons: appointment.appointment_addons?.map((a: any) => a.service?.name).filter(Boolean),
     };
 
     let result;
     console.log('[NotificationsAPI] Sending notification type:', type, 'for appointment:', appointmentId);
 
-    // TODO: In multi-tenant, fetch business context from appointment
-    const defaultCtx = {
-      business: {
-        id: 'default',
-        name: 'Kelatic',
-        slug: 'kelatic',
-        email: 'kelatic@gmail.com',
-        business_type: 'salon',
-        brand_voice: 'professional',
-        primary_color: '#f59e0b',
-        secondary_color: '#eab308',
-      },
-      settings: null,
+    if (!businessRow) {
+      return NextResponse.json(
+        { error: 'Business not found' },
+        { status: 404 }
+      );
+    }
+
+    const ctx = {
+      business: businessRow,
+      settings: settingsRow || null,
     };
 
     switch (type) {
       case 'confirmation':
-        result = await sendBookingConfirmation(appointmentDetails, defaultCtx as any);
+        result = await sendBookingConfirmation(appointmentDetails, ctx as any);
 
         // Also notify stylist
         if (stylist?.email) {
@@ -156,13 +174,13 @@ export async function POST(request: NextRequest) {
             stylist.email,
             stylist.phone,
             appointmentDetails,
-            defaultCtx as any
+            ctx as any
           );
         }
         break;
 
       case 'cancellation':
-        result = await sendBookingCancellation(appointmentDetails, defaultCtx as any);
+        result = await sendBookingCancellation(appointmentDetails, ctx as any);
         break;
 
       case 'reminder':
@@ -171,7 +189,7 @@ export async function POST(request: NextRequest) {
         const hoursUntil = Math.round((startTime.getTime() - now.getTime()) / (1000 * 60 * 60));
 
         const { sendBookingReminder } = await import('@/lib/notifications/service');
-        result = await sendBookingReminder(appointmentDetails, hoursUntil, defaultCtx as any);
+        result = await sendBookingReminder(appointmentDetails, hoursUntil, ctx as any);
         break;
     }
 
