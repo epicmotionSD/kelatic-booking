@@ -360,7 +360,7 @@ export default function ReschedulePage() {
               <div className="flex items-center justify-between mb-4">
                 <button
                   onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1))}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
@@ -369,7 +369,7 @@ export default function ReschedulePage() {
                 </span>
                 <button
                   onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1))}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="p-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
@@ -402,7 +402,7 @@ export default function ReschedulePage() {
                       disabled={isDisabled}
                       className={`
                         aspect-square rounded-lg text-sm font-medium transition-colors
-                        ${isDisabled ? 'text-gray-300 cursor-not-allowed' : 'hover:bg-purple-50'}
+                        ${isDisabled ? 'text-gray-300 cursor-not-allowed' : 'text-gray-900 hover:bg-purple-50'}
                         ${isSelected ? 'bg-purple-600 text-white hover:bg-purple-700' : ''}
                         ${isToday && !isSelected ? 'ring-2 ring-purple-200' : ''}
                       `}

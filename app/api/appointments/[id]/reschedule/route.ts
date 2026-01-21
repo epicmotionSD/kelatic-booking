@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/server';
 
 // POST - Reschedule an appointment
 export async function POST(
@@ -17,7 +17,7 @@ export async function POST(
       );
     }
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Fetch the current appointment
     const { data: appointment, error: fetchError } = await supabase
@@ -192,7 +192,9 @@ export async function POST(
 
     // Send reschedule notification
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      const proto = request.headers.get('x-forwarded-proto') || 'http';
+      const host = request.headers.get('host') || 'localhost:3000';
+      const baseUrl = `${proto}://${host}`;
       await fetch(`${baseUrl}/api/notifications/reschedule`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
