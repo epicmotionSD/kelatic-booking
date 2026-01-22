@@ -15,28 +15,29 @@ export async function POST(req: NextRequest) {
     const rawBody = await req.text()
 
     const publicKey = process.env.SENDGRID_EVENT_WEBHOOK_PUBLIC_KEY
-    if (publicKey) {
-      const signature = req.headers.get('x-twilio-email-event-webhook-signature')
-      const timestamp = req.headers.get('x-twilio-email-event-webhook-timestamp')
+    const expectedSecret = process.env.SENDGRID_EVENT_WEBHOOK_SECRET
+    const signature = req.headers.get('x-twilio-email-event-webhook-signature')
+    const timestamp = req.headers.get('x-twilio-email-event-webhook-timestamp')
 
-      if (!signature || !timestamp) {
-        return NextResponse.json({ error: 'Missing SendGrid signature headers' }, { status: 401 })
-      }
+    let authorized = false
 
+    if (publicKey && signature && timestamp) {
       const eventWebhook = new EventWebhook()
       const isValid = eventWebhook.verifySignature(publicKey, rawBody, signature, timestamp)
+      if (isValid) {
+        authorized = true
+      }
+    }
 
-      if (!isValid) {
-        return NextResponse.json({ error: 'Invalid SendGrid signature' }, { status: 401 })
+    if (!authorized && expectedSecret) {
+      const provided = getAuthSecret(req)
+      if (provided && provided === expectedSecret) {
+        authorized = true
       }
-    } else {
-      const expectedSecret = process.env.SENDGRID_EVENT_WEBHOOK_SECRET
-      if (expectedSecret) {
-        const provided = getAuthSecret(req)
-        if (!provided || provided !== expectedSecret) {
-          return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-        }
-      }
+    }
+
+    if (!authorized && (publicKey || expectedSecret)) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const events = JSON.parse(rawBody)
