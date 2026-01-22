@@ -13,7 +13,8 @@
     "db:reset": "npx supabase db reset",
     "db:types": "npx supabase gen types typescript --local > types/supabase.ts",
     "migrate:amelia": "tsx scripts/migrate-amelia.ts",
-    "generate:vapid": "node scripts/generate-vapid-keys.js"
+    "generate:vapid": "node scripts/generate-vapid-keys.js",
+    "test:booking": "tsx scripts/test-booking-flow.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.30.0",
