@@ -14,6 +14,12 @@ export async function POST(req: NextRequest) {
   try {
     const rawBody = await req.text()
 
+    const allowUnsigned = process.env.SENDGRID_EVENT_WEBHOOK_ALLOW_UNSIGNED === 'true'
+    if (allowUnsigned) {
+      const events = JSON.parse(rawBody)
+      return NextResponse.json({ received: Array.isArray(events) ? events.length : 0 })
+    }
+
     const publicKey = process.env.SENDGRID_EVENT_WEBHOOK_PUBLIC_KEY
     const expectedSecret = process.env.SENDGRID_EVENT_WEBHOOK_SECRET
     const signature = req.headers.get('x-twilio-email-event-webhook-signature')
@@ -37,6 +43,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (!authorized && (publicKey || expectedSecret)) {
+      console.warn('SendGrid webhook unauthorized', {
+        hasPublicKey: Boolean(publicKey),
+        hasSecret: Boolean(expectedSecret),
+        hasSignature: Boolean(signature),
+        hasTimestamp: Boolean(timestamp),
+      })
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
