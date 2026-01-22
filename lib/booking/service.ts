@@ -34,6 +34,8 @@ export async function getAvailability({
   const supabase = createAdminClient();
   
   let totalDuration: number;
+  let timeZone = 'America/Chicago';
+  let businessId: string | null = null;
   
   // If duration is provided directly, use it (for rescheduling)
   if (providedDuration) {
@@ -42,15 +44,27 @@ export async function getAvailability({
     // Get service duration
     const { data: service } = await supabase
       .from('services')
-      .select('duration, buffer_time')
+      .select('duration, buffer_time, business_id')
       .eq('id', service_id)
       .single();
       
     if (!service) throw new Error('Service not found');
     
     totalDuration = service.duration + (service.buffer_time || 0);
+    businessId = service.business_id || null;
   } else {
     throw new Error('Either service_id or duration must be provided');
+  }
+
+  if (businessId) {
+    const { data: business } = await supabase
+      .from('businesses')
+      .select('timezone')
+      .eq('id', businessId)
+      .single();
+    if (business?.timezone) {
+      timeZone = business.timezone;
+    }
   }
   
   const dayOfWeek = new Date(date).getDay();
@@ -61,13 +75,25 @@ export async function getAvailability({
     // Get stylist info
     const { data: stylist } = await supabase
       .from('profiles')
-      .select('id, first_name, last_name, is_active')
+      .select('id, first_name, last_name, is_active, business_id')
       .eq('id', stylist_id)
       .eq('is_active', true)
       .single();
       
     if (!stylist) {
       return { date, slots: [] };
+    }
+
+    if (!businessId && stylist.business_id) {
+      businessId = stylist.business_id;
+      const { data: business } = await supabase
+        .from('businesses')
+        .select('timezone')
+        .eq('id', businessId)
+        .single();
+      if (business?.timezone) {
+        timeZone = business.timezone;
+      }
     }
     
     // Get stylist's schedules for this day
@@ -83,8 +109,8 @@ export async function getAvailability({
     }
     
     // Get existing appointments for this stylist on this date
-    const startOfDay = `${date}T00:00:00`;
-    const endOfDay = `${date}T23:59:59`;
+    const startOfDay = zonedDateTimeToUtc(`${date}T00:00:00`, timeZone).toISOString();
+    const endOfDay = zonedDateTimeToUtc(`${date}T23:59:59`, timeZone).toISOString();
     
     let appointmentsQuery = supabase
       .from('appointments')
@@ -115,8 +141,8 @@ export async function getAvailability({
       const scheduleEnd = parseTime(schedule.end_time);
       
       for (let time = scheduleStart; time + totalDuration <= scheduleEnd; time += 30) {
-        const slotStart = formatTimeSlot(date, time);
-        const slotEnd = formatTimeSlot(date, time + totalDuration);
+        const slotStart = formatTimeSlot(date, time, timeZone);
+        const slotEnd = formatTimeSlot(date, time + totalDuration, timeZone);
         
         // Skip if this slot already exists
         if (slots.find(s => s.start_time === slotStart && s.stylist_id === stylist_id)) {
@@ -189,8 +215,8 @@ export async function getAvailability({
     if (!schedule) continue;
     
     // Get existing appointments for this stylist on this date
-    const startOfDay = `${date}T00:00:00`;
-    const endOfDay = `${date}T23:59:59`;
+    const startOfDay = zonedDateTimeToUtc(`${date}T00:00:00`, timeZone).toISOString();
+    const endOfDay = zonedDateTimeToUtc(`${date}T23:59:59`, timeZone).toISOString();
     
     let appointmentsQuery = supabase
       .from('appointments')
@@ -221,8 +247,8 @@ export async function getAvailability({
     const scheduleEnd = parseTime(schedule.end_time);
     
     for (let time = scheduleStart; time + duration <= scheduleEnd; time += 30) {
-      const slotStart = formatTimeSlot(date, time);
-      const slotEnd = formatTimeSlot(date, time + duration);
+      const slotStart = formatTimeSlot(date, time, timeZone);
+      const slotEnd = formatTimeSlot(date, time + duration, timeZone);
       
       const isAvailable = !hasConflict(
         slotStart,
@@ -457,10 +483,56 @@ function parseTime(timeStr: string): number {
   return hours * 60 + minutes;
 }
 
-function formatTimeSlot(date: string, minutes: number): string {
+function formatTimeSlot(date: string, minutes: number, timeZone: string): string {
   const hours = Math.floor(minutes / 60);
   const mins = minutes % 60;
-  return `${date}T${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00`;
+  const localDateTime = `${date}T${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}:00`;
+  return zonedDateTimeToUtc(localDateTime, timeZone).toISOString();
+}
+
+function zonedDateTimeToUtc(dateTime: string, timeZone: string): Date {
+  if (/[zZ]|[+-]\d{2}:?\d{2}$/.test(dateTime)) {
+    return new Date(dateTime);
+  }
+  const [datePart, timePartRaw] = dateTime.split('T');
+  const timePart = timePartRaw || '00:00:00';
+  const [year, month, day] = datePart.split('-').map(Number);
+  const [hour, minute, second] = timePart.split(':').map((v) => Number(v));
+
+  const utcDate = new Date(Date.UTC(year, month - 1, day, hour || 0, minute || 0, second || 0));
+  const offset = getTimezoneOffset(utcDate, timeZone);
+  return new Date(utcDate.getTime() - offset);
+}
+
+function getTimezoneOffset(date: Date, timeZone: string): number {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  const parts = formatter.formatToParts(date).reduce<Record<string, string>>((acc, part) => {
+    if (part.type !== 'literal') {
+      acc[part.type] = part.value;
+    }
+    return acc;
+  }, {});
+
+  const asUtc = Date.UTC(
+    Number(parts.year),
+    Number(parts.month) - 1,
+    Number(parts.day),
+    Number(parts.hour),
+    Number(parts.minute),
+    Number(parts.second)
+  );
+
+  return asUtc - date.getTime();
 }
 
 function hasConflict(
