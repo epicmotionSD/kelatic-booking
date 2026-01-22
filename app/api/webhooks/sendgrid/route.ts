@@ -66,12 +66,15 @@ export async function POST(req: NextRequest) {
         : new Date().toISOString()
 
       const campaignMessageId = event?.custom_args?.campaign_message_id
-      const sendgridMessageId = event?.sg_message_id || event?.smtp_id || null
+      const rawMessageId = event?.sg_message_id || event?.smtp_id || null
+      const normalizedMessageId = typeof rawMessageId === 'string'
+        ? rawMessageId.split('.')[0]
+        : null
 
       const update: Record<string, any> = {}
 
-      if (sendgridMessageId) {
-        update.sendgrid_message_id = sendgridMessageId
+      if (rawMessageId) {
+        update.sendgrid_message_id = rawMessageId
       }
 
       switch (eventType) {
@@ -112,8 +115,19 @@ export async function POST(req: NextRequest) {
 
       if (campaignMessageId) {
         query = query.eq('id', campaignMessageId)
-      } else if (sendgridMessageId) {
-        query = query.or(`sendgrid_message_id.eq.${sendgridMessageId},twilio_sid.eq.${sendgridMessageId}`)
+      } else if (rawMessageId || normalizedMessageId) {
+        const orParts = [] as string[]
+        if (rawMessageId) {
+          orParts.push(`sendgrid_message_id.eq.${rawMessageId}`)
+          orParts.push(`twilio_sid.eq.${rawMessageId}`)
+        }
+        if (normalizedMessageId && normalizedMessageId !== rawMessageId) {
+          orParts.push(`sendgrid_message_id.eq.${normalizedMessageId}`)
+          orParts.push(`twilio_sid.eq.${normalizedMessageId}`)
+        }
+        if (orParts.length) {
+          query = query.or(orParts.join(','))
+        }
       } else {
         continue
       }
