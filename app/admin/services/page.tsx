@@ -33,25 +33,19 @@ export default function ServicesPage() {
       const res = await fetch('/api/admin/services');
       const data = await res.json();
       setServices(data.services || []);
-      
-      // Fetch stylist counts for each service
-      const counts: Record<string, number> = {};
-      for (const service of data.services || []) {
-        try {
-          const stylistRes = await fetch(`/api/admin/services/${service.id}/stylists`);
-          if (stylistRes.ok) {
-            const stylistData = await stylistRes.json();
-            counts[service.id] = (stylistData.stylistIds || []).length;
-          }
-        } catch (error) {
-          console.error(`Failed to fetch stylists for service ${service.id}:`, error);
-          counts[service.id] = 0;
-        }
-      }
-      setServiceStylistCounts(counts);
+      setLoading(false);
+
+      // Fetch stylist counts in a single request (non-blocking)
+      fetch('/api/admin/services/stylist-counts')
+        .then((response) => response.json())
+        .then((payload) => {
+          setServiceStylistCounts(payload.counts || {});
+        })
+        .catch((error) => {
+          console.error('Failed to fetch stylist counts:', error);
+        });
     } catch (error) {
       console.error('Failed to fetch services:', error);
-    } finally {
       setLoading(false);
     }
   }
