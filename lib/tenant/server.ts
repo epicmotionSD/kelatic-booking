@@ -25,19 +25,28 @@ export async function getTenantSlug(): Promise<string | null> {
 
   // Parse from host header as fallback
   const host = headerStore.get('host') || '';
+  const cleanHost = host.split(':')[0];
 
-  if (host.includes('localhost')) {
-    const parts = host.split('.');
+  if (cleanHost.includes('localhost')) {
+    const parts = cleanHost.split('.');
     if (parts.length > 1 && parts[0] !== 'www') {
-      return parts[0].split(':')[0];
+      return parts[0];
     }
   }
 
-  if (host.endsWith(`.${ROOT_DOMAIN}`)) {
-    const subdomain = host.replace(`.${ROOT_DOMAIN}`, '');
+  if (cleanHost.endsWith(`.${ROOT_DOMAIN}`)) {
+    const subdomain = cleanHost.replace(`.${ROOT_DOMAIN}`, '');
     if (subdomain && subdomain !== 'www' && subdomain !== 'app') {
       return subdomain;
     }
+  }
+
+  // Custom domains — map to tenant slug
+  if (cleanHost === 'kelatic.com' || cleanHost === 'www.kelatic.com') {
+    return 'kelatic';
+  }
+  if (cleanHost === 'barbershopblock.ai' || cleanHost === 'www.barbershopblock.ai') {
+    return 'kelatic';
   }
 
   return null;
@@ -123,15 +132,51 @@ export async function requireBusiness(): Promise<Business> {
 /**
  * Generate metadata for tenant
  */
-export function generateTenantMetadata(business: Business, settings: BusinessSettings | null) {
-  const siteUrl = business.custom_domain
-    ? `https://${business.custom_domain}`
-    : `https://${business.slug}.${ROOT_DOMAIN}`;
+export async function generateTenantMetadata(business: Business, settings: BusinessSettings | null) {
+  const headerStore = await headers();
+  const host = headerStore.get('host') || '';
+  const cleanHost = host.split(':')[0];
+  const isBarber = cleanHost === 'barbershopblock.ai' || cleanHost === 'www.barbershopblock.ai'
+    || headerStore.get('x-barber-domain') === '1';
+
+  const siteUrl = isBarber
+    ? 'https://barbershopblock.ai'
+    : business.custom_domain
+      ? `https://${business.custom_domain}`
+      : `https://${business.slug}.${ROOT_DOMAIN}`;
+
+  // Barber Block gets its own SEO identity
+  if (isBarber) {
+    return {
+      metadataBase: new URL(siteUrl),
+      title: {
+        default: 'Barber Block | Premium Barber Services in Houston',
+        template: '%s | Barber Block',
+      },
+      description: 'Fresh fades, lineups, and premium barber services from Houston\'s finest at Barber Block by KeLatic Hair Lounge. Book your cut online today.',
+      keywords: ['barber houston', 'fade haircut', 'lineup', 'barber near me', 'houston barber', 'barber block', 'kelatic barber'],
+      icons: {
+        icon: business.favicon_url || '/favicon.svg',
+        apple: business.favicon_url || '/favicon.svg',
+      },
+      openGraph: {
+        title: 'Barber Block | Premium Barber Services in Houston',
+        description: 'Fresh fades, lineups, and premium cuts. Book online 24/7.',
+        url: siteUrl,
+        siteName: 'Barber Block',
+        locale: 'en_US',
+        type: 'website',
+      },
+    };
+  }
 
   // Improved SEO title: prefer meta_title, else business name + city, else business name
   let seoTitle = settings?.meta_title
-    || (business.city ? `${business.name} ${business.city}` : business.name)
+    || (business.city ? `${business.name} \u2013 ${business.city}` : business.name)
     || `${business.name} | Book Online`;
+
+  const seoDescription = settings?.meta_description
+    || `Book your appointment at ${business.name}. ${business.tagline || 'Online booking available 24/7.'}`;
 
   return {
     metadataBase: new URL(siteUrl),
@@ -139,14 +184,17 @@ export function generateTenantMetadata(business: Business, settings: BusinessSet
       default: seoTitle,
       template: `%s | ${business.name}`,
     },
-    description: settings?.meta_description || `Book your appointment at ${business.name}. ${business.tagline || ''}`,
+    description: seoDescription,
+    keywords: business.city
+      ? [`${business.business_type} ${business.city}`, `hair salon ${business.city}`, 'book online', business.name.toLowerCase()]
+      : [business.business_type, 'book online', business.name.toLowerCase()],
     icons: {
       icon: business.favicon_url || '/favicon.svg',
       apple: business.favicon_url || '/favicon.svg',
     },
     openGraph: {
       title: seoTitle,
-      description: settings?.meta_description || business.tagline || '',
+      description: seoDescription,
       url: siteUrl,
       siteName: business.name,
       locale: 'en_US',

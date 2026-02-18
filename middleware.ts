@@ -79,7 +79,14 @@ export async function middleware(request: NextRequest) {
 
   const subdomain = extractSubdomain(hostname);
 
-  // Create Supabase client for auth check
+  // Propagate tenant slug via request headers so server components can read it
+  if (subdomain) {
+    const isCustomDomain = subdomain.startsWith('custom:');
+    const tenantSlug = isCustomDomain ? subdomain.replace('custom:', '') : subdomain;
+    request.headers.set('x-tenant-slug', tenantSlug);
+  }
+
+  // Create Supabase client for auth check (uses patched request headers)
   const { supabase, response } = createClient(request);
 
   if (subdomain) {
@@ -102,12 +109,24 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // ── Set tenant slug cookie early (before any early returns) ─────
+  if (subdomain) {
+    const isCustomDomainEarly = subdomain.startsWith('custom:');
+    const tenantSlugEarly = isCustomDomainEarly ? subdomain.replace('custom:', '') : subdomain;
+    response.cookies.set('x-tenant-slug', tenantSlugEarly, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+  }
+
   // ── Barber Block domain handling ──────────────────────────────────
   const host = hostname.split(':')[0];
   const isBarberDomain = BARBER_DOMAINS.includes(host);
 
   if (isBarberDomain) {
-    // Set barber branding flag (read by client via cookie)
+    // Set barber branding flag (read by client via cookie, server via header)
     response.cookies.set('x-barber-domain', '1', {
       httpOnly: false,
       secure: process.env.NODE_ENV === 'production',
@@ -115,12 +134,19 @@ export async function middleware(request: NextRequest) {
       path: '/',
     });
     response.headers.set('x-barber-domain', '1');
+    request.headers.set('x-barber-domain', '1');
 
     // Homepage → serve the barber-block page
     if (pathname === '/') {
-      return NextResponse.rewrite(new URL('/barber-block', request.url), {
-        headers: response.headers,
+      const rewriteUrl = new URL('/barber-block', request.url);
+      const rewriteResponse = NextResponse.rewrite(rewriteUrl, {
+        request: { headers: request.headers },
       });
+      // Copy cookies from response to rewrite response
+      response.cookies.getAll().forEach((cookie) => {
+        rewriteResponse.cookies.set(cookie.name, cookie.value, cookie);
+      });
+      return rewriteResponse;
     }
 
     // /book → inject category=barber if not already set
@@ -180,6 +206,7 @@ export async function middleware(request: NextRequest) {
   const isCustomDomain = subdomain.startsWith('custom:');
   const tenantSlug = isCustomDomain ? subdomain.replace('custom:', '') : subdomain;
 
+  // Cookie already set earlier, but ensure it's up to date
   response.cookies.set('x-tenant-slug', tenantSlug, {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
