@@ -75,6 +75,7 @@ function BookingContent() {
   const preselectedStylistId = searchParams.get('stylist');
   const preselectedServiceId = searchParams.get('service');
   const specialOffer = searchParams.get('special'); // For special offers like "wednesday75"
+  const categoryFilter = searchParams.get('category') as ServiceCategory | null; // Filter services by category (e.g., barber)
 
   const [currentStep, setCurrentStep] = useState<BookingStep>('browse');
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
@@ -275,6 +276,7 @@ function BookingContent() {
           <PriceTierSelection
             viewMode={browseViewMode}
             onViewModeChange={setBrowseViewMode}
+            categoryFilter={categoryFilter || undefined}
             onSelectTier={(tier, services) => {
               updateBookingData({
                 priceTier: tier,

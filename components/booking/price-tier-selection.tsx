@@ -74,6 +74,7 @@ interface PriceTierSelectionProps {
   onSelectStylist: (stylist: Profile) => void;
   viewMode?: 'services' | 'stylist';
   onViewModeChange?: (mode: 'services' | 'stylist') => void;
+  categoryFilter?: ServiceCategory; // Only show services from this category
 }
 
 export function PriceTierSelection({
@@ -81,6 +82,7 @@ export function PriceTierSelection({
   onSelectStylist,
   viewMode: controlledViewMode,
   onViewModeChange,
+  categoryFilter,
 }: PriceTierSelectionProps) {
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Profile[]>([]);
@@ -127,7 +129,12 @@ export function PriceTierSelection({
       totalCount: number;
     }> = {};
 
-    services.forEach((service) => {
+    // If a category filter is applied, only include services from that category
+    const filteredServices = categoryFilter
+      ? services.filter((s) => s.category === categoryFilter)
+      : services;
+
+    filteredServices.forEach((service) => {
       const cat = service.category || 'other';
       if (!grouped[cat]) {
         grouped[cat] = {
@@ -150,7 +157,7 @@ export function PriceTierSelection({
 
     // Sort categories by total service count (most popular first)
     return Object.values(grouped).sort((a, b) => b.totalCount - a.totalCount);
-  }, [services]);
+  }, [services, categoryFilter]);
 
   function handleServiceSelect(service: Service) {
     const tier = PRICE_TIERS.find(
@@ -181,8 +188,16 @@ export function PriceTierSelection({
   return (
     <div>
       <div className="text-center mb-8">
-        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">Book Your Appointment</h2>
-        <p className="text-white/60 mb-6">Choose how you'd like to start your booking</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
+          {categoryFilter && CATEGORY_CONFIG[categoryFilter]
+            ? `Book ${CATEGORY_CONFIG[categoryFilter].name}`
+            : 'Book Your Appointment'}
+        </h2>
+        <p className="text-white/60 mb-6">
+          {categoryFilter && CATEGORY_CONFIG[categoryFilter]
+            ? CATEGORY_CONFIG[categoryFilter].description
+            : "Choose how you'd like to start your booking"}
+        </p>
       </div>
 
       {/* Quick Booking Options */}
@@ -193,6 +208,7 @@ export function PriceTierSelection({
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {services
+            .filter(s => categoryFilter ? s.category === categoryFilter : true)
             .filter(s => s.base_price >= 75 && s.base_price <= 150)
             .sort((a, b) => a.base_price - b.base_price)
             .slice(0, 4)
