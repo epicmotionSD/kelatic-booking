@@ -10,6 +10,7 @@ import { ClientInfo } from '@/components/booking/client-info';
 import { PaymentStep } from '@/components/booking/payment-step';
 import { Confirmation } from '@/components/booking/confirmation';
 import { PublicAuthLinks } from '@/components/layout/public-auth-links';
+import { getBrand } from '@/lib/barber-brand';
 import type { Service, Profile, TimeSlot, ServiceCategory } from '@/types/database';
 
 export type BookingStep = 'browse' | 'stylist' | 'datetime' | 'info' | 'payment' | 'confirmation';
@@ -81,6 +82,12 @@ function BookingContent() {
   const [bookingData, setBookingData] = useState<BookingData>(initialBookingData);
   const [initialized, setInitialized] = useState(false);
   const [browseViewMode, setBrowseViewMode] = useState<'services' | 'stylist'>('services');
+  const [brand, setBrand] = useState(getBrand());
+
+  // Detect barber domain on mount (cookie is set by middleware)
+  useEffect(() => {
+    setBrand(getBrand());
+  }, []);
 
   const currentStepIndex = STEPS.findIndex((s) => s.key === currentStep);
 
@@ -192,19 +199,19 @@ function BookingContent() {
       <header className="bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <span className="text-black font-black">K</span>
+            <Link href={brand.homeUrl} className="flex items-center gap-3">
+              <div className={`w-10 h-10 bg-gradient-to-br ${brand.gradientFrom} ${brand.gradientTo} rounded-xl flex items-center justify-center shadow-lg ${brand.shadowColor}`}>
+                <span className={`${brand.isBarber ? 'text-white' : 'text-black'} font-black text-xs`}>{brand.logoLetter}</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-sm text-white">KELATIC</span>
-                <span className="text-[9px] tracking-widest text-amber-400">BOOKING</span>
+                <span className="font-bold text-sm text-white">{brand.name}</span>
+                <span className={`text-[9px] tracking-widest ${brand.isBarber ? 'text-red-400' : 'text-amber-400'}`}>{brand.tagline}</span>
               </div>
             </Link>
             <div className="flex items-center gap-4">
               <PublicAuthLinks />
-              <Link href="/" className="text-sm text-white/60 hover:text-amber-400 transition-colors">
-                ← Back to site
+              <Link href={brand.homeUrl} className={`text-sm text-white/60 hover:${brand.isBarber ? 'text-red-400' : 'text-amber-400'} transition-colors`}>
+                {brand.backLabel}
               </Link>
             </div>
           </div>
@@ -233,7 +240,9 @@ function BookingContent() {
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                           isActive
-                            ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/30'
+                            ? brand.isBarber
+                              ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg shadow-red-500/30'
+                              : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/30'
                             : isCompleted
                             ? 'bg-green-500 text-white'
                             : 'bg-zinc-800 text-zinc-500'
@@ -249,7 +258,7 @@ function BookingContent() {
                       </div>
                       <span
                         className={`hidden sm:block text-sm font-medium ${
-                          isActive ? 'text-amber-400' : isCompleted ? 'text-green-400' : 'text-zinc-500'
+                          isActive ? (brand.isBarber ? 'text-red-400' : 'text-amber-400') : isCompleted ? 'text-green-400' : 'text-zinc-500'
                         }`}
                       >
                         {step.label}
@@ -369,7 +378,7 @@ function BookingContent() {
       {/* Footer */}
       <footer className="bg-black/30 border-t border-white/5 mt-auto">
         <div className="max-w-3xl mx-auto px-4 py-6 text-center text-sm text-white/40">
-          <p>Questions? Call us at <a href="tel:+17134854000" className="text-amber-400 hover:text-amber-300">(713) 485-4000</a></p>
+          <p>Questions? Call us at <a href="tel:+17134854000" className={`${brand.isBarber ? 'text-red-400 hover:text-red-300' : 'text-amber-400 hover:text-amber-300'}`}>(713) 485-4000</a></p>
           <p className="mt-1">9430 Richmond Ave, Houston, TX 77063</p>
         </div>
       </footer>
@@ -378,13 +387,15 @@ function BookingContent() {
 }
 
 function BookingLoading() {
+  // Check barber domain for loading state too
+  const loadingBrand = getBrand();
   return (
     <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
-        <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20 animate-pulse">
-          <span className="text-black font-black">K</span>
+        <div className={`w-10 h-10 bg-gradient-to-br ${loadingBrand.gradientFrom} ${loadingBrand.gradientTo} rounded-xl flex items-center justify-center shadow-lg ${loadingBrand.shadowColor} animate-pulse`}>
+          <span className={`${loadingBrand.isBarber ? 'text-white' : 'text-black'} font-black text-xs`}>{loadingBrand.logoLetter}</span>
         </div>
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400" />
+        <div className={`animate-spin rounded-full h-6 w-6 border-b-2 ${loadingBrand.isBarber ? 'border-red-400' : 'border-amber-400'}`} />
       </div>
     </div>
   );

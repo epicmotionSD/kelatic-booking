@@ -6,6 +6,8 @@ export const tenantAnalytics: Record<string, string> = {
   'kelatic.x3o.ai': 'AW-937265883',           // Kelatic's Google Ads ID
   'kelatic.com': 'AW-937265883',              // Same ID for kelatic.com if used
   'book.kelatic.com': 'AW-937265883',         // Subdomain support
+  'barbershopblock.ai': 'AW-937265883',        // Barber Block domain (same business)
+  'www.barbershopblock.ai': 'AW-937265883',
 
   // x3o.ai Platform (Multi-tenant SaaS)
   'x3o.ai': 'G-PLATFORM123456',               // Platform-level analytics
@@ -24,6 +26,16 @@ export const tenantGoogleAds: Record<string, { adsId: string; bookingConversion?
     leadConversion: process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION,
   },
   'kelatic.com': {
+    adsId: 'AW-937265883',
+    bookingConversion: process.env.NEXT_PUBLIC_GOOGLE_ADS_BOOKING_CONVERSION,
+    leadConversion: process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION,
+  },
+  'barbershopblock.ai': {
+    adsId: 'AW-937265883',
+    bookingConversion: process.env.NEXT_PUBLIC_GOOGLE_ADS_BOOKING_CONVERSION,
+    leadConversion: process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION,
+  },
+  'www.barbershopblock.ai': {
     adsId: 'AW-937265883',
     bookingConversion: process.env.NEXT_PUBLIC_GOOGLE_ADS_BOOKING_CONVERSION,
     leadConversion: process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION,

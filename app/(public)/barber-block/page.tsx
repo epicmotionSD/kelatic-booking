@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Calendar, Instagram, Scissors, ArrowLeft } from 'lucide-react';
 import { PublicAuthLinks } from '@/components/layout/public-auth-links';
+import { isBarberDomain } from '@/lib/barber-brand';
 
 interface Barber {
   id: string;
@@ -18,6 +19,11 @@ interface Barber {
 export default function BarberBlockPage() {
   const [barbers, setBarbers] = useState<Barber[]>([]);
   const [loading, setLoading] = useState(true);
+  const [onBarberDomain, setOnBarberDomain] = useState(false);
+
+  useEffect(() => {
+    setOnBarberDomain(isBarberDomain());
+  }, []);
 
   useEffect(() => {
     fetchBarbers();
@@ -56,13 +62,15 @@ export default function BarberBlockPage() {
 
             <div className="flex items-center gap-4">
               <PublicAuthLinks />
-              <Link
-                href="/"
-                className="flex items-center gap-2 text-sm text-white/50 hover:text-red-400 transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to Kelatic
-              </Link>
+              {!onBarberDomain && (
+                <Link
+                  href="/"
+                  className="flex items-center gap-2 text-sm text-white/50 hover:text-red-400 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back to Kelatic
+                </Link>
+              )}
             </div>
           </div>
         </div>
@@ -220,11 +228,13 @@ export default function BarberBlockPage() {
             </div>
             <span className="font-bold">Barber Block</span>
           </div>
-          <p className="text-white/40 text-sm mb-6">A Kelatic Hair Lounge Experience</p>
+          <p className="text-white/40 text-sm mb-6">{onBarberDomain ? 'Premium Barber Services in Houston' : 'A Kelatic Hair Lounge Experience'}</p>
           <div className="flex items-center justify-center gap-6 text-sm">
-            <Link href="/" className="text-white/50 hover:text-red-400 transition-colors">
-              Kelatic Main Site
-            </Link>
+            {!onBarberDomain && (
+              <Link href="/" className="text-white/50 hover:text-red-400 transition-colors">
+                Kelatic Main Site
+              </Link>
+            )}
             <a href="tel:+17134854000" className="text-white/50 hover:text-red-400 transition-colors">
               (713) 485-4000
             </a>

@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/middleware';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
+
+// Barber Block domain aliases — all resolve to Kelatic tenant with barber branding
+const BARBER_DOMAINS = ['barbershopblock.ai', 'www.barbershopblock.ai'];
+
+// Routes allowed on the barber domain (everything else redirects to /)
+const BARBER_ALLOWED_ROUTES = [
+  '/book',
+  '/barber-block',
+  '/login',
+  '/reset-password',
+  '/api',
+  '/dashboard',
+  '/admin',
+  '/stylist',
+  '/account',
+  '/auth',
+  '/appointments',
+  '/walk-in',
+  '/privacy-policy',
+  '/unsubscribe',
+];
 
 function extractSubdomain(hostname: string): string | null {
   const host = hostname.split(':')[0];
@@ -39,6 +61,11 @@ function extractSubdomain(hostname: string): string | null {
     return 'kelatic';
   }
 
+  // Barber Block domain → treat as Kelatic tenant (barber branding applied in middleware)
+  if (BARBER_DOMAINS.includes(host)) {
+    return 'kelatic';
+  }
+
   if (!host.includes(ROOT_DOMAIN)) {
     return `custom:${host}`;
   }
@@ -52,10 +79,74 @@ export async function middleware(request: NextRequest) {
 
   const subdomain = extractSubdomain(hostname);
 
-  const response = NextResponse.next();
+  // Create Supabase client for auth check
+  const { supabase, response } = createClient(request);
 
   if (subdomain) {
     response.headers.set('x-tenant-slug', subdomain);
+  }
+
+  // Check authentication for protected routes
+  const protectedRoutes = ['/dashboard', '/admin', '/stylist', '/account'];
+  const publicRoutes = ['/login', '/reset-password', '/api', '/platform', '/onboarding', '/auth', '/book', '/_next', '/favicon.ico'];
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+
+  if (isProtectedRoute && !isPublicRoute) {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // ── Barber Block domain handling ──────────────────────────────────
+  const host = hostname.split(':')[0];
+  const isBarberDomain = BARBER_DOMAINS.includes(host);
+
+  if (isBarberDomain) {
+    // Set barber branding flag (read by client via cookie)
+    response.cookies.set('x-barber-domain', '1', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    response.headers.set('x-barber-domain', '1');
+
+    // Homepage → serve the barber-block page
+    if (pathname === '/') {
+      return NextResponse.rewrite(new URL('/barber-block', request.url), {
+        headers: response.headers,
+      });
+    }
+
+    // /book → inject category=barber if not already set
+    if (pathname === '/book' && !request.nextUrl.searchParams.has('category')) {
+      const bookUrl = new URL('/book', request.url);
+      request.nextUrl.searchParams.forEach((value, key) => {
+        bookUrl.searchParams.set(key, value);
+      });
+      bookUrl.searchParams.set('category', 'barber');
+      return NextResponse.redirect(bookUrl);
+    }
+
+    // Block Kelatic-specific routes → redirect to /
+    const isAllowed = BARBER_ALLOWED_ROUTES.some(route => pathname.startsWith(route)) || pathname === '/';
+    if (!isAllowed) {
+      return NextResponse.redirect(new URL('/', request.url));
+    }
+  } else {
+    // Clear barber cookie on non-barber domains
+    response.cookies.set('x-barber-domain', '', {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 0,
+    });
   }
 
   if (!subdomain) {
