@@ -1,34 +1,158 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 import { createPaymentIntent } from '@/lib/stripe';
 import { toCents } from '@/lib/currency';
+import {
+  sendBookingConfirmation,
+  notifyStylistNewBooking,
+  type AppointmentDetails,
+} from '@/lib/notifications/service';
 
-// Helper to send confirmation notifications
-async function sendConfirmationNotifications(appointmentId: string, request: NextRequest) {
+// Send confirmation notifications directly (no internal HTTP fetch)
+async function sendConfirmationNotifications(appointmentId: string) {
   try {
-    const forwardedProto = request.headers.get('x-forwarded-proto');
-    const forwardedHost = request.headers.get('x-forwarded-host');
-    const host = forwardedHost || request.headers.get('host');
-    const baseUrl = host
-      ? `${forwardedProto || 'https'}://${host}`
-      : (process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000');
-    const url = `${baseUrl}/api/notifications`;
     console.log('[BookingAPI] Sending confirmation notification for appointment:', appointmentId);
-    console.log('[BookingAPI][DEBUG] Notification API URL:', url);
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        appointmentId,
-        type: 'confirmation',
-      }),
+
+    const admin = createAdminClient();
+
+    // Fetch appointment with all related data
+    const { data: appointment, error } = await admin
+      .from('appointments')
+      .select(`
+        id,
+        start_time,
+        business_id,
+        is_walk_in,
+        walk_in_name,
+        walk_in_email,
+        walk_in_phone,
+        client:profiles!appointments_client_id_fkey (
+          id,
+          first_name,
+          last_name,
+          email,
+          phone
+        ),
+        stylist:profiles!appointments_stylist_id_fkey (
+          id,
+          first_name,
+          last_name,
+          email,
+          phone
+        ),
+        service:services (
+          id,
+          name,
+          duration
+        ),
+        appointment_addons (
+          service:services (
+            name
+          )
+        )
+      `)
+      .eq('id', appointmentId)
+      .single();
+
+    if (error || !appointment) {
+      console.error('[BookingAPI] Appointment not found for notification:', { error, appointmentId });
+      return;
+    }
+
+    // Handle Supabase join which may return arrays
+    const client = Array.isArray(appointment.client)
+      ? appointment.client[0]
+      : appointment.client;
+    const stylist = Array.isArray(appointment.stylist)
+      ? appointment.stylist[0]
+      : appointment.stylist;
+    const service = Array.isArray(appointment.service)
+      ? appointment.service[0]
+      : appointment.service;
+
+    // Fall back to walk-in data when no client profile exists
+    const clientName = client
+      ? `${client.first_name} ${client.last_name}`
+      : appointment.walk_in_name || 'Guest';
+    const clientEmail = client?.email || appointment.walk_in_email;
+    const clientPhone = client?.phone || appointment.walk_in_phone;
+
+    if (!clientEmail) {
+      console.error('[BookingAPI] No client email found, skipping notification');
+      return;
+    }
+
+    // Fetch business data
+    const { data: businessRow } = await admin
+      .from('businesses')
+      .select('*')
+      .eq('id', appointment.business_id)
+      .single();
+
+    if (!businessRow) {
+      console.error('[BookingAPI] Business not found for notification');
+      return;
+    }
+
+    const { data: settingsRow } = await admin
+      .from('business_settings')
+      .select('*')
+      .eq('business_id', appointment.business_id)
+      .single();
+
+    const timezone = businessRow?.timezone || 'America/Chicago';
+    const startTime = new Date(appointment.start_time);
+    const appointmentDate = startTime.toLocaleDateString('en-CA', { timeZone: timezone });
+    const appointmentTime = startTime.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: timezone,
     });
-    const text = await res.text();
-    console.log('[BookingAPI][DEBUG] Notification API fetch result:', {
-      status: res.status,
-      statusText: res.statusText,
-      body: text,
+
+    const appointmentDetails: AppointmentDetails = {
+      id: appointment.id,
+      client_name: clientName,
+      client_email: clientEmail,
+      client_phone: clientPhone || undefined,
+      stylist_name: `${stylist?.first_name} ${stylist?.last_name}`,
+      service_name: service?.name || 'Service',
+      service_duration: service?.duration || 60,
+      appointment_date: appointmentDate,
+      appointment_time: appointmentTime,
+      add_ons: appointment.appointment_addons?.map((a: any) => a.service?.name).filter(Boolean),
+    };
+
+    const ctx = {
+      business: businessRow,
+      settings: settingsRow || null,
+    };
+
+    // Send client confirmation
+    const result = await sendBookingConfirmation(appointmentDetails, ctx as any);
+    console.log('[BookingAPI] Confirmation notification result:', result);
+
+    // Also notify stylist
+    if (stylist?.email) {
+      await notifyStylistNewBooking(
+        stylist.email,
+        stylist.phone,
+        appointmentDetails,
+        ctx as any
+      );
+      console.log('[BookingAPI] Stylist notified:', stylist.email);
+    }
+
+    // Log notification
+    await admin.from('notification_logs').insert({
+      appointment_id: appointmentId,
+      notification_type: 'confirmation',
+      email_sent: result?.email || false,
+      sms_sent: result?.sms || false,
+      recipient_email: clientEmail,
+      recipient_phone: clientPhone,
     });
   } catch (error) {
     console.error('[BookingAPI] Failed to send notification:', error);
@@ -291,10 +415,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // Send confirmation notifications for all bookings (don't await to avoid blocking response)
-    console.log('[BookingAPI][DEBUG] About to call sendConfirmationNotifications for:', appointment.id);
-    sendConfirmationNotifications(appointment.id, request).catch((err) => {
-      console.error('[BookingAPI] Error sending confirmation notifications:', err);
+    // Use after() to send notifications after response — keeps function alive on Vercel
+    const appointmentId = appointment.id;
+    after(async () => {
+      console.log('[BookingAPI] after() running for appointment:', appointmentId);
+      await sendConfirmationNotifications(appointmentId);
     });
 
     return NextResponse.json({
