@@ -326,6 +326,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Create appointment
+    // Barber services always require a deposit
+    const needsDeposit = service.deposit_required || service.category === 'barber';
     const appointmentData: any = {
       service_id: body.service_id,
       stylist_id: body.stylist_id,
@@ -334,7 +336,7 @@ export async function POST(request: NextRequest) {
       end_time: endTime.toISOString(),
       quoted_price: totalPrice,
       client_notes: body.notes || null,
-      status: service.deposit_required ? 'pending' : 'confirmed',
+      status: needsDeposit ? 'pending' : 'confirmed',
     };
 
     if (clientId) {
@@ -380,12 +382,16 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create payment intent if deposit required (per stylist logic)
+    // Create payment intent if deposit required
     let paymentIntent = null;
     let depositAmount = null;
-    if (service.deposit_required) {
-      // Determine deposit amount by stylist
-      if (stylistProfile && stylistProfile.first_name && stylistProfile.first_name.trim().toLowerCase() === 'rockal') {
+    if (needsDeposit) {
+      // Use service-level deposit_amount if set, else category defaults
+      if (service.deposit_amount && service.deposit_amount > 0) {
+        depositAmount = service.deposit_amount;
+      } else if (service.category === 'barber') {
+        depositAmount = 10;
+      } else if (stylistProfile && stylistProfile.first_name && stylistProfile.first_name.trim().toLowerCase() === 'rockal') {
         depositAmount = 50;
       } else {
         depositAmount = 25;
