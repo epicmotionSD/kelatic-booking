@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/currency';
 import type { Service, Profile, ServiceCategory } from '@/types/database';
 import { Clock, Users, Sparkles, Crown, Star, ChevronDown, ChevronRight, Scissors, CalendarDays } from 'lucide-react';
@@ -81,6 +80,7 @@ const CATEGORY_CONFIG: Record<string, { name: string; icon: string; description:
 interface PriceTierSelectionProps {
   onSelectTier: (tier: PriceTier, services: Service[]) => void;
   onSelectStylist: (stylist: Profile) => void;
+  onWednesdaySpecial?: () => void;
   viewMode?: 'services' | 'stylist';
   onViewModeChange?: (mode: 'services' | 'stylist') => void;
   categoryFilter?: ServiceCategory; // Only show services from this category
@@ -89,11 +89,11 @@ interface PriceTierSelectionProps {
 export function PriceTierSelection({
   onSelectTier,
   onSelectStylist,
+  onWednesdaySpecial,
   viewMode: controlledViewMode,
   onViewModeChange,
   categoryFilter,
 }: PriceTierSelectionProps) {
-  const router = useRouter();
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -218,9 +218,9 @@ export function PriceTierSelection({
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {/* Wednesday Special Card */}
-          {!categoryFilter && (
+          {!categoryFilter && onWednesdaySpecial && (
             <button
-              onClick={() => router.push('/book?special=wednesday75')}
+              onClick={onWednesdaySpecial}
               className="text-left p-4 bg-gradient-to-br from-amber-500/20 to-yellow-500/10 border border-amber-400/30 rounded-xl hover:border-amber-400/60 hover:from-amber-500/30 hover:to-yellow-500/20 transition-all relative overflow-hidden"
             >
               <div className="absolute top-2 right-2">

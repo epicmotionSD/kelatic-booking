@@ -286,6 +286,35 @@ function BookingContent() {
             viewMode={browseViewMode}
             onViewModeChange={setBrowseViewMode}
             categoryFilter={categoryFilter || undefined}
+            onWednesdaySpecial={async () => {
+              // Fetch services so we can build the special offer inline
+              try {
+                const res = await fetch('/api/services');
+                const data = await res.json();
+                const allServices: Service[] = data.services || [];
+                const retwistService = allServices.find((s) =>
+                  s.name.toLowerCase().includes('retwist') ||
+                  s.name.toLowerCase().includes('maintenance')
+                );
+                if (retwistService) {
+                  const specialService = {
+                    ...retwistService,
+                    name: 'Wednesday Special - Shampoo & Retwist',
+                    base_price: 75,
+                    description: 'Wednesday Special: Professional shampoo and expert retwist for just $75 (Regular $85)',
+                  };
+                  updateBookingData({
+                    service: specialService,
+                    originalServiceId: retwistService.id,
+                    availableServices: [specialService],
+                    isWednesdaySpecial: true,
+                  });
+                  goToStep('stylist');
+                }
+              } catch (e) {
+                console.error('Failed to load Wednesday special:', e);
+              }
+            }}
             onSelectTier={(tier, services) => {
               updateBookingData({
                 priceTier: tier,
