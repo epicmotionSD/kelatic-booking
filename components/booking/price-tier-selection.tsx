@@ -1,9 +1,18 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { formatCurrency } from '@/lib/currency';
 import type { Service, Profile, ServiceCategory } from '@/types/database';
-import { Clock, Users, Sparkles, Crown, Star, ChevronDown, ChevronRight, Scissors } from 'lucide-react';
+import { Clock, Users, Sparkles, Crown, Star, ChevronDown, ChevronRight, Scissors, CalendarDays } from 'lucide-react';
+
+// Curated popular service IDs – shown in the "Popular Services" section
+const POPULAR_SERVICE_IDS = [
+  '3c4386c5-96c4-451e-9b30-177cb43ef060', // +Detox Locs ($150)
+  'f5f0a325-e5e0-4677-a93e-fd39d65712c4', // +(3+ Months Overdue Retwist) ($175)
+  'e7e8b9e6-9054-44a5-a364-f6f417149911', // Short Hair Two Strand ($150)
+  '3917add9-46bd-4153-bd1b-33d7d94c4e86', // Long Hair Two Strands ($200)
+];
 
 interface PriceTier {
   id: string;
@@ -84,6 +93,7 @@ export function PriceTierSelection({
   onViewModeChange,
   categoryFilter,
 }: PriceTierSelectionProps) {
+  const router = useRouter();
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
@@ -207,11 +217,32 @@ export function PriceTierSelection({
           Popular Services
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* Wednesday Special Card */}
+          {!categoryFilter && (
+            <button
+              onClick={() => router.push('/book?special=wednesday75')}
+              className="text-left p-4 bg-gradient-to-br from-amber-500/20 to-yellow-500/10 border border-amber-400/30 rounded-xl hover:border-amber-400/60 hover:from-amber-500/30 hover:to-yellow-500/20 transition-all relative overflow-hidden"
+            >
+              <div className="absolute top-2 right-2">
+                <span className="text-[10px] font-bold bg-amber-400 text-black px-2 py-0.5 rounded-full">SPECIAL</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <div>
+                  <h4 className="font-semibold text-white text-sm flex items-center gap-1.5">
+                    <CalendarDays className="w-3.5 h-3.5 text-amber-400" />
+                    Wednesday Special
+                  </h4>
+                  <p className="text-xs text-white/50">Shampoo &amp; Retwist &bull; Wed Only</p>
+                </div>
+                <span className="text-amber-400 font-bold">$75</span>
+              </div>
+            </button>
+          )}
+
+          {/* Curated Popular Services */}
           {services
-            .filter(s => categoryFilter ? s.category === categoryFilter : true)
-            .filter(s => s.base_price >= 75 && s.base_price <= 150)
-            .sort((a, b) => a.base_price - b.base_price)
-            .slice(0, 4)
+            .filter(s => POPULAR_SERVICE_IDS.includes(s.id))
+            .sort((a, b) => POPULAR_SERVICE_IDS.indexOf(a.id) - POPULAR_SERVICE_IDS.indexOf(b.id))
             .map((service) => (
               <button
                 key={service.id}
