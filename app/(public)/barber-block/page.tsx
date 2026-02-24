@@ -89,15 +89,13 @@ export default function BarberBlockPage() {
           <p className="text-xl md:text-2xl text-white/60 max-w-2xl mx-auto mb-10">
             Premium barber services from Houston&apos;s finest. Fades, lineups, and cuts that speak for themselves.
           </p>
-          {barbers.length > 0 && (
-            <Link
-              href={`/book?stylist=${barbers[0].id}&category=barber`}
-              className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-red-500/30 transition-all"
-            >
-              <Calendar className="w-6 h-6" />
-              Book Your Cut
-            </Link>
-          )}
+          <Link
+            href={barbers.length > 0 ? `/book?stylist=${barbers[0].id}&category=barber` : '/book?category=barber'}
+            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-red-500/30 transition-all"
+          >
+            <Calendar className="w-6 h-6" />
+            Book Your Cut
+          </Link>
         </div>
       </section>
 
@@ -118,15 +116,16 @@ export default function BarberBlockPage() {
               <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-red-500/20 to-transparent rounded-full flex items-center justify-center">
                 <Scissors className="w-12 h-12 text-red-400" />
               </div>
-              <h4 className="text-2xl font-bold mb-3">Coming Soon</h4>
+              <h4 className="text-2xl font-bold mb-3">Book Online</h4>
               <p className="text-white/50 max-w-md mx-auto">
-                Our barber team is being assembled. Check back soon for booking availability.
+                Browse our barber services and book your appointment online — available 24/7.
               </p>
               <Link
-                href="/"
-                className="inline-flex items-center gap-2 mt-8 px-6 py-3 border border-white/20 rounded-full hover:border-red-400 hover:text-red-400 transition-colors"
+                href="/book?category=barber"
+                className="inline-flex items-center gap-3 mt-8 px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full font-bold text-lg hover:shadow-xl hover:shadow-red-500/30 transition-all"
               >
-                Explore Kelatic Services
+                <Calendar className="w-5 h-5" />
+                Book Now
               </Link>
             </div>
           ) : (
