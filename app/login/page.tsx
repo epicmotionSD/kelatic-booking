@@ -201,11 +201,11 @@ function LoginForm() {
 
           <button
             type="button"
-            className={`w-full mt-3 text-sm transition-colors ${
+            className={`w-full mt-3 py-3 text-sm font-medium transition-colors rounded-xl ${
               isPlatform
-                ? 'text-violet-400/70 hover:text-violet-400'
-                : 'text-amber-400/70 hover:text-amber-400'
-            }`}
+                ? 'text-violet-400/70 hover:text-violet-400 active:text-violet-300'
+                : 'text-amber-400/70 hover:text-amber-400 active:text-amber-300'
+            } disabled:opacity-40`}
             onClick={handleResetPassword}
             disabled={resetLoading || !email}
           >
