@@ -84,6 +84,7 @@ interface PriceTierSelectionProps {
   viewMode?: 'services' | 'stylist';
   onViewModeChange?: (mode: 'services' | 'stylist') => void;
   categoryFilter?: ServiceCategory; // Only show services from this category
+  selectedStylistId?: string | null; // When set, filter services to only this stylist's
 }
 
 export function PriceTierSelection({
@@ -93,8 +94,10 @@ export function PriceTierSelection({
   viewMode: controlledViewMode,
   onViewModeChange,
   categoryFilter,
+  selectedStylistId,
 }: PriceTierSelectionProps) {
-  const [services, setServices] = useState<Service[]>([]);
+  const [allServices, setAllServices] = useState<Service[]>([]);
+  const [stylistServices, setStylistServices] = useState<Service[] | null>(null);
   const [stylists, setStylists] = useState<Profile[]>([]);
   const [loading, setLoading] = useState(true);
   const [internalViewMode, setInternalViewMode] = useState<'services' | 'stylist'>('services');
@@ -107,6 +110,30 @@ export function PriceTierSelection({
     fetchData();
   }, []);
 
+  // When a stylist is selected, fetch their specific services
+  useEffect(() => {
+    if (selectedStylistId && selectedStylistId !== 'any') {
+      fetchStylistServices(selectedStylistId);
+    } else {
+      setStylistServices(null);
+    }
+  }, [selectedStylistId]);
+
+  async function fetchStylistServices(stylistId: string) {
+    try {
+      const res = await fetch(`/api/stylists/${stylistId}/services`);
+      if (res.ok) {
+        const data = await res.json();
+        setStylistServices(data.services || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch stylist services:', error);
+    }
+  }
+
+  // Use stylist-specific services when a stylist is selected, otherwise all services
+  const services = stylistServices ?? allServices;
+
   async function fetchData() {
     try {
       const [servicesRes, stylistsRes] = await Promise.all([
@@ -116,7 +143,7 @@ export function PriceTierSelection({
 
       if (servicesRes.ok) {
         const data = await servicesRes.json();
-        setServices(data.services || []);
+        setAllServices(data.services || []);
       }
 
       if (stylistsRes.ok) {
@@ -195,16 +222,25 @@ export function PriceTierSelection({
     );
   }
 
+  // Get selected stylist's name for display
+  const selectedStylist = selectedStylistId
+    ? stylists.find((s) => s.id === selectedStylistId)
+    : null;
+
   return (
     <div>
       <div className="text-center mb-8">
         <h2 className="text-2xl md:text-3xl font-bold text-white mb-2">
-          {categoryFilter && CATEGORY_CONFIG[categoryFilter]
+          {selectedStylist
+            ? `Book with ${selectedStylist.first_name}`
+            : categoryFilter && CATEGORY_CONFIG[categoryFilter]
             ? `Book ${CATEGORY_CONFIG[categoryFilter].name}`
             : 'Book Your Appointment'}
         </h2>
         <p className="text-white/60 mb-6">
-          {categoryFilter && CATEGORY_CONFIG[categoryFilter]
+          {selectedStylist
+            ? `Showing ${selectedStylist.first_name}'s available services`
+            : categoryFilter && CATEGORY_CONFIG[categoryFilter]
             ? CATEGORY_CONFIG[categoryFilter].description
             : "Choose how you'd like to start your booking"}
         </p>

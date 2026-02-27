@@ -286,6 +286,7 @@ function BookingContent() {
             viewMode={browseViewMode}
             onViewModeChange={setBrowseViewMode}
             categoryFilter={categoryFilter || undefined}
+            selectedStylistId={bookingData.stylist?.id || null}
             onWednesdaySpecial={async () => {
               // Fetch services so we can build the special offer inline
               try {
