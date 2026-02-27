@@ -86,7 +86,7 @@ export async function GET(
       },
       {
         headers: {
-          'Cache-Control': 'public, max-age=300, s-maxage=300',
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
           'X-Total-Count': String(services.length),
         },
       }
