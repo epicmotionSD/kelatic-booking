@@ -28,12 +28,16 @@ interface Stylist {
 
 const CATEGORY_LABELS: Record<string, string> = {
   locs: 'Loc Services',
-  braids: 'Braids',
+  braids: 'Braids & Plaits',
   natural: 'Natural Hair',
-  color: 'Color',
+  color: 'Color Services',
   treatments: 'Treatments',
   other: 'Other Services',
 };
+
+// Words that flag a service as consultation or kids — Rockal wants these excluded
+const EXCLUDED_KEYWORDS = /\b(consult|consultation|kid|kids|children|child|waiting\s*list|model\s*sign|join\s*waiting)\b/i;
+const MIN_PRICE = 125;
 
 // Order categories for display
 const CATEGORY_ORDER = ['locs', 'braids', 'natural', 'color', 'treatments', 'other'];
@@ -57,25 +61,36 @@ export default function RockalPage() {
 
   const fetchData = async () => {
     try {
-      // Fetch Rockal's profile and the services she can perform in parallel
-      const [stylistsRes, servicesRes] = await Promise.all([
-        fetch('/api/stylists'),
-        fetch('/api/services'),
-      ]);
+      // First fetch Rockal's profile so we have her ID
+      const stylistsRes = await fetch('/api/stylists');
+      if (!stylistsRes.ok) throw new Error('Failed to fetch stylists');
 
-      if (stylistsRes.ok) {
-        const data = await stylistsRes.json();
-        const rockalProfile = (data.stylists || []).find(
-          (s: Stylist) => s.first_name === 'Rockal'
-        );
-        if (rockalProfile) setRockal(rockalProfile);
-      }
+      const stylistsData = await stylistsRes.json();
+      const rockalProfile = (stylistsData.stylists || []).find(
+        (s: Stylist) => s.first_name === 'Rockal'
+      );
+      if (rockalProfile) {
+        setRockal(rockalProfile);
 
-      if (servicesRes.ok) {
-        const data = await servicesRes.json();
-        const allServices: Service[] = data.services || [];
-        // Exclude barber-only services — Rockal is a loctician, not a barber
-        setServices(allServices.filter((s) => s.category !== 'barber'));
+        // Now fetch only her assigned services (with custom prices)
+        const servicesRes = await fetch(`/api/stylists/${rockalProfile.id}/services`);
+        if (servicesRes.ok) {
+          const data = await servicesRes.json();
+          const allServices: Service[] = data.services || [];
+
+          // Apply Rockal's filters:
+          // 1. No barber services (she's a loctician)
+          // 2. No consultations or kids services
+          // 3. Nothing under $125
+          const filtered = allServices.filter((s) => {
+            if (s.category === 'barber') return false;
+            if (EXCLUDED_KEYWORDS.test(s.name)) return false;
+            if (s.base_price < MIN_PRICE) return false;
+            return true;
+          });
+
+          setServices(filtered);
+        }
       }
     } catch (err) {
       console.error('Failed to fetch Rockal data:', err);
