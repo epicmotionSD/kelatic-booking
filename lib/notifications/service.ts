@@ -1,18 +1,14 @@
 // Notification Service - Email (SendGrid) & SMS (Twilio)
 // Multi-tenant aware - uses business context for branding
-import sgMail from '@sendgrid/mail';
-import twilio from 'twilio';
 import type { Business, BusinessSettings } from '@/lib/tenant';
-
-// Initialize SendGrid
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
-
-// Initialize Twilio
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-  : null;
+import {
+  getEmailProviderName,
+  getSmsProviderName,
+  isEmailProviderConfigured,
+  isSmsProviderConfigured,
+  sendEmailMessage,
+  sendSmsMessage,
+} from '@/lib/notifications/providers';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
 
@@ -488,8 +484,8 @@ Book a new appointment anytime at ${siteUrl}/book${business.phone ? ` or call ${
 // ============================================
 
 export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx: BusinessContext): Promise<boolean> {
-  if (!process.env.SENDGRID_API_KEY) {
-    console.log('[Email] SendGrid not configured, skipping confirmation email');
+  if (!isEmailProviderConfigured()) {
+    console.log(`[Email] ${getEmailProviderName()} not configured, skipping confirmation email`);
     return false;
   }
 
@@ -497,21 +493,21 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx
   const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
 
   try {
-    const [response] = await sgMail.send({
+    const result = await sendEmailMessage({
       to: appointment.client_email,
-      from: {
-        email: fromEmail,
-        name: business.name,
-      },
+      fromEmail,
+      fromName: business.name,
       subject: `✨ Appointment Confirmed - ${formatDate(appointment.appointment_date)}`,
       html: getConfirmationEmailHtml(appointment, ctx),
     });
+
+    if (!result.success) {
+      throw new Error(result.error || 'Email provider send failed');
+    }
+
     console.log(`[Email] Confirmation sent to ${appointment.client_email}`);
-    if (response && response.headers) {
-      console.log('[Email] SendGrid response headers:', response.headers);
-      if (response.headers['x-message-id']) {
-        console.log('[Email] SendGrid message ID:', response.headers['x-message-id']);
-      }
+    if (result.messageId) {
+      console.log('[Email] Provider message ID:', result.messageId);
     }
     return true;
   } catch (error) {
@@ -521,8 +517,8 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx
 }
 
 export async function sendReminderEmail(appointment: AppointmentDetails, hoursUntil: number, ctx: BusinessContext): Promise<boolean> {
-  if (!process.env.SENDGRID_API_KEY) {
-    console.log('[Email] SendGrid not configured, skipping reminder email');
+  if (!isEmailProviderConfigured()) {
+    console.log(`[Email] ${getEmailProviderName()} not configured, skipping reminder email`);
     return false;
   }
 
@@ -530,15 +526,18 @@ export async function sendReminderEmail(appointment: AppointmentDetails, hoursUn
   const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
 
   try {
-    await sgMail.send({
+    const result = await sendEmailMessage({
       to: appointment.client_email,
-      from: {
-        email: fromEmail,
-        name: business.name,
-      },
+      fromEmail,
+      fromName: business.name,
       subject: `⏰ Reminder: Your appointment is ${hoursUntil === 24 ? 'tomorrow' : 'today'}!`,
       html: getReminderEmailHtml(appointment, hoursUntil, ctx),
     });
+
+    if (!result.success) {
+      throw new Error(result.error || 'Email provider send failed');
+    }
+
     console.log(`[Email] Reminder sent to ${appointment.client_email}`);
     return true;
   } catch (error) {
@@ -548,8 +547,8 @@ export async function sendReminderEmail(appointment: AppointmentDetails, hoursUn
 }
 
 export async function sendCancellationEmail(appointment: AppointmentDetails, ctx: BusinessContext): Promise<boolean> {
-  if (!process.env.SENDGRID_API_KEY) {
-    console.log('[Email] SendGrid not configured, skipping cancellation email');
+  if (!isEmailProviderConfigured()) {
+    console.log(`[Email] ${getEmailProviderName()} not configured, skipping cancellation email`);
     return false;
   }
 
@@ -557,15 +556,18 @@ export async function sendCancellationEmail(appointment: AppointmentDetails, ctx
   const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
 
   try {
-    await sgMail.send({
+    const result = await sendEmailMessage({
       to: appointment.client_email,
-      from: {
-        email: fromEmail,
-        name: business.name,
-      },
+      fromEmail,
+      fromName: business.name,
       subject: `Appointment Cancelled - ${business.name}`,
       html: getCancellationEmailHtml(appointment, ctx),
     });
+
+    if (!result.success) {
+      throw new Error(result.error || 'Email provider send failed');
+    }
+
     console.log(`[Email] Cancellation sent to ${appointment.client_email}`);
     return true;
   } catch (error) {
@@ -577,17 +579,22 @@ export async function sendCancellationEmail(appointment: AppointmentDetails, ctx
 export async function sendConfirmationSms(appointment: AppointmentDetails, ctx: BusinessContext): Promise<boolean> {
   const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
 
-  if (!twilioClient || !fromPhone || !appointment.client_phone) {
-    console.log('[SMS] Twilio not configured or no phone number, skipping confirmation SMS');
+  if (!isSmsProviderConfigured() || !fromPhone || !appointment.client_phone) {
+    console.log(`[SMS] ${getSmsProviderName()} not configured or no phone number, skipping confirmation SMS`);
     return false;
   }
 
   try {
-    await twilioClient.messages.create({
+    const result = await sendSmsMessage({
       body: getConfirmationSms(appointment, ctx),
       from: fromPhone,
       to: appointment.client_phone,
     });
+
+    if (!result.success) {
+      throw new Error(result.error || 'SMS provider send failed');
+    }
+
     console.log(`[SMS] Confirmation sent to ${appointment.client_phone}`);
     return true;
   } catch (error) {
@@ -599,17 +606,22 @@ export async function sendConfirmationSms(appointment: AppointmentDetails, ctx: 
 export async function sendReminderSms(appointment: AppointmentDetails, hoursUntil: number, ctx: BusinessContext): Promise<boolean> {
   const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
 
-  if (!twilioClient || !fromPhone || !appointment.client_phone) {
-    console.log('[SMS] Twilio not configured or no phone number, skipping reminder SMS');
+  if (!isSmsProviderConfigured() || !fromPhone || !appointment.client_phone) {
+    console.log(`[SMS] ${getSmsProviderName()} not configured or no phone number, skipping reminder SMS`);
     return false;
   }
 
   try {
-    await twilioClient.messages.create({
+    const result = await sendSmsMessage({
       body: getReminderSms(appointment, hoursUntil, ctx),
       from: fromPhone,
       to: appointment.client_phone,
     });
+
+    if (!result.success) {
+      throw new Error(result.error || 'SMS provider send failed');
+    }
+
     console.log(`[SMS] Reminder sent to ${appointment.client_phone}`);
     return true;
   } catch (error) {
@@ -621,17 +633,22 @@ export async function sendReminderSms(appointment: AppointmentDetails, hoursUnti
 export async function sendCancellationSms(appointment: AppointmentDetails, ctx: BusinessContext): Promise<boolean> {
   const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
 
-  if (!twilioClient || !fromPhone || !appointment.client_phone) {
-    console.log('[SMS] Twilio not configured or no phone number, skipping cancellation SMS');
+  if (!isSmsProviderConfigured() || !fromPhone || !appointment.client_phone) {
+    console.log(`[SMS] ${getSmsProviderName()} not configured or no phone number, skipping cancellation SMS`);
     return false;
   }
 
   try {
-    await twilioClient.messages.create({
+    const result = await sendSmsMessage({
       body: getCancellationSms(appointment, ctx),
       from: fromPhone,
       to: appointment.client_phone,
     });
+
+    if (!result.success) {
+      throw new Error(result.error || 'SMS provider send failed');
+    }
+
     console.log(`[SMS] Cancellation sent to ${appointment.client_phone}`);
     return true;
   } catch (error) {
@@ -699,14 +716,12 @@ export async function notifyStylistNewBooking(
   const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
 
   // Email to stylist
-  if (process.env.SENDGRID_API_KEY) {
+  if (isEmailProviderConfigured()) {
     try {
-      await sgMail.send({
+      const result = await sendEmailMessage({
         to: stylistEmail,
-        from: {
-          email: fromEmail,
-          name: business.name,
-        },
+        fromEmail,
+        fromName: business.name,
         subject: `📅 New Booking: ${appointment.client_name} - ${formatDate(appointment.appointment_date)}`,
         html: `
           <h2>New Appointment Booked</h2>
@@ -718,19 +733,27 @@ export async function notifyStylistNewBooking(
           ${appointment.notes ? `<p><strong>Notes:</strong> ${appointment.notes}</p>` : ''}
         `,
       });
+
+      if (!result.success) {
+        throw new Error(result.error || 'Email provider send failed');
+      }
     } catch (error) {
       console.error('[Email] Failed to notify stylist:', error);
     }
   }
 
   // SMS to stylist
-  if (twilioClient && fromPhone && stylistPhone) {
+  if (isSmsProviderConfigured() && fromPhone && stylistPhone) {
     try {
-      await twilioClient.messages.create({
+      const result = await sendSmsMessage({
         body: `📅 New booking: ${appointment.client_name} for ${appointment.service_name} on ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}`,
         from: fromPhone,
         to: stylistPhone,
       });
+
+      if (!result.success) {
+        throw new Error(result.error || 'SMS provider send failed');
+      }
     } catch (error) {
       console.error('[SMS] Failed to notify stylist:', error);
     }
@@ -859,29 +882,31 @@ export async function sendNewsletterEmail(
   content: NewsletterContent,
   ctx: BusinessContext
 ): Promise<{ success: boolean; messageId?: string; error?: string }> {
-  if (!process.env.SENDGRID_API_KEY) {
-    console.log('[Newsletter] SendGrid not configured, skipping email');
-    return { success: false, error: 'SendGrid not configured' };
+  if (!isEmailProviderConfigured()) {
+    console.log(`[Newsletter] ${getEmailProviderName()} not configured, skipping email`);
+    return { success: false, error: 'Email provider not configured' };
   }
 
   const { business } = ctx;
   const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `newsletter@${ROOT_DOMAIN}`;
 
   try {
-    const [response] = await sgMail.send({
+    const result = await sendEmailMessage({
       to,
-      from: {
-        email: fromEmail,
-        name: business.name,
-      },
+      fromEmail,
+      fromName: business.name,
       subject: content.subject,
       html: getNewsletterEmailHtml(content, to, ctx),
     });
 
+    if (!result.success) {
+      throw new Error(result.error || 'Email provider send failed');
+    }
+
     console.log(`[Newsletter] Email sent to ${to}`);
     return {
       success: true,
-      messageId: response.headers['x-message-id'] as string,
+      messageId: result.messageId,
     };
   } catch (error) {
     console.error('[Newsletter] Failed to send:', error);

@@ -137,6 +137,7 @@ export interface Appointment {
   
   is_walk_in: boolean;
   walk_in_name?: string;
+  walk_in_email?: string;
   walk_in_phone?: string;
   
   cancelled_at?: string;

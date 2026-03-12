@@ -4,16 +4,16 @@ import { useState, useEffect } from 'react';
 import NotificationBell from './NotificationBell';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Home, 
-  Zap, 
-  Calendar, 
-  CreditCard, 
-  Briefcase, 
-  Users, 
-  UserCheck, 
-  BarChart3, 
-  Settings, 
+import {
+  Home,
+  Zap,
+  Calendar,
+  CreditCard,
+  Briefcase,
+  Users,
+  UserCheck,
+  BarChart3,
+  Settings,
   HelpCircle,
   Menu,
   X

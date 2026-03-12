@@ -20,7 +20,11 @@ import {
   Calendar,
   ChevronRight,
   Zap,
+  Mail,
+  ArrowRight,
+  X,
 } from 'lucide-react'
+import { isFeatureEnabled } from '@/lib/features'
 
 interface Campaign {
   id: string
@@ -60,6 +64,7 @@ export default function CampaignsListPage() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [bannerDismissed, setBannerDismissed] = useState(false)
 
   const fetchCampaigns = async () => {
     try {
@@ -116,13 +121,49 @@ export default function CampaignsListPage() {
               className="flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition"
             >
               <Plus className="w-5 h-5" />
-              New Campaign
+              {isFeatureEnabled('SMS_ENABLED') ? 'New Campaign' : 'New Email Campaign'}
             </button>
           </div>
         </div>
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
+        {/* Email-Only Phase 1 Banner */}
+        {!isFeatureEnabled('SMS_ENABLED') && !bannerDismissed && (
+          <div className="bg-gradient-to-r from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-xl p-4 mb-6">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-emerald-500/10 rounded-lg">
+                <Mail className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="font-semibold text-white">Email Campaigns Active</h3>
+                  <span className="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">
+                    Phase 1
+                  </span>
+                </div>
+                <p className="text-sm text-zinc-400 mb-3">
+                  Your campaigns are sending via email. Want to add SMS? Activate in 7 days with our white-glove A2P service.
+                </p>
+                <button
+                  onClick={() => router.push('/dashboard/settings/upgrade-sms')}
+                  className="inline-flex items-center gap-2 text-sm font-medium text-emerald-400 hover:text-emerald-300 transition"
+                >
+                  Upgrade to SMS
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              <button
+                onClick={() => setBannerDismissed(true)}
+                className="p-1 hover:bg-zinc-800 rounded transition"
+                title="Dismiss"
+              >
+                <X className="w-4 h-4 text-zinc-500" />
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Summary Cards */}
         {data?.summary && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -211,7 +252,7 @@ export default function CampaignsListPage() {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition"
               >
                 <Plus className="w-5 h-5" />
-                Create Campaign
+                {isFeatureEnabled('SMS_ENABLED') ? 'Create Campaign' : 'Create Email Campaign'}
               </button>
             )}
           </div>

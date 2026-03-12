@@ -31,6 +31,7 @@ interface ScriptArgs {
   token?: string
   direct: boolean
   outputFile?: string
+  channel: 'email' | 'sms' | 'multi'
 }
 
 const HUMMINGBIRD_SCRIPTS = {
@@ -52,6 +53,25 @@ const HUMMINGBIRD_SCRIPTS = {
   breakup: {
     day: 7,
     type: 'sms' as const,
+    template: "Hey {firstName}, this is my last reach out. I don't want to bother you but wanted to give you one final chance to get back on the books at {businessName}. If I don't hear from you, I'll assume the timing isn't right. Either way, hope you're doing great!",
+  },
+}
+
+// Email-only cadence (Phase 1 MVP)
+const HUMMINGBIRD_SCRIPTS_EMAIL = {
+  direct_inquiry: {
+    day: 1,
+    type: 'email' as const,
+    template: "Hey {firstName}, it's been a while since we've seen you at {businessName}! We'd love to have you back for {service}. Grab your spot here: https://kelatic.com/book",
+  },
+  file_closure: {
+    day: 3,
+    type: 'email' as const,
+    template: "Hi {firstName}, I'm doing some housekeeping at {businessName} and noticed your file. If you still want {service}, grab your spot here: https://kelatic.com/book",
+  },
+  breakup: {
+    day: 7,
+    type: 'email' as const,
     template: "Hey {firstName}, this is my last reach out. I don't want to bother you but wanted to give you one final chance to get back on the books at {businessName}. If I don't hear from you, I'll assume the timing isn't right. Either way, hope you're doing great!",
   },
 }
@@ -85,6 +105,14 @@ function parseArgs(argv: string[]): ScriptArgs {
   const token = args.get('token') || process.env.CRON_SECRET || undefined
   const direct = (args.get('direct') || 'false').toLowerCase() === 'true'
   const outputFile = args.get('outputFile')
+  const channel = (args.get('channel') || 'email').toLowerCase() as 'email' | 'sms' | 'multi'
+
+  // Validate channel
+  if (channel === 'sms' && process.env.SMS_ENABLED !== 'true') {
+    console.error('❌ SMS not enabled. Use --channel email or contact support to enable SMS.')
+    console.error('   SMS requires A2P 10DLC approval (typically 7 days)')
+    process.exit(1)
+  }
 
   return {
     file,
@@ -100,6 +128,7 @@ function parseArgs(argv: string[]): ScriptArgs {
     token,
     direct,
     outputFile,
+    channel,
   }
 }
 
@@ -199,7 +228,7 @@ async function loadLeads(args: ScriptArgs): Promise<SegmentedLeadPayload[]> {
     if (!row || row.length === 0) continue
 
     const segmentRaw = getValue(row, 'segment').toUpperCase()
-    if (segmentRaw && segmentRaw !== args.segmentFilter) {
+    if (args.segmentFilter !== 'ALL' && segmentRaw && segmentRaw !== args.segmentFilter) {
       continue
     }
 
@@ -260,12 +289,21 @@ async function launchCampaign(args: ScriptArgs, leads: SegmentedLeadPayload[]): 
       auth: { persistSession: false },
     })
 
-    const cadenceConfig = [
-      HUMMINGBIRD_SCRIPTS.direct_inquiry,
-      HUMMINGBIRD_SCRIPTS.voicemail_drop,
-      HUMMINGBIRD_SCRIPTS.file_closure,
-      HUMMINGBIRD_SCRIPTS.breakup,
-    ]
+    // Select cadence based on channel
+    const cadenceConfig = args.channel === 'email'
+      ? [
+          HUMMINGBIRD_SCRIPTS_EMAIL.direct_inquiry,
+          HUMMINGBIRD_SCRIPTS_EMAIL.file_closure,
+          HUMMINGBIRD_SCRIPTS_EMAIL.breakup,
+        ]
+      : [
+          HUMMINGBIRD_SCRIPTS.direct_inquiry,
+          HUMMINGBIRD_SCRIPTS.voicemail_drop,
+          HUMMINGBIRD_SCRIPTS.file_closure,
+          HUMMINGBIRD_SCRIPTS.breakup,
+        ]
+
+    console.log(`[campaign] Channel: ${args.channel}, Cadence steps: ${cadenceConfig.length}`)
 
     const campaignId = crypto.randomUUID()
     const { error: campaignError } = await supabase

@@ -4,6 +4,7 @@ import { resolve } from 'path';
 dotenv.config({ path: resolve(process.cwd(), '.env.local') });
 
 const baseUrl = process.env.BOOKING_E2E_BASE_URL || process.env.NEXT_PUBLIC_APP_URL;
+const mode = (process.argv[2] || 'default').toLowerCase();
 
 if (!baseUrl) {
   console.error('Missing BOOKING_E2E_BASE_URL or NEXT_PUBLIC_APP_URL');
@@ -38,13 +39,19 @@ function formatDate(date: Date) {
   return `${year}-${month}-${day}`;
 }
 
-async function getFirstAvailableSlot(serviceId: string): Promise<AvailabilitySlot | null> {
+async function getFirstAvailableSlot(serviceId: string, stylistId?: string): Promise<AvailabilitySlot | null> {
   for (let i = 1; i <= 14; i += 1) {
     const date = new Date();
     date.setDate(date.getDate() + i);
     const dateStr = formatDate(date);
 
-    const availability = await requestJson(`/api/availability?service_id=${serviceId}&date=${dateStr}`);
+    const availabilityUrl = new URL('/api/availability', baseUrl);
+    availabilityUrl.searchParams.set('service_id', serviceId);
+    availabilityUrl.searchParams.set('date', dateStr);
+    if (stylistId) {
+      availabilityUrl.searchParams.set('stylist_id', stylistId);
+    }
+    const availability = await requestJson(availabilityUrl.toString());
     const slots = (availability?.slots || []) as AvailabilitySlot[];
     const available = slots.find((slot) => slot.available);
     if (available) {
@@ -74,7 +81,8 @@ async function run() {
 
   const stylist = stylists[0];
 
-  const slot = await getFirstAvailableSlot(service.id);
+  const useStylistFlow = mode === 'stylist';
+  const slot = await getFirstAvailableSlot(service.id, useStylistFlow ? stylist.id : undefined);
   if (!slot || !slot.start_time) {
     throw new Error('No availability found in the next 14 days');
   }

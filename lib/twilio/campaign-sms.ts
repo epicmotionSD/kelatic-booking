@@ -3,7 +3,7 @@
 // Handles sending SMS for campaigns with per-tenant Twilio credentials
 // =============================================================================
 
-import twilio from 'twilio'
+import { sendSmsMessage } from '@/lib/notifications/providers'
 
 interface SendCampaignSMSParams {
   to: string
@@ -60,6 +60,14 @@ function ensureOptOutLanguage(body: string): string {
 
 export async function sendCampaignSMS(params: SendCampaignSMSParams): Promise<TwilioSendResult> {
   const { to, from, body, accountSid, authToken, statusCallback } = params
+
+  if (process.env.SMS_SEND_DISABLED === 'true' || process.env.TWILIO_A2P_APPROVED !== 'true') {
+    return {
+      sid: '',
+      status: 'failed',
+      errorMessage: 'SMS sending disabled until A2P approval is complete',
+    }
+  }
   
   // Decrypt credentials (or pass through if plain text)
   const decryptedSid = await decryptCredential(accountSid)
@@ -68,32 +76,26 @@ export async function sendCampaignSMS(params: SendCampaignSMSParams): Promise<Tw
   // COMPLIANCE: Ensure message has opt-out language
   const compliantBody = ensureOptOutLanguage(body)
   
-  // Initialize Twilio client with tenant credentials
-  const client = twilio(decryptedSid, decryptedToken)
-  
-  try {
-    const message = await client.messages.create({
-      to: formatE164(to),
-      from: formatE164(from),
-      body: compliantBody, // COMPLIANCE: Use message with guaranteed opt-out language
-      statusCallback: statusCallback || `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/twilio/status`,
-    })
-    
-    return {
-      sid: message.sid,
-      status: message.status,
-      price: message.price ? parseFloat(message.price) : undefined,
-    }
-  } catch (error: unknown) {
-    const twilioError = error as { code?: number; message: string }
-    console.error('Twilio send error:', twilioError)
-    
+  const result = await sendSmsMessage({
+    to: formatE164(to),
+    from: formatE164(from),
+    body: compliantBody,
+    statusCallback: statusCallback || `${process.env.NEXT_PUBLIC_APP_URL}/api/webhooks/twilio/status`,
+    accountSid: decryptedSid,
+    authToken: decryptedToken,
+  })
+
+  if (!result.success) {
     return {
       sid: '',
       status: 'failed',
-      errorCode: twilioError.code?.toString(),
-      errorMessage: twilioError.message,
+      errorMessage: result.error,
     }
+  }
+
+  return {
+    sid: result.messageId || '',
+    status: 'queued',
   }
 }
 

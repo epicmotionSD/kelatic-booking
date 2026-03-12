@@ -128,7 +128,7 @@ export default function WalkInPage() {
             <div className="mt-6 p-4 rounded-2xl border border-white/10 bg-zinc-900">
               <p className="text-white/70 text-sm">Already a client?</p>
               <Link
-                href="/login"
+                href="/login?type=client&redirect=/account"
                 className="inline-flex items-center mt-2 text-amber-400 hover:text-amber-300 text-sm font-medium"
               >
                 Sign in to save your details →
@@ -177,6 +177,8 @@ export default function WalkInPage() {
               <div>
                 <label className="block text-sm text-white/70 mb-2">How did you hear about us?</label>
                 <select
+                  title="How did you hear about us?"
+                  aria-label="How did you hear about us?"
                   value={heardAbout}
                   onChange={(e) => setHeardAbout(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
@@ -193,6 +195,8 @@ export default function WalkInPage() {
               <div>
                 <label className="block text-sm text-white/70 mb-2">Preferred stylist</label>
                 <select
+                  title="Preferred stylist"
+                  aria-label="Preferred stylist"
                   value={preferredStylistId}
                   onChange={(e) => setPreferredStylistId(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"

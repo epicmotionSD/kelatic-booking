@@ -1,0 +1,3 @@
+firstname,lastname,phone,email,days_inactive,segment
+TestUser,One,+13055551234,test1@kelatic.com,45,GRAVEYARD
+TestUser,Two,+13055551235,test2@kelatic.com,60,GRAVEYARD

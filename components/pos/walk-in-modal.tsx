@@ -165,7 +165,10 @@ export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
           <h2 className="text-xl font-bold text-gray-900">New Walk-in</h2>
           <button
+            type="button"
             onClick={onClose}
+            title="Close walk-in modal"
+            aria-label="Close walk-in modal"
             className="text-gray-400 hover:text-gray-600"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

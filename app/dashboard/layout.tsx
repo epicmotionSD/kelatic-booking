@@ -8,7 +8,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import {
   LayoutDashboard,
   MessageSquare,
@@ -21,6 +22,7 @@ import {
   TrendingUp,
   ChevronRight,
   Zap,
+  CreditCard,
 } from 'lucide-react'
 
 const navigation = [
@@ -29,6 +31,7 @@ const navigation = [
   { name: 'Hot Leads', href: '/dashboard/hot-leads', icon: Flame },
   { name: 'Analytics', href: '/dashboard/analytics', icon: TrendingUp },
   { name: 'Contacts', href: '/dashboard/contacts', icon: Users },
+  { name: 'Billing', href: '/dashboard/billing', icon: CreditCard },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ]
 
@@ -38,7 +41,14 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
+  const router = useRouter()
   const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  const handleLogout = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -124,7 +134,11 @@ export default function DashboardLayout({
               <p className="text-sm font-medium text-white truncate">KeLatic Hair</p>
               <p className="text-xs text-zinc-500 truncate">Pro Plan</p>
             </div>
-            <button className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition">
+            <button
+              onClick={handleLogout}
+              className="p-2 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-white transition"
+              title="Logout"
+            >
               <LogOut className="w-4 h-4" />
             </button>
           </div>

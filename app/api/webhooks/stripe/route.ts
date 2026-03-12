@@ -107,6 +107,141 @@ export async function POST(request: NextRequest) {
         break;
       }
 
+      // Subscription created
+      case 'customer.subscription.created': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const businessId = subscription.metadata.business_id;
+
+        if (businessId) {
+          await supabase
+            .from('businesses')
+            .update({
+              stripe_subscription_id: subscription.id,
+              plan_status: subscription.status,
+              subscription_current_period_start: new Date(
+                subscription.current_period_start * 1000
+              ).toISOString(),
+              subscription_current_period_end: new Date(
+                subscription.current_period_end * 1000
+              ).toISOString(),
+              trial_ends_at: subscription.trial_end
+                ? new Date(subscription.trial_end * 1000).toISOString()
+                : null,
+            })
+            .eq('id', businessId);
+
+          console.log(`Subscription created: ${subscription.id}`);
+        }
+        break;
+      }
+
+      // Subscription updated
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const businessId = subscription.metadata.business_id;
+
+        if (businessId) {
+          await supabase
+            .from('businesses')
+            .update({
+              plan_status: subscription.status,
+              subscription_current_period_start: new Date(
+                subscription.current_period_start * 1000
+              ).toISOString(),
+              subscription_current_period_end: new Date(
+                subscription.current_period_end * 1000
+              ).toISOString(),
+              subscription_cancel_at_period_end: subscription.cancel_at_period_end,
+              subscription_canceled_at: subscription.canceled_at
+                ? new Date(subscription.canceled_at * 1000).toISOString()
+                : null,
+            })
+            .eq('id', businessId);
+
+          console.log(`Subscription updated: ${subscription.id}`);
+        }
+        break;
+      }
+
+      // Subscription deleted
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const businessId = subscription.metadata.business_id;
+
+        if (businessId) {
+          await supabase
+            .from('businesses')
+            .update({
+              plan_status: 'canceled',
+              subscription_canceled_at: new Date().toISOString(),
+            })
+            .eq('id', businessId);
+
+          console.log(`Subscription canceled: ${subscription.id}`);
+        }
+        break;
+      }
+
+      // Trial will end soon (3 days before)
+      case 'customer.subscription.trial_will_end': {
+        const subscription = event.data.object as Stripe.Subscription;
+        const businessId = subscription.metadata.business_id;
+
+        if (businessId) {
+          // TODO: Send email notification about trial ending
+          console.log(`Trial ending soon for subscription: ${subscription.id}`);
+        }
+        break;
+      }
+
+      // Invoice paid successfully
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const businessId = invoice.subscription_details?.metadata?.business_id;
+
+        if (businessId) {
+          // Update subscription status to active if it was past_due
+          await supabase
+            .from('businesses')
+            .update({ plan_status: 'active' })
+            .eq('id', businessId)
+            .eq('plan_status', 'past_due');
+
+          console.log(`Invoice paid: ${invoice.id}`);
+        }
+        break;
+      }
+
+      // Invoice payment failed
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const businessId = invoice.subscription_details?.metadata?.business_id;
+
+        if (businessId) {
+          // Update subscription status to past_due
+          await supabase
+            .from('businesses')
+            .update({ plan_status: 'past_due' })
+            .eq('id', businessId);
+
+          // TODO: Send email notification about failed payment
+          console.log(`Invoice payment failed: ${invoice.id}`);
+        }
+        break;
+      }
+
+      // Checkout session completed (for one-time payments like Revenue Sprint)
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const businessId = session.metadata?.business_id;
+
+        if (businessId && session.metadata?.product_type === 'revenue_sprint') {
+          // TODO: Track Revenue Sprint purchase and trigger campaign setup
+          console.log(`Revenue Sprint purchased: ${session.id}`);
+        }
+        break;
+      }
+
       default:
         console.log(`Unhandled event type: ${event.type}`);
     }

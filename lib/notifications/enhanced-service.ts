@@ -1,9 +1,15 @@
 // Enhanced Notification Service with full system integration
 // Supports: Email, SMS, Push, In-App notifications with templates, queue, preferences
-import sgMail from '@sendgrid/mail';
 import webpush from 'web-push';
-import twilio from 'twilio';
 import { createClient } from '@/lib/supabase/client';
+import {
+  getEmailProviderName,
+  getSmsProviderName,
+  isEmailProviderConfigured,
+  isSmsProviderConfigured,
+  sendEmailMessage,
+  sendSmsMessage,
+} from '@/lib/notifications/providers';
 import type { 
   NotificationType, 
   NotificationChannel, 
@@ -17,15 +23,6 @@ import type {
   Profile,
   Appointment
 } from '@/types/database';
-
-// Initialize services
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
-
-const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
-  ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
-  : null;
 
 // Configure web push
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
@@ -177,8 +174,8 @@ export class NotificationService {
       }
 
       // Send email
-      if (!process.env.SENDGRID_API_KEY) {
-        console.log('[Email] SendGrid not configured, logging notification');
+      if (!isEmailProviderConfigured()) {
+        console.log(`[Email] ${getEmailProviderName()} not configured, logging notification`);
         await this.logNotification({
           user_id: userId,
           appointment_id: options.appointmentId,
@@ -186,25 +183,23 @@ export class NotificationService {
           channel: 'email',
           recipient_email: user.email,
           status: 'failed',
-          error_message: 'SendGrid not configured',
+          error_message: `${getEmailProviderName()} not configured`,
           template_id: templateId
         });
         return { success: false, error: 'Email service not configured' };
       }
 
-      const result = await sgMail.send({
+      const result = await sendEmailMessage({
         to: user.email,
-        from: {
-          email: process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com',
-          name: variables.business_name || 'KeLatic'
-        },
+        fromEmail: process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com',
+        fromName: variables.business_name || 'KeLatic',
         subject,
         html: content,
-        trackingSettings: {
-          clickTracking: { enable: true },
-          openTracking: { enable: true }
-        }
       });
+
+      if (!result.success) {
+        return { success: false, error: result.error || 'Email provider send failed' };
+      }
 
       // Log success
       await this.logNotification({
@@ -220,7 +215,7 @@ export class NotificationService {
 
       return {
         success: true,
-        messageId: result[0].headers['x-message-id'] as string
+        messageId: result.messageId
       };
 
     } catch (error) {
@@ -292,8 +287,8 @@ export class NotificationService {
       }
 
       // Send SMS
-      if (!twilioClient) {
-        console.log('[SMS] Twilio not configured, logging notification');
+      if (!isSmsProviderConfigured()) {
+        console.log(`[SMS] ${getSmsProviderName()} not configured, logging notification`);
         await this.logNotification({
           user_id: userId,
           appointment_id: options.appointmentId,
@@ -301,17 +296,21 @@ export class NotificationService {
           channel: 'sms',
           recipient_phone: user.phone,
           status: 'failed',
-          error_message: 'Twilio not configured',
+          error_message: `${getSmsProviderName()} not configured`,
           template_id: templateId
         });
         return { success: false, error: 'SMS service not configured' };
       }
 
-      const result = await twilioClient.messages.create({
+      const result = await sendSmsMessage({
         to: user.phone,
         from: process.env.TWILIO_PHONE_NUMBER,
         body: message
       });
+
+      if (!result.success) {
+        return { success: false, error: result.error || 'SMS provider send failed' };
+      }
 
       // Log success
       await this.logNotification({
@@ -327,7 +326,7 @@ export class NotificationService {
 
       return {
         success: true,
-        messageId: result.sid
+        messageId: result.messageId
       };
 
     } catch (error) {

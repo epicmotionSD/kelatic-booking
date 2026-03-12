@@ -8,6 +8,7 @@ import { Suspense } from "react";
 function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [resetSent, setResetSent] = useState(false);
@@ -158,19 +159,31 @@ function LoginForm() {
 
             <div>
               <label className="block mb-2 text-sm font-medium text-white/70">Password</label>
-              <input
-                type="password"
-                className={`w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none transition-all ${
-                  isPlatform
-                    ? 'focus:border-violet-400/50 focus:ring-1 focus:ring-violet-400/50'
-                    : 'focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50'
-                }`}
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                suppressHydrationWarning
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className={`w-full px-4 py-3 pr-20 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none transition-all ${
+                    isPlatform
+                      ? 'focus:border-violet-400/50 focus:ring-1 focus:ring-violet-400/50'
+                      : 'focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50'
+                  }`}
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  suppressHydrationWarning
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((current) => !current)}
+                  className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium transition-colors ${
+                    isPlatform ? 'text-violet-300/80 hover:text-violet-300' : 'text-amber-300/80 hover:text-amber-300'
+                  }`}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
+              </div>
             </div>
           </div>
 

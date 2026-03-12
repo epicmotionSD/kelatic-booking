@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { canCreateCampaign } from '@/lib/usage/enforcement'
 
 export async function GET(request: NextRequest) {
   try {
@@ -134,6 +135,99 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching campaigns:', error)
     return NextResponse.json(
       { error: 'Failed to fetch campaigns' },
+      { status: 500 }
+    )
+  }
+}
+
+// =============================================================================
+// CREATE CAMPAIGN
+// =============================================================================
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient()
+
+    // Get current user's business
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Get business ID
+    const { data: member } = await supabase
+      .from('business_members')
+      .select('business_id')
+      .eq('user_id', user.id)
+      .single()
+
+    if (!member?.business_id) {
+      return NextResponse.json({ error: 'No business found' }, { status: 404 })
+    }
+
+    const businessId = member.business_id
+
+    // CHECK USAGE LIMITS BEFORE CREATING
+    const usageCheck = await canCreateCampaign(businessId)
+
+    if (!usageCheck.allowed) {
+      return NextResponse.json(
+        {
+          error: usageCheck.reason,
+          current: usageCheck.current,
+          limit: usageCheck.limit,
+          upgradeRequired: true,
+        },
+        { status: 403 }
+      )
+    }
+
+    // Parse request body
+    const body = await request.json()
+    const {
+      name,
+      description,
+      segment,
+      script_variant,
+      script_template,
+      total_leads,
+      daily_send_limit,
+    } = body
+
+    // Validate required fields
+    if (!name || !segment || !script_template) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, segment, script_template' },
+        { status: 400 }
+      )
+    }
+
+    // Create campaign
+    const { data: campaign, error } = await supabase
+      .from('campaigns')
+      .insert([
+        {
+          business_id: businessId,
+          name,
+          description,
+          segment,
+          script_variant: script_variant || 'direct_inquiry',
+          script_template,
+          total_leads: total_leads || 0,
+          daily_send_limit: daily_send_limit || 100,
+          status: 'draft',
+          created_by: user.id,
+        },
+      ])
+      .select()
+      .single()
+
+    if (error) throw error
+
+    return NextResponse.json({ campaign }, { status: 201 })
+  } catch (error) {
+    console.error('Error creating campaign:', error)
+    return NextResponse.json(
+      { error: 'Failed to create campaign' },
       { status: 500 }
     )
   }

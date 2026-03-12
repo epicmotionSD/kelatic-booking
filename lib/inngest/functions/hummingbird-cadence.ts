@@ -8,15 +8,33 @@ import { inngest } from '../client'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/client'
 import { sendCampaignSMS } from '@/lib/twilio/campaign-sms'
-import * as sgMail from '@sendgrid/mail'
+import { sendEmailMessage } from '@/lib/notifications/providers'
 
-// Hummingbird cadence schedule (fallback)
+// Hummingbird cadence schedule (SMS version)
 const HUMMINGBIRD_CADENCE = [
   { day: 1, delayHours: 0, script: 'direct_inquiry', channel: 'sms' },
   { day: 2, delayHours: 24, script: 'voicemail', channel: 'voice' },
   { day: 4, delayHours: 72, script: 'file_closure', channel: 'sms' },
   { day: 7, delayHours: 144, script: 'breakup', channel: 'sms' },
 ] as const
+
+// Email-only cadence (Phase 1 MVP)
+const HUMMINGBIRD_CADENCE_EMAIL = [
+  { day: 1, delayHours: 0, script: 'direct_inquiry', channel: 'email' },
+  { day: 3, delayHours: 48, script: 'file_closure', channel: 'email' },
+  { day: 7, delayHours: 144, script: 'breakup', channel: 'email' },
+] as const
+
+/**
+ * Get default cadence based on feature flags
+ * Email-only by default, SMS if enabled for business
+ */
+function getDefaultCadence(smsEnabled: boolean = false) {
+  if (smsEnabled) {
+    return HUMMINGBIRD_CADENCE
+  }
+  return HUMMINGBIRD_CADENCE_EMAIL
+}
 
 // Script templates (Dean Jackson 9-word framework)
 // TCPA COMPLIANCE: All SMS messages MUST include opt-out language
@@ -84,14 +102,14 @@ type CadenceStepConfig = {
   scriptVariant: string
 }
 
-function buildCadenceConfig(campaign: { cadence_config?: unknown; script_variant?: string }) {
+function buildCadenceConfig(campaign: { cadence_config?: unknown; script_variant?: string; sms_enabled?: boolean }) {
   const raw = Array.isArray(campaign.cadence_config) ? campaign.cadence_config : []
 
   if (raw.length > 0) {
     return raw
       .map((step: any) => {
         const day = Number(step.day)
-        const channel = (step.channel || step.type || 'sms') as CadenceStepConfig['channel']
+        const channel = (step.channel || step.type || 'email') as CadenceStepConfig['channel']
         const template = step.template || SCRIPTS[step.script as keyof typeof SCRIPTS]
         const delayHours = Number(step.delayHours ?? (day > 0 ? (day - 1) * 24 : 0))
 
@@ -110,7 +128,11 @@ function buildCadenceConfig(campaign: { cadence_config?: unknown; script_variant
       .filter((step): step is CadenceStepConfig => Boolean(step))
   }
 
-  return HUMMINGBIRD_CADENCE.map((step) => ({
+  // Use email-only cadence by default (Phase 1 MVP)
+  const smsEnabled = campaign.sms_enabled || process.env.SMS_ENABLED === 'true'
+  const defaultCadence = getDefaultCadence(smsEnabled)
+
+  return defaultCadence.map((step) => ({
     day: step.day,
     delayHours: step.delayHours,
     channel: step.channel,
@@ -126,32 +148,18 @@ async function sendCampaignEmail(params: {
   html: string
   customArgs?: Record<string, string>
 }): Promise<{ status: string; messageId?: string; errorMessage?: string } > {
-  if (!process.env.SENDGRID_API_KEY) {
-    return { status: 'failed', errorMessage: 'SendGrid API key not configured' }
-  }
+  const result = await sendEmailMessage({
+    to: params.to,
+    fromEmail: params.from,
+    subject: params.subject,
+    html: params.html,
+    customArgs: params.customArgs,
+  })
 
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-
-  try {
-    const [response] = await sgMail.send({
-      to: params.to,
-      from: params.from,
-      subject: params.subject,
-      html: params.html,
-      customArgs: params.customArgs,
-      trackingSettings: {
-        clickTracking: { enable: true },
-        openTracking: { enable: true },
-      },
-    })
-
-    return {
-      status: response?.statusCode === 202 ? 'sent' : 'failed',
-      messageId: response?.headers?.['x-message-id'] || response?.headers?.['X-Message-Id'],
-    }
-  } catch (error) {
-    const err = error as { message?: string }
-    return { status: 'failed', errorMessage: err.message || 'SendGrid error' }
+  return {
+    status: result.success ? 'sent' : 'failed',
+    messageId: result.messageId,
+    errorMessage: result.error,
   }
 }
 

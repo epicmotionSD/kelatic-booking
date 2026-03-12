@@ -7,7 +7,7 @@ A multi-tenant, AI-powered booking platform for salons, barbershops, spas, and b
 
 ## Platform Architecture
 
-```
+```text
 x3o.ai (Root)
 ├── Landing page, signup, onboarding
 ├── Platform admin & billing
@@ -31,18 +31,21 @@ x3o.ai (Root)
 ## Multi-Tenant Features
 
 ### Database Schema
+
 - `businesses` - Core tenant table with branding, settings, Stripe Connect
 - `business_settings` - Extended configuration (hours, policies, AI settings)
 - `business_members` - Team association (owner, admin, stylist roles)
 - `business_id` - Foreign key on all tenant-scoped tables
 
 ### Tenant Isolation
+
 - **Subdomain Routing**: Middleware extracts tenant from `*.x3o.ai`
 - **Row-Level Security**: All queries filtered by `business_id`
 - **Dynamic Theming**: CSS variables injected from business branding
 - **Scoped AI**: Trinity AI uses tenant's brand context
 
 ### White-Label Capabilities
+
 - Custom colors, logo, favicon per tenant
 - Custom domains (enterprise tier)
 - Branded email templates
@@ -51,6 +54,7 @@ x3o.ai (Root)
 ## Features
 
 ### Platform (x3o.ai)
+
 - [x] Landing page with pricing tiers
 - [x] Business onboarding wizard (4 steps)
 - [x] Tenant provisioning (auto-creates subdomain)
@@ -59,6 +63,7 @@ x3o.ai (Root)
 - [ ] Subscription billing (Stripe)
 
 ### Per-Tenant Features
+
 - [x] Public booking portal (5-step wizard)
 - [x] Service & stylist management
 - [x] Appointment management (list/calendar)
@@ -74,7 +79,7 @@ x3o.ai (Root)
 
 ## Project Structure
 
-```
+```text
 kelatic-booking/
 ├── app/
 │   ├── (platform)/                    # x3o.ai root domain
@@ -124,6 +129,7 @@ kelatic-booking/
 ## Getting Started
 
 ### Prerequisites
+
 - Node.js 18+
 - Supabase account
 - Stripe account (with Connect enabled)
@@ -175,12 +181,14 @@ npm run dev
 ### Local Subdomain Testing
 
 Add to your hosts file (`C:\Windows\System32\drivers\etc\hosts`):
-```
+
+```text
 127.0.0.1 kelatic.localhost
 127.0.0.1 test.localhost
 ```
 
 Visit:
+
 - `http://localhost:3000` - Platform landing
 - `http://kelatic.localhost:3000` - Kelatic tenant
 
@@ -201,7 +209,8 @@ Visit:
    - Add `*.x3o.ai` as wildcard subdomain
 
 4. **DNS Configuration**
-   ```
+
+   ```text
    A     @        76.76.21.21
    CNAME *        cname.vercel-dns.com
    CNAME www      cname.vercel-dns.com
@@ -214,7 +223,7 @@ Visit:
 ## Pricing Tiers
 
 | Tier | Price | Features |
-|------|-------|----------|
+| ---- | ----- | -------- |
 | **Starter** | $49/mo | 1 location, unlimited bookings, 50 AI generations |
 | **Professional** | $149/mo | 5 locations, POS terminal, custom domain, unlimited AI |
 | **Agency** | $497/mo | Unlimited locations, white-label, API access, resell |
@@ -224,7 +233,7 @@ Visit:
 Four AI agents power the platform:
 
 | Agent | Role | Responsibility |
-|-------|------|----------------|
+| ----- | ---- | -------------- |
 | **Atlas** | CEO | Strategic planning, task delegation, decision approval |
 | **Nova** | CTO | Platform management, template deployment, tech ops |
 | **Pulse** | CMO | Growth marketing, campaign optimization, lead gen |
@@ -251,6 +260,7 @@ Multi-tenant AI content with business context:
 - **Promo Graphics** - Marketing copy
 
 Each generation uses tenant's:
+
 - Business name, tagline, brand voice
 - Primary/secondary colors
 - AI context and custom hashtags
@@ -266,12 +276,22 @@ npx supabase db push
 # Copy contents of supabase/migrations/010_multi_tenant_full.sql
 ```
 
+Note: The following files are intentionally disabled to avoid duplicate migration version conflicts in Supabase CLI:
+
+- `supabase/migrations/010_multi_tenant_full.sql.disabled`
+- `supabase/migrations/011_notification_system.sql.disabled`
+- `supabase/migrations/012_functional_agents.sql.disabled`
+
+Use the active migration files with matching versions (e.g., `010_multi_tenant.sql`, `011_board_of_directors.sql`, `012_business_settings.sql`) for future schema history alignment.
+
 ## API Endpoints
 
 ### Platform
+
 - `POST /api/onboarding` - Create new tenant
 
 ### Per-Tenant (with business_id)
+
 - `GET/POST /api/bookings` - Manage appointments
 - `POST /api/trinity/generate` - AI content generation
 - `GET /api/availability` - Check stylist slots
@@ -293,4 +313,4 @@ Proprietary - All rights reserved.
 
 **Kelatic Hair Lounge** is the anchor tenant and proof-of-concept for the x3o.ai platform.
 
-For support: support@x3o.ai
+For support: [support@x3o.ai](mailto:support@x3o.ai)

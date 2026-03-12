@@ -32,8 +32,6 @@ export function PublicAuthLinks({ className = '' }: { className?: string }) {
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className="inline-flex items-center gap-2 text-sm font-medium text-white/80 hover:text-amber-400 transition-colors"
-        aria-expanded={open}
-        aria-haspopup="menu"
       >
         <LogIn className="w-4 h-4" />
         Login
@@ -42,14 +40,12 @@ export function PublicAuthLinks({ className = '' }: { className?: string }) {
       {open && (
         <div
           className="absolute right-0 mt-3 w-48 rounded-xl border border-white/10 bg-zinc-950/95 backdrop-blur shadow-xl overflow-hidden z-50"
-          role="menu"
         >
           {LINKS.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
-              role="menuitem"
             >
               {link.label}
             </Link>
