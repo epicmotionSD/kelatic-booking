@@ -70,9 +70,12 @@ export async function provisionPhoneNumber(
   // Create client for the subaccount
   const client = twilio(masterSid!, masterToken!, { accountSid: subaccountSid })
 
+  const parsedAreaCode = areaCode ? Number.parseInt(areaCode, 10) : undefined
+  const areaCodeOption = Number.isNaN(parsedAreaCode) ? undefined : parsedAreaCode
+
   // Search for available numbers
   const numbers = await client.availablePhoneNumbers('US').local.list({
-    areaCode: areaCode || undefined,
+    areaCode: areaCodeOption,
     smsEnabled: true,
     voiceEnabled: true,
     limit: 1,

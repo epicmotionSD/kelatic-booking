@@ -52,24 +52,38 @@ export async function GET(request: NextRequest) {
       ? new Date(new Date(business.subscription_current_period_end).getTime() - 30 * 24 * 60 * 60 * 1000)
       : new Date(new Date().getFullYear(), new Date().getMonth(), 1);
 
-    const { data: campaigns, error: campaignsError } = await supabase
+    const { count: campaignsCount, error: campaignsError } = await supabase
       .from('campaigns')
       .select('id', { count: 'exact', head: true })
       .eq('business_id', member.business_id)
       .gte('created_at', periodStart.toISOString());
 
-    const campaignsCount = campaigns || 0;
+    if (campaignsError) {
+      return NextResponse.json(
+        { error: 'Failed to get campaign usage' },
+        { status: 500 }
+      );
+    }
+
+    const campaignUsage = campaignsCount ?? 0;
 
     // Get contacts/clients count
-    const { data: clients, error: clientsError } = await supabase
+    const { count: clientsCount, error: clientsError } = await supabase
       .from('clients')
       .select('id', { count: 'exact', head: true })
       .eq('business_id', member.business_id);
 
-    const clientsCount = clients || 0;
+    if (clientsError) {
+      return NextResponse.json(
+        { error: 'Failed to get client usage' },
+        { status: 500 }
+      );
+    }
+
+    const clientUsage = clientsCount ?? 0;
 
     // Get SMS messages count this month
-    const { data: messages, error: messagesError } = await supabase
+    const { count: messagesCount, error: messagesError } = await supabase
       .from('campaign_messages')
       .select('id', { count: 'exact', head: true })
       .eq('business_id', member.business_id)
@@ -77,26 +91,33 @@ export async function GET(request: NextRequest) {
       .eq('channel', 'sms')
       .gte('created_at', periodStart.toISOString());
 
-    const smsCount = messages || 0;
+    if (messagesError) {
+      return NextResponse.json(
+        { error: 'Failed to get SMS usage' },
+        { status: 500 }
+      );
+    }
+
+    const smsUsage = messagesCount ?? 0;
 
     return NextResponse.json({
       campaigns: {
-        used: campaignsCount,
+        used: campaignUsage,
         limit: limits.campaigns_per_month,
         percentage: limits.campaigns_per_month > 0
-          ? Math.round((campaignsCount / limits.campaigns_per_month) * 100)
+          ? Math.round((campaignUsage / limits.campaigns_per_month) * 100)
           : 0,
       },
       contacts: {
-        used: clientsCount,
+        used: clientUsage,
         limit: limits.team_members * 500, // Approximate contacts limit based on plan
-        percentage: Math.min(100, Math.round((clientsCount / (limits.team_members * 500)) * 100)),
+        percentage: Math.min(100, Math.round((clientUsage / (limits.team_members * 500)) * 100)),
       },
       sms: {
-        used: smsCount,
+        used: smsUsage,
         limit: limits.sms_messages_per_month,
         percentage: limits.sms_messages_per_month > 0
-          ? Math.round((smsCount / limits.sms_messages_per_month) * 100)
+          ? Math.round((smsUsage / limits.sms_messages_per_month) * 100)
           : 0,
       },
       period_end: business.subscription_current_period_end,

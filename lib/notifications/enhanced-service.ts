@@ -302,9 +302,14 @@ export class NotificationService {
         return { success: false, error: 'SMS service not configured' };
       }
 
+      const smsFromNumber = process.env.TWILIO_PHONE_NUMBER;
+      if (!smsFromNumber) {
+        return { success: false, error: 'Twilio sender number is not configured' };
+      }
+
       const result = await sendSmsMessage({
         to: user.phone,
-        from: process.env.TWILIO_PHONE_NUMBER,
+        from: smsFromNumber,
         body: message
       });
 

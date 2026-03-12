@@ -268,13 +268,14 @@ export async function cancelSubscription(
     throw new Error('No active subscription found');
   }
 
-  const subscription = await stripe.subscriptions.update(
-    business.stripe_subscription_id,
-    {
-      cancel_at_period_end: !cancelImmediately,
-      ...(cancelImmediately && { cancel_at: 'now' }),
-    }
-  );
+  const subscription = cancelImmediately
+    ? await stripe.subscriptions.cancel(business.stripe_subscription_id)
+    : await stripe.subscriptions.update(
+        business.stripe_subscription_id,
+        {
+          cancel_at_period_end: true,
+        }
+      );
 
   // Update database
   await supabase

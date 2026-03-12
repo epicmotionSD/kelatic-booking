@@ -256,6 +256,8 @@ export default function BillingPage() {
 
   const currentPlan = subscription?.plan ? PLANS[subscription.plan as keyof typeof PLANS] : PLANS.free;
   const statusBadge = subscription?.plan_status ? STATUS_BADGES[subscription.plan_status as keyof typeof STATUS_BADGES] : STATUS_BADGES.canceled;
+  const CurrentPlanIcon = currentPlan.icon;
+  const StatusIcon = statusBadge.icon;
 
   if (loading) {
     return (
@@ -299,7 +301,7 @@ export default function BillingPage() {
         <div className="bg-[#0a0a0a] border border-white/10 rounded-lg p-6">
           <div className="flex items-start justify-between mb-6">
             <div className="flex items-center space-x-3">
-              {React.createElement(currentPlan.icon, { className: 'w-8 h-8 text-amber-500' })}
+              <CurrentPlanIcon className="w-8 h-8 text-amber-500" />
               <div>
                 <h2 className="text-xl font-bold text-white">{currentPlan.name}</h2>
                 <p className="text-white/60 text-sm">Your current plan</p>
@@ -308,7 +310,7 @@ export default function BillingPage() {
             <div className="flex items-center space-x-2">
               {statusBadge && (
                 <span className={`px-3 py-1 rounded-full text-xs font-medium border flex items-center space-x-1.5 ${statusBadge.className}`}>
-                  {React.createElement(statusBadge.icon, { className: 'w-3.5 h-3.5' })}
+                  <StatusIcon className="w-3.5 h-3.5" />
                   <span>{statusBadge.label}</span>
                 </span>
               )}
