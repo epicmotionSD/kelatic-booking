@@ -125,41 +125,36 @@ export async function POST(request: NextRequest) {
 
     // Check if email already exists in this business (only if email provided)
     if (email) {
-      const { data: existing } = await supabase
+      const { data: existingProfile } = await supabase
         .from('profiles')
         .select('id')
         .eq('email', email)
         .eq('business_id', business.id)
-        .single();
+        .maybeSingle();
 
-      if (existing) {
+      const { data: existingClient } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('email', email)
+        .eq('business_id', business.id)
+        .maybeSingle();
+
+      if (existingProfile || existingClient) {
         return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
       }
     }
 
     const { data: client, error } = await supabase
-      .from('profiles')
+      .from('clients')
       .insert({
+        business_id: business.id,
         first_name: body.first_name,
         last_name: body.last_name,
         email: email,
         phone: body.phone || null,
-        role: 'client',
-        business_id: business.id,
-        hair_type: body.hair_type || null,
-        texture: body.texture || null,
-        scalp_sensitivity: body.scalp_sensitivity || null,
-        allergies: body.allergies || null,
-        preferred_products: body.preferred_products || null,
+        source: 'manual',
         notes: body.notes || null,
-        // New fields
         birthday: body.birthday || null,
-        zip_code: body.zip_code || null,
-        preferred_contact: body.preferred_contact || 'both',
-        sms_opt_in: body.sms_opt_in ?? true,
-        marketing_opt_in: body.marketing_opt_in ?? false,
-        referral_source: body.referral_source || null,
-        preferred_times: body.preferred_times || null,
       })
       .select()
       .single();
