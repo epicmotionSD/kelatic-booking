@@ -88,6 +88,13 @@ function formatDuration(minutes: number): string {
   return `${hours} hour${hours > 1 ? 's' : ''} ${mins} minutes`;
 }
 
+function getInternalCcRecipients(ctx: BusinessContext): string[] {
+  if (ctx.business.slug === 'kelatic') {
+    return ['info@kelatic.com'];
+  }
+  return [];
+}
+
 // ============================================
 // EMAIL TEMPLATES
 // ============================================
@@ -495,6 +502,7 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx
   try {
     const result = await sendEmailMessage({
       to: appointment.client_email,
+      cc: getInternalCcRecipients(ctx),
       fromEmail,
       fromName: business.name,
       subject: `✨ Appointment Confirmed - ${formatDate(appointment.appointment_date)}`,

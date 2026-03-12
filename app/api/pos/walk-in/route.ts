@@ -9,6 +9,7 @@ export async function POST(request: NextRequest) {
       walk_in_name,
       walk_in_phone,
       walk_in_email,
+      notes,
       service_id,
       stylist_id,
       start_time,
@@ -69,6 +70,7 @@ export async function POST(request: NextRequest) {
       walk_in_name: walk_in_name || 'Walk-in',
       walk_in_phone: walk_in_phone || null,
       walk_in_email: walk_in_email || null,
+      client_notes: notes || null,
       status: 'in_progress', // Walk-ins start immediately
     };
 

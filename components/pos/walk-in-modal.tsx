@@ -40,6 +40,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
   const [walkInName, setWalkInName] = useState('');
   const [walkInPhone, setWalkInPhone] = useState('');
   const [walkInEmail, setWalkInEmail] = useState('');
+  const [walkInNote, setWalkInNote] = useState('');
   const [selectedService, setSelectedService] = useState<string>('');
   const [selectedStylist, setSelectedStylist] = useState<string>('');
   const [serviceSearch, setServiceSearch] = useState('');
@@ -51,6 +52,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
       setWalkInName(prefill?.name || '');
       setWalkInPhone(prefill?.phone || '');
       setWalkInEmail(prefill?.email || '');
+      setWalkInNote('');
       setSelectedService('');
       setSelectedStylist('');
       setServiceSearch('');
@@ -152,6 +154,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
           walk_in_name: walkInName.trim(),
           walk_in_phone: walkInPhone.trim(),
           walk_in_email: walkInEmail.trim() || null,
+          notes: walkInNote.trim() || null,
           service_id: selectedService,
           stylist_id: selectedStylist,
           start_time: now.toISOString(),
@@ -252,6 +255,19 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                   value={walkInEmail}
                   onChange={(e) => setWalkInEmail(e.target.value)}
                   placeholder="customer@email.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Note <span className="text-gray-400">(optional)</span>
+                </label>
+                <textarea
+                  value={walkInNote}
+                  onChange={(e) => setWalkInNote(e.target.value)}
+                  placeholder="Client note for checkout/stylist"
+                  rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>

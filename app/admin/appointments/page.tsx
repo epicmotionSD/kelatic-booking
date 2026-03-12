@@ -57,6 +57,7 @@ export default function AppointmentsPage() {
     date: 'all',
     status: 'all',
     stylist: 'all',
+    timeScope: 'upcoming',
   });
   const [stylists, setStylists] = useState<{ id: string; name: string }[]>([]);
   const [timezone, setTimezone] = useState('America/Chicago');
@@ -74,6 +75,7 @@ export default function AppointmentsPage() {
         ...(filters.date !== 'all' && { date: filters.date }),
         ...(filters.status !== 'all' && { status: filters.status }),
         ...(filters.stylist !== 'all' && { stylist_id: filters.stylist }),
+        time_scope: filters.timeScope,
         include_walkins: 'true',
       });
       const res = await fetch(`/api/admin/appointments?${params}`);
@@ -194,6 +196,23 @@ export default function AppointmentsPage() {
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
               <option value="no_show">No Show</option>
+            </select>
+          </div>
+
+          {/* Upcoming / Past */}
+          <div>
+            <label className="block text-sm font-medium text-white/70 mb-1">
+              Time
+            </label>
+            <select
+              value={filters.timeScope}
+              onChange={(e) =>
+                setFilters({ ...filters, timeScope: e.target.value })
+              }
+              className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+            >
+              <option value="upcoming">Upcoming</option>
+              <option value="past">Past</option>
             </select>
           </div>
 

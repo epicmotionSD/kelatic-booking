@@ -47,6 +47,7 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const stylistId = searchParams.get('stylist_id');
     const includeWalkIns = searchParams.get('include_walkins');
+    const timeScope = searchParams.get('time_scope') || 'upcoming';
 
     let query = supabase
       .from('appointments')
@@ -87,8 +88,11 @@ export async function GET(request: NextRequest) {
         .gte('start_time', startOfDay.toISOString())
         .lte('start_time', endOfDay.toISOString());
     } else {
-      // When showing all, only show upcoming appointments (from now onwards)
-      query = query.gte('start_time', new Date().toISOString());
+      if (timeScope === 'past') {
+        query = query.lte('start_time', new Date().toISOString());
+      } else {
+        query = query.gte('start_time', new Date().toISOString());
+      }
     }
 
     // Filter by status

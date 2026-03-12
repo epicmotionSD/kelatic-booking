@@ -23,6 +23,7 @@ const HAIR_TYPES = [
 const TEXTURES = ['Fine', 'Medium', 'Coarse', 'Mixed'];
 
 const COMMON_ALLERGIES = [
+  'Aloe',
   'Latex',
   'Ammonia',
   'PPD (Hair Dye)',

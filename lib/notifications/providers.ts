@@ -6,6 +6,7 @@ export type SmsProviderName = 'twilio' | 'telnyx' | 'vonage'
 
 export interface EmailSendParams {
   to: string
+  cc?: string[]
   fromEmail: string
   fromName?: string
   subject: string
@@ -118,10 +119,16 @@ export async function sendEmailMessage(params: EmailSendParams): Promise<Provide
             subject: params.subject,
             from_email: params.fromEmail,
             from_name: params.fromName,
-            to: [{
-              email: params.to,
-              type: 'to',
-            }],
+            to: [
+              {
+                email: params.to,
+                type: 'to',
+              },
+              ...(params.cc || []).map((email) => ({
+                email,
+                type: 'cc' as const,
+              })),
+            ],
             track_opens: params.tracking !== false,
             track_clicks: params.tracking !== false,
             metadata: params.customArgs,
@@ -174,6 +181,7 @@ export async function sendEmailMessage(params: EmailSendParams): Promise<Provide
   try {
     const [response] = await sgMail.send({
       to: params.to,
+      cc: params.cc,
       from: {
         email: params.fromEmail,
         name: params.fromName,

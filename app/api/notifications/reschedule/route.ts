@@ -15,6 +15,7 @@ const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_T
 
 const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'bookings@kelatic.com';
 const FROM_PHONE = process.env.TWILIO_PHONE_NUMBER || '';
+const CC_EMAIL = 'info@kelatic.com';
 const SALON_NAME = 'KeLatic Hair Lounge';
 const SALON_PHONE = '(713) 555-1234';
 const SALON_ADDRESS = '123 Main Street, Houston, TX 77001';
@@ -239,6 +240,7 @@ export async function POST(request: NextRequest) {
       try {
         await sgMail.send({
           to: client.email,
+          cc: CC_EMAIL,
           from: {
             email: FROM_EMAIL,
             name: SALON_NAME,

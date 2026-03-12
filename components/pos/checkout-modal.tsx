@@ -286,7 +286,7 @@ export function CheckoutModal({
                         setCustomTip(e.target.value);
                         setTipPercent(null);
                       }}
-                      className="w-full py-3 pl-7 pr-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      className="w-full py-3 pl-7 pr-3 border border-gray-300 rounded-lg bg-white text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     />
                   </div>
                 </div>
