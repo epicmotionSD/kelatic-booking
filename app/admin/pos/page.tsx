@@ -25,6 +25,7 @@ export default function POSPage() {
     status: string;
     created_at: string;
   }>>([]);
+  const [convertingRequestId, setConvertingRequestId] = useState<string | null>(null);
   const [walkInLoading, setWalkInLoading] = useState(true);
 
   useEffect(() => {
@@ -71,6 +72,24 @@ export default function POSPage() {
 
   async function handleWalkInComplete(appointmentId: string) {
     setIsWalkInOpen(false);
+
+    if (convertingRequestId) {
+      try {
+        await fetch('/api/pos/walk-in-requests', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: convertingRequestId,
+            status: 'converted',
+          }),
+        });
+      } catch (error) {
+        console.error('Failed to mark walk-in as converted:', error);
+      } finally {
+        setConvertingRequestId(null);
+      }
+    }
+
     // Fetch the newly created appointment and open checkout
     try {
       const res = await fetch(`/api/admin/appointments/${appointmentId}`);
@@ -84,6 +103,13 @@ export default function POSPage() {
     }
     fetchTodaysAppointments();
     fetchWalkInRequests();
+  }
+
+  function handleConvertWalkInRequest(requestId: string) {
+    setConvertingRequestId(requestId);
+    setSelectedAppointment(null);
+    setIsCheckoutOpen(false);
+    setIsWalkInOpen(true);
   }
 
   const filteredAppointments = appointments.filter((apt) => {
@@ -171,6 +197,15 @@ export default function POSPage() {
                       minute: '2-digit',
                     })}
                   </div>
+                  {req.status !== 'converted' && (
+                    <button
+                      type="button"
+                      onClick={() => handleConvertWalkInRequest(req.id)}
+                      className="px-3 py-2 rounded-lg text-sm font-medium bg-amber-400 text-black hover:bg-amber-300"
+                    >
+                      Start Checkout
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -297,7 +332,10 @@ export default function POSPage() {
         {/* Walk-in Button */}
         <div className="fixed bottom-6 right-6">
           <button
-            onClick={() => setIsWalkInOpen(true)}
+            onClick={() => {
+              setConvertingRequestId(null);
+              setIsWalkInOpen(true);
+            }}
             className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-semibold shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all flex items-center gap-2"
           >
             <UserPlus className="w-5 h-5" />
@@ -311,6 +349,10 @@ export default function POSPage() {
         isOpen={isWalkInOpen}
         onClose={() => setIsWalkInOpen(false)}
         onComplete={handleWalkInComplete}
+        prefill={convertingRequestId ? {
+          name: walkInRequests.find((request) => request.id === convertingRequestId)?.name,
+          phone: walkInRequests.find((request) => request.id === convertingRequestId)?.phone,
+        } : null}
       />
 
       {/* Checkout Modal */}

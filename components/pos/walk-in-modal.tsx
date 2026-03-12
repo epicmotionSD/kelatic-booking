@@ -21,9 +21,13 @@ interface WalkInModalProps {
   isOpen: boolean;
   onClose: () => void;
   onComplete: (appointmentId: string) => void;
+  prefill?: {
+    name?: string;
+    phone?: string;
+  } | null;
 }
 
-export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
+export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModalProps) {
   const [services, setServices] = useState<Service[]>([]);
   const [stylists, setStylists] = useState<Stylist[]>([]);
   const [allStylists, setAllStylists] = useState<Stylist[]>([]);
@@ -40,14 +44,14 @@ export function WalkInModal({ isOpen, onClose, onComplete }: WalkInModalProps) {
   useEffect(() => {
     if (isOpen) {
       fetchData();
-      // Reset form
-      setWalkInName('');
-      setWalkInPhone('');
+      // Reset or prefill form
+      setWalkInName(prefill?.name || '');
+      setWalkInPhone(prefill?.phone || '');
       setSelectedService('');
       setSelectedStylist('');
       setError(null);
     }
-  }, [isOpen]);
+  }, [isOpen, prefill]);
 
   // When service changes, fetch stylists who can perform that service
   useEffect(() => {

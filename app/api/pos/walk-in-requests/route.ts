@@ -62,3 +62,67 @@ export async function GET() {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function PATCH(request: Request) {
+  try {
+    const { id, status } = await request.json();
+
+    if (!id || !status) {
+      return NextResponse.json({ error: 'id and status are required' }, { status: 400 });
+    }
+
+    const supabase = await createClient();
+    const { data: authData } = await supabase.auth.getUser();
+    const user = authData?.user;
+
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    let businessId: string | null = null;
+
+    try {
+      const business = await requireBusiness();
+      businessId = business.id;
+    } catch (error) {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('business_id')
+        .eq('id', user.id)
+        .single();
+
+      businessId = profile?.business_id || null;
+
+      if (!businessId) {
+        const { data: member } = await supabase
+          .from('business_members')
+          .select('business_id')
+          .eq('user_id', user.id)
+          .single();
+
+        businessId = member?.business_id || null;
+      }
+
+      if (!businessId) {
+        return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+      }
+    }
+
+    const admin = createAdminClient();
+    const { error } = await admin
+      .from('walk_in_requests')
+      .update({ status })
+      .eq('id', id)
+      .eq('business_id', businessId);
+
+    if (error) {
+      console.error('Walk-in request update error:', error);
+      return NextResponse.json({ error: 'Failed to update walk-in request' }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Walk-in request PATCH API error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
