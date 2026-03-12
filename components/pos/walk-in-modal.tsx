@@ -224,7 +224,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                     value={walkInName}
                     onChange={(e) => setWalkInName(e.target.value)}
                     placeholder="Customer full name"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     required
                   />
                 </div>
@@ -237,7 +237,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                     value={walkInPhone}
                     onChange={(e) => setWalkInPhone(e.target.value)}
                     placeholder="(555) 555-5555"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                     required
                   />
                 </div>
@@ -252,7 +252,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                   value={walkInEmail}
                   onChange={(e) => setWalkInEmail(e.target.value)}
                   placeholder="customer@email.com"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
 
@@ -266,7 +266,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                   value={serviceSearch}
                   onChange={(e) => setServiceSearch(e.target.value)}
                   placeholder="Search services..."
-                  className="w-full mb-3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  className="w-full mb-3 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
                 {services.length === 0 ? (
                   <p className="text-sm text-amber-600 italic py-4 text-center bg-amber-50 rounded-lg">
