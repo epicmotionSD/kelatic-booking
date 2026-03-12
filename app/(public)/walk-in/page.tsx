@@ -24,6 +24,7 @@ export default function WalkInPage() {
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [heardAbout, setHeardAbout] = useState('');
   const [preferredStylistId, setPreferredStylistId] = useState('');
 
@@ -63,6 +64,7 @@ export default function WalkInPage() {
         body: JSON.stringify({
           name: name.trim(),
           phone: phone.trim(),
+          email: email.trim() || null,
           heard_about: heardAbout || null,
           preferred_stylist_id: preferredStylistId || null,
           preferred_stylist_name: preferredStylist
@@ -79,6 +81,7 @@ export default function WalkInPage() {
       setSuccess(true);
       setName('');
       setPhone('');
+      setEmail('');
       setHeardAbout('');
       setPreferredStylistId('');
     } catch (err) {
@@ -170,6 +173,17 @@ export default function WalkInPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="(555) 555-5555"
+                  className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm text-white/70 mb-2">Email</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
                   className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
                 />
               </div>

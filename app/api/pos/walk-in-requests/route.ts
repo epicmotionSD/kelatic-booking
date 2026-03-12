@@ -46,7 +46,7 @@ export async function GET() {
     const admin = createAdminClient();
     const { data, error } = await admin
       .from('walk_in_requests')
-      .select('id, name, phone, heard_about, preferred_stylist_name, status, created_at')
+      .select('id, name, phone, email, heard_about, preferred_stylist_name, status, created_at')
       .eq('business_id', businessId)
       .order('created_at', { ascending: false })
       .limit(20);

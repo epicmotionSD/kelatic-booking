@@ -20,6 +20,7 @@ export default function POSPage() {
     id: string;
     name: string;
     phone: string;
+    email: string | null;
     heard_about: string | null;
     preferred_stylist_name: string | null;
     status: string;
@@ -352,6 +353,7 @@ export default function POSPage() {
         prefill={convertingRequestId ? {
           name: walkInRequests.find((request) => request.id === convertingRequestId)?.name,
           phone: walkInRequests.find((request) => request.id === convertingRequestId)?.phone,
+          email: walkInRequests.find((request) => request.id === convertingRequestId)?.email || undefined,
         } : null}
       />
 

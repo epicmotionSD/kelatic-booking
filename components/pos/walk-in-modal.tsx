@@ -24,6 +24,7 @@ interface WalkInModalProps {
   prefill?: {
     name?: string;
     phone?: string;
+    email?: string;
   } | null;
 }
 
@@ -38,8 +39,10 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
   // Form state
   const [walkInName, setWalkInName] = useState('');
   const [walkInPhone, setWalkInPhone] = useState('');
+  const [walkInEmail, setWalkInEmail] = useState('');
   const [selectedService, setSelectedService] = useState<string>('');
   const [selectedStylist, setSelectedStylist] = useState<string>('');
+  const [serviceSearch, setServiceSearch] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -47,8 +50,10 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
       // Reset or prefill form
       setWalkInName(prefill?.name || '');
       setWalkInPhone(prefill?.phone || '');
+      setWalkInEmail(prefill?.email || '');
       setSelectedService('');
       setSelectedStylist('');
+      setServiceSearch('');
       setError(null);
     }
   }, [isOpen, prefill]);
@@ -112,6 +117,16 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
     e.preventDefault();
     setError(null);
 
+    if (!walkInName.trim()) {
+      setError('Please enter customer name');
+      return;
+    }
+
+    if (!walkInPhone.trim()) {
+      setError('Please enter customer phone number');
+      return;
+    }
+
     if (!selectedService) {
       setError('Please select a service');
       return;
@@ -134,8 +149,9 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          walk_in_name: walkInName || 'Walk-in',
-          walk_in_phone: walkInPhone || null,
+          walk_in_name: walkInName.trim(),
+          walk_in_phone: walkInPhone.trim(),
+          walk_in_email: walkInEmail.trim() || null,
           service_id: selectedService,
           stylist_id: selectedStylist,
           start_time: now.toISOString(),
@@ -159,6 +175,14 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
   }
 
   const selectedServiceData = services.find(s => s.id === selectedService);
+  const filteredServices = services.filter((service) => {
+    if (!serviceSearch.trim()) return true;
+    const query = serviceSearch.toLowerCase();
+    return (
+      service.name.toLowerCase().includes(query) ||
+      service.category.toLowerCase().includes(query)
+    );
+  });
 
   if (!isOpen) return null;
 
@@ -193,19 +217,20 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Name <span className="text-gray-400">(optional)</span>
+                    Name *
                   </label>
                   <input
                     type="text"
                     value={walkInName}
                     onChange={(e) => setWalkInName(e.target.value)}
-                    placeholder="Walk-in"
+                    placeholder="Customer full name"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Phone <span className="text-gray-400">(optional)</span>
+                    Phone *
                   </label>
                   <input
                     type="tel"
@@ -213,8 +238,22 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                     onChange={(e) => setWalkInPhone(e.target.value)}
                     placeholder="(555) 555-5555"
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    required
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email <span className="text-gray-400">(marketing follow-up)</span>
+                </label>
+                <input
+                  type="email"
+                  value={walkInEmail}
+                  onChange={(e) => setWalkInEmail(e.target.value)}
+                  placeholder="customer@email.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
               </div>
 
               {/* Service Selection */}
@@ -222,13 +261,24 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Service *
                 </label>
+                <input
+                  type="text"
+                  value={serviceSearch}
+                  onChange={(e) => setServiceSearch(e.target.value)}
+                  placeholder="Search services..."
+                  className="w-full mb-3 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                />
                 {services.length === 0 ? (
                   <p className="text-sm text-amber-600 italic py-4 text-center bg-amber-50 rounded-lg">
                     No services available. Please add services in Settings.
                   </p>
+                ) : filteredServices.length === 0 ? (
+                  <p className="text-sm text-gray-500 italic py-4 text-center bg-gray-50 rounded-lg">
+                    No services match your search.
+                  </p>
                 ) : (
                 <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
-                  {services.map((service) => (
+                  {filteredServices.map((service) => (
                     <button
                       key={service.id}
                       type="button"

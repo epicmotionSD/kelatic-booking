@@ -5,7 +5,7 @@ import { requireBusiness } from '@/lib/tenant/server';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, phone, heard_about, preferred_stylist_id, preferred_stylist_name } = body || {};
+    const { name, phone, email, heard_about, preferred_stylist_id, preferred_stylist_name } = body || {};
 
     if (!name || !phone) {
       return NextResponse.json(
@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
         business_id: business.id,
         name,
         phone,
+        email: email || null,
         heard_about: heard_about || null,
         preferred_stylist_id: preferred_stylist_id || null,
         preferred_stylist_name: preferred_stylist_name || null,

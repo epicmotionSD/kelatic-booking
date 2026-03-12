@@ -8,6 +8,7 @@ export async function POST(request: NextRequest) {
     const {
       walk_in_name,
       walk_in_phone,
+      walk_in_email,
       service_id,
       stylist_id,
       start_time,
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest) {
       is_walk_in: true,
       walk_in_name: walk_in_name || 'Walk-in',
       walk_in_phone: walk_in_phone || null,
+      walk_in_email: walk_in_email || null,
       status: 'in_progress', // Walk-ins start immediately
     };
 
