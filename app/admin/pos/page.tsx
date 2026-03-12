@@ -27,6 +27,11 @@ export default function POSPage() {
     created_at: string;
   }>>([]);
   const [convertingRequestId, setConvertingRequestId] = useState<string | null>(null);
+  const [walkInPrefill, setWalkInPrefill] = useState<{
+    name?: string;
+    phone?: string;
+    email?: string;
+  } | null>(null);
   const [walkInLoading, setWalkInLoading] = useState(true);
 
   useEffect(() => {
@@ -88,6 +93,7 @@ export default function POSPage() {
         console.error('Failed to mark walk-in as converted:', error);
       } finally {
         setConvertingRequestId(null);
+        setWalkInPrefill(null);
       }
     }
 
@@ -106,8 +112,18 @@ export default function POSPage() {
     fetchWalkInRequests();
   }
 
-  function handleConvertWalkInRequest(requestId: string) {
-    setConvertingRequestId(requestId);
+  function handleConvertWalkInRequest(request: {
+    id: string;
+    name: string;
+    phone: string;
+    email: string | null;
+  }) {
+    setWalkInPrefill({
+      name: request.name || '',
+      phone: request.phone || '',
+      email: request.email || '',
+    });
+    setConvertingRequestId(request.id);
     setSelectedAppointment(null);
     setIsCheckoutOpen(false);
     setIsWalkInOpen(true);
@@ -201,7 +217,7 @@ export default function POSPage() {
                   {req.status !== 'converted' && (
                     <button
                       type="button"
-                      onClick={() => handleConvertWalkInRequest(req.id)}
+                      onClick={() => handleConvertWalkInRequest(req)}
                       className="px-3 py-2 rounded-lg text-sm font-medium bg-amber-400 text-black hover:bg-amber-300"
                     >
                       Start Checkout
@@ -335,6 +351,7 @@ export default function POSPage() {
           <button
             onClick={() => {
               setConvertingRequestId(null);
+              setWalkInPrefill(null);
               setIsWalkInOpen(true);
             }}
             className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-semibold shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all flex items-center gap-2"
@@ -350,11 +367,7 @@ export default function POSPage() {
         isOpen={isWalkInOpen}
         onClose={() => setIsWalkInOpen(false)}
         onComplete={handleWalkInComplete}
-        prefill={convertingRequestId ? {
-          name: walkInRequests.find((request) => request.id === convertingRequestId)?.name,
-          phone: walkInRequests.find((request) => request.id === convertingRequestId)?.phone,
-          email: walkInRequests.find((request) => request.id === convertingRequestId)?.email || undefined,
-        } : null}
+        prefill={walkInPrefill}
       />
 
       {/* Checkout Modal */}
