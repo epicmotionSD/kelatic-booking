@@ -147,6 +147,18 @@ export async function generateTenantMetadata(business: Business, settings: Busin
 
   // Barber Block gets its own SEO identity
   if (isBarber) {
+    const barberKeywords = [
+      'barber houston',
+      'houston barber',
+      'barber near me',
+      'fade haircut',
+      'lineup',
+      'taper fade',
+      'mens haircut houston',
+      'barber block',
+      'kelatic barber',
+    ];
+
     return {
       metadataBase: new URL(siteUrl),
       title: {
@@ -154,7 +166,7 @@ export async function generateTenantMetadata(business: Business, settings: Busin
         template: '%s | Barber Block',
       },
       description: 'Fresh fades, lineups, and premium barber services from Houston\'s finest at Barber Block by KeLatic Hair Lounge. Book your cut online today.',
-      keywords: ['barber houston', 'fade haircut', 'lineup', 'barber near me', 'houston barber', 'barber block', 'kelatic barber'],
+      keywords: barberKeywords,
       icons: {
         icon: business.favicon_url || '/favicon.svg',
         apple: business.favicon_url || '/favicon.svg',
@@ -178,6 +190,39 @@ export async function generateTenantMetadata(business: Business, settings: Busin
   const seoDescription = settings?.meta_description
     || `Book your appointment at ${business.name}. ${business.tagline || 'Online booking available 24/7.'}`;
 
+  const businessName = business.name.toLowerCase();
+  const city = business.city?.toLowerCase();
+  const state = business.state?.toLowerCase();
+  const baseKeywords = [
+    business.business_type,
+    businessName,
+    'book online',
+    'online booking',
+    'appointment booking',
+    'loc stylist',
+    'loctician',
+    'retwist',
+    'starter locs',
+    'loc maintenance',
+    'wednesday special',
+  ];
+
+  if (city) {
+    baseKeywords.push(
+      `${business.business_type} ${city}`,
+      `hair salon ${city}`,
+      `loctician ${city}`,
+      `retwist ${city}`,
+      `${businessName} ${city}`,
+    );
+  }
+
+  if (city && state) {
+    baseKeywords.push(`hair salon ${city} ${state}`, `loctician ${city} ${state}`);
+  }
+
+  const keywords = Array.from(new Set(baseKeywords.filter(Boolean)));
+
   return {
     metadataBase: new URL(siteUrl),
     title: {
@@ -185,9 +230,7 @@ export async function generateTenantMetadata(business: Business, settings: Busin
       template: `%s | ${business.name}`,
     },
     description: seoDescription,
-    keywords: business.city
-      ? [`${business.business_type} ${business.city}`, `hair salon ${business.city}`, 'book online', business.name.toLowerCase()]
-      : [business.business_type, 'book online', business.name.toLowerCase()],
+    keywords,
     icons: {
       icon: business.favicon_url || '/favicon.svg',
       apple: business.favicon_url || '/favicon.svg',

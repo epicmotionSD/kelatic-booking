@@ -14,14 +14,32 @@ export async function generateMetadata(): Promise<Metadata> {
     return {
       title: 'Book Your Cut',
       description: 'Book a fresh fade, lineup, or premium cut at Barber Block. Online booking available 24/7 — pick your barber and time.',
+      keywords: [
+        'book barber appointment',
+        'book haircut online',
+        'houston barber booking',
+        'fade appointment',
+        'lineup appointment',
+        'barber block',
+      ],
     };
   }
 
   const businessName = context?.business?.name || 'Salon';
+  const city = context?.business?.city;
 
   return {
     title: 'Book Online',
     description: `Book your appointment at ${businessName}. Choose your service, stylist, and time — easy online booking available 24/7.`,
+    keywords: city
+      ? [
+          `book ${businessName}`,
+          `book hair appointment ${city}`,
+          `book loctician ${city}`,
+          'book retwist online',
+          'online salon booking',
+        ]
+      : ['book hair appointment', 'book loctician', 'book retwist online', 'online salon booking'],
   };
 }
 
