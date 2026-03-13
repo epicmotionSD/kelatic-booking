@@ -90,6 +90,21 @@ export default async function RootLayout({
         description: 'White-label booking platform for salons and beauty businesses',
       };
 
+  const siteUrl = business
+    ? (business.custom_domain
+        ? `https://${business.custom_domain}`
+        : `https://${business.slug}.${ROOT_DOMAIN}`)
+    : platformUrl;
+
+  const websiteJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: business?.name || 'x3o.ai',
+    url: siteUrl,
+  };
+
+  const combinedJsonLd = [jsonLd, websiteJsonLd];
+
   return (
     <html lang="en">
       <head>
@@ -101,7 +116,7 @@ export default async function RootLayout({
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(combinedJsonLd) }}
         />
         {business && <BusinessThemeStyle business={business} />}
       </head>
