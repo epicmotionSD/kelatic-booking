@@ -44,7 +44,7 @@ CREATE TRIGGER update_business_settings_updated_at
 --     "name": "KeLatic Hair Lounge",
 --     "address": "9430 Richmond Ave, Houston, TX 77063",
 --     "phone": "(713) 485-4000",
---     "email": "kelatic@gmail.com",
+--     "email": "info@kelatic.com",
 --     "timezone": "America/Chicago",
 --     "currency": "USD",
 --     "bookingLeadTime": 2,

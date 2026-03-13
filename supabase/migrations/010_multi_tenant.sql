@@ -253,7 +253,7 @@ INSERT INTO businesses (
 ) VALUES (
     'kelatic',
     'Kelatic Hair Lounge',
-    'kelatic@gmail.com',
+    'info@kelatic.com',
     '(713) 485-4000',
     '9430 Richmond Ave',
     'Houston',
