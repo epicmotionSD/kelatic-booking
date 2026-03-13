@@ -41,6 +41,8 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
   const [walkInPhone, setWalkInPhone] = useState('');
   const [walkInEmail, setWalkInEmail] = useState('');
   const [walkInNote, setWalkInNote] = useState('');
+  const [pricingMode, setPricingMode] = useState<'service' | 'custom'>('service');
+  const [customAmount, setCustomAmount] = useState('');
   const [selectedService, setSelectedService] = useState<string>('');
   const [selectedStylist, setSelectedStylist] = useState<string>('');
   const [serviceSearch, setServiceSearch] = useState('');
@@ -53,6 +55,8 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
       setWalkInPhone(prefill?.phone || '');
       setWalkInEmail(prefill?.email || '');
       setWalkInNote('');
+      setPricingMode('service');
+      setCustomAmount('');
       setSelectedService('');
       setSelectedStylist('');
       setServiceSearch('');
@@ -62,6 +66,11 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
 
   // When service changes, fetch stylists who can perform that service
   useEffect(() => {
+    if (pricingMode === 'custom') {
+      setStylists(allStylists);
+      return;
+    }
+
     if (selectedService) {
       fetchStylistsForService(selectedService);
     } else {
@@ -69,7 +78,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
     }
     // Clear stylist selection when service changes
     setSelectedStylist('');
-  }, [selectedService, allStylists]);
+  }, [selectedService, allStylists, pricingMode]);
 
   async function fetchStylistsForService(serviceId: string) {
     try {
@@ -129,9 +138,17 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
       return;
     }
 
-    if (!selectedService) {
+    if (pricingMode === 'service' && !selectedService) {
       setError('Please select a service');
       return;
+    }
+
+    if (pricingMode === 'custom') {
+      const amount = parseFloat(customAmount);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        setError('Please enter a valid custom amount');
+        return;
+      }
     }
 
     if (!selectedStylist) {
@@ -146,6 +163,7 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
       const service = services.find(s => s.id === selectedService);
       const now = new Date();
       const endTime = new Date(now.getTime() + (service?.duration || 60) * 60000);
+      const normalizedCustomAmount = parseFloat(customAmount || '0');
 
       const res = await fetch('/api/pos/walk-in', {
         method: 'POST',
@@ -155,11 +173,12 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
           walk_in_phone: walkInPhone.trim(),
           walk_in_email: walkInEmail.trim() || null,
           notes: walkInNote.trim() || null,
-          service_id: selectedService,
+          service_id: pricingMode === 'service' ? selectedService : null,
+          custom_amount: pricingMode === 'custom' ? normalizedCustomAmount : null,
           stylist_id: selectedStylist,
           start_time: now.toISOString(),
           end_time: endTime.toISOString(),
-          quoted_price: service?.base_price || 0,
+          quoted_price: pricingMode === 'custom' ? normalizedCustomAmount : (service?.base_price || 0),
         }),
       });
 
@@ -272,60 +291,119 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                 />
               </div>
 
-              {/* Service Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Service *
+                  Pricing Method
                 </label>
-                <input
-                  type="text"
-                  value={serviceSearch}
-                  onChange={(e) => setServiceSearch(e.target.value)}
-                  placeholder="Search services..."
-                  className="w-full mb-3 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
-                />
-                {services.length === 0 ? (
-                  <p className="text-sm text-amber-600 italic py-4 text-center bg-amber-50 rounded-lg">
-                    No services available. Please add services in Settings.
-                  </p>
-                ) : filteredServices.length === 0 ? (
-                  <p className="text-sm text-gray-500 italic py-4 text-center bg-gray-50 rounded-lg">
-                    No services match your search.
-                  </p>
-                ) : (
-                <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
-                  {filteredServices.map((service) => (
-                    <button
-                      key={service.id}
-                      type="button"
-                      onClick={() => setSelectedService(service.id)}
-                      className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
-                        selectedService === service.id
-                          ? 'border-purple-600 bg-purple-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
-                    >
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <p className="font-medium text-gray-900">{service.name}</p>
-                          <p className="text-sm text-gray-500">{service.duration} min</p>
-                        </div>
-                        <p className="font-semibold text-gray-900">
-                          {formatCurrency(service.base_price * 100)}
-                        </p>
-                      </div>
-                    </button>
-                  ))}
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPricingMode('service');
+                      setCustomAmount('');
+                    }}
+                    className={`px-3 py-2 rounded-lg border font-medium transition-colors ${
+                      pricingMode === 'service'
+                        ? 'border-purple-600 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Select Service
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPricingMode('custom');
+                      setSelectedService('');
+                      setServiceSearch('');
+                    }}
+                    className={`px-3 py-2 rounded-lg border font-medium transition-colors ${
+                      pricingMode === 'custom'
+                        ? 'border-purple-600 bg-purple-50 text-purple-700'
+                        : 'border-gray-200 text-gray-700 hover:border-gray-300'
+                    }`}
+                  >
+                    Custom Amount
+                  </button>
                 </div>
-                )}
               </div>
+
+              {pricingMode === 'service' ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Service *
+                  </label>
+                  <input
+                    type="text"
+                    value={serviceSearch}
+                    onChange={(e) => setServiceSearch(e.target.value)}
+                    placeholder="Search services..."
+                    className="w-full mb-3 px-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  />
+                  {services.length === 0 ? (
+                    <p className="text-sm text-amber-600 italic py-4 text-center bg-amber-50 rounded-lg">
+                      No services available. Please add services in Settings.
+                    </p>
+                  ) : filteredServices.length === 0 ? (
+                    <p className="text-sm text-gray-500 italic py-4 text-center bg-gray-50 rounded-lg">
+                      No services match your search.
+                    </p>
+                  ) : (
+                  <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+                    {filteredServices.map((service) => (
+                      <button
+                        key={service.id}
+                        type="button"
+                        onClick={() => setSelectedService(service.id)}
+                        className={`w-full text-left px-4 py-3 rounded-lg border transition-colors ${
+                          selectedService === service.id
+                            ? 'border-purple-600 bg-purple-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex justify-between items-center">
+                          <div>
+                            <p className="font-medium text-gray-900">{service.name}</p>
+                            <p className="text-sm text-gray-500">{service.duration} min</p>
+                          </div>
+                          <p className="font-semibold text-gray-900">
+                            {formatCurrency(service.base_price * 100)}
+                          </p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  )}
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Custom Amount *
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={customAmount}
+                      onChange={(e) => setCustomAmount(e.target.value)}
+                      placeholder="0.00"
+                      className="w-full pl-7 pr-3 py-2 border border-gray-300 rounded-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Use this for clients booked/paid deposit on your legacy system.
+                  </p>
+                </div>
+              )}
 
               {/* Stylist Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Stylist *
                 </label>
-                {!selectedService ? (
+                {pricingMode === 'service' && !selectedService ? (
                   <p className="text-sm text-gray-500 italic py-4 text-center bg-gray-50 rounded-lg">
                     Select a service first to see available stylists
                   </p>
@@ -356,12 +434,23 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
               </div>
 
               {/* Summary */}
-              {selectedServiceData && (
+              {pricingMode === 'service' && selectedServiceData && (
                 <div className="bg-gray-50 rounded-lg p-4">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Total</span>
                     <span className="text-xl font-bold text-gray-900">
                       {formatCurrency(selectedServiceData.base_price * 100)}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {pricingMode === 'custom' && (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-gray-600">Total</span>
+                    <span className="text-xl font-bold text-gray-900">
+                      {formatCurrency(Math.round((parseFloat(customAmount || '0') || 0) * 100))}
                     </span>
                   </div>
                 </div>
@@ -384,7 +473,12 @@ export function WalkInModal({ isOpen, onClose, onComplete, prefill }: WalkInModa
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting || !selectedService || !selectedStylist}
+                  disabled={
+                    submitting ||
+                    !selectedStylist ||
+                    (pricingMode === 'service' && !selectedService) ||
+                    (pricingMode === 'custom' && (!customAmount || parseFloat(customAmount) <= 0))
+                  }
                   className="flex-1 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {submitting ? 'Creating...' : 'Continue to Checkout'}

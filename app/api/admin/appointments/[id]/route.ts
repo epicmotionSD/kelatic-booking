@@ -13,11 +13,11 @@ export async function GET(
       .from('appointments')
       .select(`
         *,
-        services!inner(*),
+        service:services(*),
         stylist:profiles!appointments_stylist_id_fkey(*),
         client:profiles!appointments_client_id_fkey(*),
         payments(*),
-        appointment_addons(*, services(*))
+        addons:appointment_addons(*, service:services(*))
       `)
       .eq('id', id)
       .single();

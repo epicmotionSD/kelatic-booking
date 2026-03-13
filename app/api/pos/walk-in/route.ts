@@ -11,15 +11,19 @@ export async function POST(request: NextRequest) {
       walk_in_email,
       notes,
       service_id,
+      custom_amount,
       stylist_id,
       start_time,
       end_time,
       quoted_price,
     } = body;
 
-    if (!service_id || !stylist_id || !start_time || !end_time) {
+    const hasService = Boolean(service_id);
+    const hasCustomAmount = Number.isFinite(Number(custom_amount)) && Number(custom_amount) > 0;
+
+    if ((!hasService && !hasCustomAmount) || !stylist_id || !start_time || !end_time) {
       return NextResponse.json(
-        { error: 'Service, stylist, start time, and end time are required' },
+        { error: 'Service or custom amount, stylist, start time, and end time are required' },
         { status: 400 }
       );
     }
@@ -61,16 +65,16 @@ export async function POST(request: NextRequest) {
     // Create the walk-in appointment
     const insertPayload = {
       business_id,
-      service_id,
+      service_id: hasService ? service_id : null,
       stylist_id,
       start_time,
       end_time,
-      quoted_price,
+      quoted_price: hasCustomAmount ? Number(custom_amount) : quoted_price,
       is_walk_in: true,
       walk_in_name: walk_in_name || 'Walk-in',
       walk_in_phone: walk_in_phone || null,
       walk_in_email: walk_in_email || null,
-      client_notes: notes || null,
+      client_notes: notes || (hasCustomAmount ? 'Legacy booking: deposit paid on old system' : null),
       status: 'in_progress', // Walk-ins start immediately
     };
 

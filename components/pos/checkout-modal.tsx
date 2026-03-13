@@ -197,7 +197,7 @@ export function CheckoutModal({
                     ? appointment.walk_in_name || 'Walk-in'
                     : `${appointment.client?.first_name} ${appointment.client?.last_name}`}
                 </p>
-                <p className="text-sm text-gray-600 mt-1">{appointment.service?.name}</p>
+                <p className="text-sm text-gray-600 mt-1">{appointment.service?.name || 'Custom POS Charge'}</p>
                 {appointment.addons && appointment.addons.length > 0 && (
                   <p className="text-sm text-gray-500">
                     + {appointment.addons.map((a) => a.service?.name).join(', ')}

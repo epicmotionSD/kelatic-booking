@@ -301,7 +301,7 @@ export default function POSPage() {
 
                   {/* Service Info */}
                   <div className="mb-3">
-                    <p className="text-sm text-white">{apt.service?.name}</p>
+                    <p className="text-sm text-white">{apt.service?.name || 'Custom POS Charge'}</p>
                     {apt.addons && apt.addons.length > 0 && (
                       <p className="text-xs text-white/60">
                         + {apt.addons.map((a) => a.service?.name).join(', ')}
