@@ -259,14 +259,12 @@ export function PriceTierSelection({
               onClick={onWednesdaySpecial}
               className="text-left p-4 bg-gradient-to-br from-amber-500/20 to-yellow-500/10 border border-amber-400/30 rounded-xl hover:border-amber-400/60 hover:from-amber-500/30 hover:to-yellow-500/20 transition-all relative overflow-hidden"
             >
-              <div className="absolute top-2 right-2">
-                <span className="text-[10px] font-bold bg-amber-400 text-black px-2 py-0.5 rounded-full">SPECIAL</span>
-              </div>
               <div className="flex justify-between items-center">
                 <div>
                   <h4 className="font-semibold text-white text-sm flex items-center gap-1.5">
                     <CalendarDays className="w-3.5 h-3.5 text-amber-400" />
                     Wednesday Special
+                    <span className="text-[10px] font-bold bg-amber-400 text-black px-2 py-0.5 rounded-full">SPECIAL</span>
                   </h4>
                   <p className="text-xs text-white/50">Shampoo &amp; Retwist &bull; Wed Only</p>
                 </div>
