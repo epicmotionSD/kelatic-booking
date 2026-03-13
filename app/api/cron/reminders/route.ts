@@ -139,7 +139,7 @@ export async function GET(request: NextRequest) {
               id: 'default',
               name: 'Kelatic',
               slug: 'kelatic',
-              email: 'kelatic@gmail.com',
+              email: 'info@kelatic.com',
               business_type: 'salon',
               brand_voice: 'professional',
               primary_color: '#f59e0b',

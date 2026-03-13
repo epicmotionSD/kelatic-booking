@@ -60,7 +60,7 @@ export function Footer() {
                 </div>
                 <div className="text-white/50 text-sm">
                   <div>(713) 485-4000</div>
-                  <div>kelatic@gmail.com</div>
+                  <div>info@kelatic.com</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -81,7 +81,7 @@ export function Footer() {
                   <Phone className="w-5 h-5" />
                 </a>
                 <a 
-                  href="mailto:kelatic@gmail.com" 
+                  href="mailto:info@kelatic.com" 
                   aria-label="Email us" 
                   className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors"
                 >

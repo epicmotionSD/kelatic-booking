@@ -31,7 +31,7 @@ Your role is to:
 Key information:
 - Location: 9430 Richmond Ave, Houston, TX 77063
 - Phone: (713) 485-4000
-- Email: kelatic@gmail.com
+- Email: info@kelatic.com
 - Instagram: @kelatic_
 - Hours: Monday-Friday 9am-6pm, Saturday 9am-5pm (closed Sunday)
 - Walk-ins welcome but appointments recommended for longer services

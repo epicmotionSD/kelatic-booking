@@ -11,7 +11,7 @@ const setTempPassword = async () => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        email: 'kelatic@gmail.com'
+        email: 'info@kelatic.com'
       }),
     });
 

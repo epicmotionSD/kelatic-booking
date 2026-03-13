@@ -31,7 +31,7 @@ export default function SettingsPage() {
     name: 'KeLatic Hair Lounge',
     address: '9430 Richmond Ave, Houston, TX 77063',
     phone: '(713) 485-4000',
-    email: 'kelatic@gmail.com',
+    email: 'info@kelatic.com',
     timezone: 'America/Chicago',
     currency: 'USD',
     bookingLeadTime: 2,
@@ -214,7 +214,7 @@ export default function SettingsPage() {
                 value={settings.email}
                 onChange={(e) => setSettings({ ...settings, email: e.target.value })}
                 className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
-                placeholder="kelatic@gmail.com"
+                placeholder="info@kelatic.com"
               />
             </div>
 

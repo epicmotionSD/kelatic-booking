@@ -426,7 +426,7 @@ export const runHummingbirdCadence = inngest.createFunction(
                   continue
                 }
 
-                const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com'
+                const fromEmail = process.env.SENDGRID_FROM_EMAIL || 'info@kelatic.com'
                 const emailTemplate = EMAIL_TEMPLATES[cadenceStep.scriptVariant as keyof typeof EMAIL_TEMPLATES] || EMAIL_TEMPLATES.direct_inquiry
                 const templateVars = {
                   firstName: lead.first_name || 'there',
@@ -534,7 +534,7 @@ export const runHummingbirdCadence = inngest.createFunction(
                 to_phone: cadenceStep.channel === 'sms' ? lead.phone : null,
                 from_phone: cadenceStep.channel === 'sms' ? business.twilio_phone_number : null,
                 to_email: cadenceStep.channel === 'email' ? lead.email : null,
-                from_email: cadenceStep.channel === 'email' ? process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com' : null,
+                from_email: cadenceStep.channel === 'email' ? process.env.SENDGRID_FROM_EMAIL || 'info@kelatic.com' : null,
                 body: personalizedMessage,
                 cadence_day: cadenceStep.day,
                 script_variant: cadenceStep.scriptVariant || campaign.script_variant,

@@ -27,7 +27,7 @@ import type {
 // Configure web push
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webpush.setVapidDetails(
-    'mailto:' + (process.env.VAPID_EMAIL || 'kelatic@gmail.com'),
+    'mailto:' + (process.env.VAPID_EMAIL || 'info@kelatic.com'),
     process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
   );
@@ -191,7 +191,7 @@ export class NotificationService {
 
       const result = await sendEmailMessage({
         to: user.email,
-        fromEmail: process.env.SENDGRID_FROM_EMAIL || 'kelatic@gmail.com',
+        fromEmail: process.env.SENDGRID_FROM_EMAIL || 'info@kelatic.com',
         fromName: variables.business_name || 'KeLatic',
         subject,
         html: content,

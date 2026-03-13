@@ -591,7 +591,7 @@ export default function LandingPage() {
                 {[
                   { icon: MapPin, label: 'Address', value: '9430 Richmond Ave, Houston, TX 77063', href: 'https://maps.google.com/?q=9430+Richmond+Ave+Houston+TX+77063' },
                   { icon: Phone, label: 'Phone', value: '(713) 485-4000', href: 'tel:+17134854000' },
-                  { icon: Mail, label: 'Email', value: 'kelatic@gmail.com', href: 'mailto:kelatic@gmail.com' },
+                  { icon: Mail, label: 'Email', value: 'info@kelatic.com', href: 'mailto:info@kelatic.com' },
                   { icon: Instagram, label: 'Instagram', value: '@kelatichairlounge_', href: 'https://instagram.com/kelatichairlounge_' },
                 ].map((item, idx) => (
                   <a key={idx} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined} className="flex items-center gap-4 group">

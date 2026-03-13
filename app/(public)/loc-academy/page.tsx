@@ -55,7 +55,7 @@ export default function LocAcademyPage() {
             </ul>
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="mailto:kelatic@gmail.com?subject=Loc Academy Interest"
+                href="mailto:info@kelatic.com?subject=Loc Academy Interest"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
               >
                 <Mail className="w-5 h-5" />

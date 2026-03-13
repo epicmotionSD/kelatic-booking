@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/client';
 
 // GET /api/admin-users - fetch admin users by email
 export async function GET(request: NextRequest) {
-  const emails = ['kelatic@gmail.com', 'shawnsonnier04@gmail.com'];
+  const emails = ['info@kelatic.com', 'shawnsonnier04@gmail.com'];
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from('profiles')

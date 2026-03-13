@@ -52,7 +52,7 @@ async function addMemberByEmail(email: string, role: 'owner' | 'admin' | 'stylis
 
 // Add all stylists
 const stylists = [
-  'kelatic@gmail.com',
+  'info@kelatic.com',
   'destinyiharris@yahoo.com',
   'jacksonsamira6@gmail.com',
   'nevaehsomone@gmail.com',
