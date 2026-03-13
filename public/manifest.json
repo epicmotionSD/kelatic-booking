@@ -1,6 +1,7 @@
 {
   "name": "KeLatic - Premium Hair Salon",
   "short_name": "KeLatic",
+  "id": "/",
   "description": "Book appointments at KeLatic premium hair salon",
   "start_url": "/",
   "display": "standalone",
@@ -28,6 +29,20 @@
       "short_name": "Book",
       "description": "Book a new appointment",
       "url": "/book",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Point of Sale",
+      "short_name": "POS",
+      "description": "Open point of sale checkout",
+      "url": "/admin/pos",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Walk-in Check-in",
+      "short_name": "Walk-in",
+      "description": "Open walk-in check-in form",
+      "url": "/walk-in",
       "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
     },
     {
