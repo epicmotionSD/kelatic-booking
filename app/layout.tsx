@@ -8,6 +8,7 @@ import { createAdminClient } from '@/lib/supabase/server';
 import type { Service } from '@/types/database';
 import { BusinessProvider, BusinessThemeStyle } from '@/lib/tenant/context';
 import { getAnalyticsId, getGoogleAdsConfig } from '@/lib/tenant-config';
+import { PwaInstallPrompt } from '@/components/pwa-install-prompt';
 
 const inter = Inter({ subsets: ['latin'] });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
@@ -92,6 +93,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="manifest" href="/manifest.json" />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -101,6 +103,7 @@ export default async function RootLayout({
       <body className={`${inter.className} ${playfair.variable}`} suppressHydrationWarning={true}>
         <BusinessProvider business={business} settings={settings}>
           {children}
+          <PwaInstallPrompt />
         </BusinessProvider>
         {/* Dynamic Google Analytics/Ads - optimized for Vercel */}
         {analyticsId && <GoogleAnalytics gaId={analyticsId} />}

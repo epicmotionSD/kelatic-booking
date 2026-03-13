@@ -52,6 +52,11 @@ const NAV_ITEMS = [
     icon: <Users className="w-5 h-5" />,
   },
   {
+    label: 'Schedules',
+    href: '/admin/stylists/schedule',
+    icon: <Calendar className="w-5 h-5" />,
+  },
+  {
     label: 'Clients',
     href: '/admin/clients',
     icon: <UserCheck className="w-5 h-5" />,
