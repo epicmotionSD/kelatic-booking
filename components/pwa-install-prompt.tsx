@@ -25,12 +25,19 @@ function isIosSafari() {
   return isIos && isSafari;
 }
 
+function isIosDevice() {
+  if (typeof window === 'undefined') return false;
+  const ua = window.navigator.userAgent;
+  return /iPhone|iPad|iPod/i.test(ua);
+}
+
 export function PwaInstallPrompt() {
   const [visible, setVisible] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<DeferredPromptEvent | null>(null);
   const [installing, setInstalling] = useState(false);
 
   const iosMode = useMemo(() => isIosSafari(), []);
+  const iosDevice = useMemo(() => isIosDevice(), []);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -66,7 +73,7 @@ export function PwaInstallPrompt() {
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     window.addEventListener('appinstalled', handleInstalled);
 
-    if (iosMode) {
+    if (iosDevice) {
       setVisible(true);
     }
 
@@ -74,7 +81,7 @@ export function PwaInstallPrompt() {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleInstalled);
     };
-  }, [iosMode]);
+  }, [iosMode, iosDevice]);
 
   async function handleInstall() {
     if (!deferredPrompt) return;
@@ -109,9 +116,16 @@ export function PwaInstallPrompt() {
             <p className="text-white font-semibold">Install App</p>
             <p className="text-white/70 text-sm mt-1">
               {iosMode
-                ? 'Tap Share, then “Add to Home Screen” for faster access.'
+                ? 'On iPhone Safari: tap Share, then “Add to Home Screen”.'
+                : iosDevice
+                ? 'On iPhone, install works in Safari. Open this page in Safari first.'
                 : 'Install this app for faster access and a better in-salon experience.'}
             </p>
+            {iosMode && (
+              <p className="text-white/60 text-xs mt-2">
+                If you don’t see “Add to Home Screen,” scroll down in the Share menu.
+              </p>
+            )}
           </div>
           <button
             type="button"
@@ -124,7 +138,7 @@ export function PwaInstallPrompt() {
           </button>
         </div>
 
-        {!iosMode && deferredPrompt && (
+        {!iosDevice && deferredPrompt && (
           <button
             type="button"
             onClick={handleInstall}
