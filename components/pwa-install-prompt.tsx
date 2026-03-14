@@ -35,6 +35,7 @@ export function PwaInstallPrompt() {
   const [visible, setVisible] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<DeferredPromptEvent | null>(null);
   const [installing, setInstalling] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const iosMode = useMemo(() => isIosSafari(), []);
   const iosDevice = useMemo(() => isIosDevice(), []);
@@ -106,6 +107,18 @@ export function PwaInstallPrompt() {
     setVisible(false);
   }
 
+  async function handleCopyLink() {
+    if (typeof window === 'undefined') return;
+
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error('Failed to copy install link:', error);
+    }
+  }
+
   if (!visible || isRunningStandalone()) return null;
 
   return (
@@ -147,6 +160,26 @@ export function PwaInstallPrompt() {
           >
             {installing ? 'Installing...' : 'Install'}
           </button>
+        )}
+
+        {iosDevice && !iosMode && (
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className="rounded-xl px-3 py-2 bg-white/10 text-white text-sm font-medium hover:bg-white/15 transition-colors"
+            >
+              {copied ? 'Copied' : 'Copy Link'}
+            </button>
+            <a
+              href="https://support.apple.com/en-us/guide/iphone/iph42ab2f3a7/ios"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-xl px-3 py-2 bg-white/10 text-white text-sm font-medium text-center hover:bg-white/15 transition-colors"
+            >
+              Open in Safari
+            </a>
+          </div>
         )}
       </div>
     </div>
