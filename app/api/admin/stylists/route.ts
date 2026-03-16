@@ -6,7 +6,12 @@ export async function GET() {
     const supabase = createAdminClient();
 
     const now = new Date();
-    const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    const weekStart = new Date(now);
+    weekStart.setHours(0, 0, 0, 0);
+    weekStart.setDate(now.getDate() - now.getDay());
+
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 7);
 
     // Get stylists
     const { data: stylists, error } = await supabase
@@ -51,6 +56,7 @@ export async function GET() {
       .select('stylist_id')
       .in('stylist_id', stylistIds)
       .gte('start_time', weekStart.toISOString())
+      .lt('start_time', weekEnd.toISOString())
       .not('status', 'in', '("cancelled","no_show")');
 
     const servicesPerStylist: Record<string, number> = {};
