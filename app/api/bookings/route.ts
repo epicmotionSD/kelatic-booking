@@ -22,6 +22,7 @@ async function sendConfirmationNotifications(appointmentId: string) {
       .from('appointments')
       .select(`
         id,
+        status,
         start_time,
         business_id,
         is_walk_in,
@@ -114,6 +115,7 @@ async function sendConfirmationNotifications(appointmentId: string) {
 
     const appointmentDetails: AppointmentDetails = {
       id: appointment.id,
+      status: appointment.status,
       client_name: clientName,
       client_email: clientEmail,
       client_phone: clientPhone || undefined,

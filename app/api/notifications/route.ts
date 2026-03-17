@@ -43,6 +43,7 @@ export async function POST(request: NextRequest) {
       .from('appointments')
       .select(`
         id,
+        status,
         start_time,
         business_id,
         is_walk_in,
@@ -138,6 +139,7 @@ export async function POST(request: NextRequest) {
 
     const appointmentDetails: AppointmentDetails = {
       id: appointment.id,
+      status: appointment.status,
       client_name: clientName,
       client_email: clientEmail,
       client_phone: clientPhone || undefined,

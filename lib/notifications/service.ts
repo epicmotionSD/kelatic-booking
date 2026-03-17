@@ -41,6 +41,7 @@ function getBrandGradient(business: Business): string {
 
 export interface AppointmentDetails {
   id: string;
+  status?: 'pending' | 'confirmed' | 'completed' | 'cancelled' | 'no_show' | string;
   client_name: string;
   client_email: string;
   client_phone?: string;
@@ -105,6 +106,13 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails, ctx: Business
   const logoUrl = getLogoUrl(business);
   const address = getFullAddress(business);
   const gradient = getBrandGradient(business);
+  const isPending = appointment.status === 'pending';
+
+  const statusTitle = isPending ? 'Appointment Pending Deposit' : 'Appointment Confirmed!';
+  const statusSubtitle = isPending ? 'Complete your deposit to lock in your time' : "We're excited to see you";
+  const introText = isPending
+    ? 'Your appointment request has been received and is currently pending. Complete your deposit to confirm your booking. Here are your details:'
+    : "Your appointment has been confirmed! We're excited to see you. Here are your booking details:";
 
   const addOnsHtml = appointment.add_ons?.length
     ? `<p style="margin: 0; color: #666;">Add-ons: ${appointment.add_ons.join(', ')}</p>`
@@ -131,8 +139,8 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails, ctx: Business
           <!-- Title Banner -->
           <tr>
             <td style="background: ${gradient}; padding: 30px; text-align: center;">
-              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">Appointment Confirmed!</h1>
-              <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">We're excited to see you</p>
+              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">${statusTitle}</h1>
+              <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">${statusSubtitle}</p>
             </td>
           </tr>
 
@@ -140,7 +148,7 @@ function getConfirmationEmailHtml(appointment: AppointmentDetails, ctx: Business
           <tr>
             <td style="padding: 40px;">
               <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
-              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">Your appointment has been confirmed! We're excited to see you. Here are your booking details:</p>
+              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">${introText}</p>
 
               <!-- Appointment Card -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
@@ -455,6 +463,17 @@ function getCancellationEmailHtml(appointment: AppointmentDetails, ctx: Business
 function getConfirmationSms(appointment: AppointmentDetails, ctx: BusinessContext): string {
   const { business } = ctx;
   const address = getFullAddress(business);
+  const isPending = appointment.status === 'pending';
+
+  if (isPending) {
+    return `⏳ ${business.name} Booking Pending
+
+📅 ${formatDate(appointment.appointment_date)}
+⏰ ${formatTime(appointment.appointment_time)}
+💇 ${appointment.service_name} with ${appointment.stylist_name}
+
+Complete your deposit to confirm this appointment.${business.phone ? ` Need help? Call ${business.phone}` : ''}`;
+  }
 
   return `✅ ${business.name} Booking Confirmed!
 
@@ -500,12 +519,15 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx
   const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
 
   try {
+    const isPending = appointment.status === 'pending';
     const result = await sendEmailMessage({
       to: appointment.client_email,
       cc: getInternalCcRecipients(ctx),
       fromEmail,
       fromName: business.name,
-      subject: `✨ Appointment Confirmed - ${formatDate(appointment.appointment_date)}`,
+      subject: isPending
+        ? `⏳ Appointment Pending Deposit - ${formatDate(appointment.appointment_date)}`
+        : `✨ Appointment Confirmed - ${formatDate(appointment.appointment_date)}`,
       html: getConfirmationEmailHtml(appointment, ctx),
     });
 
