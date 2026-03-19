@@ -53,12 +53,12 @@ interface LeadAnalysis {
 }
 
 const businessTypes = [
-  { value: 'salon', label: 'Hair Salon', icon: '💇' },
+  { value: 'salon', label: 'Salon / Beauty', icon: '💇' },
   { value: 'barbershop', label: 'Barbershop', icon: '💈' },
-  { value: 'spa', label: 'Spa & Wellness', icon: '🧖' },
-  { value: 'nails', label: 'Nail Salon', icon: '💅' },
-  { value: 'lashes', label: 'Lash Studio', icon: '👁️' },
-  { value: 'other', label: 'Other Beauty', icon: '✨' },
+  { value: 'spa', label: 'Spa / Wellness', icon: '🧖' },
+  { value: 'nails', label: 'MedSpa / Clinic', icon: '🩺' },
+  { value: 'lashes', label: 'Fitness Studio / Gym', icon: '🏋️' },
+  { value: 'other', label: 'Other Service Business', icon: '✨' },
 ];
 
 const timezones = [
@@ -69,6 +69,9 @@ const timezones = [
 ];
 
 const currentSystems = [
+  { value: 'calendly', label: 'Calendly' },
+  { value: 'mindbody', label: 'Mindbody' },
+  { value: 'booksy', label: 'Booksy' },
   { value: 'square', label: 'Square Appointments' },
   { value: 'vagaro', label: 'Vagaro' },
   { value: 'fresha', label: 'Fresha' },
@@ -79,10 +82,10 @@ const currentSystems = [
 ];
 
 const painPoints = [
-  { value: 'ghosts', label: 'Clients disappear after 1-2 visits', icon: Users },
-  { value: 'dms', label: 'DMs go unanswered or drop off', icon: MessageSquare },
-  { value: 'cancellations', label: 'Last-minute cancellations hurt', icon: Clock },
-  { value: 'notime', label: 'No time to follow up with everyone', icon: Calendar },
+  { value: 'ghosts', label: 'Past clients stop returning without follow-up', icon: Users },
+  { value: 'dms', label: 'Conversations go cold before booking', icon: MessageSquare },
+  { value: 'cancellations', label: 'Last-minute cancellations leave open capacity', icon: Clock },
+  { value: 'notime', label: 'Team has no time to run consistent follow-up', icon: Calendar },
 ];
 
 export default function OnboardingPage() {
@@ -339,7 +342,7 @@ export default function OnboardingPage() {
             </div>
             <div>
               <h1 className="text-xl font-bold">7-Day Revenue Sprint</h1>
-              <p className="text-sm text-zinc-500">Let's find your revenue leaks</p>
+              <p className="text-sm text-zinc-500">Let’s map and recover your revenue leaks</p>
             </div>
           </div>
         </div>
@@ -388,8 +391,8 @@ export default function OnboardingPage() {
         {step === 'audit' && (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Let's audit your revenue</h2>
-              <p className="text-zinc-400">First, tell us about your business so we can find your leaks.</p>
+              <h2 className="text-2xl font-bold mb-2">Let’s map your revenue baseline</h2>
+              <p className="text-zinc-400">Tell us about your business so we can identify your biggest recovery opportunities.</p>
             </div>
 
             <div className="space-y-6">
@@ -405,7 +408,7 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">What type of business?</label>
+                <label className="block text-sm font-medium mb-2">What type of business do you run?</label>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {businessTypes.map((type) => (
                     <button
@@ -436,7 +439,7 @@ export default function OnboardingPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Phone (for sprint updates)</label>
+                  <label className="block text-sm font-medium mb-2">Phone (for implementation updates)</label>
                   <input
                     type="tel"
                     value={data.phone}
@@ -493,13 +496,13 @@ export default function OnboardingPage() {
         {step === 'leaks' && (
           <div className="space-y-8">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Where are you losing money?</h2>
-              <p className="text-zinc-400">Help us understand your current situation.</p>
+              <h2 className="text-2xl font-bold mb-2">Where is revenue leaking today?</h2>
+              <p className="text-zinc-400">These answers let Trinity estimate recoverable revenue before launch.</p>
             </div>
 
             <div className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-2" id="monthly-clients-label">How many clients do you see per month?</label>
+                <label className="block text-sm font-medium mb-2" id="monthly-clients-label">How many customers do you serve per month?</label>
                 <select
                   value={data.monthlyClients}
                   onChange={(e) => updateData('monthlyClients', e.target.value)}
@@ -516,7 +519,7 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2" id="avg-ticket-label">What's your average service price?</label>
+                <label className="block text-sm font-medium mb-2" id="avg-ticket-label">What is your average appointment value?</label>
                 <select
                   value={data.averageTicket}
                   onChange={(e) => updateData('averageTicket', e.target.value)}
@@ -534,7 +537,7 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2" id="repeat-rate-label">What percent of clients come back within 8 weeks?</label>
+                <label className="block text-sm font-medium mb-2" id="repeat-rate-label">What percent of customers rebook in your normal cycle?</label>
                 <select
                   value={data.repeatRate}
                   onChange={(e) => updateData('repeatRate', e.target.value)}
@@ -551,7 +554,7 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">What booking system do you use now?</label>
+                <label className="block text-sm font-medium mb-2">What scheduling or booking tool do you use now?</label>
                 <div className="grid grid-cols-2 gap-3">
                   {currentSystems.map((system) => (
                     <button
@@ -568,12 +571,12 @@ export default function OnboardingPage() {
                   ))}
                 </div>
                 <p className="text-xs text-zinc-500 mt-2">
-                  ✓ Trinity works alongside your existing system—no migration needed
+                  ✓ Trinity runs on top of your current stack—no migration required
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-3">What's hurting your revenue most? (select all)</label>
+                <label className="block text-sm font-medium mb-3">What is hurting revenue most right now? (select all)</label>
                 <div className="space-y-3">
                   {painPoints.map((pain) => {
                     const Icon = pain.icon;
@@ -612,7 +615,7 @@ export default function OnboardingPage() {
             <div>
               <h2 className="text-2xl font-bold mb-2">Upload Your Client List</h2>
               <p className="text-zinc-400">
-                We'll analyze your contacts to find ghost clients and calculate your real recovery potential.
+                We’ll analyze your contacts to identify dormant demand and calculate realistic recovery potential.
               </p>
             </div>
 
@@ -701,7 +704,7 @@ export default function OnboardingPage() {
                 )}
               </ol>
               <p className="text-xs text-zinc-500 mt-4">
-                🔒 Your data is encrypted and only used for analysis. We never spam your clients.
+                🔒 Your data is encrypted and used only for this analysis and launch planning.
               </p>
             </div>
 
@@ -712,7 +715,7 @@ export default function OnboardingPage() {
                 onClick={() => setStep('estimate')}
                 className="text-emerald-400 hover:text-emerald-300 text-sm font-medium transition"
               >
-                Skip and see estimate based on your answers →
+                Skip for now and see estimate from your answers →
               </button>
             </div>
 
@@ -848,13 +851,13 @@ export default function OnboardingPage() {
                 <div className="bg-gradient-to-br from-red-500/10 to-red-500/5 border border-red-500/20 rounded-2xl p-8 text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <AlertTriangle className="w-6 h-6 text-red-400" />
-                    <span className="text-red-400 font-medium">Estimated Monthly Revenue Leak</span>
+                    <span className="text-red-400 font-medium">Estimated Monthly Revenue Leakage</span>
                   </div>
                   <div className="text-6xl font-bold text-red-400 mb-2">
                     ${leak.monthlyLeak.toLocaleString()}
                   </div>
                   <p className="text-zinc-400">
-                    ~{leak.lostClients} clients not returning × ${data.averageTicket || 75} avg ticket
+                    ~{leak.lostClients} customers not returning × ${data.averageTicket || 75} average value
                   </p>
                 </div>
 
@@ -863,12 +866,12 @@ export default function OnboardingPage() {
                   <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
                     <div className="text-sm text-zinc-500 mb-1">Yearly Impact</div>
                     <div className="text-3xl font-bold text-red-400">${leak.yearlyLeak.toLocaleString()}</div>
-                    <p className="text-xs text-zinc-500 mt-1">Lost revenue per year</p>
+                    <p className="text-xs text-zinc-500 mt-1">Estimated annual leakage</p>
                   </div>
                   <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-6">
                     <div className="text-sm text-emerald-400 mb-1">Recoverable</div>
                     <div className="text-3xl font-bold text-emerald-400">${leak.recoverableMonthly.toLocaleString()}/mo</div>
-                    <p className="text-xs text-zinc-500 mt-1">What Trinity can bring back</p>
+                    <p className="text-xs text-zinc-500 mt-1">Likely recoverable with Trinity</p>
                   </div>
                 </div>
 
@@ -894,16 +897,16 @@ export default function OnboardingPage() {
           <div className="space-y-8">
             <div>
               <h2 className="text-2xl font-bold mb-2">Start Your 7-Day Revenue Sprint</h2>
-              <p className="text-zinc-400">Here's exactly what happens next.</p>
+              <p className="text-zinc-400">Here is exactly how implementation runs from kickoff to report.</p>
             </div>
 
             {/* Sprint Timeline */}
             <div className="space-y-4">
               {[
-                { day: 'Today', title: 'Kickoff Call Scheduled', desc: 'We\'ll connect your systems and set up Trinity in 30 min.' },
-                { day: 'Day 1-2', title: 'Database Analysis', desc: 'We identify your ghost clients and dead conversations.' },
-                { day: 'Day 3-5', title: 'Trinity Goes Live', desc: 'AI starts reactivating clients and responding to DMs.' },
-                { day: 'Day 6-7', title: 'Results & Strategy', desc: 'You see recovered revenue + recommendations for scale.' },
+                { day: 'Today', title: 'Kickoff Scheduled', desc: 'We connect your stack and configure Trinity in about 30 minutes.' },
+                { day: 'Day 1-2', title: 'Recovery Mapping', desc: 'We identify dormant demand and stalled conversation opportunities.' },
+                { day: 'Day 3-5', title: 'Trinity Live', desc: 'Recovery workflows launch across reactivation, follow-up, and slot filling.' },
+                { day: 'Day 6-7', title: 'Results & Scale Plan', desc: 'You receive recovered revenue results plus optimization recommendations.' },
               ].map((item, index) => (
                 <div key={index} className="flex gap-4">
                   <div className="flex flex-col items-center">
@@ -940,7 +943,7 @@ export default function OnboardingPage() {
                   'Full database analysis',
                   'Ghost client campaigns',
                   'Trinity AI (7 days)',
-                  'Cancellation recovery',
+                  'Conversation + cancellation recovery',
                   'Revenue dashboard',
                   'Strategy call',
                 ].map((item, index) => (
@@ -986,7 +989,7 @@ export default function OnboardingPage() {
             {/* Fine Print */}
             <p className="text-xs text-zinc-500 text-center">
               After clicking "Start Sprint", you'll be redirected to secure checkout. 
-              Your kickoff call will be scheduled within 24 hours.
+              Kickoff scheduling is sent within 24 hours.
             </p>
           </div>
         )}
@@ -1010,10 +1013,10 @@ export default function OnboardingPage() {
               </h3>
               <ul className="space-y-4">
                 {[
-                  { time: 'Within 1 hour', action: 'Check your email for kickoff call booking link' },
-                  { time: 'On the call', action: 'We\'ll connect your systems (takes ~30 min)' },
+                  { time: 'Within 1 hour', action: 'Watch for your kickoff scheduling link by email' },
+                  { time: 'On kickoff', action: 'We connect systems and confirm recovery priorities (~30 min)' },
                   { time: 'Day 1', action: 'Trinity starts analyzing your client database' },
-                  { time: 'Day 3', action: 'First reactivation messages go out' },
+                  { time: 'Day 3', action: 'First recovery workflows go live' },
                   { time: 'Day 7', action: 'You get your Revenue Recovery Report' },
                 ].map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
@@ -1080,8 +1083,8 @@ export default function OnboardingPage() {
                 disabled={step === 'audit' && (!data.name || !data.email)}
                 className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 px-8 py-3 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
               >
-                {step === 'leaks' && 'Connect Your Data'}
-                {step === 'connect' && 'See My Analysis'}
+                {step === 'leaks' && 'Connect Data'}
+                {step === 'connect' && 'See Analysis'}
                 {step === 'estimate' && 'Start My Sprint'}
                 {step === 'audit' && 'Continue'}
                 <ArrowRight className="w-5 h-5" />

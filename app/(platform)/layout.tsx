@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'x3o.ai | Revenue Injection Engine for Salons',
-  description: 'Stop losing money to ghost clients and empty chairs. Our AI workforce reactivates dormant clients, fills last-minute cancellations, and recovers lost revenue—while you work.',
+  title: 'x3o.ai | Revenue Recovery AI for Service Businesses',
+  description: 'Recover lost revenue from ghost clients, cold conversations, and empty slots. x3o.ai integrates with your existing booking tools to reactivate demand automatically.',
   openGraph: {
-    title: 'x3o.ai | Revenue Injection Engine',
-    description: 'Your clients are leaking revenue. Ghost clients. Dead DMs. Empty chairs. We plug the leaks. You keep the money.',
+    title: 'x3o.ai | Revenue Recovery AI',
+    description: 'Not another booking platform. x3o.ai plugs revenue leaks by reactivating dormant clients, recovering abandoned conversations, and filling cancelled slots.',
     type: 'website',
   },
 };

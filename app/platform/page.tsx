@@ -23,31 +23,31 @@ export default function PlatformLandingPage() {
   const [businessName, setBusinessName] = useState('');
 
   const problemStats = [
-    { stat: '67%', label: 'of salon clients never return after first visit' },
-    { stat: '$4,200', label: 'average monthly revenue lost to inactive clients' },
-    { stat: '23%', label: 'of clients ghost after booking consultation' },
+    { stat: '67%', label: 'of first-time clients do not rebook without follow-up' },
+    { stat: '$4,200', label: 'average monthly revenue leakage from inactive demand' },
+    { stat: '23%', label: 'of inbound conversations go cold before booking' },
   ];
 
   const sprintDeliverables = [
     {
       icon: Users,
       title: 'Ghost Client Revival',
-      description: 'AI identifies and re-engages clients who haven\'t booked in 60+ days with personalized outreach.',
+      description: 'AI identifies and re-engages clients who have not booked in 60+ days with personalized outreach.',
     },
     {
       icon: MessageSquare,
       title: 'Conversation Recovery',
-      description: 'Trinity AI picks up dead DM conversations and books them—while you sleep.',
+      description: 'Trinity AI detects cold conversations and follows up automatically across your channels.',
     },
     {
       icon: Calendar,
       title: 'Instant Slot Filling',
-      description: 'Last-minute cancellation? AI texts your waitlist and fills the slot in minutes, not hours.',
+      description: 'When a cancellation happens, AI messages your waitlist and fills the slot in minutes.',
     },
     {
       icon: BarChart3,
       title: 'Revenue Dashboard',
-      description: 'See exactly how much recovered revenue your AI workforce generates. Updated daily.',
+      description: 'Track recovered revenue, response rates, and fill rate in one operational dashboard.',
     },
   ];
 
@@ -56,27 +56,28 @@ export default function PlatformLandingPage() {
     { feature: 'Auto-respond to DMs 24/7', us: true, them: false },
     { feature: 'Fill last-minute cancellations', us: true, them: false },
     { feature: 'Show "Recovered Revenue" metrics', us: true, them: false },
-    { feature: 'Works with your existing calendar', us: true, them: true },
+    { feature: 'Works with your existing booking tool', us: true, them: true },
+    { feature: 'Native booking UI included', us: false, them: true },
     { feature: 'Monthly subscription', us: true, them: true },
   ];
 
   const testimonials = [
     {
-      quote: "In the first week, Trinity booked 3 clients I thought I'd lost forever. That's $600 I wouldn't have seen.",
+      quote: "In the first week, Trinity recovered clients I thought were gone for good. That revenue would have stayed lost.",
       author: 'Jasmine T.',
-      role: 'Loc Specialist, Atlanta',
+      role: 'Salon Owner, Atlanta',
       revenue: '$2,400/mo recovered',
     },
     {
-      quote: "I stopped paying my VA to chase DMs. Trinity does it better and never forgets a follow-up.",
+      quote: "I stopped paying my VA to chase cold conversations. Trinity follows up instantly and consistently.",
       author: 'Marcus R.',
-      role: 'Barbershop Owner, Chicago',
+      role: 'Gym Operator, Chicago',
       revenue: '$1,800/mo recovered',
     },
     {
-      quote: "The ghost client reactivation alone paid for a year of service in the first month.",
+      quote: "Ghost client reactivation alone paid for the service quickly. The dashboard made ROI obvious.",
       author: 'Keisha W.',
-      role: 'Natural Hair Salon, Houston',
+      role: 'Wellness Clinic, Houston',
       revenue: '$3,100/mo recovered',
     },
   ];
@@ -118,19 +119,19 @@ export default function PlatformLandingPage() {
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 mb-8">
             <DollarSign className="w-4 h-4 text-emerald-400" />
-            <span className="text-sm text-emerald-400 font-medium">AI Workforce That Pays For Itself</span>
+            <span className="text-sm text-emerald-400 font-medium">Revenue Recovery AI for Service Businesses</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-            Your Clients Are
-            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"> Leaking Revenue</span>
+            Recover Revenue
+            <span className="bg-gradient-to-r from-emerald-400 to-cyan-400 bg-clip-text text-transparent"> From Existing Demand</span>
           </h1>
 
           <p className="text-xl text-zinc-400 mb-4 max-w-3xl mx-auto">
-            Ghost clients. Dead DMs. Last-minute cancellations.
+            Ghost clients. Cold conversations. Last-minute cancellations.
           </p>
           <p className="text-2xl text-white mb-10 max-w-3xl mx-auto font-semibold">
-            We plug the leaks. You keep the money.
+            We plug the leaks while your current booking tool stays in place.
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8">
@@ -139,7 +140,7 @@ export default function PlatformLandingPage() {
               className="w-full sm:w-auto bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 px-8 py-4 rounded-lg font-semibold text-lg transition flex items-center justify-center gap-2"
             >
               <Zap className="w-5 h-5" />
-              Start 7-Day Revenue Sprint
+              Start Revenue Sprint
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -165,10 +166,11 @@ export default function PlatformLandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              You Don't Need <span className="text-red-400">Another Calendar App</span>
+              Keep Your Booking Stack.
+              <span className="text-red-400"> Recover What It Misses.</span>
             </h2>
             <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-              You have a calendar. It's not working because the <em>people</em> aren't showing up.
+              x3o.ai is the recovery layer on top of your existing booking platform.
             </p>
           </div>
 
@@ -182,7 +184,7 @@ export default function PlatformLandingPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Ghost Clients</h3>
                     <p className="text-zinc-400 text-sm">
-                      They came once. Loved it. Then vanished. They're not gone—they just forgot about you.
+                      They booked before, then stopped returning. Automated outreach brings them back.
                     </p>
                   </div>
                 </div>
@@ -196,7 +198,7 @@ export default function PlatformLandingPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Dead DMs</h3>
                     <p className="text-zinc-400 text-sm">
-                      "I'll check my schedule and get back to you!" They didn't. And you were too busy to follow up.
+                      Inquiries stall before booking. Trinity follows up until they convert or opt out.
                     </p>
                   </div>
                 </div>
@@ -210,7 +212,7 @@ export default function PlatformLandingPage() {
                   <div>
                     <h3 className="font-semibold mb-1">Empty Chairs</h3>
                     <p className="text-zinc-400 text-sm">
-                      Last-minute cancellation at 9am. You post on IG. Maybe someone sees it. Usually they don't.
+                      Cancellations create wasted capacity. x3o.ai fills openings from your waitlist instantly.
                     </p>
                   </div>
                 </div>
@@ -223,7 +225,7 @@ export default function PlatformLandingPage() {
                 <p className="text-zinc-400 mb-6">Average monthly revenue lost to client leakage</p>
                 <div className="h-px bg-zinc-800 mb-6"></div>
                 <p className="text-sm text-zinc-500">
-                  Based on average salon with 150 clients, $65 average ticket, 67% churn rate
+                  Illustrative baseline for service businesses with recurring clients and limited follow-up capacity
                 </p>
               </div>
             </div>
@@ -237,13 +239,13 @@ export default function PlatformLandingPage() {
           <div className="text-center mb-16">
             <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/20 rounded-full px-4 py-1.5 mb-6">
               <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span className="text-emerald-400 font-medium">Revenue Injection Engine</span>
+              <span className="text-emerald-400 font-medium">Integration-First Revenue Recovery</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
               Meet <span className="text-emerald-400">Trinity</span> — Your AI Revenue Agent
             </h2>
             <p className="text-zinc-400 max-w-2xl mx-auto text-lg">
-              Not a chatbot. Not a calendar. An AI workforce that finds your lost revenue and brings it back.
+              Not another booking UI. Trinity runs the recovery workflows your team does not have time to run.
             </p>
           </div>
 
@@ -277,16 +279,16 @@ export default function PlatformLandingPage() {
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">The 7-Day Revenue Sprint</h2>
             <p className="text-zinc-400 max-w-2xl mx-auto">
-              We deploy Trinity into your business. You watch the revenue roll in.
+              We deploy Trinity on top of your current system and measure recovered revenue in real time.
             </p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-6">
             {[
               { day: 'Day 1-2', title: 'Connect & Analyze', desc: 'We connect to your booking system and analyze your client database for revenue leaks.' },
-              { day: 'Day 3-4', title: 'Deploy Trinity', desc: 'AI agent goes live—responding to DMs, reactivating ghosts, filling cancellations.' },
-              { day: 'Day 5-6', title: 'Optimize & Scale', desc: 'We tune messaging based on response rates. Trinity gets smarter.' },
-              { day: 'Day 7', title: 'Revenue Report', desc: 'You get a dashboard showing exactly how much money we recovered.' },
+              { day: 'Day 3-4', title: 'Launch Recovery Flows', desc: 'Trinity activates ghost revival, conversation recovery, and slot-filling workflows.' },
+              { day: 'Day 5-6', title: 'Optimize Messaging', desc: 'We tune script variants from live response data to improve conversion.' },
+              { day: 'Day 7', title: 'Revenue Report', desc: 'You receive a full recovered-revenue report and ongoing plan recommendation.' },
             ].map((step, index) => (
               <div key={index} className="text-center">
                 <div className="w-12 h-12 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -306,10 +308,11 @@ export default function PlatformLandingPage() {
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              This Isn't <span className="text-zinc-500 line-through">Booking Software</span>
+              Built to Layer on Top of
+              <span className="text-zinc-500 line-through"> Your Existing Booking Stack</span>
             </h2>
             <p className="text-zinc-400">
-              Compare us to the calendars you're already paying for.
+              Booking tools schedule appointments. x3o.ai recovers the demand they do not capture.
             </p>
           </div>
 
@@ -317,7 +320,7 @@ export default function PlatformLandingPage() {
             <div className="grid grid-cols-3 bg-zinc-800/50 p-4">
               <div className="font-medium">Feature</div>
               <div className="text-center font-medium text-emerald-400">x3o.ai</div>
-              <div className="text-center font-medium text-zinc-400">Calendar Apps</div>
+              <div className="text-center font-medium text-zinc-400">Booking Platforms</div>
             </div>
             {comparisonData.map((row, index) => (
               <div key={index} className="grid grid-cols-3 p-4 border-t border-zinc-800">
@@ -373,8 +376,8 @@ export default function PlatformLandingPage() {
       <section className="py-20 px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">Simple. Pay Once. See Results.</h2>
-            <p className="text-zinc-400">No monthly fees until you see the money.</p>
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Start with Results. Continue with Scale.</h2>
+            <p className="text-zinc-400">Sprint first, then ongoing recovery automation.</p>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
@@ -382,7 +385,7 @@ export default function PlatformLandingPage() {
             <div className="bg-gradient-to-b from-emerald-600/20 to-cyan-600/20 border-2 border-emerald-500 rounded-2xl p-8">
               <div className="text-sm font-medium text-emerald-400 mb-4">Most Popular</div>
               <h3 className="text-2xl font-bold mb-2">7-Day Revenue Sprint</h3>
-              <p className="text-zinc-400 mb-6">Find your leaks. Plug them. See the money.</p>
+              <p className="text-zinc-400 mb-6">Find your leaks. Plug them. Verify ROI.</p>
               <div className="mb-6">
                 <span className="text-5xl font-bold">$1,500</span>
                 <span className="text-zinc-500"> one-time</span>
@@ -392,7 +395,7 @@ export default function PlatformLandingPage() {
                   'Full client database analysis',
                   'Ghost client reactivation campaign',
                   'Trinity AI deployment (7 days)',
-                  'Cancellation recovery system',
+                  'Conversation and cancellation recovery system',
                   'Revenue recovery dashboard',
                   'Strategy call with results',
                 ].map((feature, index) => (
@@ -441,7 +444,7 @@ export default function PlatformLandingPage() {
                 Available After Sprint
               </button>
               <p className="text-center text-sm text-zinc-500 mt-4">
-                Cancel anytime. No contracts.
+                Cancel anytime. No long-term contracts.
               </p>
             </div>
           </div>
@@ -452,19 +455,19 @@ export default function PlatformLandingPage() {
       <section className="py-20 px-4 bg-gradient-to-b from-zinc-950 to-emerald-950/20">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            How Much Are You Losing Every Month?
+            How Much Revenue Is Slipping Through Right Now?
           </h2>
           <p className="text-zinc-400 mb-10 text-lg">
-            The average salon loses $4,200/mo to ghost clients and empty chairs.
+            The average service business leaks thousands each month from missed follow-up and unused capacity.
             <br />
-            <span className="text-white font-semibold">Let's find out what you're leaving on the table.</span>
+            <span className="text-white font-semibold">Let’s map your leakage and recover it fast.</span>
           </p>
           <Link
             href="/onboarding"
             className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 px-8 py-4 rounded-lg font-semibold text-lg transition"
           >
             <Zap className="w-5 h-5" />
-            Start 7-Day Revenue Sprint
+            Start Revenue Sprint
             <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="text-sm text-zinc-500 mt-6">
@@ -488,7 +491,7 @@ export default function PlatformLandingPage() {
               <a href="#" className="text-zinc-400 hover:text-white transition">Terms</a>
               <a href="mailto:hey@x3o.ai" className="text-zinc-400 hover:text-white transition">Contact</a>
             </div>
-            <p className="text-zinc-500 text-sm">© 2025 x3o.ai. Revenue Injection Engine.</p>
+            <p className="text-zinc-500 text-sm">© 2026 x3o.ai. Revenue Recovery AI.</p>
           </div>
         </div>
       </footer>

@@ -20,18 +20,18 @@ const platformUrl = `https://${ROOT_DOMAIN}`;
 const platformMetadata: Metadata = {
   metadataBase: new URL(platformUrl),
   title: {
-    default: 'x3o.ai | White-Label Booking Platform for Salons',
+    default: 'x3o.ai | Revenue Recovery AI for Service Businesses',
     template: '%s | x3o.ai',
   },
-  description: 'Launch your own branded booking system with AI-powered content generation. Built for salons, barbershops, and beauty businesses.',
-  keywords: ['salon software', 'booking system', 'white label', 'AI marketing', 'salon booking'],
+  description: 'Recover lost revenue from ghost clients, cold conversations, and cancelled slots. x3o.ai integrates with your existing booking tools and CRM workflows.',
+  keywords: ['revenue recovery ai', 'ghost client reactivation', 'conversation recovery', 'slot filling automation', 'service business growth'],
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
   },
   openGraph: {
-    title: 'x3o.ai | White-Label Booking Platform',
-    description: 'Launch your own branded booking system with AI-powered content generation.',
+    title: 'x3o.ai | Revenue Recovery AI',
+    description: 'Not another booking platform. Recover demand your current stack is missing with automated reactivation, follow-up, and slot filling.',
     url: platformUrl,
     siteName: 'x3o.ai',
     type: 'website',
@@ -87,7 +87,7 @@ export default async function RootLayout({
         '@type': 'SoftwareApplication',
         name: 'x3o.ai',
         applicationCategory: 'BusinessApplication',
-        description: 'White-label booking platform for salons and beauty businesses',
+        description: 'Revenue recovery AI for service businesses that integrates with existing booking systems',
       };
 
   const siteUrl = business
