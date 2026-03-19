@@ -1,29 +1,35 @@
 import Link from 'next/link';
 
+const tagClasses: Record<string, string> = {
+  '#22c55e': 'x3o-tag x3o-tag-green',
+  '#6366f1': 'x3o-tag x3o-tag-purple',
+  '#4a5a78': 'x3o-tag',
+};
+
+const valueColors: Record<string, string> = {
+  '#22c55e': 'var(--x3o-green)',
+  '#e8a020': 'var(--x3o-accent)',
+  '#6366f1': 'var(--x3o-purple)',
+};
+
 export default function IntelDashboard() {
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 1100 }}>
-      <div style={{ marginBottom: 32 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, color: '#f0f4ff', margin: 0 }}>
-          Intelligence Dashboard
-        </h1>
-        <p style={{ fontSize: 13, color: '#6b7fa3', marginTop: 4 }}>
-          Real-time competitive intelligence powered by Trinity AI
-        </p>
+    <div className="x3o-main">
+      <div className="mb-8">
+        <h1 className="x3o-sec-title">Intelligence Dashboard</h1>
+        <p className="x3o-sec-sub">Real-time competitive intelligence powered by Trinity AI</p>
       </div>
 
       {/* Quick Stats */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 32 }}>
+      <div className="x3o-g3 mb-8">
         <StatCard label="Market Position" value="#1" sub="Houston loc salon by IG followers" color="#22c55e" />
         <StatCard label="Threats Monitored" value="9" sub="Active competitors tracked" color="#e8a020" />
         <StatCard label="AI Conversations" value="∞" sub="Oracle · Sentinel · Sage ready" color="#6366f1" />
       </div>
 
       {/* Navigation Cards */}
-      <h2 style={{ fontSize: 14, fontWeight: 600, color: '#8899bb', marginBottom: 16, letterSpacing: '0.04em' }}>
-        INTELLIGENCE MODULES
-      </h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+      <h2 className="x3o-sec-label mb-4">INTELLIGENCE MODULES</h2>
+      <div className="x3o-g2">
         <NavCard
           href="/platform/intel/competitive"
           icon="🎯"
@@ -65,12 +71,10 @@ export default function IntelDashboard() {
 
 function StatCard({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) {
   return (
-    <div style={{
-      background: '#0d1424', border: '1px solid #1e2d45', borderRadius: 10, padding: '20px 24px',
-    }}>
-      <div style={{ fontSize: 11, color: '#6b7fa3', marginBottom: 8, letterSpacing: '0.04em' }}>{label}</div>
-      <div style={{ fontSize: 28, fontWeight: 800, color, marginBottom: 4 }}>{value}</div>
-      <div style={{ fontSize: 11, color: '#4a5a78' }}>{sub}</div>
+    <div className="x3o-metric">
+      <div className="x3o-metric-label">{label}</div>
+      <div className="x3o-metric-val" style={{ color: valueColors[color] || color }}>{value}</div>
+      <div className="x3o-metric-sub">{sub}</div>
     </div>
   );
 }
@@ -79,21 +83,14 @@ function NavCard({ href, icon, title, description, tag, tagColor, disabled }: {
   href: string; icon: string; title: string; description: string; tag: string; tagColor: string; disabled?: boolean;
 }) {
   return (
-    <Link href={disabled ? '#' : href} style={{ textDecoration: 'none' }}>
-      <div style={{
-        background: '#0d1424', border: '1px solid #1e2d45', borderRadius: 10, padding: '24px',
-        cursor: disabled ? 'default' : 'pointer', opacity: disabled ? 0.5 : 1,
-        transition: 'border-color 0.15s',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-          <span style={{ fontSize: 20 }}>{icon}</span>
-          <span style={{ fontSize: 15, fontWeight: 700, color: '#f0f4ff' }}>{title}</span>
-          <span style={{
-            fontSize: 10, fontWeight: 600, color: tagColor, background: `${tagColor}18`,
-            padding: '2px 8px', borderRadius: 4, marginLeft: 'auto',
-          }}>{tag}</span>
+    <Link href={disabled ? '#' : href} className="no-underline">
+      <div className={`x3o-vert-card${disabled ? ' opacity-50 pointer-events-none' : ''}`}>
+        <div className="flex items-center gap-2.5 mb-2.5">
+          <span className="text-xl">{icon}</span>
+          <span className="x3o-h3">{title}</span>
+          <span className={`${tagClasses[tagColor] || 'x3o-tag'} ml-auto`}>{tag}</span>
         </div>
-        <p style={{ fontSize: 12, color: '#6b7fa3', lineHeight: 1.5, margin: 0 }}>{description}</p>
+        <p className="x3o-sec-sub" style={{ margin: 0, lineHeight: 1.5 }}>{description}</p>
       </div>
     </Link>
   );

@@ -120,71 +120,35 @@ export default function TrinityPage() {
   // Agent selection screen
   if (!activeAgent) {
     return (
-      <div style={{ padding: 32, maxWidth: 960, margin: '0 auto' }}>
-        <div style={{ marginBottom: 32 }}>
-          <h1 style={{ fontSize: 24, fontWeight: 700, color: '#f0f4ff', margin: 0 }}>
-            Trinity AI
-          </h1>
-          <p style={{ fontSize: 14, color: '#6b7fa3', marginTop: 6 }}>
-            Choose an intelligence agent to start a conversation
-          </p>
+      <div className="x3o-main" style={{ maxWidth: 960 }}>
+        <div className="mb-8">
+          <h1 className="x3o-sec-title">Trinity AI</h1>
+          <p className="x3o-sec-sub">Choose an intelligence agent to start a conversation</p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+        <div className="x3o-g3">
           {agents.map(agent => (
             <button
               key={agent.id}
               onClick={() => selectAgent(agent)}
-              style={{
-                background: '#0d1424',
-                border: '1px solid #1e2d45',
-                borderRadius: 12,
-                padding: 28,
-                cursor: 'pointer',
-                textAlign: 'left' as const,
-                transition: 'all 0.2s',
-                display: 'flex',
-                flexDirection: 'column' as const,
-                gap: 16,
-              }}
-              onMouseEnter={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = agent.color;
-                (e.currentTarget as HTMLElement).style.background = '#111b2e';
-              }}
-              onMouseLeave={e => {
-                (e.currentTarget as HTMLElement).style.borderColor = '#1e2d45';
-                (e.currentTarget as HTMLElement).style.background = '#0d1424';
-              }}
+              className="x3o-agent-card"
             >
-              <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                <div style={{
-                  width: 48, height: 48, borderRadius: 10,
-                  background: `${agent.color}18`,
-                  border: `1px solid ${agent.color}40`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 22,
-                }}>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-[10px] flex items-center justify-center text-[22px] shrink-0"
+                  style={{ background: `${agent.color}18`, border: `1px solid ${agent.color}40` }}>
                   {agent.icon}
                 </div>
                 <div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: '#f0f4ff' }}>{agent.name}</div>
-                  <div style={{ fontSize: 11, color: agent.color, fontWeight: 600, letterSpacing: '0.03em' }}>
+                  <div className="text-base font-bold" style={{ color: 'var(--x3o-t1)' }}>{agent.name}</div>
+                  <div className="text-[11px] font-semibold tracking-wide" style={{ color: agent.color }}>
                     {agent.tagline}
                   </div>
                 </div>
               </div>
-              <p style={{ fontSize: 13, color: '#6b7fa3', lineHeight: 1.5, margin: 0 }}>
+              <p className="text-[13px] leading-relaxed m-0 mt-4" style={{ color: 'var(--x3o-t2)' }}>
                 {agent.description}
               </p>
-              <div style={{
-                marginTop: 'auto',
-                fontSize: 12,
-                color: agent.color,
-                fontWeight: 600,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}>
+              <div className="mt-auto pt-2 text-xs font-semibold flex items-center gap-1.5" style={{ color: agent.color }}>
                 Start conversation →
               </div>
             </button>
@@ -192,34 +156,21 @@ export default function TrinityPage() {
         </div>
 
         {/* Feature overview */}
-        <div style={{
-          marginTop: 40,
-          padding: 24,
-          background: '#0d1424',
-          border: '1px solid #1e2d45',
-          borderRadius: 10,
-        }}>
-          <div style={{ fontSize: 13, fontWeight: 600, color: '#8899bb', marginBottom: 16 }}>
+        <div className="x3o-card mt-10">
+          <div className="text-[13px] font-semibold mb-4" style={{ color: 'var(--x3o-t2)' }}>
             How Trinity AI works
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 20 }}>
+          <div className="x3o-g3 !mb-0">
             {[
               { step: '1', title: 'Select an agent', desc: 'Each agent specializes in a different domain of business intelligence.' },
               { step: '2', title: 'Ask anything', desc: 'Natural language questions about your market, competitors, or performance.' },
               { step: '3', title: 'Get actionable intel', desc: 'Data-driven insights and strategic recommendations for your business.' },
             ].map(item => (
-              <div key={item.step} style={{ display: 'flex', gap: 12 }}>
-                <div style={{
-                  width: 28, height: 28, borderRadius: '50%',
-                  background: '#e8a02018', border: '1px solid #e8a02040',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 700, color: '#e8a020', flexShrink: 0,
-                }}>
-                  {item.step}
-                </div>
+              <div key={item.step} className="flex gap-3">
+                <div className="x3o-tl-dot active shrink-0">{item.step}</div>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: '#c8d6e5' }}>{item.title}</div>
-                  <div style={{ fontSize: 12, color: '#4a5a78', lineHeight: 1.5, marginTop: 4 }}>{item.desc}</div>
+                  <div className="text-[13px] font-semibold" style={{ color: 'var(--x3o-t1)' }}>{item.title}</div>
+                  <div className="text-xs mt-1" style={{ color: 'var(--x3o-t3)', lineHeight: 1.5 }}>{item.desc}</div>
                 </div>
               </div>
             ))}
@@ -231,119 +182,47 @@ export default function TrinityPage() {
 
   // Chat interface
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+    <div className="x3o-chat-wrap">
       {/* Chat header */}
-      <div style={{
-        padding: '14px 24px',
-        borderBottom: '1px solid #1e2d45',
-        background: '#0a0f1a',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        flexShrink: 0,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: `${activeAgent.color}18`,
-            border: `1px solid ${activeAgent.color}40`,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 18,
-          }}>
+      <div className="x3o-chat-header">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center text-lg shrink-0"
+            style={{ background: `${activeAgent.color}18`, border: `1px solid ${activeAgent.color}40` }}>
             {activeAgent.icon}
           </div>
           <div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#f0f4ff' }}>
-              {activeAgent.name}
-            </div>
-            <div style={{ fontSize: 11, color: activeAgent.color }}>{activeAgent.tagline}</div>
+            <div className="text-sm font-bold" style={{ color: 'var(--x3o-t1)' }}>{activeAgent.name}</div>
+            <div className="text-[11px]" style={{ color: activeAgent.color }}>{activeAgent.tagline}</div>
           </div>
         </div>
-        <button
-          onClick={resetAgent}
-          style={{
-            background: '#111b2e',
-            border: '1px solid #1e2d45',
-            borderRadius: 6,
-            padding: '6px 14px',
-            fontSize: 12,
-            color: '#8899bb',
-            cursor: 'pointer',
-          }}
-        >
-          ← Switch Agent
-        </button>
+        <button onClick={resetAgent} className="x3o-btn-ghost">← Switch Agent</button>
       </div>
 
       {/* Messages */}
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: 24,
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 16,
-      }}>
+      <div className="x3o-chat-messages flex flex-col gap-4">
         {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              display: 'flex',
-              justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
-              gap: 10,
-            }}
-          >
+          <div key={i} className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             {msg.role === 'assistant' && (
-              <div style={{
-                width: 30, height: 30, borderRadius: 8,
-                background: `${activeAgent.color}18`,
-                border: `1px solid ${activeAgent.color}30`,
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: 14, flexShrink: 0, marginTop: 2,
-              }}>
+              <div className="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-sm shrink-0 mt-0.5"
+                style={{ background: `${activeAgent.color}18`, border: `1px solid ${activeAgent.color}30` }}>
                 {activeAgent.icon}
               </div>
             )}
-            <div style={{
-              maxWidth: '70%',
-              padding: '12px 16px',
-              borderRadius: msg.role === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
-              background: msg.role === 'user' ? '#1a3a6a' : '#111b2e',
-              border: `1px solid ${msg.role === 'user' ? '#234a7a' : '#1e2d45'}`,
-              fontSize: 13,
-              lineHeight: 1.6,
-              color: msg.role === 'user' ? '#dbe8ff' : '#c8d6e5',
-              whiteSpace: 'pre-wrap' as const,
-            }}>
+            <div className={msg.role === 'user' ? 'x3o-msg-user' : 'x3o-msg-assistant'}
+              style={{ fontSize: 13, lineHeight: 1.6, color: msg.role === 'user' ? '#dbe8ff' : 'var(--x3o-t2)', whiteSpace: 'pre-wrap' }}>
               {msg.content}
             </div>
           </div>
         ))}
 
         {loading && (
-          <div style={{ display: 'flex', gap: 10 }}>
-            <div style={{
-              width: 30, height: 30, borderRadius: 8,
-              background: `${activeAgent.color}18`,
-              border: `1px solid ${activeAgent.color}30`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 14, flexShrink: 0,
-            }}>
+          <div className="flex gap-2.5">
+            <div className="w-[30px] h-[30px] rounded-lg flex items-center justify-center text-sm shrink-0"
+              style={{ background: `${activeAgent.color}18`, border: `1px solid ${activeAgent.color}30` }}>
               {activeAgent.icon}
             </div>
-            <div style={{
-              padding: '12px 16px',
-              borderRadius: '14px 14px 14px 4px',
-              background: '#111b2e',
-              border: '1px solid #1e2d45',
-              fontSize: 13,
-              color: '#6b7fa3',
-            }}>
-              <span style={{ display: 'inline-flex', gap: 4 }}>
-                <span style={{ animation: 'pulse 1.4s infinite', animationDelay: '0s' }}>●</span>
-                <span style={{ animation: 'pulse 1.4s infinite', animationDelay: '0.2s' }}>●</span>
-                <span style={{ animation: 'pulse 1.4s infinite', animationDelay: '0.4s' }}>●</span>
-              </span>
+            <div className="x3o-msg-assistant" style={{ color: 'var(--x3o-t2)' }}>
+              <span className="inline-flex gap-1" style={{ animation: 'x3o-pulse 1.4s infinite' }}>● ● ●</span>
             </div>
           </div>
         )}
@@ -352,18 +231,8 @@ export default function TrinityPage() {
       </div>
 
       {/* Input */}
-      <div style={{
-        padding: '16px 24px',
-        borderTop: '1px solid #1e2d45',
-        background: '#0a0f1a',
-        flexShrink: 0,
-      }}>
-        <div style={{
-          display: 'flex',
-          gap: 10,
-          maxWidth: 800,
-          margin: '0 auto',
-        }}>
+      <div className="x3o-chat-input-wrap">
+        <div className="flex gap-2.5 max-w-[800px] mx-auto">
           <input
             ref={inputRef}
             type="text"
@@ -372,46 +241,27 @@ export default function TrinityPage() {
             onKeyDown={handleKeyDown}
             placeholder={`Ask ${activeAgent.name} anything...`}
             disabled={loading}
-            style={{
-              flex: 1,
-              padding: '12px 16px',
-              borderRadius: 8,
-              border: '1px solid #1e2d45',
-              background: '#0d1424',
-              color: '#f0f4ff',
-              fontSize: 13,
-              outline: 'none',
-            }}
+            className="flex-1 px-4 py-3 rounded-lg text-[13px] outline-none"
+            style={{ border: '1px solid var(--x3o-border)', background: 'var(--x3o-bg)', color: 'var(--x3o-t1)' }}
           />
           <button
             onClick={sendMessage}
             disabled={loading || !input.trim()}
+            className="px-5 py-3 rounded-lg text-[13px] font-semibold transition-all"
             style={{
-              padding: '12px 20px',
-              borderRadius: 8,
+              background: loading || !input.trim() ? 'var(--x3o-border)' : activeAgent.color,
+              color: loading || !input.trim() ? 'var(--x3o-t3)' : '#fff',
               border: 'none',
-              background: loading || !input.trim() ? '#1e2d45' : activeAgent.color,
-              color: loading || !input.trim() ? '#4a5a78' : '#fff',
-              fontSize: 13,
-              fontWeight: 600,
               cursor: loading || !input.trim() ? 'default' : 'pointer',
-              transition: 'all 0.15s',
             }}
           >
             Send
           </button>
         </div>
-        <div style={{ textAlign: 'center' as const, marginTop: 8, fontSize: 11, color: '#2a3555' }}>
+        <div className="text-center mt-2 text-[11px]" style={{ color: 'var(--x3o-t4)' }}>
           Trinity AI provides intelligence analysis. Always verify critical decisions with your own research.
         </div>
       </div>
-
-      <style>{`
-        @keyframes pulse {
-          0%, 80%, 100% { opacity: 0.3; }
-          40% { opacity: 1; }
-        }
-      `}</style>
     </div>
   );
 }

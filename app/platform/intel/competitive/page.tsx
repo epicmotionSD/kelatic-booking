@@ -66,72 +66,64 @@ export default function CompetitiveIntelPage() {
   const totalIG = competitors.reduce((s, c) => s + c.ig, 0);
 
   return (
-    <div style={{ padding: '32px 40px', maxWidth: 1200, color: '#c8d6e5' }}>
+    <div className="x3o-main" style={{ color: 'var(--x3o-t2)' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
+      <div className="flex justify-between items-start mb-2">
         <div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: '#f0f4ff', margin: 0 }}>
-            Houston Loc Market <span style={{ color: '#4a5a78' }}>·</span> Competitive Intelligence
+          <h1 className="x3o-sec-title">
+            Houston Loc Market <span style={{ color: 'var(--x3o-t3)' }}>·</span> Competitive Intelligence
           </h1>
-          <p style={{ fontSize: 12, color: '#4a5a78', marginTop: 4 }}>
+          <p className="text-xs" style={{ color: 'var(--x3o-t3)' }}>
             KeLatic Hair Lounge vs top 9 Houston loc salons · Data sourced Dec 2025 – Mar 2026
           </p>
         </div>
-        <div style={{ display: 'flex', gap: 8 }}>
-          <button style={btnStyle}>Export Report</button>
-          <button style={btnStyle}>Share</button>
+        <div className="flex gap-2">
+          <button className="x3o-btn-ghost">Export Report</button>
+          <button className="x3o-btn-ghost">Share</button>
         </div>
       </div>
 
       {/* Insight Callout */}
-      <div style={{
-        background: '#0d2818', border: '1px solid #166534', borderRadius: 8, padding: '14px 20px',
-        marginBottom: 24, display: 'flex', alignItems: 'center', gap: 12,
-      }}>
-        <span style={{ fontSize: 18 }}>🟢</span>
-        <p style={{ margin: 0, fontSize: 13, color: '#86efac', lineHeight: 1.5 }}>
-          <strong>KeLatic leads the market on Instagram</strong> — 18,240 followers vs #2 Houston Loc Fairy&apos;s 12,000. 
+      <div className="x3o-insight flex items-center gap-3">
+        <span className="text-lg">🟢</span>
+        <p className="m-0">
+          <strong>KeLatic leads the market on Instagram</strong> — 18,240 followers vs #2 Houston Loc Fairy&apos;s 12,000.
           7.4% engagement rate is 2.8% above market average. Primary vulnerability: Yelp ranking (#2 behind Loc Fairy).
         </p>
       </div>
 
       {/* Key Metrics */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 28 }}>
-        <MetricCard label="KeLatic IG Rank" value="#1" sub="Houston loc salons" color="#22c55e" />
-        <MetricCard label="Yelp Ranking" value="Top 10" sub="Behind Loc Fairy #1" color="#e8a020" />
-        <MetricCard label="Engagement Lead" value="+2.8%" sub="vs market avg 4.6%" color="#22c55e" />
-        <MetricCard label="Follower Gap to #2" value="+6,240" sub="vs Houston Loc Fairy" color="#22c55e" />
+      <div className="x3o-g4">
+        <MetricCard label="KeLatic IG Rank" value="#1" sub="Houston loc salons" color="var(--x3o-green)" />
+        <MetricCard label="Yelp Ranking" value="Top 10" sub="Behind Loc Fairy #1" color="var(--x3o-accent)" />
+        <MetricCard label="Engagement Lead" value="+2.8%" sub="vs market avg 4.6%" color="var(--x3o-green)" />
+        <MetricCard label="Follower Gap to #2" value="+6,240" sub="vs Houston Loc Fairy" color="var(--x3o-green)" />
       </div>
 
       {/* Competitive Landscape Table */}
       <SectionTitle>Full Competitive Landscape</SectionTitle>
-      <div style={{ overflowX: 'auto', marginBottom: 28 }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+      <div className="overflow-x-auto mb-7">
+        <table className="x3o-table">
           <thead>
-            <tr style={{ borderBottom: '1px solid #1e2d45' }}>
+            <tr>
               {['Salon', 'Yelp', 'IG Followers', 'Engagement', 'Platform', 'Specialty', 'Threat'].map(h => (
-                <th key={h} style={{ padding: '10px 12px', textAlign: 'left', color: '#6b7fa3', fontWeight: 600, fontSize: 11 }}>{h}</th>
+                <th key={h}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {competitors.map((c, i) => (
-              <tr key={i} style={{
-                borderBottom: '1px solid #151d2e',
-                background: c.isUs ? '#0d1a2e' : 'transparent',
-              }}>
-                <td style={{ padding: '10px 12px' }}>
-                  <div style={{ fontWeight: c.isUs ? 700 : 500, color: c.isUs ? '#e8a020' : '#c8d6e5' }}>{c.name}</div>
-                  <div style={{ fontSize: 11, color: '#4a5a78' }}>{c.handle}</div>
+              <tr key={i} style={{ background: c.isUs ? 'var(--x3o-bg3)' : undefined }}>
+                <td>
+                  <div style={{ fontWeight: c.isUs ? 700 : 500, color: c.isUs ? 'var(--x3o-accent)' : 'var(--x3o-t1)' }}>{c.name}</div>
+                  <div className="text-xs" style={{ color: 'var(--x3o-t3)' }}>{c.handle}</div>
                 </td>
-                <td style={cellStyle}>
-                  <span style={{ color: c.yelp >= 4.7 ? '#22c55e' : '#c8d6e5' }}>⭐ {c.yelp}</span>
-                </td>
-                <td style={cellStyle}>{c.ig.toLocaleString()}</td>
-                <td style={cellStyle}>{c.engagement}%</td>
-                <td style={cellStyle}>{c.platform}</td>
-                <td style={cellStyle}>{c.specialty}</td>
-                <td style={cellStyle}><ThreatBadge level={c.threat} /></td>
+                <td><span style={{ color: c.yelp >= 4.7 ? 'var(--x3o-green)' : undefined }}>⭐ {c.yelp}</span></td>
+                <td>{c.ig.toLocaleString()}</td>
+                <td>{c.engagement}%</td>
+                <td>{c.platform}</td>
+                <td>{c.specialty}</td>
+                <td><ThreatBadge level={c.threat} /></td>
               </tr>
             ))}
           </tbody>
@@ -139,24 +131,21 @@ export default function CompetitiveIntelPage() {
       </div>
 
       {/* Charts Row */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 28 }}>
-        {/* IG Bar Chart */}
-        <div style={cardStyle}>
-          <h3 style={cardTitleStyle}>Instagram Follower Comparison</h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+      <div className="x3o-g2">
+        <div className="x3o-card">
+          <h3 className="x3o-h3 mb-3">Instagram Follower Comparison</h3>
+          <div className="flex flex-col gap-2">
             {competitors.map((c, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                <div style={{ width: 110, fontSize: 11, color: c.isUs ? '#e8a020' : '#6b7fa3', textAlign: 'right', flexShrink: 0 }}>
+              <div key={i} className="flex items-center gap-2.5">
+                <div className="w-28 text-right text-xs shrink-0" style={{ color: c.isUs ? 'var(--x3o-accent)' : 'var(--x3o-t3)' }}>
                   {c.name.length > 16 ? c.name.slice(0, 16) + '…' : c.name}
                 </div>
-                <div style={{ flex: 1, background: '#151d2e', borderRadius: 4, height: 20, position: 'relative' }}>
-                  <div style={{
+                <div className="flex-1 h-5 rounded" style={{ background: 'var(--x3o-bg4)' }}>
+                  <div className="h-full rounded flex items-center justify-end pr-1.5" style={{
                     width: `${(c.ig / maxIG) * 100}%`,
-                    background: c.isUs ? 'linear-gradient(90deg, #e8a020, #f59e0b)' : '#1e3a5f',
-                    height: '100%', borderRadius: 4,
-                    display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 6,
+                    background: c.isUs ? 'linear-gradient(90deg, var(--x3o-accent), var(--x3o-accent2))' : 'var(--x3o-border2)',
                   }}>
-                    <span style={{ fontSize: 10, color: c.isUs ? '#000' : '#6b7fa3', fontWeight: 600 }}>
+                    <span className="text-[10px] font-semibold" style={{ color: c.isUs ? '#000' : 'var(--x3o-t3)' }}>
                       {c.ig >= 1000 ? `${(c.ig / 1000).toFixed(1)}K` : c.ig}
                     </span>
                   </div>
@@ -166,10 +155,9 @@ export default function CompetitiveIntelPage() {
           </div>
         </div>
 
-        {/* Market Share Donut */}
-        <div style={cardStyle}>
-          <h3 style={cardTitleStyle}>Market Share (Houston IG Presence)</h3>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 24, marginTop: 16 }}>
+        <div className="x3o-card">
+          <h3 className="x3o-h3 mb-4">Market Share (Houston IG Presence)</h3>
+          <div className="flex items-center justify-center gap-6">
             <DonutChart data={[
               { label: 'KeLatic', pct: Math.round((18240 / totalIG) * 100), color: '#e8a020' },
               { label: 'Loc Fairy', pct: Math.round((12000 / totalIG) * 100), color: '#3b82f6' },
@@ -181,32 +169,29 @@ export default function CompetitiveIntelPage() {
       </div>
 
       {/* Primary Threat */}
-      <div style={{ ...cardStyle, marginBottom: 28 }}>
-        <div
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-          onClick={() => setExpandedThreat(!expandedThreat)}
-        >
-          <h3 style={{ ...cardTitleStyle, marginBottom: 0 }}>
-            Primary Threat Analysis — <span style={{ color: '#ef4444' }}>Houston Loc Fairy</span>
+      <div className="x3o-card mb-7">
+        <div className="flex justify-between items-center cursor-pointer" onClick={() => setExpandedThreat(!expandedThreat)}>
+          <h3 className="x3o-h3">
+            Primary Threat Analysis — <span style={{ color: 'var(--x3o-red)' }}>Houston Loc Fairy</span>
           </h3>
-          <span style={{ color: '#4a5a78', fontSize: 14 }}>{expandedThreat ? '▾' : '▸'}</span>
+          <span style={{ color: 'var(--x3o-t3)' }}>{expandedThreat ? '▾' : '▸'}</span>
         </div>
-        <p style={{ fontSize: 12, color: '#4a5a78', marginTop: 4 }}>Reyna · @houstonlocfairy · 12,000 IG followers</p>
+        <p className="text-xs mt-1" style={{ color: 'var(--x3o-t3)' }}>Reyna · @houstonlocfairy · 12,000 IG followers</p>
         {expandedThreat && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginTop: 16 }}>
-            <ThreatColumn title="What They Do Well" color="#ef4444" items={[
+          <div className="x3o-g3 mt-4 !mb-0">
+            <ThreatColumn title="What They Do Well" color="var(--x3o-red)" items={[
               'Yelp #1 ranking (4.9 stars, 380+ reviews)',
               'Strong word-of-mouth referral network',
               'Diverse services — locs + braids expands market',
               'Consistent Instagram content schedule',
             ]} />
-            <ThreatColumn title="Weaknesses to Exploit" color="#22c55e" items={[
+            <ThreatColumn title="Weaknesses to Exploit" color="var(--x3o-green)" items={[
               'Long booking lead times (2-3 weeks)',
               'No booking tech — phone/DM only',
               'Smaller IG following (12K vs 18.2K)',
               'No education or product extension',
             ]} />
-            <ThreatColumn title="KeLatic Counter Strategy" color="#3b82f6" items={[
+            <ThreatColumn title="KeLatic Counter Strategy" color="var(--x3o-blue)" items={[
               'Same-day/next-day booking availability ads',
               'Highlight x3o booking tech as competitive edge',
               'Yelp review campaign to close rating gap',
@@ -218,42 +203,36 @@ export default function CompetitiveIntelPage() {
 
       {/* SWOT */}
       <SectionTitle>SWOT Analysis</SectionTitle>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 28 }}>
-        <SwotCard title="Strengths" color="#22c55e" icon="💪" items={swot.strengths} />
-        <SwotCard title="Weaknesses" color="#ef4444" icon="⚠️" items={swot.weaknesses} />
-        <SwotCard title="Opportunities" color="#3b82f6" icon="🚀" items={swot.opportunities} />
-        <SwotCard title="Threats" color="#e8a020" icon="🛡️" items={swot.threats} />
+      <div className="x3o-g2">
+        <SwotCard title="Strengths" color="var(--x3o-green)" icon="💪" items={swot.strengths} />
+        <SwotCard title="Weaknesses" color="var(--x3o-red)" icon="⚠️" items={swot.weaknesses} />
+        <SwotCard title="Opportunities" color="var(--x3o-blue)" icon="🚀" items={swot.opportunities} />
+        <SwotCard title="Threats" color="var(--x3o-accent)" icon="🛡️" items={swot.threats} />
       </div>
 
       {/* Gap Analysis Radar */}
-      <div style={{ ...cardStyle, marginBottom: 28 }}>
-        <h3 style={cardTitleStyle}>Gap Analysis — KeLatic vs Houston Loc Fairy</h3>
-        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}>
+      <div className="x3o-card mb-7">
+        <h3 className="x3o-h3 mb-4">Gap Analysis — KeLatic vs Houston Loc Fairy</h3>
+        <div className="flex justify-center">
           <RadarChart categories={gapCategories} seriesA={gapKelatic} seriesB={gapFairy} labelA="KeLatic" labelB="Loc Fairy" />
         </div>
       </div>
 
       {/* Attack Opportunities */}
       <SectionTitle>Immediate Attack Opportunities</SectionTitle>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 32 }}>
+      <div className="flex flex-col gap-3 mb-8">
         {attacks.map((a, i) => (
-          <div key={i} style={{ ...cardStyle, display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div style={{
-              width: 52, height: 52, borderRadius: 8, background: `${a.color}18`,
-              display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
-              <span style={{ fontSize: 16, fontWeight: 800, color: a.color }}>{a.days}</span>
-              <span style={{ fontSize: 9, color: a.color }}>days</span>
+          <div key={i} className="x3o-card flex items-center gap-4">
+            <div className="w-13 h-13 rounded-lg flex flex-col items-center justify-center shrink-0"
+              style={{ background: `${a.color}18` }}>
+              <span className="text-base font-extrabold" style={{ color: a.color }}>{a.days}</span>
+              <span className="text-[9px]" style={{ color: a.color }}>days</span>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 700, color: '#f0f4ff', fontSize: 14 }}>{a.title}</div>
-              <div style={{ fontSize: 12, color: '#6b7fa3', marginTop: 2, lineHeight: 1.4 }}>{a.desc}</div>
+            <div className="flex-1">
+              <div className="x3o-h3">{a.title}</div>
+              <div className="text-xs mt-0.5" style={{ color: 'var(--x3o-t2)', lineHeight: 1.4 }}>{a.desc}</div>
             </div>
-            <button style={{
-              padding: '8px 16px', borderRadius: 6, border: `1px solid ${a.color}`,
-              background: 'transparent', color: a.color, fontSize: 12, fontWeight: 600,
-              cursor: 'pointer', whiteSpace: 'nowrap',
-            }}>
+            <button className="x3o-btn-ghost whitespace-nowrap" style={{ borderColor: a.color, color: a.color }}>
               {a.action}
             </button>
           </div>
@@ -267,27 +246,22 @@ export default function CompetitiveIntelPage() {
 
 function MetricCard({ label, value, sub, color }: { label: string; value: string; sub: string; color: string }) {
   return (
-    <div style={{ background: '#0d1424', border: '1px solid #1e2d45', borderRadius: 8, padding: '16px 20px' }}>
-      <div style={{ fontSize: 11, color: '#6b7fa3', marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 24, fontWeight: 800, color }}>{value}</div>
-      <div style={{ fontSize: 11, color: '#4a5a78', marginTop: 2 }}>{sub}</div>
+    <div className="x3o-metric">
+      <div className="x3o-metric-label">{label}</div>
+      <div className="x3o-metric-val" style={{ color }}>{value}</div>
+      <div className="x3o-metric-sub x3o-muted">{sub}</div>
     </div>
   );
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 style={{ fontSize: 14, fontWeight: 600, color: '#8899bb', marginBottom: 12, letterSpacing: '0.04em' }}>
-      {children ? String(children).toUpperCase() : ''}
-    </h2>
-  );
+  return <h2 className="x3o-sec-label mb-3">{children ? String(children).toUpperCase() : ''}</h2>;
 }
 
 function ThreatBadge({ level }: { level: string }) {
-  const colors: Record<string, string> = { high: '#ef4444', medium: '#e8a020', low: '#22c55e', self: '#6366f1' };
-  const c = colors[level] || '#4a5a78';
+  const classMap: Record<string, string> = { high: 'x3o-tag-red', medium: 'x3o-tag-amber', low: 'x3o-tag-green', self: 'x3o-tag-purple' };
   return (
-    <span style={{ fontSize: 10, fontWeight: 600, color: c, background: `${c}18`, padding: '2px 8px', borderRadius: 4 }}>
+    <span className={`x3o-tag ${classMap[level] || ''}`}>
       {level === 'self' ? 'You' : level.charAt(0).toUpperCase() + level.slice(1)}
     </span>
   );
@@ -296,10 +270,10 @@ function ThreatBadge({ level }: { level: string }) {
 function ThreatColumn({ title, color, items }: { title: string; color: string; items: string[] }) {
   return (
     <div>
-      <div style={{ fontSize: 12, fontWeight: 700, color, marginBottom: 8 }}>{title}</div>
-      <ul style={{ margin: 0, paddingLeft: 16 }}>
+      <div className="text-xs font-bold mb-2" style={{ color }}>{title}</div>
+      <ul className="m-0 pl-4">
         {items.map((item, i) => (
-          <li key={i} style={{ fontSize: 12, color: '#c8d6e5', lineHeight: 1.6 }}>{item}</li>
+          <li key={i} className="text-xs leading-relaxed" style={{ color: 'var(--x3o-t2)' }}>{item}</li>
         ))}
       </ul>
     </div>
@@ -308,14 +282,14 @@ function ThreatColumn({ title, color, items }: { title: string; color: string; i
 
 function SwotCard({ title, color, icon, items }: { title: string; color: string; icon: string; items: string[] }) {
   return (
-    <div style={{ background: '#0d1424', border: '1px solid #1e2d45', borderRadius: 8, padding: '20px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <span style={{ fontSize: 16 }}>{icon}</span>
-        <span style={{ fontWeight: 700, color, fontSize: 14 }}>{title}</span>
+    <div className="x3o-card">
+      <div className="flex items-center gap-2 mb-3">
+        <span className="text-base">{icon}</span>
+        <span className="font-bold text-sm" style={{ color }}>{title}</span>
       </div>
-      <ul style={{ margin: 0, paddingLeft: 16 }}>
+      <ul className="m-0 pl-4">
         {items.map((item, i) => (
-          <li key={i} style={{ fontSize: 12, color: '#c8d6e5', lineHeight: 1.7 }}>{item}</li>
+          <li key={i} className="text-xs leading-7" style={{ color: 'var(--x3o-t2)' }}>{item}</li>
         ))}
       </ul>
     </div>
@@ -331,7 +305,7 @@ function DonutChart({ data }: { data: { label: string; pct: number; color: strin
   let offset = 0;
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+    <div className="flex items-center gap-6">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {data.map((seg, i) => {
           const dash = (seg.pct / 100) * circumference;
@@ -346,15 +320,15 @@ function DonutChart({ data }: { data: { label: string; pct: number; color: strin
             />
           );
         })}
-        <text x={cx} y={cy - 6} textAnchor="middle" fill="#f0f4ff" fontSize="18" fontWeight="800">33%</text>
-        <text x={cx} y={cy + 10} textAnchor="middle" fill="#6b7fa3" fontSize="9">KeLatic</text>
+        <text x={cx} y={cy - 6} textAnchor="middle" fill="var(--x3o-t1)" fontSize="18" fontWeight="800">33%</text>
+        <text x={cx} y={cy + 10} textAnchor="middle" fill="var(--x3o-t2)" fontSize="9">KeLatic</text>
       </svg>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+      <div className="flex flex-col gap-1.5">
         {data.map((seg, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-            <span style={{ width: 10, height: 10, borderRadius: 2, background: seg.color, flexShrink: 0 }} />
-            <span style={{ color: '#c8d6e5' }}>{seg.label}</span>
-            <span style={{ color: '#4a5a78' }}>{seg.pct}%</span>
+          <div key={i} className="flex items-center gap-2 text-xs">
+            <span className="w-2.5 h-2.5 rounded-sm shrink-0" style={{ background: seg.color }} />
+            <span style={{ color: 'var(--x3o-t2)' }}>{seg.label}</span>
+            <span style={{ color: 'var(--x3o-t3)' }}>{seg.pct}%</span>
           </div>
         ))}
       </div>
@@ -386,7 +360,7 @@ function RadarChart({ categories, seriesA, seriesB, labelA, labelB }: {
   const polyB = ptsB.map(p => `${p.x},${p.y}`).join(' ');
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+    <div className="flex items-center gap-6">
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         {/* Grid rings */}
         {[20, 40, 60, 80, 100].map(pct => {
@@ -394,48 +368,40 @@ function RadarChart({ categories, seriesA, seriesB, labelA, labelB }: {
             const p = polarToXY((360 / n) * i, (pct / 100) * maxR);
             return `${p.x},${p.y}`;
           }).join(' ');
-          return <polygon key={pct} points={pts} fill="none" stroke="#1e2d45" strokeWidth={0.5} />;
+          return <polygon key={pct} points={pts} fill="none" stroke="var(--x3o-border)" strokeWidth={0.5} />;
         })}
         {/* Axis lines */}
         {categories.map((_, i) => {
           const p = polarToXY((360 / n) * i, maxR);
-          return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="#1e2d45" strokeWidth={0.5} />;
+          return <line key={i} x1={cx} y1={cy} x2={p.x} y2={p.y} stroke="var(--x3o-border)" strokeWidth={0.5} />;
         })}
         {/* Series */}
-        <polygon points={polyA} fill="rgba(232,160,32,0.15)" stroke="#e8a020" strokeWidth={2} />
-        <polygon points={polyB} fill="rgba(59,130,246,0.1)" stroke="#3b82f6" strokeWidth={1.5} strokeDasharray="4 2" />
+        <polygon points={polyA} fill="rgba(232,160,32,0.15)" stroke="var(--x3o-accent)" strokeWidth={2} />
+        <polygon points={polyB} fill="rgba(59,130,246,0.1)" stroke="var(--x3o-blue)" strokeWidth={1.5} strokeDasharray="4 2" />
         {/* Dots */}
-        {ptsA.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r={3} fill="#e8a020" />)}
-        {ptsB.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r={2.5} fill="#3b82f6" />)}
+        {ptsA.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r={3} fill="var(--x3o-accent)" />)}
+        {ptsB.map((p, i) => <circle key={i} cx={p.x} cy={p.y} r={2.5} fill="var(--x3o-blue)" />)}
         {/* Labels */}
         {categories.map((cat, i) => {
           const p = polarToXY((360 / n) * i, maxR + 18);
           return (
-            <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fill="#6b7fa3" fontSize={10}>
+            <text key={i} x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fill="var(--x3o-t2)" fontSize={10}>
               {cat}
             </text>
           );
         })}
       </svg>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-          <span style={{ width: 14, height: 3, background: '#e8a020', borderRadius: 2 }} />
-          <span style={{ color: '#e8a020' }}>{labelA}</span>
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-xs">
+          <span className="w-3.5 h-0.5 rounded-sm" style={{ background: 'var(--x3o-accent)' }} />
+          <span style={{ color: 'var(--x3o-accent)' }}>{labelA}</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12 }}>
-          <span style={{ width: 14, height: 3, background: '#3b82f6', borderRadius: 2, borderStyle: 'dashed' }} />
-          <span style={{ color: '#3b82f6' }}>{labelB}</span>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="w-3.5 h-0.5 rounded-sm border-dashed" style={{ background: 'var(--x3o-blue)' }} />
+          <span style={{ color: 'var(--x3o-blue)' }}>{labelB}</span>
         </div>
       </div>
     </div>
   );
 }
 
-// ─── Shared Styles ─────────────────────────────────────────────────────────────
-const cellStyle: React.CSSProperties = { padding: '10px 12px', fontSize: 13 };
-const cardStyle: React.CSSProperties = { background: '#0d1424', border: '1px solid #1e2d45', borderRadius: 10, padding: '24px' };
-const cardTitleStyle: React.CSSProperties = { fontSize: 14, fontWeight: 700, color: '#f0f4ff', margin: 0, marginBottom: 4 };
-const btnStyle: React.CSSProperties = {
-  padding: '8px 16px', borderRadius: 6, border: '1px solid #1e2d45',
-  background: '#0d1424', color: '#8899bb', fontSize: 12, fontWeight: 500, cursor: 'pointer',
-};
