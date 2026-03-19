@@ -20,20 +20,20 @@ const platformUrl = `https://${ROOT_DOMAIN}`;
 const platformMetadata: Metadata = {
   metadataBase: new URL(platformUrl),
   title: {
-    default: 'x3o.ai | Revenue Recovery AI for Service Businesses',
-    template: '%s | x3o.ai',
+    default: 'x3o Intelligence | Claude-Powered B2B Intelligence Marketplace',
+    template: '%s | x3o Intelligence',
   },
-  description: 'Recover lost revenue from ghost clients, cold conversations, and cancelled slots. x3o.ai integrates with your existing booking tools and CRM workflows.',
-  keywords: ['revenue recovery ai', 'ghost client reactivation', 'conversation recovery', 'slot filling automation', 'service business growth'],
+  description: 'The first Claude-powered vertical intelligence marketplace. Production-ready AI systems for beauty, restaurants, fitness, retail, med spas, and legal — deployed in days, not months.',
+  keywords: ['ai intelligence marketplace', 'claude api vertical ai', 'b2b ai platform', 'mcp server marketplace', 'service business ai', 'revenue recovery ai', 'ghost client reactivation', 'anthropic mcp'],
   icons: {
     icon: '/favicon.svg',
     apple: '/favicon.svg',
   },
   openGraph: {
-    title: 'x3o.ai | Revenue Recovery AI',
-    description: 'Not another booking platform. Recover demand your current stack is missing with automated reactivation, follow-up, and slot filling.',
+    title: 'x3o Intelligence | Claude-Powered B2B Intelligence Marketplace',
+    description: 'Production-ready AI systems for 6 service verticals. Social metrics, competitor intel, campaign tracking, booking funnel analysis — all powered by Claude.',
     url: platformUrl,
-    siteName: 'x3o.ai',
+    siteName: 'x3o Intelligence',
     type: 'website',
   },
 };
@@ -85,9 +85,9 @@ export default async function RootLayout({
     : {
         '@context': 'https://schema.org',
         '@type': 'SoftwareApplication',
-        name: 'x3o.ai',
+        name: 'x3o Intelligence',
         applicationCategory: 'BusinessApplication',
-        description: 'Revenue recovery AI for service businesses that integrates with existing booking systems',
+        description: 'Claude-powered vertical intelligence marketplace delivering production-ready AI systems for service businesses',
       };
 
   const siteUrl = business
@@ -99,7 +99,7 @@ export default async function RootLayout({
   const websiteJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
-    name: business?.name || 'x3o.ai',
+    name: business?.name || 'x3o Intelligence',
     url: siteUrl,
   };
 
