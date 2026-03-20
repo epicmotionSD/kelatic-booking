@@ -1,21 +1,28 @@
 // =============================================================================
 // GET /api/reactivation/ghost-clients
-// Queries Bluehost Amelia MySQL to find clients who haven't visited in 45+ days
-// Returns SegmentedLead[] ready to feed directly into /api/reactivation/launch
+// Merges inactive clients from BOTH databases:
+//   1. Bluehost MySQL (Amelia WordPress) — historical bookings
+//   2. Supabase — current platform bookings
+// Deduplicates by email (Supabase takes precedence for fresher data)
+// Returns SegmentedLead[] ready to feed into /api/reactivation/launch
 //
 // Segmentation:
 //   ghost     → last visit > 90 days ago  (cold, hardest to reactivate)
 //   near-miss → last visit 45–90 days ago (warm, highest conversion rate)
 //
 // Usage:
-//   GET /api/reactivation/ghost-clients              → all 45+ days
-//   GET /api/reactivation/ghost-clients?minDays=60   → 60+ days only
-//   GET /api/reactivation/ghost-clients?segment=ghost → 90+ days only
+//   GET /api/reactivation/ghost-clients                         → all 45+ days (both DBs)
+//   GET /api/reactivation/ghost-clients?minDays=60              → 60+ days only
+//   GET /api/reactivation/ghost-clients?segment=ghost           → 90+ days only
 //   GET /api/reactivation/ghost-clients?limit=100
+//   GET /api/reactivation/ghost-clients?businessId=<uuid>       → include Supabase clients
+//   GET /api/reactivation/ghost-clients?source=amelia           → Amelia only
+//   GET /api/reactivation/ghost-clients?source=supabase         → Supabase only
 // =============================================================================
 
 import { NextRequest, NextResponse } from 'next/server'
 import { queryBluehost } from '@/lib/mysql/bluehost'
+import { createAdminClient } from '@/lib/supabase/client'
 import type { SegmentedLead, Segment, RiskProfile, ScriptVariant } from '@/types/reactivation'
 
 interface AmeliaClientRow {
@@ -29,6 +36,10 @@ interface AmeliaClientRow {
   daysSince: number
   totalVisits: number
 }
+
+// ---------------------------------------------------------------------------
+// Shared helpers
+// ---------------------------------------------------------------------------
 
 function cleanPhone(raw: string | null): string {
   if (!raw) return ''
@@ -53,28 +64,23 @@ function scriptFromSegment(segment: Segment): ScriptVariant {
 
 function estimateValue(totalVisits: number): number {
   // KeLatic average service value ~$125–$175
-  // Repeat clients weighted slightly higher
   const base = 135
   const loyaltyBonus = Math.min(totalVisits * 5, 40)
   return base + loyaltyBonus
 }
 
-export async function GET(request: NextRequest) {
+// ---------------------------------------------------------------------------
+// Source 1: Bluehost MySQL (Amelia)
+// ---------------------------------------------------------------------------
+
+async function fetchAmeliaLeads(
+  effectiveMinDays: number,
+  effectiveMaxDays: number,
+  limit: number,
+): Promise<Map<string, SegmentedLead>> {
+  const leadMap = new Map<string, SegmentedLead>()
+
   try {
-    const { searchParams } = new URL(request.url)
-    const minDays  = Number(searchParams.get('minDays') || '45')
-    const maxDays  = Number(searchParams.get('maxDays') || '99999')
-    const segment  = searchParams.get('segment') as Segment | null
-    const limit    = Math.min(Number(searchParams.get('limit') || '500'), 1000)
-
-    // Resolve minDays from segment filter shorthand
-    const effectiveMinDays = segment === 'ghost' ? Math.max(minDays, 90)
-      : segment === 'near-miss' ? minDays
-      : minDays
-
-    const effectiveMaxDays = segment === 'near-miss' ? Math.min(maxDays, 89)
-      : maxDays
-
     const rows = await queryBluehost<AmeliaClientRow>(`
       SELECT
         u.id                                          AS userId,
@@ -101,33 +107,212 @@ export async function GET(request: NextRequest) {
       LIMIT ?
     `, [effectiveMinDays, effectiveMaxDays, limit])
 
-    const leads: SegmentedLead[] = rows.map((row) => {
+    for (const row of rows) {
+      const email = row.email.toLowerCase().trim()
+      if (!email) continue
+
       const seg   = segmentFromDays(row.daysSince)
       const risk  = riskFromDays(row.daysSince, row.totalVisits)
       const value = estimateValue(row.totalVisits)
 
-      return {
-        id: `amelia_${row.userId}`,
-        firstName: row.firstName,
-        lastName:  row.lastName,
-        email:     row.email,
-        phone:     cleanPhone(row.phone),
-        source:    'amelia',
-        firstContact: row.firstVisit,
-        lastContact:  row.lastVisit,
-        segment:   seg,
-        riskProfile:  risk,
-        estimatedValue: value,
+      leadMap.set(email, {
+        id:               `amelia_${row.userId}`,
+        firstName:        row.firstName,
+        lastName:         row.lastName,
+        email,
+        phone:            cleanPhone(row.phone),
+        source:           'amelia',
+        firstContact:     row.firstVisit,
+        lastContact:      row.lastVisit,
+        segment:          seg,
+        riskProfile:      risk,
+        estimatedValue:   value,
         daysSinceContact: row.daysSince,
         recommendedScript: scriptFromSegment(seg),
+      })
+    }
+  } catch (err) {
+    console.error('[GhostClients] Amelia query failed (non-blocking):', err)
+  }
+
+  return leadMap
+}
+
+// ---------------------------------------------------------------------------
+// Source 2: Supabase (kelatic-booking platform appointments)
+// ---------------------------------------------------------------------------
+
+async function fetchSupabaseLeads(
+  businessId: string,
+  effectiveMinDays: number,
+  effectiveMaxDays: number,
+): Promise<Map<string, SegmentedLead>> {
+  const leadMap = new Map<string, SegmentedLead>()
+
+  try {
+    const admin = createAdminClient()
+
+    // Pull all completed appointments with client profiles, unfiltered on date
+    // We aggregate in JS to find each client's first/last visit and total count.
+    // Limit 5000 rows — more than enough for a single salon.
+    const { data: appts, error } = await admin
+      .from('appointments')
+      .select(`
+        client_id,
+        start_time,
+        client:profiles!appointments_client_id_fkey (
+          id, first_name, last_name, email, phone
+        )
+      `)
+      .eq('business_id', businessId)
+      .eq('status', 'completed')
+      .not('client_id', 'is', null)
+      .order('start_time', { ascending: false })
+      .limit(5000)
+
+    if (error) {
+      console.error('[GhostClients] Supabase query failed:', error)
+      return leadMap
+    }
+
+    // Aggregate per client: since we ordered DESC, first occurrence = most recent visit
+    type ClientAgg = {
+      clientId: string
+      firstName: string
+      lastName: string
+      email: string
+      phone: string | null
+      lastVisit: string   // first row encountered (DESC order)
+      firstVisit: string  // last row encountered
+      totalVisits: number
+    }
+
+    const clientAgg = new Map<string, ClientAgg>()
+
+    for (const appt of appts ?? []) {
+      const clientArr = Array.isArray(appt.client) ? appt.client : [appt.client]
+      const client = clientArr[0]
+      if (!client?.email) continue
+
+      const email = client.email.toLowerCase().trim()
+      const existing = clientAgg.get(appt.client_id as string)
+
+      if (!existing) {
+        clientAgg.set(appt.client_id as string, {
+          clientId:   appt.client_id as string,
+          firstName:  client.first_name ?? '',
+          lastName:   client.last_name ?? '',
+          email,
+          phone:      client.phone ?? null,
+          lastVisit:  appt.start_time,   // most recent (desc order, first seen)
+          firstVisit: appt.start_time,   // will be overwritten to oldest
+          totalVisits: 1,
+        })
+      } else {
+        // Earlier appointment — update firstVisit and increment count
+        existing.firstVisit = appt.start_time
+        existing.totalVisits++
       }
-    })
+    }
+
+    const now = Date.now()
+
+    for (const agg of clientAgg.values()) {
+      const lastVisitMs  = new Date(agg.lastVisit).getTime()
+      const daysSince    = Math.floor((now - lastVisitMs) / 86_400_000)
+
+      if (daysSince < effectiveMinDays || daysSince > effectiveMaxDays) continue
+      if (!agg.email) continue
+
+      const seg   = segmentFromDays(daysSince)
+      const risk  = riskFromDays(daysSince, agg.totalVisits)
+      const value = estimateValue(agg.totalVisits)
+
+      leadMap.set(agg.email, {
+        id:               `supabase_${agg.clientId}`,
+        firstName:        agg.firstName,
+        lastName:         agg.lastName,
+        email:            agg.email,
+        phone:            cleanPhone(agg.phone),
+        source:           'supabase',
+        firstContact:     agg.firstVisit,
+        lastContact:      agg.lastVisit,
+        segment:          seg,
+        riskProfile:      risk,
+        estimatedValue:   value,
+        daysSinceContact: daysSince,
+        recommendedScript: scriptFromSegment(seg),
+      })
+    }
+  } catch (err) {
+    console.error('[GhostClients] Supabase aggregation failed (non-blocking):', err)
+  }
+
+  return leadMap
+}
+
+// ---------------------------------------------------------------------------
+// Route handler
+// ---------------------------------------------------------------------------
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const minDays    = Number(searchParams.get('minDays')  || '45')
+    const maxDays    = Number(searchParams.get('maxDays')  || '99999')
+    const segment    = searchParams.get('segment') as Segment | null
+    const limit      = Math.min(Number(searchParams.get('limit') || '500'), 1000)
+    const businessId = searchParams.get('businessId') || null
+    const source     = searchParams.get('source')    || 'both' // 'both' | 'amelia' | 'supabase'
+
+    // Resolve effective date range from segment shorthand
+    const effectiveMinDays = segment === 'ghost'
+      ? Math.max(minDays, 90)
+      : minDays
+
+    const effectiveMaxDays = segment === 'near-miss'
+      ? Math.min(maxDays, 89)
+      : maxDays
+
+    // -----------------------------------------------------------------
+    // Fetch from each source (parallel where possible)
+    // -----------------------------------------------------------------
+    const [ameliaMap, supabaseMap] = await Promise.all([
+      source !== 'supabase'
+        ? fetchAmeliaLeads(effectiveMinDays, effectiveMaxDays, limit)
+        : Promise.resolve(new Map<string, SegmentedLead>()),
+      source !== 'amelia' && businessId
+        ? fetchSupabaseLeads(businessId, effectiveMinDays, effectiveMaxDays)
+        : Promise.resolve(new Map<string, SegmentedLead>()),
+    ])
+
+    // -----------------------------------------------------------------
+    // Merge: Supabase data wins on email collision (fresher platform data)
+    // -----------------------------------------------------------------
+    const merged = new Map<string, SegmentedLead>()
+
+    // Insert Amelia leads first
+    for (const [email, lead] of ameliaMap) {
+      merged.set(email, lead)
+    }
+
+    // Supabase leads overwrite any Amelia duplicate
+    for (const [email, lead] of supabaseMap) {
+      merged.set(email, lead)
+    }
+
+    // Sort by daysSince DESC, cap at limit
+    const leads: SegmentedLead[] = [...merged.values()]
+      .sort((a, b) => b.daysSinceContact - a.daysSinceContact)
+      .slice(0, limit)
 
     // Summary stats
     const summary = {
       total:    leads.length,
       ghost:    leads.filter(l => l.segment === 'ghost').length,
       nearMiss: leads.filter(l => l.segment === 'near-miss').length,
+      fromAmelia:   leads.filter(l => l.source === 'amelia').length,
+      fromSupabase: leads.filter(l => l.source === 'supabase').length,
       totalEstimatedValue: leads.reduce((s, l) => s + l.estimatedValue, 0),
       avgDaysSince: leads.length
         ? Math.round(leads.reduce((s, l) => s + l.daysSinceContact, 0) / leads.length)
@@ -136,7 +321,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ leads, summary })
   } catch (error) {
-    console.error('[GhostClients] MySQL error:', error)
+    console.error('[GhostClients] Error:', error)
     return NextResponse.json({ error: 'Failed to fetch ghost clients' }, { status: 500 })
   }
 }
