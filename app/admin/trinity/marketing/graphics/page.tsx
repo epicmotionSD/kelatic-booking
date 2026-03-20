@@ -1,19 +1,10 @@
 'use client';
 
-import GeneratorForm from '@/components/trinity/generator-form';
-import Link from 'next/link';
+import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function PromoGraphicsGenerator() {
   return (
-    <div className="space-y-4">
-      <Link
-        href="/admin/trinity"
-        className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
-      >
-        ← Back to AI Marketing
-      </Link>
-
-      <GeneratorForm
+    <TrinityToolPage
         type="graphics"
         title="Promo Graphics Copy"
         description="Generate copy for flyers, stories, and promotional graphics"
@@ -21,7 +12,7 @@ export default function PromoGraphicsGenerator() {
         contextPlaceholder="Details about the promotion: prices, dates, any specific terms..."
         showTone={true}
         showAudience={false}
-      />
+    >
 
       {/* Copy Format */}
       <div className="bg-purple-50 rounded-xl p-6 mt-6">
@@ -45,6 +36,6 @@ export default function PromoGraphicsGenerator() {
           </div>
         </div>
       </div>
-    </div>
+    </TrinityToolPage>
   );
 }

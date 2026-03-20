@@ -1,19 +1,10 @@
 'use client';
 
-import GeneratorForm from '@/components/trinity/generator-form';
-import Link from 'next/link';
+import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function VideoScriptGenerator() {
   return (
-    <div className="space-y-4">
-      <Link
-        href="/admin/trinity"
-        className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
-      >
-        ← Back to AI Marketing
-      </Link>
-
-      <GeneratorForm
+    <TrinityToolPage
         type="video"
         title="Video Script Generator"
         description="Create scripts for TikTok, Instagram Reels, and YouTube"
@@ -21,7 +12,7 @@ export default function VideoScriptGenerator() {
         contextPlaceholder="Video length preference, format (tutorial, vlog, transformation), any trending audio to reference..."
         showTone={true}
         showAudience={true}
-      />
+    >
 
       {/* Video Ideas */}
       <div className="bg-purple-50 rounded-xl p-6 mt-6">
@@ -56,6 +47,6 @@ export default function VideoScriptGenerator() {
           </div>
         </div>
       </div>
-    </div>
+    </TrinityToolPage>
   );
 }

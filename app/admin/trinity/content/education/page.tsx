@@ -1,19 +1,10 @@
 'use client';
 
-import GeneratorForm from '@/components/trinity/generator-form';
-import Link from 'next/link';
+import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function ClientEducationCreator() {
   return (
-    <div className="space-y-4">
-      <Link
-        href="/admin/trinity"
-        className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
-      >
-        ← Back to AI Marketing
-      </Link>
-
-      <GeneratorForm
+    <TrinityToolPage
         type="education"
         title="Client Education Creator"
         description="Create aftercare guides and educational materials for clients"
@@ -21,7 +12,7 @@ export default function ClientEducationCreator() {
         contextPlaceholder="Specific service this relates to, any products you recommend, common questions from clients..."
         showTone={false}
         showAudience={false}
-      />
+    >
 
       {/* Education Materials */}
       <div className="bg-purple-50 rounded-xl p-6 mt-6">
@@ -50,6 +41,6 @@ export default function ClientEducationCreator() {
           Tip: Print these as handouts or send as follow-up emails after appointments!
         </p>
       </div>
-    </div>
+    </TrinityToolPage>
   );
 }

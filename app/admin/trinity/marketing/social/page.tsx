@@ -1,19 +1,10 @@
 'use client';
 
-import GeneratorForm from '@/components/trinity/generator-form';
-import Link from 'next/link';
+import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function SocialPostGenerator() {
   return (
-    <div className="space-y-4">
-      <Link
-        href="/admin/trinity"
-        className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
-      >
-        ← Back to AI Marketing
-      </Link>
-
-      <GeneratorForm
+    <TrinityToolPage
         type="social"
         title="Social Post Generator"
         description="Create engaging Instagram and Facebook posts with hashtags"
@@ -21,7 +12,7 @@ export default function SocialPostGenerator() {
         contextPlaceholder="Describe the post: client story, promotion details, specific service to highlight..."
         showTone={true}
         showAudience={true}
-      />
+    >
 
       {/* Tips */}
       <div className="bg-purple-50 rounded-xl p-6 mt-6">
@@ -33,6 +24,6 @@ export default function SocialPostGenerator() {
           <li>• Include a call-to-action: "Book now", "Link in bio", "DM for availability"</li>
         </ul>
       </div>
-    </div>
+    </TrinityToolPage>
   );
 }

@@ -1,19 +1,10 @@
 'use client';
 
-import GeneratorForm from '@/components/trinity/generator-form';
-import Link from 'next/link';
+import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function EmailCampaignCreator() {
   return (
-    <div className="space-y-4">
-      <Link
-        href="/admin/trinity"
-        className="text-purple-600 hover:text-purple-700 text-sm flex items-center gap-1"
-      >
-        ← Back to AI Marketing
-      </Link>
-
-      <GeneratorForm
+    <TrinityToolPage
         type="email"
         title="Email Campaign Creator"
         description="Create promotional emails and newsletters for your clients"
@@ -21,7 +12,7 @@ export default function EmailCampaignCreator() {
         contextPlaceholder="What's the promotion? Any discounts, deadlines, or special offers to include..."
         showTone={true}
         showAudience={true}
-      />
+    >
 
       {/* Email Types */}
       <div className="bg-purple-50 rounded-xl p-6 mt-6">
@@ -47,6 +38,6 @@ export default function EmailCampaignCreator() {
           </div>
         </div>
       </div>
-    </div>
+    </TrinityToolPage>
   );
 }
