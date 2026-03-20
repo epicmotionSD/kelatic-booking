@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Home,
-  TrendingUp,
+  Layers,
   Calendar,
   CreditCard,
   Briefcase,
@@ -27,9 +27,9 @@ const NAV_ITEMS = [
     icon: <Home className="w-5 h-5" />,
   },
   {
-    label: 'Migration',
+    label: 'Trinity',
     href: '/admin/trinity',
-    icon: <TrendingUp className="w-5 h-5" />,
+    icon: <Layers className="w-5 h-5" />,
   },
   {
     label: 'Appointments',
