@@ -9,6 +9,7 @@ import {
   notifyStylistNewBooking,
   type AppointmentDetails,
 } from '@/lib/notifications/service';
+import { queryBluehost } from '@/lib/mysql/bluehost';
 
 // Send confirmation notifications directly (no internal HTTP fetch)
 async function sendConfirmationNotifications(appointmentId: string) {
@@ -281,6 +282,41 @@ export async function POST(request: NextRequest) {
         { error: 'This time slot is no longer available' },
         { status: 409 }
       );
+    }
+
+    // Cross-check against Amelia (Bluehost MySQL) — prevents double-booking
+    // between the kelatic.com WordPress booking system and this platform
+    try {
+      if (stylistProfile?.email) {
+        const toMySQL = (d: Date) => d.toISOString().slice(0, 19).replace('T', ' ');
+
+        const ameliaUsers = await queryBluehost<{ id: number }>(
+          `SELECT id FROM gzf_amelia_users WHERE email = ? AND type = 'provider' LIMIT 1`,
+          [stylistProfile.email]
+        );
+
+        if (ameliaUsers.length) {
+          const ameliaConflicts = await queryBluehost<{ id: number }>(
+            `SELECT a.id FROM gzf_amelia_appointments a
+             WHERE a.providerId = ?
+               AND a.status NOT IN ('canceled', 'rejected', 'no-show')
+               AND a.bookingStart < ?
+               AND a.bookingEnd   > ?
+             LIMIT 1`,
+            [ameliaUsers[0].id, toMySQL(endTime), toMySQL(startTime)]
+          );
+
+          if (ameliaConflicts.length) {
+            return NextResponse.json(
+              { error: 'This time slot is not available — stylist has an existing appointment' },
+              { status: 409 }
+            );
+          }
+        }
+      }
+    } catch (ameliaError) {
+      // Non-blocking: log but don't reject the booking if MySQL is unreachable
+      console.error('[BookingAPI] Amelia cross-check failed (non-blocking):', ameliaError);
     }
 
     // Find or create client profile

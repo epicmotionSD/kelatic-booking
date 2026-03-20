@@ -1,5 +1,137 @@
 'use client'
 
+import { useEffect, useState } from 'react'
+
+// ─── Booking Conflict Panel ───────────────────────────────────────────────────
+
+interface AmeliaConflict {
+  appt_1_id: number
+  appt_2_id: number
+  stylist: string
+  service: string
+  slot_1_start: string
+  slot_1_end: string
+  slot_2_start: string
+  slot_2_end: string
+}
+
+function fmt(dt: string) {
+  const d = new Date(dt)
+  return d.toLocaleString('en-US', {
+    month: 'short', day: 'numeric', year: 'numeric',
+    hour: 'numeric', minute: '2-digit', hour12: true,
+  })
+}
+
+function overlapMinutes(c: AmeliaConflict) {
+  const overlapStart = Math.max(new Date(c.slot_1_start).getTime(), new Date(c.slot_2_start).getTime())
+  const overlapEnd   = Math.min(new Date(c.slot_1_end).getTime(),   new Date(c.slot_2_end).getTime())
+  return Math.round((overlapEnd - overlapStart) / 60000)
+}
+
+function ConflictPanel() {
+  const [conflicts, setConflicts] = useState<AmeliaConflict[]>([])
+  const [loading, setLoading]     = useState(true)
+  const [error, setError]         = useState(false)
+
+  useEffect(() => {
+    fetch('/api/bookings/conflicts')
+      .then(r => r.json())
+      .then(d => { setConflicts(d.conflicts ?? []); setLoading(false) })
+      .catch(() => { setError(true); setLoading(false) })
+  }, [])
+
+  if (loading) return (
+    <div className="rounded-[14px] border border-white/10 bg-zinc-900 p-4 flex items-center gap-3">
+      <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+      <span className="text-xs text-white/40 tracking-widest uppercase">Scanning Amelia for conflicts…</span>
+    </div>
+  )
+
+  if (error) return (
+    <div className="rounded-[14px] border border-red-500/20 bg-red-500/5 p-4 flex items-center gap-3">
+      <div className="w-2 h-2 rounded-full bg-red-400" />
+      <span className="text-xs text-red-400 tracking-widest uppercase">Bluehost MySQL unreachable — check env vars</span>
+    </div>
+  )
+
+  const count = conflicts.length
+
+  return (
+    <div className={`rounded-[14px] border p-4 md:p-5 ${
+      count === 0
+        ? 'border-emerald-500/20 bg-emerald-500/5'
+        : 'border-red-500/30 bg-red-500/5'
+    }`}>
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-3">
+          <div className={`w-2 h-2 rounded-full ${count === 0 ? 'bg-emerald-400' : 'bg-red-400 animate-pulse'}`} />
+          <h2 className="text-xs uppercase tracking-[0.12em] font-semibold text-white/40">
+            Amelia Double-Booking Monitor
+          </h2>
+        </div>
+        <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
+          count === 0
+            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+            : 'bg-red-500/10 text-red-400 border-red-500/20'
+        }`}>
+          {count === 0 ? '✓ No Conflicts' : `${count} Conflict${count > 1 ? 's' : ''} Detected`}
+        </span>
+      </div>
+
+      {count === 0 ? (
+        <p className="text-sm text-white/40">All Amelia appointments are clean — no overlapping bookings.</p>
+      ) : (
+        <div className="space-y-3 mt-2">
+          {conflicts.map((c, i) => (
+            <div key={i} className="rounded-[10px] border border-red-500/20 bg-zinc-900 p-4">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-sm font-semibold text-white">{c.stylist}</p>
+                  <p className="text-xs text-white/50 mt-0.5">{c.service}</p>
+                </div>
+                <span className="text-xs font-mono text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full whitespace-nowrap">
+                  {overlapMinutes(c)} min overlap
+                </span>
+              </div>
+              <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="rounded-[8px] bg-zinc-800 border border-white/6 p-3">
+                  <p className="text-[10px] text-white/30 uppercase tracking-widest mb-1">Appt #{c.appt_1_id}</p>
+                  <p className="text-xs text-white/70">{fmt(c.slot_1_start)}</p>
+                  <p className="text-xs text-white/40">→ {fmt(c.slot_1_end)}</p>
+                </div>
+                <div className="rounded-[8px] bg-zinc-800 border border-red-500/20 p-3">
+                  <p className="text-[10px] text-red-400/60 uppercase tracking-widest mb-1">Appt #{c.appt_2_id} ⚠</p>
+                  <p className="text-xs text-white/70">{fmt(c.slot_2_start)}</p>
+                  <p className="text-xs text-white/40">→ {fmt(c.slot_2_end)}</p>
+                </div>
+              </div>
+              <div className="mt-3 flex gap-2">
+                <a
+                  href={`https://kelatic.com/hair-lounge/wp-admin/admin.php?page=wpamelia-appointments&id=${c.appt_1_id}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="text-[10px] text-amber-400 hover:text-amber-300 border border-amber-500/20 px-2 py-1 rounded-md tracking-widest uppercase transition-colors"
+                >
+                  Appt #{c.appt_1_id} →
+                </a>
+                <a
+                  href={`https://kelatic.com/hair-lounge/wp-admin/admin.php?page=wpamelia-appointments&id=${c.appt_2_id}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="text-[10px] text-amber-400 hover:text-amber-300 border border-amber-500/20 px-2 py-1 rounded-md tracking-widest uppercase transition-colors"
+                >
+                  Appt #{c.appt_2_id} →
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Dashboard data ───────────────────────────────────────────────────────────
+
 const topMetrics = [
   { label: 'Google ads spend', value: '$280/mo', sublabel: 'Target: $0' },
   { label: 'Migration complete', value: '67%', sublabel: '33% remaining' },
@@ -201,6 +333,9 @@ export default function RevenueMigrationDashboard({
         </h1>
         <p className="text-white/50 mt-1 text-sm">From Google Ads dependency to organic + social-led bookings.</p>
       </div>
+
+      {/* Booking conflict monitor */}
+      <ConflictPanel />
 
       {/* Top metrics */}
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
