@@ -162,6 +162,37 @@ export async function sendEmailMessage(params: EmailSendParams): Promise<Provide
     }
   }
 
+  if (provider === 'resend') {
+    const apiKey = process.env.RESEND_API_KEY
+    if (!apiKey) {
+      return { success: false, error: 'Resend API key not configured' }
+    }
+    try {
+      const { Resend } = await import('resend')
+      const resend = new Resend(apiKey)
+      const from = params.fromName
+        ? `${params.fromName} <${params.fromEmail}>`
+        : params.fromEmail
+      const { data, error } = await resend.emails.send({
+        from,
+        to: params.to,
+        cc: params.cc,
+        subject: params.subject,
+        html: params.html,
+        text: params.text,
+      })
+      if (error) {
+        return { success: false, error: error.message }
+      }
+      return { success: true, messageId: data?.id }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown Resend error',
+      }
+    }
+  }
+
   if (provider !== 'sendgrid') {
     return {
       success: false,
