@@ -1,226 +1,126 @@
-# Kelatic Google Ads Campaign Strategy
+# KeLatic Google Ads Transition Strategy
 
-## Quick Setup Checklist
-1. Create Google Ads account at ads.google.com
-2. Get your Google Ads ID (format: AW-XXXXXXXXXX)
-3. Create conversion actions for "Booking Complete" and "Lead Form"
-4. Add these to your `.env`:
-   ```
-   NEXT_PUBLIC_GOOGLE_ADS_ID=AW-XXXXXXXXXX
-   NEXT_PUBLIC_GOOGLE_ADS_BOOKING_CONVERSION=XXXXXXXXXXX
-   NEXT_PUBLIC_GOOGLE_ADS_LEAD_CONVERSION=XXXXXXXXXXX
-   ```
-5. Redeploy to Vercel
+## Core Principle
 
----
+Google Ads is still carrying demand that KeLatic has not yet replaced with organic discovery. Do not treat search ads as optional overhead and do not shut them off early just to save budget. The remaining gap is an infrastructure problem, not a spend problem.
 
-## Campaign 1: Loc Services (High Intent)
+If Google Ads is cut before the organic layer is strong enough, the business loses the bookings that search is currently catching with nothing ready to absorb them.
 
-### Search Ads - Responsive Search Ads
+## What Google Ads Is Doing Right Now
 
-**Headlines (max 30 chars each):**
-1. Houston Loc Specialists
-2. Expert Loc Maintenance
-3. Locs Done Right - Book Now
-4. Professional Loc Services
-5. Starter Locs Houston TX
-6. Loc Retwists Near You
-7. Book Your Loc Appointment
-8. Trusted Loc Stylists
-9. Premium Loc Care Houston
-10. Same Week Appointments
-11. 5-Star Loc Services
-12. Loc Shop by Kelatic
-13. Transform Your Locs Today
-14. Licensed Loc Experts
+- Acting as a bridge while Google Business Profile and Yelp are still underbuilt
+- Capturing high-intent searches already proven to convert for KeLatic
+- Preserving conversion history, keyword data, and remarketing audiences that will still matter after the transition
 
-**Descriptions (max 90 chars each):**
-1. Professional loc services in Houston. Starter locs, retwists, repairs & more. Book online!
-2. Expert loc stylists ready to serve you. Easy online booking. Same week availability.
-3. From starter locs to maintenance - we've got you covered. Book your appointment today!
-4. Transform your hair journey with Houston's trusted loc specialists. See our services.
-5. Quality loc care at 9430 Richmond Ave. Professional stylists, beautiful results guaranteed.
+## Current Operating Rule
 
-**Keywords:**
-- loc retwist houston
-- starter locs near me
-- loc maintenance houston tx
-- loc specialists houston
-- loc salon houston
-- loc repair houston
-- interlocking locs houston
-- sisterlocks houston
-- loc stylist near me
-- dreadlock salon houston
+Keep Google Ads running while fixing the booking funnel and building free discovery channels. The goal is not to scale search spend. The goal is to hold demand in place until the organic system is strong enough to replace it.
 
-**Negative Keywords:**
-- free
-- cheap
-- DIY
-- tutorial
-- how to
+## Priority Order
 
----
+### 1. Fix Booking Conversion First
 
-## Campaign 2: Hair Salon (Broader Reach)
+The booking page is converting at roughly 15% from visit to appointment. A well-optimized local service booking page should be closer to 22-28%.
 
-### Search Ads
+That gap is worth more than buying more traffic. At current traffic levels, closing it is worth about $2,100/month in recovered revenue from existing visitors.
 
-**Headlines:**
-1. KeLatic Hair Lounge
-2. Houston Hair Specialists
-3. Book Your Hair Appt Now
-4. Premium Hair Services
-5. Natural Hair Experts
-6. Walk-Ins Welcome
-7. Affordable Hair Care
-8. Top Houston Stylists
-9. Hair Transformation
-10. Book Online - Easy!
+Immediate changes:
 
-**Descriptions:**
-1. Full-service hair salon in Houston. Locs, braids, natural hair care & more. Book online!
-2. Your hair deserves the best. Professional stylists, convenient online booking. Visit us!
-3. From consultation to styling - complete hair care at KeLatic. Schedule your visit today.
+- Replace any `Linktree`-style bio path with a direct booking link
+- Add scarcity indicators on the booking page and booking CTAs
+- Add booking stickers to Instagram Stories and push viewers straight to the booking page
 
-**Keywords:**
-- hair salon houston
-- black hair salon near me
-- natural hair salon houston
-- braiding salon houston
-- hair stylist houston tx
+### 2. Build the Free Discovery Layer
 
----
+Once the booking leak is tighter, invest effort into the two channels most likely to replace search demand.
 
-## Campaign 3: Loc Academy (Training/Education)
+#### Google Business Profile
 
-### Search Ads
+- Rewrite service descriptions with keyword-rich local intent terms
+- Add 20+ strong photos
+- Publish weekly posts
+- Focus on ranking for searches like `locs Houston` and `loc retwist near me`
 
-**Headlines:**
-1. Learn Loc Techniques
-2. Loc Certification Course
-3. Become a Loc Specialist
-4. Loc Training Houston
-5. Hands-On Loc Classes
-6. Start Your Loc Career
-7. Professional Loc Training
-8. Loc Academy by Kelatic
+#### Yelp
 
-**Descriptions:**
-1. Master loc techniques with hands-on training from certified instructors. Enroll today!
-2. Turn your passion into profit. Professional loc training program in Houston. Learn more.
-3. Comprehensive loc education - from basics to advanced. Get certified. Start earning.
+- Treat Yelp as a live demand-capture channel, not a vanity profile
+- Push for 10+ new reviews
+- Keep profile details and availability current
+- Use KeLatic's open calendar as the advantage against competitors who are fully booked or have limited hours
 
-**Keywords:**
-- loc training course
-- learn to do locs
-- loc certification
-- loctician training houston
-- how to become a loctician
+### 3. Redeploy Spend to Retargeting Only After the Foundation Is Ready
 
----
+Week 4 is when the current budget can move away from cold search intent and toward paid social retargeting.
 
-## Campaign 4: Local Service Ads (Google Guaranteed)
+That is a different use of paid media:
 
-### Business Profile Optimization
-- **Business Name:** KeLatic Hair Lounge
-- **Address:** 9430 Richmond Ave, Houston, TX 77063
-- **Phone:** (713) 485-4000
-- **Hours:** Update in Google Business Profile
-- **Services:** Loc Maintenance, Starter Locs, Retwists, Repairs, Natural Hair Care
-- **Photos:** Upload high-quality before/after photos
+- Retarget profile visitors
+- Retarget Reel engagers
+- Retarget site visitors when audience size is sufficient
 
----
+These audiences already know the brand and typically convert materially better than cold keyword traffic.
 
-## Budget Recommendations
+## 4-Week Transition Plan
 
-| Campaign | Daily Budget | Monthly Est. | Goal |
-|----------|-------------|--------------|------|
-| Loc Services | $30-50 | $900-1,500 | Bookings |
-| Hair Salon | $20-30 | $600-900 | Awareness |
-| Loc Academy | $15-25 | $450-750 | Enrollments |
-| Local Ads | $10-20 | $300-600 | Calls/Directions |
+### Week 1
 
-**Start with:** $50/day total ($1,500/month) focused on Loc Services campaign
+- Keep Google Ads live
+- Fix the booking conversion leak
+- Route social traffic directly to booking
+- Add urgency and booking-first CTAs across Instagram
 
----
+### Week 2
 
-## Conversion Tracking Setup
+- Fully optimize Google Business Profile
+- Add fresh service photos
+- Publish keyword-aware posts
+- Start monitoring branded and local discovery lift
 
-### In Google Ads Dashboard:
-1. Go to Tools & Settings > Conversions
-2. Click "+ New conversion action"
-3. Select "Website"
-4. Enter kelatic.com
-5. Create these conversions:
+### Week 3
 
-**Conversion 1: Booking Complete**
-- Name: `Booking Complete`
-- Category: `Purchase`
-- Value: Use different values for each conversion (dynamic)
-- Count: One conversion per click
+- Push Yelp review acquisition
+- Update Yelp profile and service detail pages
+- Watch for appointment volume generated without paid search assist
 
-**Conversion 2: Lead Form**
-- Name: `Contact Form Submission`
-- Category: `Lead`
-- Value: $50 (estimated lead value)
-- Count: One conversion per click
+### Week 4
 
-### Get Your Conversion IDs:
-After creating, click on each conversion > "Use Google Tag Manager" or "Install tag manually" to find:
-- Conversion ID (format: AW-XXXXXXXXXX)
-- Conversion Label (format: XXXXXXXXXXX)
+- Only if the green-light checks are met, reduce or pause Google Ads
+- Reallocate the existing budget into warm retargeting audiences on paid social
+- Keep the Google Ads account intact for at least 30 days after the pause
 
----
+## Green-Light Checks Before Pausing Google Ads
 
-## Ad Extensions to Add
+Do not cut Google Ads until all of the following are true:
 
-### Sitelink Extensions
-1. **Book Now** - Direct link to /book
-2. **Our Services** - Link to services page
-3. **Meet Our Stylists** - Link to team page
-4. **Contact Us** - Link to contact page
+- Booking-page-to-appointment conversion has materially improved and is trending toward the 22-28% target band
+- The booking path from Instagram is direct, with no `Linktree` friction
+- Google Business Profile is fully optimized and updated weekly
+- Yelp is active, complete, and has at least 10 new reviews driving discovery credibility
+- Retargeting audiences and tracking are in place so paid social can take over as the backup paid channel
+- The calendar is 80%+ filled from organic sources for two consecutive weeks
 
-### Call Extension
-- (713) 485-4000
+## How To Shut Search Down Safely
 
-### Location Extension
-- Link Google Business Profile
+When the business is ready:
 
-### Callout Extensions
-- Online Booking Available
-- Same Week Appointments
-- Licensed Professionals
-- 5-Star Reviews
+1. Pause campaigns first
+2. Do not delete the Google Ads account
+3. Preserve conversion history, tracking, and audience lists for at least 30 days
+4. Watch booking volume, cost per booking, and organic share before making the pause permanent
 
-### Structured Snippets
-- **Services:** Starter Locs, Retwists, Repairs, Interlocking, Natural Hair
+## Metrics That Matter During the Transition
 
----
+| Metric | Target / Decision Signal |
+|--------|--------------------------|
+| Booking page conversion | Move from ~15% toward 22-28% |
+| Organic share of booked calendar | 80%+ for 2 consecutive weeks |
+| Google Business Profile activity | Weekly posts + 20+ photos + service descriptions updated |
+| Yelp momentum | 10+ fresh reviews and current profile availability |
+| Retargeting readiness | Warm audiences and tracking live before spend shifts |
 
-## Quick Launch Checklist
+## What Not To Do
 
-- [ ] Create Google Ads account
-- [ ] Set up billing
-- [ ] Create "Loc Services" campaign first
-- [ ] Add responsive search ads with headlines/descriptions above
-- [ ] Add keywords (start with exact match, expand to phrase)
-- [ ] Set up conversion tracking
-- [ ] Add env variables to Vercel
-- [ ] Enable location targeting (Houston + 25 mile radius)
-- [ ] Set ad schedule (business hours + evenings)
-- [ ] Link Google Analytics
-- [ ] Review and publish
-
----
-
-## Performance Targets
-
-| Metric | Target |
-|--------|--------|
-| Click-Through Rate | 3-5% |
-| Cost Per Click | $2-5 |
-| Conversion Rate | 5-10% |
-| Cost Per Booking | $20-50 |
-
-Monitor weekly and adjust bids/keywords based on performance.
+- Do not cut Google Ads before organic demand is demonstrably replacing it
+- Do not increase search spend to compensate for a weak booking page
+- Do not send Instagram traffic through multi-link hubs when the goal is bookings
+- Do not delete ad account history once campaigns are paused
