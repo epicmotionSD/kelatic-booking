@@ -22,7 +22,8 @@ export function getPool(): mysql.Pool {
 
 export async function queryBluehost<T = Record<string, unknown>>(
   sql: string,
-  params: unknown[] = []
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  params: any[] = []
 ): Promise<T[]> {
   const p = getPool()
   const [rows] = await p.execute(sql, params)
