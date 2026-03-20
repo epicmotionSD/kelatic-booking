@@ -84,19 +84,19 @@ export default function PlatformPage() {
 
           <div className="x3o-g4">
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric">$297</div>
+              <div className="x3o-metric-val">$297</div>
               <div className="x3o-metric-label">Avg MRR / Tenant</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric">18.5×</div>
+              <div className="x3o-metric-val">18.5×</div>
               <div className="x3o-metric-label">Client ROI (KeLatic)</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric">6</div>
+              <div className="x3o-metric-val">6</div>
               <div className="x3o-metric-label">Verticals Targeted</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric">~$1.2M</div>
+              <div className="x3o-metric-val">~$1.2M</div>
               <div className="x3o-metric-label">Year-1 Revenue Target</div>
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function PlatformPage() {
             </h2>
             <p style={{ color: 'var(--x3o-muted)' }}>
               First x3o vertical deployment. Full-stack AI operations for a premium
-              loc studio in Phoenix, AZ.
+              loc studio in Houston, TX.
             </p>
             <a
               href="https://kelatic.x3o.ai"
@@ -312,19 +312,19 @@ export default function PlatformPage() {
           {/* Metrics */}
           <div className="x3o-g4">
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric" style={{ color: '#22c55e' }}>+$5,510</div>
+              <div className="x3o-metric-val x3o-val-green">+$5,510</div>
               <div className="x3o-metric-label">Monthly Revenue Recovered</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric">18.5×</div>
+              <div className="x3o-metric-val">18.5×</div>
               <div className="x3o-metric-label">ROI on $297/mo plan</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric">23%</div>
+              <div className="x3o-metric-val">23%</div>
               <div className="x3o-metric-label">Ghost Client Recovery</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric">142</div>
+              <div className="x3o-metric-val">142</div>
               <div className="x3o-metric-label">Active Clients Managed</div>
             </div>
           </div>
@@ -392,27 +392,27 @@ export default function PlatformPage() {
                 <tbody>
                   <tr>
                     <td>Ghost Client Recovery</td>
-                    <td style={{ color: '#22c55e' }}>+$3,200</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>+$3,200</td>
                     <td>AI-generated win-back campaigns</td>
                   </tr>
                   <tr>
                     <td>Rebooking Optimization</td>
-                    <td style={{ color: '#22c55e' }}>+$1,100</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>+$1,100</td>
                     <td>Smart scheduling &amp; reminders</td>
                   </tr>
                   <tr>
                     <td>Social-Driven Bookings</td>
-                    <td style={{ color: '#22c55e' }}>+$680</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>+$680</td>
                     <td>Optimized content calendar</td>
                   </tr>
                   <tr>
                     <td>Upsell Intelligence</td>
-                    <td style={{ color: '#22c55e' }}>+$530</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>+$530</td>
                     <td>Service recommendations</td>
                   </tr>
                   <tr style={{ fontWeight: 600, borderTop: '1px solid rgba(255,255,255,.1)' }}>
                     <td>Total Monthly Lift</td>
-                    <td style={{ color: '#22c55e' }}>+$5,510</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>+$5,510</td>
                     <td>18.5× ROI on $297/mo</td>
                   </tr>
                 </tbody>
@@ -446,40 +446,40 @@ export default function PlatformPage() {
                 icon: '🍽️',
                 title: 'Restaurants',
                 desc: 'Review management, menu optimization, reservation intelligence.',
-                status: 'Q2 2025',
-                statusColor: 'amber' as const,
+                status: 'Live',
+                statusColor: 'green' as const,
                 tenant: 'Coming soon',
               },
               {
                 icon: '🏋️',
                 title: 'Fitness',
                 desc: 'Member retention AI, class scheduling, churn prediction.',
-                status: 'Q2 2025',
-                statusColor: 'amber' as const,
+                status: 'Live',
+                statusColor: 'green' as const,
                 tenant: 'Coming soon',
               },
               {
                 icon: '🛍️',
                 title: 'Retail',
                 desc: 'Inventory intelligence, foot traffic analysis, loyalty optimization.',
-                status: 'Q3 2025',
-                statusColor: 'blue' as const,
+                status: 'Q2 2026',
+                statusColor: 'amber' as const,
                 tenant: 'Coming soon',
               },
               {
                 icon: '💉',
                 title: 'Med Spas',
                 desc: 'Treatment rebooking, consent automation, provider scheduling.',
-                status: 'Q3 2025',
-                statusColor: 'blue' as const,
+                status: 'Q2 2026',
+                statusColor: 'amber' as const,
                 tenant: 'Coming soon',
               },
               {
                 icon: '⚖️',
                 title: 'Legal',
                 desc: 'Intake qualification, case pipeline, billing analytics.',
-                status: 'Q4 2025',
-                statusColor: 'purple' as const,
+                status: 'Q3 2026',
+                statusColor: 'blue' as const,
                 tenant: 'Coming soon',
               },
             ].map((v) => (
@@ -554,11 +554,11 @@ export default function PlatformPage() {
               <Tag color="green">Starter</Tag>
               <div className="x3o-price">$97<span className="x3o-price-period">/mo</span></div>
               <ul className="x3o-price-features">
-                <li><Dot color="#22c55e" />Social intelligence dashboard</li>
-                <li><Dot color="#22c55e" />Ghost client detection</li>
-                <li><Dot color="#22c55e" />Monthly content calendar</li>
-                <li><Dot color="#22c55e" />Basic competitor monitoring</li>
-                <li><Dot color="#22c55e" />Email support</li>
+                <li><Dot color="var(--x3o-green)" />Social intelligence dashboard</li>
+                <li><Dot color="var(--x3o-green)" />Ghost client detection</li>
+                <li><Dot color="var(--x3o-green)" />Monthly content calendar</li>
+                <li><Dot color="var(--x3o-green)" />Basic competitor monitoring</li>
+                <li><Dot color="var(--x3o-green)" />Email support</li>
               </ul>
               <button className="x3o-btn x3o-btn-ghost" style={{ width: '100%' }}>Start Free Trial</button>
             </div>
@@ -568,12 +568,12 @@ export default function PlatformPage() {
               <Tag color="amber">Most Popular</Tag>
               <div className="x3o-price">$297<span className="x3o-price-period">/mo</span></div>
               <ul className="x3o-price-features">
-                <li><Dot color="#22c55e" />Everything in Starter</li>
-                <li><Dot color="#f59e0b" />Automated win-back campaigns</li>
-                <li><Dot color="#f59e0b" />Campaign ROI analytics</li>
-                <li><Dot color="#f59e0b" />Booking funnel optimization</li>
-                <li><Dot color="#f59e0b" />Weekly AI content generation</li>
-                <li><Dot color="#f59e0b" />Priority support + Slack</li>
+                <li><Dot color="var(--x3o-green)" />Everything in Starter</li>
+                <li><Dot color="var(--x3o-accent)" />Automated win-back campaigns</li>
+                <li><Dot color="var(--x3o-accent)" />Campaign ROI analytics</li>
+                <li><Dot color="var(--x3o-accent)" />Booking funnel optimization</li>
+                <li><Dot color="var(--x3o-accent)" />Weekly AI content generation</li>
+                <li><Dot color="var(--x3o-accent)" />Priority support + Slack</li>
               </ul>
               <button className="x3o-btn x3o-btn-primary" style={{ width: '100%' }}>Start Free Trial</button>
             </div>
@@ -583,12 +583,12 @@ export default function PlatformPage() {
               <Tag color="purple">Enterprise</Tag>
               <div className="x3o-price">$897<span className="x3o-price-period">/mo</span></div>
               <ul className="x3o-price-features">
-                <li><Dot color="#22c55e" />Everything in Growth</li>
-                <li><Dot color="#a78bfa" />Multi-location support</li>
-                <li><Dot color="#a78bfa" />Custom Claude system prompts</li>
-                <li><Dot color="#a78bfa" />API / MCP access</li>
-                <li><Dot color="#a78bfa" />Dedicated account manager</li>
-                <li><Dot color="#a78bfa" />White-label option</li>
+                <li><Dot color="var(--x3o-green)" />Everything in Growth</li>
+                <li><Dot color="var(--x3o-purple)" />Multi-location support</li>
+                <li><Dot color="var(--x3o-purple)" />Custom Claude system prompts</li>
+                <li><Dot color="var(--x3o-purple)" />API / MCP access</li>
+                <li><Dot color="var(--x3o-purple)" />Dedicated account manager</li>
+                <li><Dot color="var(--x3o-purple)" />White-label option</li>
               </ul>
               <button className="x3o-btn x3o-btn-ghost" style={{ width: '100%' }}>Contact Sales</button>
             </div>
@@ -602,7 +602,7 @@ export default function PlatformPage() {
                 <thead>
                   <tr>
                     <th>Capability</th>
-                    <th style={{ color: '#f59e0b' }}>x3o Intelligence</th>
+                    <th style={{ color: 'var(--x3o-accent)' }}>x3o Intelligence</th>
                     <th>Generic CRM</th>
                     <th>Manual / Agency</th>
                   </tr>
@@ -610,37 +610,37 @@ export default function PlatformPage() {
                 <tbody>
                   <tr>
                     <td>AI-Powered Analysis</td>
-                    <td style={{ color: '#22c55e' }}>✓ Claude</td>
-                    <td style={{ color: '#ef4444' }}>✗</td>
-                    <td style={{ color: '#ef4444' }}>✗</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>✓ Claude</td>
+                    <td style={{ color: 'var(--x3o-red)' }}>✗</td>
+                    <td style={{ color: 'var(--x3o-red)' }}>✗</td>
                   </tr>
                   <tr>
                     <td>Vertical-Specific</td>
-                    <td style={{ color: '#22c55e' }}>✓</td>
-                    <td style={{ color: '#ef4444' }}>✗ Generic</td>
-                    <td style={{ color: '#f59e0b' }}>~ Varies</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>✓</td>
+                    <td style={{ color: 'var(--x3o-red)' }}>✗ Generic</td>
+                    <td style={{ color: 'var(--x3o-accent)' }}>~ Varies</td>
                   </tr>
                   <tr>
                     <td>Automated Campaigns</td>
-                    <td style={{ color: '#22c55e' }}>✓</td>
-                    <td style={{ color: '#f59e0b' }}>~ Basic</td>
-                    <td style={{ color: '#22c55e' }}>✓ Manual</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>✓</td>
+                    <td style={{ color: 'var(--x3o-accent)' }}>~ Basic</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>✓ Manual</td>
                   </tr>
                   <tr>
                     <td>Content Generation</td>
-                    <td style={{ color: '#22c55e' }}>✓ AI</td>
-                    <td style={{ color: '#ef4444' }}>✗</td>
-                    <td style={{ color: '#22c55e' }}>✓ Human</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>✓ AI</td>
+                    <td style={{ color: 'var(--x3o-red)' }}>✗</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>✓ Human</td>
                   </tr>
                   <tr>
                     <td>Setup Time</td>
-                    <td style={{ color: '#22c55e' }}>24 hours</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>24 hours</td>
                     <td>1–2 weeks</td>
                     <td>2–4 weeks</td>
                   </tr>
                   <tr>
                     <td>Monthly Cost</td>
-                    <td style={{ color: '#22c55e' }}>$97–$897</td>
+                    <td style={{ color: 'var(--x3o-green)' }}>$97–$897</td>
                     <td>$200–$500</td>
                     <td>$2,000–$5,000</td>
                   </tr>
@@ -663,7 +663,7 @@ export default function PlatformPage() {
           {/* Phases */}
           <div className="x3o-g3">
             <div className="x3o-card-accent">
-              <Tag color="green">Phase 1 · NOW</Tag>
+              <Tag color="green">Phase 1 · COMPLETE</Tag>
               <h3 style={{ margin: '12px 0 8px' }}>Prove</h3>
               <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.8, paddingLeft: 18 }}>
                 <li>KeLatic as flagship case study</li>
@@ -674,7 +674,7 @@ export default function PlatformPage() {
               </ul>
             </div>
             <div className="x3o-card">
-              <Tag color="amber">Phase 2 · Q2 2025</Tag>
+              <Tag color="amber">Phase 2 · NOW</Tag>
               <h3 style={{ margin: '12px 0 8px' }}>Expand</h3>
               <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.8, paddingLeft: 18 }}>
                 <li>Launch restaurant &amp; fitness verticals</li>
@@ -685,7 +685,7 @@ export default function PlatformPage() {
               </ul>
             </div>
             <div className="x3o-card">
-              <Tag color="blue">Phase 3 · Q3-Q4 2025</Tag>
+              <Tag color="blue">Phase 3 · Q2-Q3 2026</Tag>
               <h3 style={{ margin: '12px 0 8px' }}>Scale</h3>
               <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.8, paddingLeft: 18 }}>
                 <li>All 6 verticals live</li>
@@ -702,7 +702,7 @@ export default function PlatformPage() {
             <h3 style={{ marginBottom: 16 }}>Anthropic Partnership Pitch</h3>
             <div className="x3o-g3">
               <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <h4 style={{ color: '#f59e0b', marginBottom: 8 }}>For Anthropic</h4>
+                <h4 style={{ color: 'var(--x3o-accent)', marginBottom: 8 }}>For Anthropic</h4>
                 <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
                   <li>Showcase Claude in B2B vertical AI</li>
                   <li>Real revenue attribution (18.5× ROI)</li>
@@ -711,7 +711,7 @@ export default function PlatformPage() {
                 </ul>
               </div>
               <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <h4 style={{ color: '#f59e0b', marginBottom: 8 }}>For x3o</h4>
+                <h4 style={{ color: 'var(--x3o-accent)', marginBottom: 8 }}>For x3o</h4>
                 <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
                   <li>Featured marketplace placement</li>
                   <li>API credits / discount program</li>
@@ -720,7 +720,7 @@ export default function PlatformPage() {
                 </ul>
               </div>
               <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <h4 style={{ color: '#f59e0b', marginBottom: 8 }}>Mutual Value</h4>
+                <h4 style={{ color: 'var(--x3o-accent)', marginBottom: 8 }}>Mutual Value</h4>
                 <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
                   <li>Prove AI-driven SMB transformation</li>
                   <li>Template for vertical AI deployments</li>
@@ -742,38 +742,38 @@ export default function PlatformPage() {
                   <p>KeLatic deployment complete, collecting production data</p>
                 </div>
               </div>
-              <div className="x3o-tl-item x3o-tl-active">
+              <div className="x3o-tl-item x3o-tl-done">
                 <div className="x3o-tl-dot" />
                 <div>
                   <strong>Feb 2025</strong>
                   <p>MCP server live, Anthropic marketplace submission, x3o.ai relaunch</p>
                 </div>
               </div>
-              <div className="x3o-tl-item x3o-tl-future">
+              <div className="x3o-tl-item x3o-tl-done">
                 <div className="x3o-tl-dot" />
                 <div>
-                  <strong>Mar 2025</strong>
-                  <p>10 beauty tenants, optimize onboarding funnel</p>
+                  <strong>Q2–Q4 2025</strong>
+                  <p>10 beauty tenants onboarded, onboarding funnel optimized, restaurant &amp; fitness verticals launched</p>
+                </div>
+              </div>
+              <div className="x3o-tl-item x3o-tl-active">
+                <div className="x3o-tl-dot" />
+                <div>
+                  <strong>Q1 2026</strong>
+                  <p>50 total tenants, Trust Stack integration, OpenConductor SDK v1.4</p>
                 </div>
               </div>
               <div className="x3o-tl-item x3o-tl-future">
                 <div className="x3o-tl-dot" />
                 <div>
-                  <strong>Q2 2025</strong>
-                  <p>Restaurant &amp; fitness verticals launch, 50 tenants</p>
+                  <strong>Q2 2026</strong>
+                  <p>Retail &amp; med spa verticals, white-label program launch</p>
                 </div>
               </div>
               <div className="x3o-tl-item x3o-tl-future">
                 <div className="x3o-tl-dot" />
                 <div>
-                  <strong>Q3 2025</strong>
-                  <p>Retail &amp; med spa verticals, white-label program</p>
-                </div>
-              </div>
-              <div className="x3o-tl-item x3o-tl-future">
-                <div className="x3o-tl-dot" />
-                <div>
-                  <strong>Q4 2025</strong>
+                  <strong>Q3–Q4 2026</strong>
                   <p>Legal vertical, 200 tenants, $100K MRR milestone</p>
                 </div>
               </div>
@@ -781,6 +781,14 @@ export default function PlatformPage() {
           </div>
         </main>
       )}
+
+      {/* ── Footer ── */}
+      <footer className="x3o-footer">
+        <p>x3o.ai is where you start.</p>
+        <p style={{ marginTop: 8 }}>
+          © {new Date().getFullYear()} Sonnier Ventures. All rights reserved.
+        </p>
+      </footer>
     </div>
   )
 }

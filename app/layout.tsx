@@ -106,13 +106,13 @@ export default async function RootLayout({
   const combinedJsonLd = [jsonLd, websiteJsonLd];
 
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="KeLatic" />
+        <meta name="apple-mobile-web-app-title" content={business?.name || 'x3o Intelligence'} />
         <link rel="apple-touch-icon" href="/icon-192x192.png" />
         <script
           type="application/ld+json"
@@ -120,7 +120,7 @@ export default async function RootLayout({
         />
         {business && <BusinessThemeStyle business={business} />}
       </head>
-      <body className={`${inter.className} ${playfair.variable}`} suppressHydrationWarning={true}>
+      <body className={`${inter.className} ${playfair.variable} overflow-x-hidden bg-[#010409]`} suppressHydrationWarning={true}>
         <BusinessProvider business={business} settings={settings}>
           {children}
           <PwaInstallPrompt />
