@@ -51,22 +51,26 @@ const OFFER_URL = process.env.PUBLIC_SPECIAL_OFFERS_URL || 'https://kelatic.com/
 
 const EMAIL_TEMPLATES = {
   direct_inquiry: {
-    subject: 'Still thinking about {service} at {businessName}?',
-    headline: 'Let\'s get you booked',
-    body: 'Hi {firstName}, if you\'re still interested in {service}, we\'d love to take care of you this week. You can grab the next available slot in minutes.',
-    ctaLabel: 'Book your appointment',
+    subject: 'Welcome back — 20% off your next visit 🎉',
+    headline: 'We\'ve missed you, {firstName}',
+    body: 'It\'s been a while since we\'ve seen you at {businessName}, and we want you back. As a welcome-back gift, we\'re offering <strong>20% off your next {service}</strong> — just mention this email when you book.',
+    ctaLabel: 'Claim 20% Off & Book Now',
     ctaUrl: BOOKING_URL,
-    secondaryLabel: 'View the $75 Wednesday Special',
+    secondaryLabel: 'View current specials',
     secondaryUrl: OFFER_URL,
+    offer: '20% OFF YOUR NEXT VISIT',
+    offerSub: 'Welcome-back exclusive — mention this email at booking',
   },
   file_closure: {
-    subject: 'Quick check-in from {businessName}',
-    headline: 'Should we keep your spot open?',
-    body: 'Hi {firstName}, we were about to close your file for {service}. If you still want to come in, book below and we\'ll take care of the rest.',
-    ctaLabel: 'Keep my spot',
+    subject: 'Your 20% off is about to expire, {firstName}',
+    headline: 'Last chance to claim your discount',
+    body: 'Hi {firstName}, we sent you a welcome-back offer a couple days ago and wanted to make sure you saw it. Your <strong>20% off {service}</strong> is still waiting — but we can only hold it a little longer.',
+    ctaLabel: 'Book Before It Expires',
     ctaUrl: BOOKING_URL,
-    secondaryLabel: 'See current offers',
+    secondaryLabel: 'See current specials',
     secondaryUrl: OFFER_URL,
+    offer: '20% OFF — EXPIRING SOON',
+    offerSub: 'Mention this email at booking to redeem',
   },
   gift: {
     subject: 'A complimentary upgrade for your next visit',
@@ -76,15 +80,19 @@ const EMAIL_TEMPLATES = {
     ctaUrl: BOOKING_URL,
     secondaryLabel: 'Browse our specials',
     secondaryUrl: OFFER_URL,
+    offer: 'COMPLIMENTARY UPGRADE',
+    offerSub: 'Applied automatically at your next visit',
   },
   breakup: {
-    subject: 'Last check-in from {businessName}',
-    headline: 'We\'re here if you need us',
-    body: 'Hi {firstName}, we won\'t keep reaching out. If you ever want {service} again, you can book anytime below.',
-    ctaLabel: 'Book anytime',
+    subject: 'We\'ll always have a spot for you, {firstName}',
+    headline: 'No hard feelings — we\'re still here',
+    body: 'Hi {firstName}, we won\'t keep reaching out after this. But if you ever want to come back for {service}, your 20% welcome-back discount is still good — just mention this email when you book.',
+    ctaLabel: 'Book Anytime',
     ctaUrl: BOOKING_URL,
-    secondaryLabel: 'See current offers',
-    secondaryUrl: OFFER_URL,
+    secondaryLabel: null,
+    secondaryUrl: null,
+    offer: null,
+    offerSub: null,
   },
 } as const
 
@@ -190,13 +198,11 @@ function getNextSendWindowMs(timezone = 'America/New_York'): number {
   const currentHour = parseInt(formatter.format(now), 10)
   
   if (currentHour < SEND_WINDOW.startHour) {
-    // Before window - wait until start
     return (SEND_WINDOW.startHour - currentHour) * 60 * 60 * 1000
   } else if (currentHour >= SEND_WINDOW.endHour) {
-    // After window - wait until tomorrow 9am
     return ((24 - currentHour) + SEND_WINDOW.startHour) * 60 * 60 * 1000
   }
-  return 0 // Within window
+  return 0
 }
 
 // =============================================================================
@@ -212,21 +218,13 @@ async function getDailyLimitForBusiness(businessId: string): Promise<number> {
     .eq('business_id', businessId)
     .single()
   
-  if (!compliance) {
-    // No A2P registration - use minimum safe limit
-    return 50
-  }
+  if (!compliance) return 50
+  if (compliance.daily_message_limit) return compliance.daily_message_limit
   
-  // Use configured limit or calculate from trust score
-  if (compliance.daily_message_limit) {
-    return compliance.daily_message_limit
-  }
-  
-  // Trust score thresholds from migration 026
   const trustScore = compliance.trust_score || 0
   if (trustScore >= 75) return 2000
   if (trustScore >= 50) return 500
-  return 50 // Low trust or unverified
+  return 50
 }
 
 // =============================================================================
@@ -240,29 +238,24 @@ export const runHummingbirdCadence = inngest.createFunction(
     name: 'Run Hummingbird Reactivation Cadence',
     retries: 3,
     concurrency: {
-      limit: 5, // Max 5 campaigns running simultaneously (plan limit)
+      limit: 5,
     },
   },
   { event: 'campaign/started' },
   async ({ event, step }) => {
     const { campaignId, businessId } = event.data
     
-    // Step 1: Load campaign and leads
     const { campaign, leads, business } = await step.run('load-campaign-data', async () => {
       const supabase = createAdminClient()
       
       const [campaignResult, leadsResult, businessResult] = await Promise.all([
-        supabase
-          .from('campaigns')
-          .select('*')
-          .eq('id', campaignId)
-          .single(),
+        supabase.from('campaigns').select('*').eq('id', campaignId).single(),
         supabase
           .from('campaign_leads')
           .select('*')
           .eq('campaign_id', campaignId)
           .eq('status', 'pending')
-          .order('estimated_value', { ascending: false }), // High value first
+          .order('estimated_value', { ascending: false }),
         supabase
           .from('businesses')
           .select('name, twilio_phone_number, twilio_account_sid_encrypted, twilio_auth_token_encrypted')
@@ -280,49 +273,31 @@ export const runHummingbirdCadence = inngest.createFunction(
       }
     })
     
-    if (leads.length === 0) {
-      return { status: 'no_leads', campaignId }
-    }
+    if (leads.length === 0) return { status: 'no_leads', campaignId }
     
-    // Step 2: Mark campaign as active
     await step.run('activate-campaign', async () => {
       const supabase = createAdminClient()
       await supabase
         .from('campaigns')
-        .update({
-          status: 'active',
-          started_at: new Date().toISOString(),
-          current_day: 1,
-        })
+        .update({ status: 'active', started_at: new Date().toISOString(), current_day: 1 })
         .eq('id', campaignId)
     })
     
     const cadenceConfig = buildCadenceConfig(campaign)
 
-    // Step 3: Execute each day of the cadence
     for (const cadenceStep of cadenceConfig) {
-      // Check if campaign was paused/cancelled
       const shouldContinue = await step.run(`check-status-day-${cadenceStep.day}`, async () => {
         const supabase = createAdminClient()
-        const { data } = await supabase
-          .from('campaigns')
-          .select('status')
-          .eq('id', campaignId)
-          .single()
-        
+        const { data } = await supabase.from('campaigns').select('status').eq('id', campaignId).single()
         return data?.status === 'active'
       })
       
-      if (!shouldContinue) {
-        return { status: 'paused_or_cancelled', stoppedAtDay: cadenceStep.day }
-      }
+      if (!shouldContinue) return { status: 'paused_or_cancelled', stoppedAtDay: cadenceStep.day }
       
-      // Wait for the scheduled delay (except Day 1)
       if (cadenceStep.delayHours > 0) {
         await step.sleep(`wait-for-day-${cadenceStep.day}`, `${cadenceStep.delayHours}h`)
       }
       
-      // Get leads that haven't responded or opted out
       const activeLeads = await step.run(`get-active-leads-day-${cadenceStep.day}`, async () => {
         const supabase = createAdminClient()
         const { data } = await supabase
@@ -331,17 +306,11 @@ export const runHummingbirdCadence = inngest.createFunction(
           .eq('campaign_id', campaignId)
           .in('status', ['pending', 'in_progress'])
           .eq('has_responded', false)
-        
         return data || []
       })
       
-      if (activeLeads.length === 0) {
-        // Everyone responded or opted out - early completion!
-        break
-      }
+      if (activeLeads.length === 0) break
       
-      // Send messages in batches
-      // NOTE: A2P trust score limits apply to SMS/voice only, not email
       const dailyLimit = await getDailyLimitForBusiness(businessId)
       const channelLimit = cadenceStep.channel === 'email'
         ? (campaign.daily_send_limit || activeLeads.length)
@@ -352,7 +321,6 @@ export const runHummingbirdCadence = inngest.createFunction(
       for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
         const batch = batches[batchIndex]
         
-        // COMPLIANCE: Check if within send window before each batch
         const waitMs = getNextSendWindowMs()
         if (waitMs > 0) {
           console.log(`[COMPLIANCE] Outside send window. Waiting ${Math.round(waitMs / 3600000)}h until 9am`)
@@ -364,7 +332,6 @@ export const runHummingbirdCadence = inngest.createFunction(
           const results = []
           
           for (const lead of batch) {
-            // COMPLIANCE: Pre-send verification - check if lead opted out since batch was created
             const { data: optOutCheck } = await supabase
               .from('clients')
               .select('sms_opt_out')
@@ -380,7 +347,6 @@ export const runHummingbirdCadence = inngest.createFunction(
               continue
             }
             
-            // Personalize the script
             const personalizedMessage = cadenceStep.template
               .replace('{firstName}', lead.first_name || 'there')
               .replace('{service}', campaign.script_variables?.service || 'your appointment')
@@ -394,16 +360,14 @@ export const runHummingbirdCadence = inngest.createFunction(
                   to: lead.phone,
                   from: business.twilio_phone_number,
                   body: personalizedMessage,
-                  accountSid: business.twilio_account_sid_encrypted, // Decrypt in function
+                  accountSid: business.twilio_account_sid_encrypted,
                   authToken: business.twilio_auth_token_encrypted,
                 })
-
                 sendResult = {
                   status: twilioResult.status === 'queued' ? 'sent' : 'failed',
                   messageId: twilioResult.sid,
                   errorMessage: twilioResult.errorMessage,
                 }
-
                 await supabase.from('campaign_messages').insert({
                   campaign_id: campaignId,
                   campaign_lead_id: lead.id,
@@ -442,20 +406,75 @@ export const runHummingbirdCadence = inngest.createFunction(
                   ? interpolateTemplate(emailTemplate.secondaryLabel, templateVars)
                   : null
                 const secondaryUrl = emailTemplate.secondaryUrl
+                const offer = 'offer' in emailTemplate ? emailTemplate.offer : null
+                const offerSub = 'offerSub' in emailTemplate ? emailTemplate.offerSub : null
 
-                const html = `
-                  <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111;">
-                    <h2 style="margin: 0 0 12px; font-size: 22px;">${headline}</h2>
-                    <p style="margin: 0 0 16px;">${body}</p>
-                    <p style="margin: 24px 0;">
-                      <a href="${ctaUrl}" style="display: inline-block; padding: 12px 20px; background: #f59e0b; color: #111; text-decoration: none; border-radius: 999px; font-weight: 700;">
-                        ${ctaLabel}
-                      </a>
-                    </p>
-                    ${secondaryLabel && secondaryUrl ? `<p style=\"margin: 0 0 8px;\"><a href=\"${secondaryUrl}\" style=\"color: #f59e0b; text-decoration: none;\">${secondaryLabel}</a></p>` : ''}
-                    <p style="margin: 24px 0 0; color: #666; font-size: 12px;">If you no longer want to hear from us, you can ignore this email.</p>
-                  </div>
-                `
+                const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>${subject}</title>
+</head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <!-- HEADER -->
+          <tr>
+            <td style="background:#111111;padding:28px 40px;text-align:center;">
+              <p style="margin:0;font-size:22px;font-weight:800;letter-spacing:0.08em;color:#ffffff;text-transform:uppercase;">KeLatic</p>
+              <p style="margin:4px 0 0;font-size:11px;color:#888888;letter-spacing:0.12em;text-transform:uppercase;">Hair Lounge</p>
+            </td>
+          </tr>
+          \${offer ? \`
+          <!-- OFFER BANNER -->
+          <tr>
+            <td style="background:#f59e0b;padding:20px 40px;text-align:center;">
+              <p style="margin:0;font-size:18px;font-weight:800;color:#111111;letter-spacing:0.06em;">\${offer}</p>
+              \${offerSub ? \`<p style="margin:4px 0 0;font-size:12px;color:#111111;opacity:0.75;">\${offerSub}</p>\` : ''}
+            </td>
+          </tr>\` : ''}
+          <!-- BODY -->
+          <tr>
+            <td style="padding:40px 40px 32px;">
+              <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#111111;line-height:1.3;">${headline}</h1>
+              <p style="margin:0 0 28px;font-size:15px;line-height:1.7;color:#444444;">${body}</p>
+              <!-- CTA BUTTON -->
+              <table cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
+                <tr>
+                  <td style="background:#f59e0b;border-radius:8px;">
+                    <a href="${ctaUrl}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#111111;text-decoration:none;letter-spacing:0.02em;">${ctaLabel}</a>
+                  </td>
+                </tr>
+              </table>
+              \${secondaryLabel && secondaryUrl ? \`<p style="margin:0;font-size:13px;"><a href="\${secondaryUrl}" style="color:#f59e0b;text-decoration:underline;">\${secondaryLabel}</a></p>\` : ''}
+            </td>
+          </tr>
+          <!-- DIVIDER -->
+          <tr>
+            <td style="padding:0 40px;">
+              <hr style="border:none;border-top:1px solid #eeeeee;margin:0;" />
+            </td>
+          </tr>
+          <!-- FOOTER -->
+          <tr>
+            <td style="padding:24px 40px;text-align:center;">
+              <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#111111;">KeLatic Hair Lounge</p>
+              <p style="margin:0 0 12px;font-size:12px;color:#888888;">Houston, TX · kelatic.com</p>
+              <p style="margin:0;font-size:11px;color:#bbbbbb;line-height:1.6;">
+                You're receiving this because you've visited us before.<br/>
+                To stop receiving emails, simply reply with "unsubscribe" and we'll remove you right away.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
                 const emailBodyText = `${headline}\n\n${body}\n\n${ctaLabel}: ${ctaUrl}${secondaryLabel && secondaryUrl ? `\n${secondaryLabel}: ${secondaryUrl}` : ''}`
 
                 const { data: emailMessage, error: emailMessageError } = await supabase
@@ -509,7 +528,6 @@ export const runHummingbirdCadence = inngest.createFunction(
                 continue
               }
               
-              // Update lead status
               await supabase
                 .from('campaign_leads')
                 .update({
@@ -523,8 +541,6 @@ export const runHummingbirdCadence = inngest.createFunction(
               
             } catch (error) {
               console.error(`Failed to send to ${lead.phone}:`, error)
-              
-              // Record failed message
               await supabase.from('campaign_messages').insert({
                 campaign_id: campaignId,
                 campaign_lead_id: lead.id,
@@ -542,24 +558,20 @@ export const runHummingbirdCadence = inngest.createFunction(
                 error_message: String(error),
                 failed_at: new Date().toISOString(),
               })
-              
               results.push({ leadId: lead.id, success: false, error: String(error) })
             }
             
-            // Rate limiting: 1 message per second
             await new Promise(resolve => setTimeout(resolve, 1000))
           }
           
           return results
         })
         
-        // Pause between batches
         if (batchIndex < batches.length - 1) {
           await step.sleep(`batch-cooldown-day-${cadenceStep.day}-${batchIndex}`, '5m')
         }
       }
       
-      // Update campaign progress
       await step.run(`update-progress-day-${cadenceStep.day}`, async () => {
         const supabase = createAdminClient()
         await supabase
@@ -568,23 +580,15 @@ export const runHummingbirdCadence = inngest.createFunction(
           .eq('id', campaignId)
       })
       
-      // Emit day complete event
       await step.sendEvent(`day-${cadenceStep.day}-complete`, {
         name: 'cadence/day-complete',
-        data: {
-          campaignId,
-          day: cadenceStep.day,
-          sent: activeLeads.length,
-          failed: 0, // TODO: Calculate from results
-        },
+        data: { campaignId, day: cadenceStep.day, sent: activeLeads.length, failed: 0 },
       })
     }
     
-    // Step 4: Mark campaign as complete
     const finalMetrics = await step.run('complete-campaign', async () => {
       const supabase = createAdminClient()
       
-      // Get final metrics
       const { data: messages } = await supabase
         .from('campaign_messages')
         .select('status, direction, sentiment, is_opt_out')
@@ -608,30 +612,18 @@ export const runHummingbirdCadence = inngest.createFunction(
       
       await supabase
         .from('campaigns')
-        .update({
-          status: 'completed',
-          completed_at: new Date().toISOString(),
-          metrics,
-        })
+        .update({ status: 'completed', completed_at: new Date().toISOString(), metrics })
         .eq('id', campaignId)
       
       return metrics
     })
     
-    // Emit completion event
     await step.sendEvent('campaign-completed', {
       name: 'campaign/completed',
-      data: {
-        campaignId,
-        metrics: finalMetrics,
-      },
+      data: { campaignId, metrics: finalMetrics },
     })
     
-    return {
-      status: 'completed',
-      campaignId,
-      metrics: finalMetrics,
-    }
+    return { status: 'completed', campaignId, metrics: finalMetrics }
   }
 )
 
