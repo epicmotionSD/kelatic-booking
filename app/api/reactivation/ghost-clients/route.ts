@@ -152,21 +152,24 @@ async function fetchSupabaseLeads(
   try {
     const admin = createAdminClient()
 
-    // Pull all completed appointments with client profiles, unfiltered on date
-    // We aggregate in JS to find each client's first/last visit and total count.
-    // Limit 5000 rows — more than enough for a single salon.
+    // Pull all confirmed appointments — includes both registered clients (client_id set)
+    // and walk-ins (client_id null, data in walk_in_name/phone/email columns).
+    // Most KeLatic appointments are walk-ins, so we must handle both paths.
     const { data: appts, error } = await admin
       .from('appointments')
       .select(`
+        id,
         client_id,
         start_time,
+        walk_in_name,
+        walk_in_phone,
+        walk_in_email,
         client:profiles!appointments_client_id_fkey (
           id, first_name, last_name, email, phone
         )
       `)
       .eq('business_id', businessId)
       .eq('status', 'confirmed')
-      .not('client_id', 'is', null)
       .order('start_time', { ascending: false })
       .limit(5000)
 
@@ -175,41 +178,61 @@ async function fetchSupabaseLeads(
       return leadMap
     }
 
-    // Aggregate per client: since we ordered DESC, first occurrence = most recent visit
+    // Aggregate per unique client key (profile ID or walk-in email)
     type ClientAgg = {
-      clientId: string
+      key: string
       firstName: string
       lastName: string
       email: string
       phone: string | null
-      lastVisit: string   // first row encountered (DESC order)
-      firstVisit: string  // last row encountered
+      lastVisit: string
+      firstVisit: string
       totalVisits: number
     }
 
     const clientAgg = new Map<string, ClientAgg>()
 
     for (const appt of appts ?? []) {
-      const clientArr = Array.isArray(appt.client) ? appt.client : [appt.client]
-      const client = clientArr[0]
-      if (!client?.email) continue
+      let email: string | null = null
+      let firstName = ''
+      let lastName = ''
+      let phone: string | null = null
+      let key: string
 
-      const email = client.email.toLowerCase().trim()
-      const existing = clientAgg.get(appt.client_id as string)
+      if (appt.client_id) {
+        // Registered client — pull from profiles join
+        const clientArr = Array.isArray(appt.client) ? appt.client : [appt.client]
+        const client = clientArr[0]
+        if (!client?.email) continue
+        email = client.email.toLowerCase().trim()
+        firstName = client.first_name ?? ''
+        lastName = client.last_name ?? ''
+        phone = client.phone ?? null
+        key = `profile_${appt.client_id}`
+      } else if (appt.walk_in_email) {
+        // Walk-in — use walk_in_* columns
+        email = (appt.walk_in_email as string).toLowerCase().trim()
+        const nameParts = ((appt.walk_in_name as string) ?? '').trim().split(' ')
+        firstName = nameParts[0] ?? ''
+        lastName = nameParts.slice(1).join(' ')
+        phone = appt.walk_in_phone as string | null
+        key = `walkin_${email}`
+      } else {
+        continue // no email — skip
+      }
 
+      if (!email) continue
+
+      const existing = clientAgg.get(key)
       if (!existing) {
-        clientAgg.set(appt.client_id as string, {
-          clientId:   appt.client_id as string,
-          firstName:  client.first_name ?? '',
-          lastName:   client.last_name ?? '',
-          email,
-          phone:      client.phone ?? null,
-          lastVisit:  appt.start_time,   // most recent (desc order, first seen)
-          firstVisit: appt.start_time,   // will be overwritten to oldest
+        clientAgg.set(key, {
+          key, firstName, lastName, email, phone,
+          lastVisit:  appt.start_time,
+          firstVisit: appt.start_time,
           totalVisits: 1,
         })
       } else {
-        // Earlier appointment — update firstVisit and increment count
+        // Earlier appointment (DESC order) — update firstVisit and increment count
         existing.firstVisit = appt.start_time
         existing.totalVisits++
       }
@@ -229,7 +252,7 @@ async function fetchSupabaseLeads(
       const value = estimateValue(agg.totalVisits)
 
       leadMap.set(agg.email, {
-        id:               `supabase_${agg.clientId}`,
+        id:               `supabase_${agg.key}`,
         firstName:        agg.firstName,
         lastName:         agg.lastName,
         email:            agg.email,

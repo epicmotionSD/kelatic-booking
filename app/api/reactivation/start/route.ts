@@ -131,18 +131,23 @@ async function getSupabaseLeads(businessId: string, minDays: number): Promise<Ma
   const map = new Map<string, SegmentedLead>()
   try {
     const admin = createAdminClient()
+    // Select both registered-client fields AND walk-in fields.
+    // Most appointments are walk-ins (client_id = null) with data in walk_in_* columns.
     const { data: appts, error } = await admin
       .from('appointments')
       .select(`
+        id,
         client_id,
         start_time,
+        walk_in_name,
+        walk_in_phone,
+        walk_in_email,
         client:profiles!appointments_client_id_fkey (
           id, first_name, last_name, email, phone
         )
       `)
       .eq('business_id', businessId)
       .eq('status', 'confirmed')
-      .not('client_id', 'is', null)
       .order('start_time', { ascending: false })
       .limit(5000)
 
@@ -151,26 +156,42 @@ async function getSupabaseLeads(businessId: string, minDays: number): Promise<Ma
       return map
     }
 
-    type Agg = { clientId: string; firstName: string; lastName: string; email: string; phone: string | null; lastVisit: string; firstVisit: string; totalVisits: number }
+    type Agg = { key: string; firstName: string; lastName: string; email: string; phone: string | null; lastVisit: string; firstVisit: string; totalVisits: number }
     const agg = new Map<string, Agg>()
 
     for (const appt of appts) {
-      const clientArr = Array.isArray(appt.client) ? appt.client : [appt.client]
-      const c = clientArr[0]
-      if (!c?.email) continue
-      const email = c.email.toLowerCase().trim()
-      const existing = agg.get(appt.client_id as string)
+      // Resolve identity: registered client takes priority over walk-in
+      let email: string | null = null
+      let firstName = ''
+      let lastName = ''
+      let phone: string | null = null
+      let key: string
+
+      if (appt.client_id) {
+        const clientArr = Array.isArray(appt.client) ? appt.client : [appt.client]
+        const c = clientArr[0]
+        if (!c?.email) continue
+        email = c.email.toLowerCase().trim()
+        firstName = c.first_name ?? ''
+        lastName = c.last_name ?? ''
+        phone = c.phone ?? null
+        key = `profile_${appt.client_id}`
+      } else if (appt.walk_in_email) {
+        email = (appt.walk_in_email as string).toLowerCase().trim()
+        const nameParts = ((appt.walk_in_name as string) ?? '').trim().split(' ')
+        firstName = nameParts[0] ?? ''
+        lastName = nameParts.slice(1).join(' ')
+        phone = appt.walk_in_phone as string | null
+        key = `walkin_${email}`
+      } else {
+        continue // no email — skip
+      }
+
+      if (!email) continue
+
+      const existing = agg.get(key)
       if (!existing) {
-        agg.set(appt.client_id as string, {
-          clientId:    appt.client_id as string,
-          firstName:   c.first_name ?? '',
-          lastName:    c.last_name ?? '',
-          email,
-          phone:       c.phone ?? null,
-          lastVisit:   appt.start_time,
-          firstVisit:  appt.start_time,
-          totalVisits: 1,
-        })
+        agg.set(key, { key, firstName, lastName, email, phone, lastVisit: appt.start_time, firstVisit: appt.start_time, totalVisits: 1 })
       } else {
         existing.firstVisit = appt.start_time
         existing.totalVisits++
@@ -183,7 +204,7 @@ async function getSupabaseLeads(businessId: string, minDays: number): Promise<Ma
       if (daysSince < minDays) continue
       const seg = segmentFromDays(daysSince)
       map.set(a.email, {
-        id:               `supabase_${a.clientId}`,
+        id:               `supabase_${a.key}`,
         firstName:        a.firstName,
         lastName:         a.lastName,
         email:            a.email,
