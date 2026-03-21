@@ -141,7 +141,7 @@ async function getSupabaseLeads(businessId: string, minDays: number): Promise<Ma
         )
       `)
       .eq('business_id', businessId)
-      .eq('status', 'completed')
+      .eq('status', 'confirmed')
       .not('client_id', 'is', null)
       .order('start_time', { ascending: false })
       .limit(5000)
