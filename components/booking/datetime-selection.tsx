@@ -108,9 +108,6 @@ export function DateTimeSelection({
 
     // Check day of week
     const dayOfWeek = dateToCheck.getDay();
-    
-    // Salon closed Sunday (0) and Monday (1)
-    if (dayOfWeek === 0 || dayOfWeek === 1) return false;
 
     // Wednesday-only restriction for special offers
     if (wednesdayOnly && dayOfWeek !== 3) return false;

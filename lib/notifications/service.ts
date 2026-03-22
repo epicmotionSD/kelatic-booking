@@ -735,6 +735,132 @@ export async function sendBookingCancellation(appointment: AppointmentDetails, c
 // STYLIST NOTIFICATIONS
 // ============================================
 
+function getStylistNotificationEmailHtml(
+  appointment: AppointmentDetails,
+  ctx: BusinessContext
+): string {
+  const { business } = ctx;
+  const logoUrl = getLogoUrl(business);
+  const gradient = getBrandGradient(business);
+  const addOnsHtml = appointment.add_ons?.length
+    ? `<p style="margin: 2px 0 0; color: #a1a1aa; font-size: 14px;">Add-ons: ${appointment.add_ons.join(', ')}</p>`
+    : '';
+  const notesHtml = appointment.notes
+    ? `
+      <tr>
+        <td style="padding-top: 16px; border-top: 1px solid #52525b;">
+          <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Client Notes</p>
+          <p style="margin: 4px 0 0; color: #ffffff; font-size: 15px;">${appointment.notes}</p>
+        </td>
+      </tr>`
+    : '';
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
+              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
+            </td>
+          </tr>
+
+          <!-- Title Banner -->
+          <tr>
+            <td style="background: ${gradient}; padding: 30px; text-align: center;">
+              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">📅 New Appointment</h1>
+              <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">You have a new client booked</p>
+            </td>
+          </tr>
+
+          <!-- Content -->
+          <tr>
+            <td style="padding: 40px;">
+              <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.stylist_name.split(' ')[0]},</p>
+              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">A new appointment has been booked with you. Here are the details:</p>
+
+              <!-- Client Card -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid ${business.primary_color};">
+                <tr>
+                  <td>
+                    <p style="margin: 0 0 4px; color: ${business.primary_color}; font-size: 12px; font-weight: 600; text-transform: uppercase;">Client</p>
+                    <p style="margin: 0 0 8px; color: #ffffff; font-size: 22px; font-weight: 700;">${appointment.client_name}</p>
+                    ${appointment.client_phone ? `<a href="tel:${appointment.client_phone.replace(/[^0-9]/g, '')}" style="display: inline-block; color: ${business.primary_color}; font-size: 15px; text-decoration: none; font-weight: 500;">📞 ${appointment.client_phone}</a>` : ''}
+                    ${appointment.client_email ? `<p style="margin: 4px 0 0; color: #a1a1aa; font-size: 14px;">✉️ ${appointment.client_email}</p>` : ''}
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Appointment Details -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
+                <tr><td>
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td style="padding-bottom: 16px; border-bottom: 1px solid #52525b;">
+                        <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Service</p>
+                        <p style="margin: 4px 0 0; color: #ffffff; font-size: 18px; font-weight: 600;">${appointment.service_name}</p>
+                        ${addOnsHtml}
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 16px 0; border-bottom: 1px solid #52525b;">
+                        <table width="100%">
+                          <tr>
+                            <td width="50%">
+                              <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Date</p>
+                              <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatDate(appointment.appointment_date)}</p>
+                            </td>
+                            <td width="50%">
+                              <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Time</p>
+                              <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatTime(appointment.appointment_time)}</p>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="padding-top: 16px; ${notesHtml ? 'border-bottom: 1px solid #52525b; padding-bottom: 16px;' : ''}">
+                        <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Duration</p>
+                        <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatDuration(appointment.service_duration)}</p>
+                      </td>
+                    </tr>
+                    ${notesHtml}
+                  </table>
+                </td></tr>
+              </table>
+
+              <!-- Footer note -->
+              <p style="margin: 0; color: #71717a; font-size: 13px; text-align: center;">This is an internal notification for ${business.name} staff only.</p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #18181b; padding: 24px 30px; text-align: center; border-top: 1px solid #3f3f46;">
+              <img src="${logoUrl}" alt="${business.name}" style="height: 36px; width: auto; margin-bottom: 12px;" />
+              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${business.name}. Internal staff notification.</p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+  `;
+}
+
 export async function notifyStylistNewBooking(
   stylistEmail: string,
   stylistPhone: string | null,
@@ -752,16 +878,8 @@ export async function notifyStylistNewBooking(
         to: stylistEmail,
         fromEmail,
         fromName: business.name,
-        subject: `📅 New Booking: ${appointment.client_name} - ${formatDate(appointment.appointment_date)}`,
-        html: `
-          <h2>New Appointment Booked</h2>
-          <p><strong>Client:</strong> ${appointment.client_name}</p>
-          <p><strong>Service:</strong> ${appointment.service_name}</p>
-          <p><strong>Date:</strong> ${formatDate(appointment.appointment_date)}</p>
-          <p><strong>Time:</strong> ${formatTime(appointment.appointment_time)}</p>
-          <p><strong>Duration:</strong> ${formatDuration(appointment.service_duration)}</p>
-          ${appointment.notes ? `<p><strong>Notes:</strong> ${appointment.notes}</p>` : ''}
-        `,
+        subject: `📅 New Booking: ${appointment.client_name} — ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}`,
+        html: getStylistNotificationEmailHtml(appointment, ctx),
       });
 
       if (!result.success) {
