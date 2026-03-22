@@ -1,4 +1,4 @@
-// Notification Service - Email (SendGrid) & SMS (Twilio)
+// Notification Service - Email (Resend) & SMS (Twilio)
 // Multi-tenant aware - uses business context for branding
 import type { Business, BusinessSettings } from '@/lib/tenant';
 import {
@@ -34,9 +34,11 @@ function getLogoUrl(business: Business): string {
   return `${getBusinessUrl(business)}${business.logo_url || '/logo.png'}`;
 }
 
-// Get brand gradient
-function getBrandGradient(business: Business): string {
-  return `linear-gradient(135deg, ${business.primary_color} 0%, ${business.secondary_color} 100%)`;
+// Get from email
+function getFromEmail(ctx: BusinessContext): string {
+  return process.env.RESEND_FROM_EMAIL
+    || ctx.settings?.sendgrid_from_email
+    || `bookings@${ROOT_DOMAIN}`;
 }
 
 export interface AppointmentDetails {
@@ -97,363 +99,379 @@ function getInternalCcRecipients(ctx: BusinessContext): string[] {
 }
 
 // ============================================
+// SHARED EMAIL LAYOUT BUILDER
+// ============================================
+
+interface EmailLayoutOptions {
+  business: Business;
+  bannerText?: string | null;
+  bannerSubtext?: string | null;
+  headline: string;
+  bodyHtml: string;
+  ctaLabel?: string;
+  ctaUrl?: string;
+  secondaryLabel?: string;
+  secondaryUrl?: string;
+  footerNote?: string;
+}
+
+function buildEmailHtml(opts: EmailLayoutOptions): string {
+  const { business } = opts;
+  const primaryColor = business.primary_color || '#f59e0b';
+  const address = getFullAddress(business);
+  const siteUrl = getBusinessUrl(business);
+  const city = business.city ? `${business.city}${business.state ? ', ' + business.state : ''}` : '';
+  const businessDomain = business.custom_domain || `${business.slug}.${ROOT_DOMAIN}`;
+
+  const bannerHtml = opts.bannerText ? `
+          <!-- OFFER / INFO BANNER -->
+          <tr>
+            <td style="background:${primaryColor};padding:20px 40px;text-align:center;">
+              <p style="margin:0;font-size:18px;font-weight:800;color:#111111;letter-spacing:0.06em;">${opts.bannerText}</p>
+              ${opts.bannerSubtext ? `<p style="margin:4px 0 0;font-size:12px;color:#111111;opacity:0.75;">${opts.bannerSubtext}</p>` : ''}
+            </td>
+          </tr>` : '';
+
+  const ctaHtml = opts.ctaLabel && opts.ctaUrl ? `
+              <!-- CTA BUTTON -->
+              <table cellpadding="0" cellspacing="0" style="margin:28px 0 8px;">
+                <tr>
+                  <td style="background:${primaryColor};border-radius:8px;">
+                    <a href="${opts.ctaUrl}" style="display:inline-block;padding:14px 32px;font-size:15px;font-weight:700;color:#111111;text-decoration:none;letter-spacing:0.02em;">${opts.ctaLabel}</a>
+                  </td>
+                </tr>
+              </table>` : '';
+
+  const secondaryHtml = opts.secondaryLabel && opts.secondaryUrl ? `
+              <p style="margin:12px 0 0;font-size:13px;">
+                <a href="${opts.secondaryUrl}" style="color:${primaryColor};text-decoration:underline;">${opts.secondaryLabel}</a>
+              </p>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body style="margin:0;padding:32px 16px;background:#f4f4f5;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+
+  <table width="100%" cellpadding="0" cellspacing="0">
+    <tr>
+      <td align="center">
+        <table width="100%" cellpadding="0" cellspacing="0" style="max-width:580px;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+
+          <!-- HEADER -->
+          <tr>
+            <td style="background:#111111;padding:28px 40px;text-align:center;">
+              <p style="margin:0;font-size:22px;font-weight:800;letter-spacing:0.08em;color:#ffffff;text-transform:uppercase;">${business.name}</p>
+              ${business.tagline ? `<p style="margin:4px 0 0;font-size:11px;color:#888888;letter-spacing:0.12em;text-transform:uppercase;">${business.tagline}</p>` : ''}
+            </td>
+          </tr>
+${bannerHtml}
+          <!-- BODY -->
+          <tr>
+            <td style="padding:40px 40px 32px;">
+              <h1 style="margin:0 0 16px;font-size:24px;font-weight:700;color:#111111;line-height:1.3;">${opts.headline}</h1>
+              ${opts.bodyHtml}
+${ctaHtml}
+${secondaryHtml}
+            </td>
+          </tr>
+
+          <!-- DIVIDER -->
+          <tr>
+            <td style="padding:0 40px;">
+              <hr style="border:none;border-top:1px solid #eeeeee;margin:0;" />
+            </td>
+
+          <!-- FOOTER -->
+          <tr>
+            <td style="padding:24px 40px;text-align:center;">
+              <p style="margin:0 0 6px;font-size:13px;font-weight:600;color:#111111;">${business.name}</p>
+              <p style="margin:0 0 12px;font-size:12px;color:#888888;">${city ? city + ' &middot; ' : ''}${businessDomain}</p>
+              <p style="margin:0;font-size:11px;color:#bbbbbb;line-height:1.6;">
+                ${opts.footerNote || `You're receiving this because you have an appointment with us.<br/>Questions? ${business.phone ? `Call us at ${business.phone}.` : `Visit ${businessDomain}.`}`}
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>`;
+}
+
+// ============================================
 // EMAIL TEMPLATES
 // ============================================
 
 function getConfirmationEmailHtml(appointment: AppointmentDetails, ctx: BusinessContext): string {
   const { business } = ctx;
   const siteUrl = getBusinessUrl(business);
-  const logoUrl = getLogoUrl(business);
-  const address = getFullAddress(business);
-  const gradient = getBrandGradient(business);
+  const primaryColor = business.primary_color || '#f59e0b';
   const isPending = appointment.status === 'pending';
-
-  const statusTitle = isPending ? 'Appointment Pending Deposit' : 'Appointment Confirmed!';
-  const statusSubtitle = isPending ? 'Complete your deposit to lock in your time' : "We're excited to see you";
-  const introText = isPending
-    ? 'Your appointment request has been received and is currently pending. Complete your deposit to confirm your booking. Here are your details:'
-    : "Your appointment has been confirmed! We're excited to see you. Here are your booking details:";
+  const firstName = appointment.client_name.split(' ')[0];
 
   const addOnsHtml = appointment.add_ons?.length
-    ? `<p style="margin: 0; color: #666;">Add-ons: ${appointment.add_ons.join(', ')}</p>`
+    ? `<p style="margin:4px 0 0;font-size:13px;color:#888888;">Add-ons: ${appointment.add_ons.join(', ')}</p>`
     : '';
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
-          <!-- Header with Logo -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
-              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
-            </td>
-          </tr>
-          <!-- Title Banner -->
-          <tr>
-            <td style="background: ${gradient}; padding: 30px; text-align: center;">
-              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">${statusTitle}</h1>
-              <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">${statusSubtitle}</p>
-            </td>
-          </tr>
-
-          <!-- Content -->
-          <tr>
-            <td style="padding: 40px;">
-              <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
-              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">${introText}</p>
-
-              <!-- Appointment Card -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
+  const addressHtml = (() => {
+    const addr = getFullAddress(business);
+    if (!addr) return '';
+    const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(addr)}`;
+    return `
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
                 <tr>
-                  <td>
+                  <td style="background:#f9f9f9;border-radius:8px;padding:16px;">
+                    <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Location</p>
+                    <p style="margin:0 0 6px;font-size:14px;color:#111111;">${addr}</p>
+                    <a href="${mapsUrl}" style="font-size:13px;color:${primaryColor};text-decoration:none;">Get Directions &rarr;</a>
+                  </td>
+                </tr>
+              </table>`;
+  })();
+
+  const bodyHtml = `
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#444444;">${
+    isPending
+      ? `Hi ${firstName}, your appointment request is pending. Complete your deposit to lock in your time.`
+      : `Hi ${firstName}, you're all set! We can't wait to see you. Here are your details:`
+  }</p>
+
+              <!-- APPOINTMENT DETAILS CARD -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:8px;margin-bottom:20px;overflow:hidden;">
+                <tr>
+                  <td style="padding:16px 20px;border-bottom:1px solid #eeeeee;">
+                    <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Service</p>
+                    <p style="margin:0;font-size:16px;font-weight:600;color:#111111;">${appointment.service_name}</p>
+                    ${addOnsHtml}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0;">
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
-                        <td style="padding-bottom: 16px; border-bottom: 1px solid #52525b;">
-                          <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Service</p>
-                          <p style="margin: 4px 0 0; color: #ffffff; font-size: 18px; font-weight: 600;">${appointment.service_name}</p>
-                          ${addOnsHtml}
+                        <td width="50%" style="padding:16px 20px;border-bottom:1px solid #eeeeee;border-right:1px solid #eeeeee;">
+                          <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Date</p>
+                          <p style="margin:0;font-size:14px;color:#111111;">${formatDate(appointment.appointment_date)}</p>
+                        </td>
+                        <td width="50%" style="padding:16px 20px;border-bottom:1px solid #eeeeee;">
+                          <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Time</p>
+                          <p style="margin:0;font-size:14px;color:#111111;">${formatTime(appointment.appointment_time)}</p>
                         </td>
                       </tr>
                       <tr>
-                        <td style="padding: 16px 0; border-bottom: 1px solid #52525b;">
-                          <table width="100%">
-                            <tr>
-                              <td width="50%">
-                                <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Date</p>
-                                <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatDate(appointment.appointment_date)}</p>
-                              </td>
-                              <td width="50%">
-                                <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Time</p>
-                                <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatTime(appointment.appointment_time)}</p>
-                              </td>
-                            </tr>
-                          </table>
+                        <td width="50%" style="padding:16px 20px;border-right:1px solid #eeeeee;">
+                          <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Stylist</p>
+                          <p style="margin:0;font-size:14px;color:#111111;">${appointment.stylist_name}</p>
+                        </td>
+                        <td width="50%" style="padding:16px 20px;">
+                          <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Duration</p>
+                          <p style="margin:0;font-size:14px;color:#111111;">${formatDuration(appointment.service_duration)}</p>
                         </td>
                       </tr>
+                      ${appointment.total_amount != null ? `
                       <tr>
-                        <td style="padding: 16px 0; border-bottom: 1px solid #52525b;">
-                          <table width="100%">
-                            <tr>
-                              <td width="50%">
-                                <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Stylist</p>
-                                <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${appointment.stylist_name}</p>
-                              </td>
-                              <td width="50%">
-                                <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Duration</p>
-                                <p style="margin: 4px 0 0; color: #ffffff; font-size: 16px;">${formatDuration(appointment.service_duration)}</p>
-                              </td>
-                            </tr>
-                          </table>
+                        <td colspan="2" style="padding:16px 20px;border-top:1px solid #eeeeee;">
+                          <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Total</p>
+                          <p style="margin:0;font-size:20px;font-weight:700;color:${primaryColor};">$${(appointment.total_amount ?? 0).toFixed(2)}</p>
                         </td>
-                      </tr>
-                      <tr>
-                        <td style="padding-top: 16px;">
-                          <p style="margin: 0; color: ${business.primary_color}; font-size: 14px; font-weight: 600; text-transform: uppercase;">Total</p>
-                          <p style="margin: 4px 0 0; color: ${business.primary_color}; font-size: 24px; font-weight: 700;">$${(appointment.total_amount ?? 0).toFixed(2)}</p>
-                        </td>
-                      </tr>
+                      </tr>` : ''}
                     </table>
                   </td>
                 </tr>
               </table>
 
-              <!-- Location -->
-              ${address ? `
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
-                <tr>
-                  <td>
-                    <p style="margin: 0 0 8px; color: #ffffff; font-size: 16px; font-weight: 600;">📍 Location</p>
-                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">${address}</p>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(address)}" style="color: ${business.primary_color}; font-size: 14px; text-decoration: none;">Get Directions →</a>
-                  </td>
-                </tr>
-              </table>
-              ` : ''}
+              ${addressHtml}
 
-              <!-- Important Info -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: rgba(245, 158, 11, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(245, 158, 11, 0.3);">
+              <!-- REMINDERS -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;margin-bottom:20px;">
                 <tr>
-                  <td>
-                    <p style="margin: 0 0 12px; color: ${business.primary_color}; font-size: 16px; font-weight: 600;">⚡ Important Reminders</p>
-                    <ul style="margin: 0; padding-left: 20px; color: #a1a1aa; font-size: 14px; line-height: 1.8;">
-                      <li>Please arrive 10-15 minutes early</li>
-                      <li>Come with clean, product-free hair unless otherwise instructed</li>
-                      <li>If you need to reschedule, please give us at least 24 hours notice</li>
-                      <li>Late arrivals may result in shortened service time</li>
-                    </ul>
+                  <td style="padding:16px 20px;">
+                    <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.06em;">Reminders</p>
+                    <p style="margin:0;font-size:13px;color:#78350f;line-height:1.8;">
+                      &bull; Arrive 10&ndash;15 minutes early<br/>
+                      &bull; Come with clean, product-free hair<br/>
+                      &bull; Reschedule at least 24 hours in advance<br/>
+                      &bull; Late arrivals may result in shortened service time
+                    </p>
                   </td>
                 </tr>
               </table>
 
-              <!-- Buttons -->
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td align="center" style="padding-bottom: 20px;">
-                    <a href="${siteUrl}/appointments/${appointment.id}" style="display: inline-block; padding: 14px 32px; background: ${gradient}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">View Appointment</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td align="center">
-                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">Need to make changes? <a href="${siteUrl}/appointments/${appointment.id}/reschedule" style="color: ${business.primary_color}; text-decoration: none;">Reschedule</a>${business.phone ? ` or call us at <a href="tel:${business.phone.replace(/[^0-9]/g, '')}" style="color: ${business.primary_color}; text-decoration: none;">${business.phone}</a>` : ''}</p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
+              <p style="margin:0;font-size:13px;color:#888888;">
+                Need to reschedule?
+                <a href="${siteUrl}/appointments/${appointment.id}/reschedule" style="color:${primaryColor};text-decoration:none;">Reschedule here</a>${business.phone ? ` or call <a href="tel:${business.phone.replace(/[^0-9]/g, '')}" style="color:${primaryColor};text-decoration:none;">${business.phone}</a>` : ''}.
+              </p>`;
 
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
-              <img src="${logoUrl}" alt="${business.name}" style="height: 40px; width: auto; margin-bottom: 15px;" />
-              ${address ? `<p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${address}</p>` : ''}
-              ${business.phone ? `<p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${business.phone}</p>` : ''}
-              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${business.name}. All rights reserved.</p>
-              ${business.tagline ? `<p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">${business.tagline}</p>` : ''}
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `;
+  return buildEmailHtml({
+    business,
+    bannerText: isPending ? 'DEPOSIT REQUIRED' : 'APPOINTMENT CONFIRMED',
+    bannerSubtext: isPending ? 'Complete your deposit to lock in your slot' : "We're excited to see you",
+    headline: isPending ? 'Your booking is pending' : `See you ${formatDate(appointment.appointment_date)}`,
+    bodyHtml,
+    ctaLabel: isPending ? 'Complete Deposit' : 'View Appointment',
+    ctaUrl: `${siteUrl}/appointments/${appointment.id}`,
+  });
 }
 
 function getReminderEmailHtml(appointment: AppointmentDetails, hoursUntil: number, ctx: BusinessContext): string {
   const { business } = ctx;
-  const logoUrl = getLogoUrl(business);
-  const address = getFullAddress(business);
-  const gradient = getBrandGradient(business);
+  const siteUrl = getBusinessUrl(business);
+  const primaryColor = business.primary_color || '#f59e0b';
   const timeLabel = hoursUntil === 24 ? 'tomorrow' : 'today';
+  const firstName = appointment.client_name.split(' ')[0];
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
-          <!-- Header with Logo -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
-              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
-            </td>
-          </tr>
-          <!-- Title Banner -->
-          <tr>
-            <td style="background: ${gradient}; padding: 30px; text-align: center;">
-              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">Appointment Reminder ⏰</h1>
-              <p style="margin: 10px 0 0; color: rgba(0,0,0,0.7); font-size: 16px;">Your appointment is ${timeLabel}!</p>
-            </td>
-          </tr>
-
-          <!-- Content -->
-          <tr>
-            <td style="padding: 40px;">
-              <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
-              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">This is a friendly reminder about your upcoming appointment at ${business.name}.</p>
-
-              <!-- Appointment Summary -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
+  const addressHtml = (() => {
+    const addr = getFullAddress(business);
+    if (!addr) return '';
+    const mapsUrl = `https://maps.google.com/?q=${encodeURIComponent(addr)}`;
+    return `
+              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:20px;">
                 <tr>
-                  <td>
-                    <p style="margin: 0 0 8px; color: #ffffff; font-size: 20px; font-weight: 600;">${appointment.service_name}</p>
-                    <p style="margin: 0 0 4px; color: #a1a1aa; font-size: 16px;">📅 ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}</p>
-                    <p style="margin: 0; color: #a1a1aa; font-size: 16px;">💇 with ${appointment.stylist_name}</p>
+                  <td style="background:#f9f9f9;border-radius:8px;padding:16px;">
+                    <p style="margin:0 0 4px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Location</p>
+                    <p style="margin:0 0 6px;font-size:14px;color:#111111;">${addr}</p>
+                    <a href="${mapsUrl}" style="font-size:13px;color:${primaryColor};text-decoration:none;">Get Directions &rarr;</a>
+                  </td>
+                </tr>
+              </table>`;
+  })();
+
+  const bodyHtml = `
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#444444;">Hi ${firstName}, just a heads-up &mdash; your appointment is <strong>${timeLabel}</strong>. We're looking forward to seeing you!</p>
+
+              <!-- APPOINTMENT SUMMARY -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:8px;margin-bottom:20px;">
+                <tr>
+                  <td style="padding:20px;">
+                    <p style="margin:0 0 4px;font-size:18px;font-weight:700;color:#111111;">${appointment.service_name}</p>
+                    <p style="margin:0 0 4px;font-size:14px;color:#444444;">${formatDate(appointment.appointment_date)} &middot; ${formatTime(appointment.appointment_time)}</p>
+                    <p style="margin:0;font-size:14px;color:#888888;">with ${appointment.stylist_name} &middot; ${formatDuration(appointment.service_duration)}</p>
                   </td>
                 </tr>
               </table>
 
-              <!-- Checklist -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: rgba(245, 158, 11, 0.1); border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px solid rgba(245, 158, 11, 0.3);">
+              ${addressHtml}
+
+              <!-- CHECKLIST -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#fffbeb;border:1px solid #fde68a;border-radius:8px;margin-bottom:20px;">
                 <tr>
-                  <td>
-                    <p style="margin: 0 0 12px; color: ${business.primary_color}; font-size: 16px; font-weight: 600;">✅ Pre-Appointment Checklist</p>
-                    <ul style="margin: 0; padding-left: 20px; color: #a1a1aa; font-size: 14px; line-height: 2;">
-                      <li>Arrive 10-15 minutes early</li>
-                      <li>Hair should be clean and product-free</li>
-                      <li>Bring reference photos if you have a specific style in mind</li>
-                      <li>Have your payment method ready</li>
-                    </ul>
+                  <td style="padding:16px 20px;">
+                    <p style="margin:0 0 8px;font-size:13px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:0.06em;">Before you arrive</p>
+                    <p style="margin:0;font-size:13px;color:#78350f;line-height:1.8;">
+                      &bull; Arrive 10&ndash;15 minutes early<br/>
+                      &bull; Come with clean, product-free hair<br/>
+                      &bull; Bring reference photos if you have a look in mind<br/>
+                      &bull; Have your payment method ready
+                    </p>
                   </td>
                 </tr>
               </table>
 
-              <!-- Location -->
-              ${address ? `
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 30px;">
-                <tr>
-                  <td>
-                    <p style="margin: 0 0 8px; color: #ffffff; font-size: 16px; font-weight: 600;">📍 Location</p>
-                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">${address}</p>
-                    <a href="https://maps.google.com/?q=${encodeURIComponent(address)}" style="color: ${business.primary_color}; font-size: 14px; text-decoration: none;">Get Directions →</a>
-                  </td>
-                </tr>
-              </table>
-              ` : ''}
+              <p style="margin:0;font-size:13px;color:#888888;">Can't make it? ${business.phone ? `Call us at <a href="tel:${business.phone.replace(/[^0-9]/g, '')}" style="color:${primaryColor};text-decoration:none;">${business.phone}</a> to reschedule.` : `<a href="${siteUrl}/appointments/${appointment.id}/reschedule" style="color:${primaryColor};text-decoration:none;">Reschedule here</a>.`}</p>`;
 
-              <!-- CTA -->
-              <table width="100%" cellpadding="0" cellspacing="0">
-                <tr>
-                  <td align="center">
-                    <p style="margin: 0; color: #a1a1aa; font-size: 14px;">Can't make it? ${business.phone ? `Please call us at <a href="tel:${business.phone.replace(/[^0-9]/g, '')}" style="color: ${business.primary_color}; text-decoration: none;">${business.phone}</a> to reschedule.` : `Please contact us to reschedule.`}</p>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
-              <img src="${logoUrl}" alt="${business.name}" style="height: 40px; width: auto; margin-bottom: 15px;" />
-              ${address ? `<p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${address}</p>` : ''}
-              ${business.phone ? `<p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${business.phone}</p>` : ''}
-              <p style="margin: 0; color: #71717a; font-size: 12px;">See you soon! ✨</p>
-              ${business.tagline ? `<p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">${business.tagline}</p>` : ''}
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `;
+  return buildEmailHtml({
+    business,
+    bannerText: hoursUntil === 24 ? 'SEE YOU TOMORROW' : 'SEE YOU TODAY',
+    bannerSubtext: `${formatTime(appointment.appointment_time)} &middot; ${appointment.service_name}`,
+    headline: `Your appointment is ${timeLabel}!`,
+    bodyHtml,
+    ctaLabel: 'View Appointment',
+    ctaUrl: `${siteUrl}/appointments/${appointment.id}`,
+  });
 }
 
 function getCancellationEmailHtml(appointment: AppointmentDetails, ctx: BusinessContext): string {
   const { business } = ctx;
   const siteUrl = getBusinessUrl(business);
-  const logoUrl = getLogoUrl(business);
-  const address = getFullAddress(business);
-  const gradient = getBrandGradient(business);
+  const primaryColor = business.primary_color || '#f59e0b';
+  const firstName = appointment.client_name.split(' ')[0];
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
-          <!-- Header with Logo -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
-              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
-            </td>
-          </tr>
-          <!-- Title Banner -->
-          <tr>
-            <td style="background-color: #3f3f46; padding: 30px; text-align: center;">
-              <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700;">Appointment Cancelled</h1>
-              <p style="margin: 10px 0 0; color: #a1a1aa; font-size: 16px;">We hope to see you again soon</p>
-            </td>
-          </tr>
+  const bodyHtml = `
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#444444;">Hi ${firstName}, your appointment has been cancelled. We're sorry we won't be seeing you this time &mdash; we hope to welcome you back soon.</p>
 
-          <!-- Content -->
-          <tr>
-            <td style="padding: 40px;">
-              <p style="margin: 0 0 20px; color: #ffffff; font-size: 18px;">Hi ${appointment.client_name.split(' ')[0]},</p>
-              <p style="margin: 0 0 30px; color: #a1a1aa; font-size: 16px; line-height: 1.6;">Your appointment has been cancelled as requested. We're sorry we won't be seeing you this time!</p>
-
-              <!-- Cancelled Appointment Info -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #3f3f46; border-radius: 12px; padding: 24px; margin-bottom: 30px; border: 1px solid #52525b;">
+              <!-- CANCELLED DETAILS -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:8px;margin-bottom:24px;">
                 <tr>
-                  <td>
-                    <p style="margin: 0 0 4px; color: #71717a; font-size: 14px; text-decoration: line-through;">${appointment.service_name}</p>
-                    <p style="margin: 0; color: #71717a; font-size: 14px; text-decoration: line-through;">${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}</p>
+                  <td style="padding:20px;">
+                    <p style="margin:0 0 4px;font-size:16px;font-weight:600;color:#aaaaaa;text-decoration:line-through;">${appointment.service_name}</p>
+                    <p style="margin:0;font-size:14px;color:#aaaaaa;text-decoration:line-through;">${formatDate(appointment.appointment_date)} &middot; ${formatTime(appointment.appointment_time)}</p>
                   </td>
                 </tr>
               </table>
 
-              <!-- Rebook CTA -->
-              <table width="100%" cellpadding="0" cellspacing="0">
+              <p style="margin:0 0 8px;font-size:15px;line-height:1.7;color:#444444;">Whenever you're ready, we'd love to see you again. Book a new appointment at any time.</p>`;
+
+  return buildEmailHtml({
+    business,
+    bannerText: null,
+    headline: 'Appointment cancelled',
+    bodyHtml,
+    ctaLabel: 'Book a New Appointment',
+    ctaUrl: `${siteUrl}/book`,
+    footerNote: `You're receiving this because you had an appointment with us.<br/>Questions? ${business.phone ? `Call us at ${business.phone}.` : `Visit ${getBusinessUrl(business)}.`}`,
+  });
+}
+
+function getStylistNotificationHtml(appointment: AppointmentDetails, ctx: BusinessContext): string {
+  const { business } = ctx;
+  const primaryColor = business.primary_color || '#f59e0b';
+
+  const bodyHtml = `
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#444444;">A new appointment has been booked. Here are the details:</p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:8px;margin-bottom:20px;">
                 <tr>
-                  <td align="center" style="padding-bottom: 20px;">
-                    <p style="margin: 0 0 20px; color: #a1a1aa; font-size: 16px;">We'd love to see you soon! Book a new appointment when you're ready.</p>
-                    <a href="${siteUrl}/book" style="display: inline-block; padding: 14px 32px; background: ${gradient}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 600; font-size: 16px;">Book New Appointment</a>
+                  <td style="padding:16px 20px;border-bottom:1px solid #eeeeee;">
+                    <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Client</p>
+                    <p style="margin:0;font-size:16px;font-weight:600;color:#111111;">${appointment.client_name}</p>
+                    ${appointment.client_phone ? `<p style="margin:2px 0 0;font-size:13px;color:#888888;">${appointment.client_phone}</p>` : ''}
                   </td>
                 </tr>
-              </table>
-            </td>
-          </tr>
+                <tr>
+                  <td style="padding:16px 20px;border-bottom:1px solid #eeeeee;">
+                    <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Service</p>
+                    <p style="margin:0;font-size:15px;color:#111111;">${appointment.service_name} &mdash; ${formatDuration(appointment.service_duration)}</p>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:0;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="50%" style="padding:16px 20px;border-right:1px solid #eeeeee;">
+                          <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Date</p>
+                          <p style="margin:0;font-size:14px;color:#111111;">${formatDate(appointment.appointment_date)}</p>
+                        </td>
+                        <td width="50%" style="padding:16px 20px;">
+                          <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Time</p>
+                          <p style="margin:0;font-size:14px;color:#111111;">${formatTime(appointment.appointment_time)}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                ${appointment.notes ? `
+                <tr>
+                  <td style="padding:16px 20px;border-top:1px solid #eeeeee;">
+                    <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Client Notes</p>
+                    <p style="margin:0;font-size:14px;color:#111111;">${appointment.notes}</p>
+                  </td>
+                </tr>` : ''}
+              </table>`;
 
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
-              <img src="${logoUrl}" alt="${business.name}" style="height: 40px; width: auto; margin-bottom: 15px;" />
-              ${address ? `<p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${address}</p>` : ''}
-              ${business.phone ? `<p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">${business.phone}</p>` : ''}
-              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${business.name}. All rights reserved.</p>
-              ${business.tagline ? `<p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">${business.tagline}</p>` : ''}
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `;
+  return buildEmailHtml({
+    business,
+    bannerText: 'NEW BOOKING',
+    bannerSubtext: `${appointment.client_name} &mdash; ${formatDate(appointment.appointment_date)}`,
+    headline: 'You have a new appointment',
+    bodyHtml,
+    footerNote: `Internal notification from ${business.name}.`,
+  });
 }
 
 // ============================================
@@ -516,10 +534,10 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx
   }
 
   const { business } = ctx;
-  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
+  const fromEmail = getFromEmail(ctx);
+  const isPending = appointment.status === 'pending';
 
   try {
-    const isPending = appointment.status === 'pending';
     const result = await sendEmailMessage({
       to: appointment.client_email,
       cc: getInternalCcRecipients(ctx),
@@ -553,7 +571,7 @@ export async function sendReminderEmail(appointment: AppointmentDetails, hoursUn
   }
 
   const { business } = ctx;
-  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
+  const fromEmail = getFromEmail(ctx);
 
   try {
     const result = await sendEmailMessage({
@@ -583,7 +601,7 @@ export async function sendCancellationEmail(appointment: AppointmentDetails, ctx
   }
 
   const { business } = ctx;
-  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
+  const fromEmail = getFromEmail(ctx);
 
   try {
     const result = await sendEmailMessage({
@@ -868,7 +886,7 @@ export async function notifyStylistNewBooking(
   ctx: BusinessContext
 ): Promise<void> {
   const { business } = ctx;
-  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `bookings@${ROOT_DOMAIN}`;
+  const fromEmail = getFromEmail(ctx);
   const fromPhone = ctx.settings?.twilio_phone_number || process.env.TWILIO_PHONE_NUMBER || '';
 
   // Email to stylist
@@ -928,174 +946,52 @@ function getNewsletterEmailHtml(
 ): string {
   const { business } = ctx;
   const siteUrl = getBusinessUrl(business);
-  const logoUrl = getLogoUrl(business);
-  const address = getFullAddress(business);
-  const gradient = getBrandGradient(business);
-
   const unsubscribeToken = Buffer.from(subscriberEmail.toLowerCase()).toString('base64');
   const unsubscribeUrl = `${siteUrl}/api/newsletter/unsubscribe?email=${encodeURIComponent(subscriberEmail)}&token=${unsubscribeToken}`;
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="x-apple-disable-message-reformatting">
-  ${content.previewText ? `<!--[if !mso]><!--><meta http-equiv="X-UA-Compatible" content="IE=edge"><!--<![endif]--><span style="display:none;font-size:1px;color:#ffffff;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;">${content.previewText}</span>` : ''}
-</head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #18181b;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #18181b; padding: 40px 20px;">
-    <tr>
-      <td align="center">
-        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #27272a; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
-          <!-- Header with Logo -->
-          <tr>
-            <td style="background: linear-gradient(135deg, #000000 0%, #18181b 100%); padding: 30px; text-align: center; border-bottom: 2px solid ${business.primary_color};">
-              <img src="${logoUrl}" alt="${business.name}" style="height: 60px; width: auto;" />
-            </td>
-          </tr>
+  const bodyHtml = `
+              <div style="font-size:15px;line-height:1.7;color:#444444;">${content.content}</div>`;
 
-          <!-- Headline Banner -->
-          <tr>
-            <td style="background: ${gradient}; padding: 30px; text-align: center;">
-              <h1 style="margin: 0; color: #000000; font-size: 28px; font-weight: 700;">${content.headline}</h1>
-            </td>
-          </tr>
-
-          <!-- Content -->
-          <tr>
-            <td style="padding: 40px;">
-              <div style="color: #a1a1aa; font-size: 16px; line-height: 1.8;">
-                ${content.content}
-              </div>
-
-              ${content.ctaText && content.ctaUrl ? `
-              <!-- CTA Button -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 30px;">
-                <tr>
-                  <td align="center">
-                    <a href="${content.ctaUrl}" style="display: inline-block; padding: 16px 40px; background: ${gradient}; color: #000000; text-decoration: none; border-radius: 50px; font-weight: 700; font-size: 16px;">${content.ctaText}</a>
-                  </td>
-                </tr>
-              </table>
-              ` : ''}
-            </td>
-          </tr>
-
-          <!-- Divider -->
-          <tr>
-            <td style="padding: 0 40px;">
-              <hr style="border: none; border-top: 1px solid #3f3f46; margin: 0;" />
-            </td>
-          </tr>
-
-          <!-- Footer -->
-          <tr>
-            <td style="background-color: #18181b; padding: 30px; text-align: center; border-top: 1px solid #3f3f46;">
-              <img src="${logoUrl}" alt="${business.name}" style="height: 40px; width: auto; margin-bottom: 15px;" />
-              ${address ? `<p style="margin: 0 0 5px; color: #a1a1aa; font-size: 14px;">${address}</p>` : ''}
-              ${business.phone ? `
-              <p style="margin: 0 0 15px; color: #a1a1aa; font-size: 14px;">
-                <a href="tel:${business.phone.replace(/[^0-9]/g, '')}" style="color: ${business.primary_color}; text-decoration: none;">${business.phone}</a>
-              </p>
-              ` : ''}
-
-              <!-- Social Links -->
-              <p style="margin: 0 0 20px;">
-                ${business.instagram_handle ? `<a href="https://instagram.com/${business.instagram_handle.replace('@', '')}" style="color: ${business.primary_color}; text-decoration: none; margin: 0 10px;">Instagram</a>` : ''}
-                <a href="${siteUrl}/book" style="color: ${business.primary_color}; text-decoration: none; margin: 0 10px;">Book Now</a>
-              </p>
-
-              <p style="margin: 0; color: #71717a; font-size: 12px;">© ${new Date().getFullYear()} ${business.name}. All rights reserved.</p>
-              ${business.tagline ? `<p style="margin: 10px 0 0; color: #71717a; font-size: 11px;">${business.tagline}</p>` : ''}
-
-              <!-- Unsubscribe -->
-              <p style="margin: 20px 0 0; color: #52525b; font-size: 11px;">
-                Don't want to receive these emails? <a href="${unsubscribeUrl}" style="color: #52525b; text-decoration: underline;">Unsubscribe</a>
-              </p>
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `;
+  return buildEmailHtml({
+    business,
+    headline: content.headline,
+    bodyHtml,
+    ctaLabel: content.ctaText,
+    ctaUrl: content.ctaUrl,
+    footerNote: `You're receiving this because you subscribed to updates from ${business.name}.<br/><a href="${unsubscribeUrl}" style="color:#888888;">Unsubscribe</a>`,
+  });
 }
 
 export async function sendNewsletterEmail(
-  to: string,
   content: NewsletterContent,
+  subscriberEmail: string,
   ctx: BusinessContext
-): Promise<{ success: boolean; messageId?: string; error?: string }> {
+): Promise<boolean> {
   if (!isEmailProviderConfigured()) {
-    console.log(`[Newsletter] ${getEmailProviderName()} not configured, skipping email`);
-    return { success: false, error: 'Email provider not configured' };
+    console.log(`[Email] ${getEmailProviderName()} not configured, skipping newsletter`);
+    return false;
   }
 
   const { business } = ctx;
-  const fromEmail = ctx.settings?.sendgrid_from_email || process.env.SENDGRID_FROM_EMAIL || `newsletter@${ROOT_DOMAIN}`;
+  const fromEmail = getFromEmail(ctx);
 
   try {
     const result = await sendEmailMessage({
-      to,
+      to: subscriberEmail,
       fromEmail,
       fromName: business.name,
       subject: content.subject,
-      html: getNewsletterEmailHtml(content, to, ctx),
+      html: getNewsletterEmailHtml(content, subscriberEmail, ctx),
     });
 
     if (!result.success) {
       throw new Error(result.error || 'Email provider send failed');
     }
 
-    console.log(`[Newsletter] Email sent to ${to}`);
-    return {
-      success: true,
-      messageId: result.messageId,
-    };
+    console.log(`[Email] Newsletter sent to ${subscriberEmail}`);
+    return true;
   } catch (error) {
-    console.error('[Newsletter] Failed to send:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-    };
+    console.error('[Email] Failed to send newsletter:', error);
+    return false;
   }
-}
-
-export async function sendBulkNewsletter(
-  subscribers: Array<{ email: string; firstName?: string }>,
-  content: NewsletterContent,
-  ctx: BusinessContext
-): Promise<{
-  sent: number;
-  failed: number;
-  results: Array<{ email: string; success: boolean; error?: string }>;
-}> {
-  const results: Array<{ email: string; success: boolean; error?: string }> = [];
-  let sent = 0;
-  let failed = 0;
-
-  for (const subscriber of subscribers) {
-    const result = await sendNewsletterEmail(subscriber.email, content, ctx);
-    results.push({
-      email: subscriber.email,
-      success: result.success,
-      error: result.error,
-    });
-
-    if (result.success) {
-      sent++;
-    } else {
-      failed++;
-    }
-
-    // Small delay to respect rate limits
-    await new Promise((resolve) => setTimeout(resolve, 50));
-  }
-
-  console.log(`[Newsletter] Bulk send complete: ${sent} sent, ${failed} failed`);
-  return { sent, failed, results };
 }
