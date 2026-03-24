@@ -812,9 +812,7 @@ function getStylistNotificationEmailHtml(
                 <tr>
                   <td>
                     <p style="margin: 0 0 4px; color: ${business.primary_color}; font-size: 12px; font-weight: 600; text-transform: uppercase;">Client</p>
-                    <p style="margin: 0 0 8px; color: #ffffff; font-size: 22px; font-weight: 700;">${appointment.client_name}</p>
-                    ${appointment.client_phone ? `<a href="tel:${appointment.client_phone.replace(/[^0-9]/g, '')}" style="display: inline-block; color: ${business.primary_color}; font-size: 15px; text-decoration: none; font-weight: 500;">📞 ${appointment.client_phone}</a>` : ''}
-                    ${appointment.client_email ? `<p style="margin: 4px 0 0; color: #a1a1aa; font-size: 14px;">✉️ ${appointment.client_email}</p>` : ''}
+                    <p style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 700;">${appointment.client_name}</p>
                   </td>
                 </tr>
               </table>
