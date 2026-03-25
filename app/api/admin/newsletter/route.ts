@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { sendBulkNewsletter, type NewsletterContent } from '@/lib/notifications/service';
+import { sendNewsletterEmail, type NewsletterContent } from '@/lib/notifications/service';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -82,7 +82,6 @@ export async function POST(request: NextRequest) {
 
     // If test email provided, send only to that email
     if (testEmail) {
-      const { sendNewsletterEmail } = await import('@/lib/notifications/service');
       // Default context for test emails
       const testCtx = {
         business: {
@@ -97,16 +96,16 @@ export async function POST(request: NextRequest) {
         },
         settings: null,
       };
-      const result = await sendNewsletterEmail(testEmail, newsletterContent, testCtx as any);
+      const sent = await sendNewsletterEmail(newsletterContent, testEmail, testCtx as any);
 
-      if (result.success) {
+      if (sent) {
         return NextResponse.json({
           message: `Test email sent to ${testEmail}`,
           success: true,
         });
       } else {
         return NextResponse.json(
-          { error: `Failed to send test email: ${result.error}` },
+          { error: `Failed to send test email to ${testEmail}` },
           { status: 500 }
         );
       }
@@ -166,7 +165,23 @@ export async function POST(request: NextRequest) {
       },
       settings: null,
     };
-    const result = await sendBulkNewsletter(subscribers, newsletterContent, platformCtx as any);
+    const sendResults = await Promise.all(
+      subscribers.map(async (subscriber) => {
+        const success = await sendNewsletterEmail(
+          newsletterContent,
+          subscriber.email,
+          platformCtx as any
+        );
+
+        return {
+          email: subscriber.email,
+          success,
+        };
+      })
+    );
+
+    const sent = sendResults.filter((r) => r.success).length;
+    const failed = sendResults.length - sent;
 
     // Update campaign status
     if (campaign) {
@@ -174,21 +189,21 @@ export async function POST(request: NextRequest) {
         .from('newsletter_campaigns')
         .update({
           status: 'sent',
-          recipients_count: result.sent,
+          recipients_count: sent,
         })
         .eq('id', campaign.id);
 
       // Update subscriber email counts
-      const sentEmails = result.results.filter((r) => r.success).map((r) => r.email);
+      const sentEmails = sendResults.filter((r) => r.success).map((r) => r.email);
       if (sentEmails.length > 0) {
         await supabase.rpc('increment_newsletter_sends', { emails: sentEmails });
       }
     }
 
     return NextResponse.json({
-      message: `Newsletter sent to ${result.sent} subscribers`,
-      sent: result.sent,
-      failed: result.failed,
+      message: `Newsletter sent to ${sent} subscribers`,
+      sent,
+      failed,
       campaignId: campaign?.id,
     });
   } catch (error) {

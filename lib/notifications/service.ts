@@ -34,6 +34,12 @@ function getLogoUrl(business: Business): string {
   return `${getBusinessUrl(business)}${business.logo_url || '/logo.png'}`;
 }
 
+function getBrandGradient(business: Business): string {
+  const primaryColor = business.primary_color || '#f59e0b';
+  const secondaryColor = business.secondary_color || primaryColor;
+  return `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
+}
+
 // Get from email
 function getFromEmail(ctx: BusinessContext): string {
   return process.env.RESEND_FROM_EMAIL
