@@ -1,0 +1,1 @@
+Wire Resend email provider + ghost client reactivation from Amelia MySQL. Add Resend to providers.ts, build /api/reactivation/ghost-clients querying gzf_amelia_customer_bookings for 45+ day inactive clients, set EMAIL_PROVIDER=resend in env  

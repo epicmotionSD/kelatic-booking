@@ -8,6 +8,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { canCreateCampaign } from '@/lib/usage/enforcement'
 
+type CampaignMetrics = {
+  sent?: number
+  delivered?: number
+  failed?: number
+  responses?: number
+  responded?: number
+  positive_responses?: number
+  negative_responses?: number
+  opt_outs?: number
+  bookings?: number
+  booked?: number
+  revenue?: number
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -18,18 +32,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get business ID from user metadata or profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('business_id')
-      .eq('id', user.id)
-      .single()
+    const businessId = await getBusinessId(supabase, user.id)
 
-    if (!profile?.business_id) {
+    if (!businessId) {
       return NextResponse.json({ error: 'No business found' }, { status: 404 })
     }
-
-    const businessId = profile.business_id
 
     // Fetch all campaigns with lead counts
     const { data: campaigns, error } = await supabase
@@ -42,12 +49,7 @@ export async function GET(request: NextRequest) {
         script_variant,
         cadence_config,
         total_leads,
-        messages_sent,
-        messages_delivered,
-        responses_received,
-        positive_responses,
-        bookings_made,
-        revenue_generated,
+        metrics,
         started_at,
         completed_at,
         created_at,
@@ -77,10 +79,8 @@ export async function GET(request: NextRequest) {
     // Format campaigns
     const formattedCampaigns = campaigns?.map(c => {
       // Calculate progress
-      const cadence = c.cadence_config as { steps?: Array<{ day: number }> } | null
-      const totalDays = cadence?.steps?.length 
-        ? Math.max(...cadence.steps.map(s => s.day))
-        : 7
+      const totalDays = getCadenceTotalDays(c.cadence_config)
+      const metrics = (c.metrics || {}) as CampaignMetrics
 
       let currentDay = 0
       if (c.started_at) {
@@ -103,10 +103,10 @@ export async function GET(request: NextRequest) {
         segment: c.segment,
         totalLeads: c.total_leads || 0,
         metrics: {
-          sent: c.messages_sent || 0,
-          responses: c.responses_received || 0,
-          bookings: c.bookings_made || 0,
-          revenue: c.revenue_generated || 0,
+          sent: numberOrZero(metrics.sent),
+          responses: numberOrZero(metrics.responses ?? metrics.responded),
+          bookings: numberOrZero(metrics.bookings ?? metrics.booked),
+          revenue: numberOrZero(metrics.revenue),
         },
         progress: {
           currentDay,
@@ -138,6 +138,40 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+async function getBusinessId(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const [{ data: membership }, { data: profile }] = await Promise.all([
+    supabase
+      .from('business_members')
+      .select('business_id')
+      .eq('user_id', userId)
+      .maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('business_id')
+      .eq('id', userId)
+      .maybeSingle(),
+  ])
+
+  return membership?.business_id || profile?.business_id || null
+}
+
+function getCadenceTotalDays(cadenceConfig: unknown) {
+  if (Array.isArray(cadenceConfig) && cadenceConfig.length > 0) {
+    return Math.max(...cadenceConfig.map((step) => Number((step as { day?: number }).day || 0)), 7)
+  }
+
+  const cadence = cadenceConfig as { steps?: Array<{ day?: number }> } | null
+  if (cadence?.steps?.length) {
+    return Math.max(...cadence.steps.map((step) => Number(step.day || 0)), 7)
+  }
+
+  return 7
+}
+
+function numberOrZero(value: number | null | undefined) {
+  return typeof value === 'number' ? value : 0
 }
 
 // =============================================================================

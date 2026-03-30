@@ -54,42 +54,68 @@ interface AnalyticsData {
 export default function AnalyticsPage() {
   const [data, setData] = useState<AnalyticsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [dateRange, setDateRange] = useState('30d')
 
   useEffect(() => {
-    // Mock data for now - will connect to API
-    setData({
-      overview: {
-        totalRevenue: 12450,
-        revenueChange: 23.5,
-        totalBookings: 47,
-        bookingsChange: 15.2,
-        avgResponseRate: 8.3,
-        avgROI: 340,
-      },
-      monthlyTrend: [
-        { month: 'Oct', revenue: 3200, bookings: 12, campaigns: 2 },
-        { month: 'Nov', revenue: 4100, bookings: 15, campaigns: 3 },
-        { month: 'Dec', revenue: 5150, bookings: 20, campaigns: 2 },
-      ],
-      segmentPerformance: [
-        { segment: 'Ghost', leads: 245, responses: 18, bookings: 8, revenue: 2400, conversionRate: 3.3 },
-        { segment: 'Near-Miss', leads: 156, responses: 24, bookings: 19, revenue: 5700, conversionRate: 12.2 },
-        { segment: 'VIP', leads: 89, responses: 31, bookings: 20, revenue: 4350, conversionRate: 22.5 },
-      ],
-      topCampaigns: [
-        { id: '1', name: 'December VIP Reactivation', revenue: 3200, bookings: 12, roi: 480 },
-        { id: '2', name: 'Holiday Near-Miss', revenue: 2800, bookings: 11, roi: 350 },
-        { id: '3', name: 'Q4 Ghost Recovery', revenue: 1850, bookings: 8, roi: 220 },
-      ],
-    })
-    setLoading(false)
+    const controller = new AbortController()
+
+    async function loadAnalytics() {
+      setLoading(true)
+      setError(null)
+
+      try {
+        const response = await fetch(`/api/dashboard/analytics?range=${dateRange}`, {
+          signal: controller.signal,
+          cache: 'no-store',
+        })
+
+        if (!response.ok) {
+          const payload = await response.json().catch(() => null)
+          throw new Error(payload?.error || 'Failed to load analytics')
+        }
+
+        const payload = await response.json()
+        setData(payload)
+      } catch (err) {
+        if ((err as Error).name === 'AbortError') return
+        setError(err instanceof Error ? err.message : 'Failed to load analytics')
+        setData(null)
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    void loadAnalytics()
+
+    return () => controller.abort()
   }, [dateRange])
 
-  if (loading || !data) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-zinc-400">Loading analytics...</div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="bg-zinc-900 border border-red-500/30 rounded-xl px-6 py-5 text-center max-w-md">
+          <h1 className="text-lg font-semibold text-white mb-2">Analytics unavailable</h1>
+          <p className="text-sm text-zinc-400">{error}</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-zinc-400">No analytics data available.</div>
       </div>
     )
   }
@@ -105,6 +131,8 @@ export default function AnalyticsPage() {
         <select
           value={dateRange}
           onChange={(e) => setDateRange(e.target.value)}
+          aria-label="Analytics date range"
+          title="Analytics date range"
           className="px-4 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white"
         >
           <option value="7d">Last 7 days</option>
@@ -166,11 +194,15 @@ export default function AnalyticsPage() {
                 </div>
                 <div className="flex items-center gap-6 text-sm">
                   <span className="text-zinc-500">{seg.leads} leads</span>
+                  <span className="text-zinc-500">{seg.responses} responses</span>
                   <span className="text-zinc-400">{seg.bookings} bookings</span>
                   <span className="text-emerald-400 font-medium">${seg.revenue.toLocaleString()}</span>
                 </div>
               </div>
             ))}
+            {data.segmentPerformance.length === 0 && (
+              <p className="text-sm text-zinc-500">No segment performance data for this range.</p>
+            )}
           </div>
         </div>
 
@@ -188,27 +220,32 @@ export default function AnalyticsPage() {
                   <span className="text-zinc-300">{campaign.name}</span>
                 </div>
                 <div className="flex items-center gap-4 text-sm">
+                  <span className="text-zinc-500">{campaign.bookings} bookings</span>
                   <span className="text-emerald-400 font-medium">${campaign.revenue.toLocaleString()}</span>
                   <span className="text-cyan-400">{campaign.roi}% ROI</span>
                 </div>
               </div>
             ))}
+            {data.topCampaigns.length === 0 && (
+              <p className="text-sm text-zinc-500">No campaign revenue attributed in this range yet.</p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Monthly Trend */}
+      {/* Trend */}
       <div className="bg-zinc-900 rounded-xl border border-zinc-800 p-6">
         <div className="flex items-center gap-2 mb-6">
           <TrendingUp className="w-5 h-5 text-emerald-400" />
-          <h2 className="font-semibold text-white">Monthly Trend</h2>
+          <h2 className="font-semibold text-white">Performance Trend</h2>
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {data.monthlyTrend.map((month) => (
             <div key={month.month} className="bg-zinc-800/50 rounded-lg p-4">
               <p className="text-zinc-500 text-sm mb-2">{month.month}</p>
               <p className="text-xl font-bold text-white">${month.revenue.toLocaleString()}</p>
               <p className="text-sm text-zinc-400">{month.bookings} bookings</p>
+              <p className="text-xs text-zinc-500 mt-1">{month.campaigns} campaigns</p>
             </div>
           ))}
         </div>

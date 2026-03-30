@@ -176,13 +176,15 @@ export default function HotLeadsPage() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
+            aria-label="Hot lead status filter"
+            title="Hot lead status filter"
             className="pl-10 pr-8 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-white appearance-none focus:outline-none focus:border-zinc-700 cursor-pointer"
           >
             <option value="all">All Status</option>
-            <option value="new">🔴 New (Call Now!)</option>
-            <option value="contacted">🟡 Contacted</option>
+            <option value="responded">🔴 New (Call Now!)</option>
+            <option value="in_progress">🟡 Following Up</option>
             <option value="booked">🟢 Booked</option>
-            <option value="no_show">⚫ No Show</option>
+            <option value="completed">⚫ Closed</option>
           </select>
         </div>
       </div>
@@ -267,9 +269,9 @@ function HotLeadCard({
 }) {
   const statusConfig: Record<string, { bg: string; text: string; label: string }> = {
     responded: { bg: 'bg-red-500/10', text: 'text-red-400', label: '🔴 Call Now!' },
-    contacted: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', label: '🟡 Contacted' },
+    in_progress: { bg: 'bg-yellow-500/10', text: 'text-yellow-400', label: '🟡 Following Up' },
     booked: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', label: '🟢 Booked' },
-    no_show: { bg: 'bg-zinc-500/10', text: 'text-zinc-400', label: '⚫ No Show' },
+    completed: { bg: 'bg-zinc-500/10', text: 'text-zinc-400', label: '⚫ Closed' },
   }
 
   const { bg, text, label } = statusConfig[lead.status] || statusConfig.responded
@@ -345,12 +347,12 @@ function HotLeadCard({
       {lead.status !== 'booked' && (
         <div className="flex gap-2 mt-4 pt-4 border-t border-zinc-800">
           <span className="text-sm text-zinc-500 mr-2">Mark as:</span>
-          {lead.status !== 'contacted' && (
+          {lead.status !== 'in_progress' && (
             <button
-              onClick={() => onStatusUpdate(lead.id, 'contacted')}
+              onClick={() => onStatusUpdate(lead.id, 'in_progress')}
               className="text-xs px-2 py-1 bg-yellow-500/10 text-yellow-400 rounded hover:bg-yellow-500/20 transition"
             >
-              Contacted
+              Following Up
             </button>
           )}
           <button
@@ -360,10 +362,10 @@ function HotLeadCard({
             Booked ✓
           </button>
           <button
-            onClick={() => onStatusUpdate(lead.id, 'no_show')}
+            onClick={() => onStatusUpdate(lead.id, 'completed')}
             className="text-xs px-2 py-1 bg-zinc-500/10 text-zinc-400 rounded hover:bg-zinc-500/20 transition"
           >
-            No Show
+            Closed
           </button>
         </div>
       )}

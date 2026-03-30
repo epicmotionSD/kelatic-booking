@@ -7,6 +7,49 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+type CampaignMetrics = {
+  sent?: number
+  delivered?: number
+  failed?: number
+  responses?: number
+  responded?: number
+  positive_responses?: number
+  negative_responses?: number
+  opt_outs?: number
+  bookings?: number
+  booked?: number
+  revenue?: number
+}
+
+type CampaignRow = {
+  id: string
+  name: string
+  status: string
+  created_at: string
+  started_at: string | null
+  cadence_config: unknown
+  metrics: CampaignMetrics | null
+}
+
+type HotLeadRow = {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  phone: string | null
+  last_response_text: string | null
+  last_response_at: string | null
+  campaigns: { name: string }[] | { name: string } | null
+}
+
+type RecentMessageRow = {
+  id: string
+  direction: 'inbound' | 'outbound'
+  status: string
+  sentiment: string | null
+  created_at: string
+  campaign_leads: { first_name?: string | null; last_name?: string | null }[] | { first_name?: string | null; last_name?: string | null } | null
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -17,18 +60,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get business ID from user metadata or profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('business_id')
-      .eq('id', user.id)
-      .single()
+    const businessId = await getBusinessId(supabase, user.id)
 
-    if (!profile?.business_id) {
+    if (!businessId) {
       return NextResponse.json({ error: 'No business found' }, { status: 404 })
     }
-
-    const businessId = profile.business_id
     const now = new Date()
     const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
     const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000)
@@ -36,29 +72,31 @@ export async function GET(request: NextRequest) {
     // Fetch campaigns for metrics
     const { data: allCampaigns } = await supabase
       .from('campaigns')
-      .select('*')
+      .select('id, name, status, created_at, started_at, cadence_config, metrics')
       .eq('business_id', businessId)
 
+    const campaigns = (allCampaigns || []) as CampaignRow[]
+
     // Current period (last 30 days)
-    const currentPeriodCampaigns = allCampaigns?.filter(c => 
+    const currentPeriodCampaigns = campaigns.filter(c => 
       new Date(c.created_at) >= thirtyDaysAgo
-    ) || []
+    )
 
     // Previous period (30-60 days ago)
-    const previousPeriodCampaigns = allCampaigns?.filter(c => 
+    const previousPeriodCampaigns = campaigns.filter(c => 
       new Date(c.created_at) >= sixtyDaysAgo && 
       new Date(c.created_at) < thirtyDaysAgo
-    ) || []
+    )
 
     // Calculate metrics
-    const currentRevenue = currentPeriodCampaigns.reduce((sum, c) => sum + (c.revenue_generated || 0), 0)
-    const previousRevenue = previousPeriodCampaigns.reduce((sum, c) => sum + (c.revenue_generated || 0), 0)
+    const currentRevenue = currentPeriodCampaigns.reduce((sum, c) => sum + numberOrZero(c.metrics?.revenue), 0)
+    const previousRevenue = previousPeriodCampaigns.reduce((sum, c) => sum + numberOrZero(c.metrics?.revenue), 0)
     const revenueChange = previousRevenue > 0 
       ? ((currentRevenue - previousRevenue) / previousRevenue) * 100 
       : currentRevenue > 0 ? 100 : 0
 
-    const currentBookings = currentPeriodCampaigns.reduce((sum, c) => sum + (c.bookings_made || 0), 0)
-    const previousBookings = previousPeriodCampaigns.reduce((sum, c) => sum + (c.bookings_made || 0), 0)
+    const currentBookings = currentPeriodCampaigns.reduce((sum, c) => sum + numberOrZero(c.metrics?.bookings ?? c.metrics?.booked), 0)
+    const previousBookings = previousPeriodCampaigns.reduce((sum, c) => sum + numberOrZero(c.metrics?.bookings ?? c.metrics?.booked), 0)
     const bookingsChange = previousBookings > 0 
       ? ((currentBookings - previousBookings) / previousBookings) * 100 
       : currentBookings > 0 ? 100 : 0
@@ -68,24 +106,26 @@ export async function GET(request: NextRequest) {
       .from('campaign_leads')
       .select('*', { count: 'exact', head: true })
       .eq('business_id', businessId)
-      .in('status', ['pending', 'contacted', 'responded'])
+      .in('status', ['pending', 'in_progress', 'responded'])
 
     // Calculate response rate
-    const totalSent = allCampaigns?.reduce((sum, c) => sum + (c.messages_sent || 0), 0) || 0
-    const totalResponses = allCampaigns?.reduce((sum, c) => sum + (c.responses_received || 0), 0) || 0
+    const totalSent = campaigns.reduce((sum, c) => sum + numberOrZero(c.metrics?.sent), 0)
+    const totalResponses = campaigns.reduce((sum, c) => sum + numberOrZero(c.metrics?.responses ?? c.metrics?.responded), 0)
     const responseRate = totalSent > 0 ? (totalResponses / totalSent) * 100 : 0
 
     // Get active campaigns
     const { data: activeCampaigns } = await supabase
       .from('campaigns')
-      .select('id, name, status, started_at, cadence_config, positive_responses')
+      .select('id, name, status, started_at, cadence_config, metrics')
       .eq('business_id', businessId)
       .eq('status', 'active')
       .order('started_at', { ascending: false })
       .limit(5)
 
+    const activeCampaignRows = (activeCampaigns || []) as CampaignRow[]
+
     // Get hot lead counts per campaign
-    const activeCampaignIds = activeCampaigns?.map(c => c.id) || []
+    const activeCampaignIds = activeCampaignRows.map(c => c.id)
     const { data: hotLeadCounts } = await supabase
       .from('campaign_leads')
       .select('campaign_id')
@@ -99,11 +139,8 @@ export async function GET(request: NextRequest) {
     })
 
     // Format active campaigns
-    const formattedActiveCampaigns = activeCampaigns?.map(c => {
-      const cadence = c.cadence_config as { steps?: Array<{ day: number }> } | null
-      const totalDays = cadence?.steps?.length 
-        ? Math.max(...cadence.steps.map(s => s.day))
-        : 7
+    const formattedActiveCampaigns = activeCampaignRows.map(c => {
+      const totalDays = getCadenceTotalDays(c.cadence_config)
 
       let currentDay = 0
       if (c.started_at) {
@@ -121,15 +158,16 @@ export async function GET(request: NextRequest) {
         hotLeads: hotLeadMap[c.id] || 0,
         status: c.status,
       }
-    }) || []
+    })
 
     // Get hot leads (positive responses not yet booked)
     const { data: hotLeads } = await supabase
       .from('campaign_leads')
       .select(`
         id,
-        client_name,
-        client_phone,
+        first_name,
+        last_name,
+        phone,
         last_response_text,
         last_response_at,
         campaign_id,
@@ -141,17 +179,20 @@ export async function GET(request: NextRequest) {
       .order('last_response_at', { ascending: false })
       .limit(5)
 
-    const formattedHotLeads = hotLeads?.map(lead => {
-      const campaigns = lead.campaigns as { name: string }[] | null
+    const hotLeadRows = (hotLeads || []) as HotLeadRow[]
+
+    const formattedHotLeads = hotLeadRows.map(lead => {
+      const campaign = normalizeCampaign(lead.campaigns)
+      const name = `${lead.first_name || ''} ${lead.last_name || ''}`.trim()
       return {
         id: lead.id,
-        name: lead.client_name || 'Unknown',
-        phone: formatPhone(lead.client_phone),
+        name: name || 'Unknown',
+        phone: formatPhone(lead.phone),
         response: lead.last_response_text || '',
-        campaignName: campaigns?.[0]?.name || 'Unknown Campaign',
+        campaignName: campaign?.name || 'Unknown Campaign',
         respondedAt: formatTimeAgo(lead.last_response_at),
       }
-    }) || []
+    })
 
     // Get recent activity from campaign_messages
     const { data: recentMessages } = await supabase
@@ -162,15 +203,17 @@ export async function GET(request: NextRequest) {
         status,
         sentiment,
         created_at,
-        campaign_leads(client_name)
+        campaign_leads(first_name, last_name)
       `)
       .eq('business_id', businessId)
       .order('created_at', { ascending: false })
       .limit(10)
 
-    const recentActivity = recentMessages?.map(msg => {
-      const campaignLeads = msg.campaign_leads as { client_name: string }[] | null
-      const clientName = campaignLeads?.[0]?.client_name || 'Unknown'
+    const recentMessageRows = (recentMessages || []) as RecentMessageRow[]
+
+    const recentActivity = recentMessageRows.map(msg => {
+      const campaignLead = normalizeCampaignLead(msg.campaign_leads)
+      const clientName = `${campaignLead?.first_name || ''} ${campaignLead?.last_name || ''}`.trim() || 'Unknown'
       
       let type: 'booking' | 'response' | 'opt_out' | 'campaign_started' = 'response'
       let message = ''
@@ -196,13 +239,13 @@ export async function GET(request: NextRequest) {
         message,
         timestamp: formatTimeAgo(msg.created_at),
       }
-    }) || []
+    })
 
     return NextResponse.json({
       metrics: {
-        totalRevenue: allCampaigns?.reduce((sum, c) => sum + (c.revenue_generated || 0), 0) || 0,
+        totalRevenue: campaigns.reduce((sum, c) => sum + numberOrZero(c.metrics?.revenue), 0),
         revenueChange: Math.round(revenueChange * 10) / 10,
-        totalBookings: allCampaigns?.reduce((sum, c) => sum + (c.bookings_made || 0), 0) || 0,
+        totalBookings: campaigns.reduce((sum, c) => sum + numberOrZero(c.metrics?.bookings ?? c.metrics?.booked), 0),
         bookingsChange: Math.round(bookingsChange * 10) / 10,
         activeLeads: activeLeads || 0,
         leadsChange: 0, // TODO: Calculate lead change
@@ -220,6 +263,56 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+async function getBusinessId(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const [{ data: membership }, { data: profile }] = await Promise.all([
+    supabase
+      .from('business_members')
+      .select('business_id')
+      .eq('user_id', userId)
+      .maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('business_id')
+      .eq('id', userId)
+      .maybeSingle(),
+  ])
+
+  return membership?.business_id || profile?.business_id || null
+}
+
+function getCadenceTotalDays(cadenceConfig: unknown) {
+  if (Array.isArray(cadenceConfig) && cadenceConfig.length > 0) {
+    return Math.max(...cadenceConfig.map((step) => Number((step as { day?: number }).day || 0)), 7)
+  }
+
+  const cadence = cadenceConfig as { steps?: Array<{ day?: number }> } | null
+  if (cadence?.steps?.length) {
+    return Math.max(...cadence.steps.map((step) => Number(step.day || 0)), 7)
+  }
+
+  return 7
+}
+
+function normalizeCampaign(campaigns: HotLeadRow['campaigns']) {
+  if (Array.isArray(campaigns)) {
+    return campaigns[0] || null
+  }
+
+  return campaigns
+}
+
+function normalizeCampaignLead(campaignLead: RecentMessageRow['campaign_leads']) {
+  if (Array.isArray(campaignLead)) {
+    return campaignLead[0] || null
+  }
+
+  return campaignLead
+}
+
+function numberOrZero(value: number | null | undefined) {
+  return typeof value === 'number' ? value : 0
 }
 
 function formatPhone(phone: string | null): string {

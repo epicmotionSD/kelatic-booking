@@ -7,6 +7,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
+type HotLeadRow = {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  phone: string | null
+  email: string | null
+  status: string
+  response_sentiment: string | null
+  last_response_text: string | null
+  last_response_at: string | null
+  campaign_id: string
+  created_at: string
+  campaigns: { id: string; name: string }[] | { id: string; name: string } | null
+}
+
 export async function GET(request: NextRequest) {
   try {
     const supabase = await createClient()
@@ -17,33 +32,25 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get business ID from user metadata or profile
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('business_id')
-      .eq('id', user.id)
-      .single()
+    const businessId = await getBusinessId(supabase, user.id)
 
-    if (!profile?.business_id) {
+    if (!businessId) {
       return NextResponse.json({ error: 'No business found' }, { status: 404 })
     }
-
-    const businessId = profile.business_id
 
     // Get all hot leads (positive sentiment, not yet booked)
     const { data: hotLeads, error } = await supabase
       .from('campaign_leads')
       .select(`
         id,
-        client_name,
-        client_phone,
-        client_email,
+        first_name,
+        last_name,
+        phone,
+        email,
         status,
         response_sentiment,
         last_response_text,
         last_response_at,
-        contacted_at,
-        booked_at,
         campaign_id,
         created_at,
         campaigns(id, name)
@@ -54,35 +61,39 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error
 
+    const rows = (hotLeads || []) as HotLeadRow[]
+
     // Calculate stats
     const stats = {
-      total: hotLeads?.length || 0,
-      needToCall: hotLeads?.filter(l => l.status === 'responded' && !l.contacted_at).length || 0,
-      contacted: hotLeads?.filter(l => l.contacted_at && !l.booked_at).length || 0,
-      booked: hotLeads?.filter(l => l.status === 'booked').length || 0,
+      total: rows.length,
+      needToCall: rows.filter((lead) => lead.status === 'responded').length,
+      contacted: rows.filter((lead) => lead.status === 'in_progress').length,
+      booked: rows.filter((lead) => lead.status === 'booked').length,
     }
 
     // Format leads
-    const formattedLeads = hotLeads?.map(lead => {
-      const campaigns = lead.campaigns as { id: string; name: string }[] | null
+    const formattedLeads = rows.map((lead) => {
+      const campaigns = normalizeCampaignRelation(lead.campaigns)
+      const fullName = `${lead.first_name || ''} ${lead.last_name || ''}`.trim()
+
       return {
         id: lead.id,
-        name: lead.client_name || 'Unknown',
-        phone: formatPhone(lead.client_phone),
-        rawPhone: lead.client_phone,
-        email: lead.client_email,
+        name: fullName || 'Unknown',
+        phone: formatPhone(lead.phone),
+        rawPhone: lead.phone,
+        email: lead.email,
         status: lead.status,
         response: lead.last_response_text || '',
         respondedAt: lead.last_response_at,
         respondedAtFormatted: formatTimeAgo(lead.last_response_at),
-        contactedAt: lead.contacted_at,
-        bookedAt: lead.booked_at,
+        contactedAt: lead.status === 'in_progress' ? lead.last_response_at : null,
+        bookedAt: lead.status === 'booked' ? lead.last_response_at : null,
         campaignId: lead.campaign_id,
-        campaignName: campaigns?.[0]?.name || 'Unknown',
+        campaignName: campaigns?.name || 'Unknown',
         // Extract booking intent from response
         bookingIntent: extractBookingIntent(lead.last_response_text || ''),
       }
-    }) || []
+    })
 
     return NextResponse.json({
       leads: formattedLeads,
@@ -109,23 +120,21 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { leadId, status, notes } = body
+    const { leadId, status } = body
 
     if (!leadId || !status) {
       return NextResponse.json({ error: 'leadId and status required' }, { status: 400 })
     }
 
-    // Build update object
-    const updateData: Record<string, unknown> = { status }
-    
-    if (status === 'contacted') {
-      updateData.contacted_at = new Date().toISOString()
-    } else if (status === 'booked') {
-      updateData.booked_at = new Date().toISOString()
+    if (!['in_progress', 'booked', 'completed', 'responded'].includes(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
     }
 
-    if (notes) {
-      updateData.notes = notes
+    // Build update object
+    const updateData: Record<string, unknown> = { status }
+
+    if (status === 'booked') {
+      updateData.converted_to_booking = true
     }
 
     const { data, error } = await supabase
@@ -145,6 +154,31 @@ export async function PATCH(request: NextRequest) {
       { status: 500 }
     )
   }
+}
+
+async function getBusinessId(supabase: Awaited<ReturnType<typeof createClient>>, userId: string) {
+  const [{ data: membership }, { data: profile }] = await Promise.all([
+    supabase
+      .from('business_members')
+      .select('business_id')
+      .eq('user_id', userId)
+      .maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('business_id')
+      .eq('id', userId)
+      .maybeSingle(),
+  ])
+
+  return membership?.business_id || profile?.business_id || null
+}
+
+function normalizeCampaignRelation(campaigns: HotLeadRow['campaigns']) {
+  if (Array.isArray(campaigns)) {
+    return campaigns[0] || null
+  }
+
+  return campaigns
 }
 
 function formatPhone(phone: string | null): string {
