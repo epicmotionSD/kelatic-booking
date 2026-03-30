@@ -308,8 +308,46 @@ export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   newsletter: 'Newsletter Email',
 };
 
+const TRINITY_BASE_BUSINESS: Business = {
+  id: 'default',
+  slug: 'kelatic',
+  name: 'Kelatic',
+  email: 'info@kelatic.com',
+  phone: null,
+  address: null,
+  city: null,
+  state: null,
+  zip: null,
+  timezone: 'America/Chicago',
+  latitude: null,
+  longitude: null,
+  logo_url: null,
+  favicon_url: null,
+  primary_color: '#f59e0b',
+  secondary_color: '#eab308',
+  accent_color: '#f97316',
+  font_family: 'Inter',
+  business_type: 'salon',
+  brand_voice: 'professional',
+  tagline: null,
+  instagram_handle: null,
+  website_url: null,
+  stripe_account_id: null,
+  stripe_account_status: 'not_connected',
+  plan: 'pro',
+  features: {},
+  custom_domain: null,
+  is_active: true,
+};
+
+export const KELATIC_DEFAULT_CONTEXT: BusinessContext = {
+  business: TRINITY_BASE_BUSINESS,
+  settings: null,
+};
+
 export const BARBER_BLOCK_CONTEXT: BusinessContext = {
   business: {
+    ...TRINITY_BASE_BUSINESS,
     id: 'barber-block',
     name: 'Barber Block by Kelatic',
     slug: 'kelatic',
@@ -326,6 +364,7 @@ export const BARBER_BLOCK_CONTEXT: BusinessContext = {
 
 export const LOC_ACADEMY_CONTEXT: BusinessContext = {
   business: {
+    ...TRINITY_BASE_BUSINESS,
     id: 'loc-academy',
     name: 'Loc Academy by Kelatic',
     slug: 'kelatic',

@@ -3,29 +3,19 @@ import { generateContent, GenerationRequest } from '@/lib/trinity/service';
 import {
   BARBER_BLOCK_CONTEXT,
   ContentType,
+  KELATIC_DEFAULT_CONTEXT,
   LOC_ACADEMY_CONTEXT,
 } from '@/lib/trinity/prompts';
+import type { BusinessContext } from '@/lib/trinity/prompts';
 
-function getBrandContext(brand?: string) {
+function getBrandContext(brand?: string): BusinessContext {
   switch (brand) {
     case 'barber-block':
       return BARBER_BLOCK_CONTEXT;
     case 'loc-academy':
       return LOC_ACADEMY_CONTEXT;
     default:
-      return {
-        business: {
-          id: 'default',
-          name: 'Kelatic',
-          slug: 'kelatic',
-          email: 'info@kelatic.com',
-          business_type: 'salon',
-          brand_voice: 'professional',
-          primary_color: '#f59e0b',
-          secondary_color: '#eab308',
-        },
-        settings: null,
-      };
+      return KELATIC_DEFAULT_CONTEXT;
   }
 }
 
