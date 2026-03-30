@@ -13,6 +13,7 @@ import {
   Users,
   UserCheck,
   BarChart3,
+  TrendingUp,
   Settings,
   HelpCircle,
   Menu,
@@ -65,6 +66,11 @@ const NAV_ITEMS = [
     label: 'Reports',
     href: '/admin/reports',
     icon: <BarChart3 className="w-5 h-5" />,
+  },
+  {
+    label: 'Analytics',
+    href: '/admin/analytics',
+    icon: <TrendingUp className="w-5 h-5" />,
   },
   {
     label: 'Settings',
