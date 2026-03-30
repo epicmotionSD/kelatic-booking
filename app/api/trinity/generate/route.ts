@@ -1,6 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateContent, GenerationRequest } from '@/lib/trinity/service';
-import { ContentType } from '@/lib/trinity/prompts';
+import {
+  BARBER_BLOCK_CONTEXT,
+  ContentType,
+  LOC_ACADEMY_CONTEXT,
+} from '@/lib/trinity/prompts';
+
+function getBrandContext(brand?: string) {
+  switch (brand) {
+    case 'barber-block':
+      return BARBER_BLOCK_CONTEXT;
+    case 'loc-academy':
+      return LOC_ACADEMY_CONTEXT;
+    default:
+      return {
+        business: {
+          id: 'default',
+          name: 'Kelatic',
+          slug: 'kelatic',
+          email: 'info@kelatic.com',
+          business_type: 'salon',
+          brand_voice: 'professional',
+          primary_color: '#f59e0b',
+          secondary_color: '#eab308',
+        },
+        settings: null,
+      };
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,21 +59,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: In multi-tenant, get business context from session/request
-    const defaultBusinessContext = {
-      business: {
-        id: 'default',
-        name: 'Kelatic',
-        slug: 'kelatic',
-        email: 'info@kelatic.com',
-        business_type: 'salon',
-        brand_voice: 'professional',
-        primary_color: '#f59e0b',
-        secondary_color: '#eab308',
-      },
-      settings: null,
-    };
-
     const request_data: GenerationRequest = {
       type: body.type,
       topic: body.topic,
@@ -54,7 +66,7 @@ export async function POST(request: NextRequest) {
       tone: body.tone,
       targetAudience: body.targetAudience,
       additionalInstructions: body.additionalInstructions,
-      businessContext: body.businessContext || defaultBusinessContext,
+      businessContext: body.businessContext || getBrandContext(body.brand),
     };
 
     const result = await generateContent(request_data);

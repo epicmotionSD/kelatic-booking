@@ -10,6 +10,7 @@ interface GeneratorFormProps {
   contextPlaceholder?: string;
   showTone?: boolean;
   showAudience?: boolean;
+  brand?: string;
 }
 
 export default function GeneratorForm({
@@ -20,6 +21,7 @@ export default function GeneratorForm({
   contextPlaceholder,
   showTone = true,
   showAudience = true,
+  brand,
 }: GeneratorFormProps) {
   const [topic, setTopic] = useState('');
   const [context, setContext] = useState('');
@@ -52,6 +54,7 @@ export default function GeneratorForm({
           tone,
           targetAudience: audience || undefined,
           additionalInstructions: instructions || undefined,
+          brand: brand || undefined,
         }),
       });
 
@@ -124,10 +127,12 @@ export default function GeneratorForm({
 
           {showTone && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="generator-tone" className="block text-sm font-medium text-gray-700 mb-1">
                 Tone
               </label>
               <select
+                id="generator-tone"
+                title="Tone"
                 value={tone}
                 onChange={(e) => setTone(e.target.value as typeof tone)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"

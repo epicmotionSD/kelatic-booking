@@ -1,8 +1,12 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function VideoScriptGenerator() {
+  const searchParams = useSearchParams();
+  const brand = searchParams.get('brand') ?? undefined;
+
   return (
     <TrinityToolPage
         type="video"
@@ -12,6 +16,7 @@ export default function VideoScriptGenerator() {
         contextPlaceholder="Video length preference, format (tutorial, vlog, transformation), any trending audio to reference..."
         showTone={true}
         showAudience={true}
+        brand={brand}
     >
 
       {/* Video Ideas */}

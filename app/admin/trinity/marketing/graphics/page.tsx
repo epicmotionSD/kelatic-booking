@@ -1,8 +1,12 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function PromoGraphicsGenerator() {
+  const searchParams = useSearchParams();
+  const brand = searchParams.get('brand') ?? undefined;
+
   return (
     <TrinityToolPage
         type="graphics"
@@ -12,6 +16,7 @@ export default function PromoGraphicsGenerator() {
         contextPlaceholder="Details about the promotion: prices, dates, any specific terms..."
         showTone={true}
         showAudience={false}
+        brand={brand}
     >
 
       {/* Copy Format */}

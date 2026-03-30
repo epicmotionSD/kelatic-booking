@@ -1,8 +1,12 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function ClientEducationCreator() {
+  const searchParams = useSearchParams();
+  const brand = searchParams.get('brand') ?? undefined;
+
   return (
     <TrinityToolPage
         type="education"
@@ -12,6 +16,7 @@ export default function ClientEducationCreator() {
         contextPlaceholder="Specific service this relates to, any products you recommend, common questions from clients..."
         showTone={false}
         showAudience={false}
+        brand={brand}
     >
 
       {/* Education Materials */}

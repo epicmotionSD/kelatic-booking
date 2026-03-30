@@ -308,6 +308,38 @@ export const CONTENT_TYPE_LABELS: Record<ContentType, string> = {
   newsletter: 'Newsletter Email',
 };
 
+export const BARBER_BLOCK_CONTEXT: BusinessContext = {
+  business: {
+    id: 'barber-block',
+    name: 'Barber Block by Kelatic',
+    slug: 'kelatic',
+    email: 'info@kelatic.com',
+    business_type: 'barbershop',
+    brand_voice: 'bold, confident, street-smart',
+    primary_color: '#ef4444',
+    secondary_color: '#dc2626',
+    tagline: 'Fresh Cuts. No Cap.',
+    instagram_handle: 'barbershopblock',
+  },
+  settings: null,
+};
+
+export const LOC_ACADEMY_CONTEXT: BusinessContext = {
+  business: {
+    id: 'loc-academy',
+    name: 'Loc Academy by Kelatic',
+    slug: 'kelatic',
+    email: 'info@kelatic.com',
+    business_type: 'education',
+    brand_voice: 'educational, empowering, authoritative',
+    primary_color: '#f59e0b',
+    secondary_color: '#eab308',
+    tagline: 'Train with The Loc Gawd',
+    instagram_handle: 'kelatic_',
+  },
+  settings: null,
+};
+
 // Legacy static prompts for backward compatibility (will be removed)
 // "Trinity" was internal codename - now branded as "AI Marketing Automation"
 export const TRINITY_BASE_CONTEXT = `You are an AI content creator for beauty and wellness businesses.`;

@@ -2,10 +2,13 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { ExternalLink, Copy, Check, Sparkles, FileText } from 'lucide-react';
 import { blogPosts } from '@/lib/blog-posts';
 
 export default function BlogArticleWriter() {
+  const searchParams = useSearchParams();
+  const brand = searchParams.get('brand') ?? undefined;
   const [topic, setTopic] = useState('');
   const [keywords, setKeywords] = useState('');
   const [tone, setTone] = useState<'professional' | 'casual' | 'inspiring'>('professional');
@@ -40,6 +43,7 @@ export default function BlogArticleWriter() {
           topic,
           context: keywords,
           tone,
+          brand: brand || undefined,
           additionalInstructions: `
             Generate a complete blog post in the following JSON format:
             {

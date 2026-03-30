@@ -1,8 +1,12 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function SocialPostGenerator() {
+  const searchParams = useSearchParams();
+  const brand = searchParams.get('brand') ?? undefined;
+
   return (
     <TrinityToolPage
         type="social"
@@ -12,6 +16,7 @@ export default function SocialPostGenerator() {
         contextPlaceholder="Describe the post: client story, promotion details, specific service to highlight..."
         showTone={true}
         showAudience={true}
+        brand={brand}
     >
 
       {/* Tips */}

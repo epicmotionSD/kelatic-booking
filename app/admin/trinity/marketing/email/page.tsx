@@ -1,8 +1,12 @@
 'use client';
 
+import { useSearchParams } from 'next/navigation';
 import TrinityToolPage from '@/components/trinity/tool-page';
 
 export default function EmailCampaignCreator() {
+  const searchParams = useSearchParams();
+  const brand = searchParams.get('brand') ?? undefined;
+
   return (
     <TrinityToolPage
         type="email"
@@ -12,6 +16,7 @@ export default function EmailCampaignCreator() {
         contextPlaceholder="What's the promotion? Any discounts, deadlines, or special offers to include..."
         showTone={true}
         showAudience={true}
+        brand={brand}
     >
 
       {/* Email Types */}

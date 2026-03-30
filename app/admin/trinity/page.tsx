@@ -81,6 +81,84 @@ const AI_TOOLS = [
   },
 ];
 
+const BARBER_BLOCK_TOOLS = [
+  {
+    href: '/admin/trinity/marketing/social?brand=barber-block',
+    icon: '📱',
+    title: 'Barber Social Posts',
+    desc: 'Sharp social captions for cuts, fades, and shop culture',
+  },
+  {
+    href: '/admin/trinity/marketing/email?brand=barber-block',
+    icon: '📧',
+    title: 'Barber Email Campaigns',
+    desc: 'Promotions, booking pushes, and client retention emails',
+  },
+  {
+    href: '/admin/trinity/marketing/graphics?brand=barber-block',
+    icon: '🎨',
+    title: 'Barber Graphics Copy',
+    desc: 'Flyer and story copy for cuts, specials, and events',
+  },
+  {
+    href: '/admin/trinity/content/blog?brand=barber-block',
+    icon: '📝',
+    title: 'Barber Blog Writer',
+    desc: 'SEO blog content for grooming, style, and barber education',
+  },
+  {
+    href: '/admin/trinity/content/video?brand=barber-block',
+    icon: '🎬',
+    title: 'Barber Video Scripts',
+    desc: 'Video ideas and scripts for transformations and tutorials',
+  },
+  {
+    href: '/admin/trinity/content/education?brand=barber-block',
+    icon: '📚',
+    title: 'Barber Education',
+    desc: 'Client education for cuts, maintenance, and aftercare',
+  },
+];
+
+const LOC_ACADEMY_TOOLS = [
+  {
+    href: '/admin/trinity/marketing/social?brand=loc-academy',
+    icon: '📱',
+    title: 'Loc Academy Social Posts',
+    desc: 'Educational social content for aspiring locticians',
+  },
+  {
+    href: '/admin/trinity/marketing/email?brand=loc-academy',
+    icon: '📧',
+    title: 'Loc Academy Emails',
+    desc: 'Enrollment, nurture, and launch campaigns for training offers',
+  },
+  {
+    href: '/admin/trinity/marketing/graphics?brand=loc-academy',
+    icon: '🎨',
+    title: 'Loc Academy Graphics',
+    desc: 'Promo copy for workshops, courses, and educational offers',
+  },
+  {
+    href: '/admin/trinity/content/blog?brand=loc-academy',
+    icon: '📝',
+    title: 'Loc Academy Blog Writer',
+    desc: 'Authority-building blog articles for loc education topics',
+  },
+  {
+    href: '/admin/trinity/content/video?brand=loc-academy',
+    icon: '🎬',
+    title: 'Loc Academy Video Scripts',
+    desc: 'Training, tutorial, and explainer scripts for students',
+  },
+  {
+    href: '/admin/trinity/content/education?brand=loc-academy',
+    icon: '📚',
+    title: 'Loc Academy Education',
+    desc: 'Structured teaching materials and printable guidance',
+  },
+];
+
 export default function TrinityPage() {
   const [activeTab, setActiveTab] = useState<Tab>('insights');
 
@@ -217,6 +295,52 @@ export default function TrinityPage() {
                   <div className="mt-3 flex items-center gap-1">
                     <div className={`w-1.5 h-1.5 rounded-full ${tool.manager === 'Manager 1' ? 'bg-purple-400' : 'bg-amber-400'}`} />
                     <span className="text-xs text-white/30">{tool.manager}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold text-red-300/80 mb-3 uppercase tracking-wider">✂️ Barber Block</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {BARBER_BLOCK_TOOLS.map((tool) => (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  className="bg-red-500/5 border border-red-500/15 rounded-xl p-5 hover:border-red-500/35 hover:bg-red-500/10 transition-all group"
+                >
+                  <div className="text-2xl mb-3">{tool.icon}</div>
+                  <h3 className="font-semibold text-white group-hover:text-red-300 transition-colors text-sm">
+                    {tool.title}
+                  </h3>
+                  <p className="text-white/40 text-xs mt-1">{tool.desc}</p>
+                  <div className="mt-3 flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-red-400" />
+                    <span className="text-xs text-red-200/60">Barber Block</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold text-amber-300/80 mb-3 uppercase tracking-wider">🔱 Loc Academy</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {LOC_ACADEMY_TOOLS.map((tool) => (
+                <Link
+                  key={tool.href}
+                  href={tool.href}
+                  className="bg-amber-500/5 border border-amber-500/15 rounded-xl p-5 hover:border-amber-500/35 hover:bg-amber-500/10 transition-all group"
+                >
+                  <div className="text-2xl mb-3">{tool.icon}</div>
+                  <h3 className="font-semibold text-white group-hover:text-amber-300 transition-colors text-sm">
+                    {tool.title}
+                  </h3>
+                  <p className="text-white/40 text-xs mt-1">{tool.desc}</p>
+                  <div className="mt-3 flex items-center gap-1">
+                    <div className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                    <span className="text-xs text-amber-200/60">Loc Academy</span>
                   </div>
                 </Link>
               ))}

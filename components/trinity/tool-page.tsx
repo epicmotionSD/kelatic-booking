@@ -11,6 +11,7 @@ interface TrinityToolPageProps {
   contextPlaceholder?: string;
   showTone?: boolean;
   showAudience?: boolean;
+  brand?: string;
   children?: React.ReactNode;
 }
 
@@ -22,6 +23,7 @@ export default function TrinityToolPage({
   contextPlaceholder,
   showTone = true,
   showAudience = true,
+  brand,
   children,
 }: TrinityToolPageProps) {
   return (
@@ -41,6 +43,7 @@ export default function TrinityToolPage({
         contextPlaceholder={contextPlaceholder}
         showTone={showTone}
         showAudience={showAudience}
+        brand={brand}
       />
 
       {children}
