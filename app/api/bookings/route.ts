@@ -429,12 +429,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       appointment,
-      paymentIntent: paymentIntent
-        ? {
-            clientSecret: paymentIntent.client_secret,
-            id: paymentIntent.id,
-          }
-        : null,
+      paymentIntent: null,
     });
   } catch (error) {
     console.error('Booking error:', error);
