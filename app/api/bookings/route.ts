@@ -2,8 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { after } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
-import { createPaymentIntent } from '@/lib/stripe';
-import { toCents } from '@/lib/currency';
 import {
   sendBookingConfirmation,
   notifyStylistNewBooking,
@@ -363,9 +361,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create appointment
-    // Barber services always require a deposit
-    const needsDeposit = service.deposit_required || service.category === 'barber';
+    // Create appointment — deposits removed, all bookings go straight to confirmed
+    const needsDeposit = false;
     const appointmentData: any = {
       service_id: body.service_id,
       stylist_id: body.stylist_id,
@@ -374,7 +371,7 @@ export async function POST(request: NextRequest) {
       end_time: endTime.toISOString(),
       quoted_price: totalPrice,
       client_notes: body.notes || null,
-      status: needsDeposit ? 'pending' : 'confirmed',
+      status: 'confirmed',
     };
 
     if (clientId) {
@@ -420,44 +417,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create payment intent if deposit required
-    let paymentIntent = null;
-    let depositAmount = null;
-    if (needsDeposit) {
-      // Use service-level deposit_amount if set, else category defaults
-      if (service.deposit_amount && service.deposit_amount > 0) {
-        depositAmount = service.deposit_amount;
-      } else if (service.category === 'barber') {
-        depositAmount = 10;
-      } else if (stylistProfile && stylistProfile.first_name && stylistProfile.first_name.trim().toLowerCase() === 'rockal') {
-        depositAmount = 50;
-      } else {
-        depositAmount = 25;
-      }
-
-      paymentIntent = await createPaymentIntent({
-        amount: toCents(depositAmount),
-        appointmentId: appointment.id,
-        isDeposit: true,
-        metadata: {
-          client_email: body.client.email,
-          client_name: `${body.client.first_name} ${body.client.last_name}`,
-        },
-      });
-
-      // Record pending payment
-      await admin.from('payments').insert({
-        appointment_id: appointment.id,
-        client_id: clientId,
-        amount: depositAmount,
-        tip_amount: 0,
-        total_amount: depositAmount,
-        status: 'pending',
-        method: 'card_online',
-        stripe_payment_intent_id: paymentIntent.id,
-        is_deposit: true,
-      });
-    }
+    // No deposit required — Stripe payment skipped
+    const paymentIntent = null;
 
     // Use after() to send notifications after response — keeps function alive on Vercel
     const appointmentId = appointment.id;
