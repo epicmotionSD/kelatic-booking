@@ -11,6 +11,7 @@ interface DateTimeSelectionProps {
   onSelect: (date: string, slot: TimeSlot) => void;
   onBack: () => void;
   wednesdayOnly?: boolean;
+  closedDays?: number[];
 }
 
 export function DateTimeSelection({
@@ -21,6 +22,7 @@ export function DateTimeSelection({
   onSelect,
   onBack,
   wednesdayOnly = false,
+  closedDays = [0],
 }: DateTimeSelectionProps) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [date, setDate] = useState<string | null>(selectedDate);
@@ -106,8 +108,10 @@ export function DateTimeSelection({
     maxDate.setDate(maxDate.getDate() + 60);
     if (dateToCheck > maxDate) return false;
 
-    // Check day of week
     const dayOfWeek = dateToCheck.getDay();
+
+    // Block business closed days
+    if (closedDays.includes(dayOfWeek)) return false;
 
     // Wednesday-only restriction for special offers
     if (wednesdayOnly && dayOfWeek !== 3) return false;

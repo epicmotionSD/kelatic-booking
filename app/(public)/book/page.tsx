@@ -83,6 +83,7 @@ function BookingContent() {
   const [initialized, setInitialized] = useState(false);
   const [browseViewMode, setBrowseViewMode] = useState<'services' | 'stylist'>('services');
   const [brand, setBrand] = useState(getBrand());
+  const [closedDays, setClosedDays] = useState<number[]>([0]);
 
   // Detect barber domain on mount (cookie is set by middleware)
   useEffect(() => {
@@ -104,6 +105,7 @@ function BookingContent() {
         const servicesRes = await fetch('/api/services');
         const servicesData = await servicesRes.json();
         const allServices = servicesData.services || [];
+        if (servicesData.closedDays) setClosedDays(servicesData.closedDays);
 
         // Handle special offers (e.g., ?special=wednesday75)
         if (specialOffer === 'wednesday75') {
@@ -364,6 +366,7 @@ function BookingContent() {
             selectedDate={bookingData.date}
             selectedSlot={bookingData.timeSlot}
             wednesdayOnly={bookingData.isWednesdaySpecial}
+            closedDays={closedDays}
             onSelect={(date, slot) => {
               updateBookingData({
                 date,

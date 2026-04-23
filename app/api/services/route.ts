@@ -25,26 +25,29 @@ export async function GET() {
     const headerStore = await headers();
     const tenantSlug = headerStore.get('x-tenant-slug');
     
-    // Get business_id from slug
+    // Get business_id and closed_days from slug
     let businessId: string | null = null;
+    let closedDays: number[] = [0]; // default: Sunday closed
     if (tenantSlug) {
       const { data: business } = await supabase
         .from('businesses')
-        .select('id')
+        .select('id, closed_days')
         .eq('slug', tenantSlug)
         .eq('is_active', true)
         .single();
       businessId = business?.id || null;
+      if (business?.closed_days) closedDays = business.closed_days;
     }
-    
+
     // If no business found, try to get the default Kelatic business
     if (!businessId) {
       const { data: defaultBusiness } = await supabase
         .from('businesses')
-        .select('id')
+        .select('id, closed_days')
         .eq('slug', 'kelatic')
         .single();
       businessId = defaultBusiness?.id || null;
+      if (defaultBusiness?.closed_days) closedDays = defaultBusiness.closed_days;
     }
 
     // Build query with business filter
@@ -88,8 +91,9 @@ export async function GET() {
 
     // Optimize response with proper headers
     return NextResponse.json(
-      { 
+      {
         services: services || [],
+        closedDays,
         meta: {
           total: services?.length || 0,
           categories: [...new Set(services?.map(s => s.category) || [])]
