@@ -50,6 +50,7 @@ export default function TeamPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // Form state
   const [formData, setFormData] = useState({
@@ -121,6 +122,7 @@ export default function TeamPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setSaveError(null);
 
     try {
       const url = editingMember
@@ -137,9 +139,13 @@ export default function TeamPage() {
       if (res.ok) {
         closeModal();
         fetchTeam();
+      } else {
+        const data = await res.json();
+        setSaveError(data.error || 'Failed to save. Please try again.');
       }
     } catch (error) {
       console.error('Failed to save team member:', error);
+      setSaveError('Network error. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -477,6 +483,13 @@ export default function TeamPage() {
                   ></div>
                 </button>
               </div>
+
+              {/* Error */}
+              {saveError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg text-sm">
+                  {saveError}
+                </div>
+              )}
 
               {/* Actions */}
               <div className="flex gap-3 pt-4">

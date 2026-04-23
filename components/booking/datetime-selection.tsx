@@ -29,6 +29,17 @@ export function DateTimeSelection({
   const [slots, setSlots] = useState<TimeSlot[]>([]);
   const [slot, setSlot] = useState<TimeSlot | null>(selectedSlot);
   const [loadingSlots, setLoadingSlots] = useState(false);
+  // Days of week (0-6) this specific stylist works. null = not yet loaded / any stylist.
+  const [stylistWorkingDays, setStylistWorkingDays] = useState<number[] | null>(null);
+
+  // When a specific stylist is selected, fetch which days of the week they work
+  useEffect(() => {
+    if (!stylistId) { setStylistWorkingDays(null); return; }
+    fetch(`/api/availability/stylist-days?stylist_id=${stylistId}`)
+      .then(r => r.json())
+      .then(d => setStylistWorkingDays(d.working_days ?? null))
+      .catch(() => setStylistWorkingDays(null));
+  }, [stylistId]);
 
   // Fetch availability when date changes
   useEffect(() => {
@@ -112,6 +123,9 @@ export function DateTimeSelection({
 
     // Block business closed days
     if (closedDays.includes(dayOfWeek)) return false;
+
+    // Block days this specific stylist doesn't work
+    if (stylistWorkingDays !== null && !stylistWorkingDays.includes(dayOfWeek)) return false;
 
     // Wednesday-only restriction for special offers
     if (wednesdayOnly && dayOfWeek !== 3) return false;

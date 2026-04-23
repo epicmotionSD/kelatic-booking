@@ -73,7 +73,6 @@ export async function POST(request: NextRequest) {
       is_active = true,
     } = body;
 
-    // Validate required fields
     if (!first_name || !last_name || !email) {
       return NextResponse.json(
         { error: 'First name, last name, and email are required' },
@@ -81,7 +80,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if email already exists
+    // Check if email already exists in profiles
     const { data: existing } = await supabase
       .from('profiles')
       .select('id')
@@ -95,10 +94,39 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create the team member
-    const { data: newMember, error } = await supabase
+    // profiles.id must reference auth.users(id) — create the auth user first.
+    // A random temporary password is set; the stylist resets it via email.
+    const tempPassword = crypto.randomUUID();
+    const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+      email,
+      password: tempPassword,
+      email_confirm: true,
+      user_metadata: { first_name, last_name, role: 'stylist' },
+    });
+
+    if (authError || !authData.user) {
+      console.error('Auth user creation error:', authError);
+      return NextResponse.json(
+        { error: authError?.message || 'Failed to create auth user' },
+        { status: 500 }
+      );
+    }
+
+    const userId = authData.user.id;
+
+    // Get the business_id for Kelatic so the profile is correctly scoped
+    const { data: biz } = await supabase
+      .from('businesses')
+      .select('id')
+      .eq('slug', 'kelatic')
+      .single();
+    const businessId = biz?.id || null;
+
+    // Insert the profile row — id matches the new auth user
+    const { data: newMember, error: profileError } = await supabase
       .from('profiles')
       .insert({
+        id: userId,
         first_name,
         last_name,
         email,
@@ -109,30 +137,43 @@ export async function POST(request: NextRequest) {
         commission_rate: commission_rate || 0,
         is_active,
         role: 'stylist',
+        business_id: businessId,
       })
       .select()
       .single();
 
-    if (error) throw error;
+    if (profileError) {
+      // Roll back the auth user so we don't leave an orphan
+      await supabase.auth.admin.deleteUser(userId);
+      console.error('Profile insert error:', profileError);
+      return NextResponse.json({ error: profileError.message }, { status: 500 });
+    }
 
-    // Create default schedule
-    const defaultSchedule = {
-      monday: { enabled: true, blocks: [{ id: '1', start: '09:00', end: '17:00' }] },
-      tuesday: { enabled: true, blocks: [{ id: '1', start: '09:00', end: '17:00' }] },
-      wednesday: { enabled: true, blocks: [{ id: '1', start: '09:00', end: '17:00' }] },
-      thursday: { enabled: true, blocks: [{ id: '1', start: '09:00', end: '17:00' }] },
-      friday: { enabled: true, blocks: [{ id: '1', start: '09:00', end: '17:00' }] },
-      saturday: { enabled: true, blocks: [{ id: '1', start: '10:00', end: '16:00' }] },
-      sunday: { enabled: false, blocks: [] },
-    };
+    // Create default schedule — one row per day (the actual schema)
+    // Mon–Fri 9am–5pm active, Sat 10am–4pm active, Sun closed
+    const defaultDays = [
+      { day_of_week: 0, is_active: false, start_time: '10:00:00', end_time: '17:00:00' },
+      { day_of_week: 1, is_active: true,  start_time: '09:00:00', end_time: '17:00:00' },
+      { day_of_week: 2, is_active: true,  start_time: '09:00:00', end_time: '17:00:00' },
+      { day_of_week: 3, is_active: true,  start_time: '09:00:00', end_time: '17:00:00' },
+      { day_of_week: 4, is_active: true,  start_time: '09:00:00', end_time: '17:00:00' },
+      { day_of_week: 5, is_active: true,  start_time: '09:00:00', end_time: '17:00:00' },
+      { day_of_week: 6, is_active: true,  start_time: '10:00:00', end_time: '16:00:00' },
+    ];
 
-    await supabase
-      .from('stylist_schedules')
-      .insert({
-        stylist_id: newMember.id,
-        weekly_schedule: defaultSchedule,
-        blocked_dates: [],
-      });
+    await supabase.from('stylist_schedules').insert(
+      defaultDays.map(d => ({
+        stylist_id: userId,
+        business_id: businessId,
+        ...d,
+      }))
+    );
+
+    // Send password reset so they can set their own password
+    await supabase.auth.admin.generateLink({
+      type: 'recovery',
+      email,
+    });
 
     return NextResponse.json(newMember, { status: 201 });
   } catch (error) {
