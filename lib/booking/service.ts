@@ -67,7 +67,10 @@ export async function getAvailability({
     }
   }
   
-  const dayOfWeek = new Date(date).getDay();
+  // Parse date as UTC to avoid server timezone shifting the day-of-week
+  const [y, m, d] = date.split('-').map(Number);
+  const dayOfWeek = new Date(Date.UTC(y, m - 1, d)).getUTCDay();
+  console.log(`[availability] date=${date} dayOfWeek=${dayOfWeek} tz=${timeZone}`);
   const slots: TimeSlot[] = [];
   
   // If stylist_id is provided directly (for rescheduling), just check that stylist
@@ -193,16 +196,17 @@ export async function getAvailability({
     stylistQuery = stylistQuery.eq('stylist_id', stylist_id);
   }
   
-  const { data: stylistServices } = await stylistQuery;
-  
+  const { data: stylistServices, error: ssErr } = await stylistQuery;
+  console.log(`[availability] stylist_services found=${stylistServices?.length ?? 0} err=${ssErr?.message ?? 'none'}`);
+
   if (!stylistServices?.length) {
     return { date, slots: [] };
   }
-  
+
   for (const ss of stylistServices) {
     const profile = ss.profiles as any;
-    if (!profile?.is_active) continue;
-    
+    if (!profile?.is_active) { console.log(`[availability] skip ${profile?.first_name}: profile inactive`); continue; }
+
     // Get stylist's schedule for this day
     const { data: schedule } = await supabase
       .from('stylist_schedules')
@@ -211,7 +215,8 @@ export async function getAvailability({
       .eq('day_of_week', dayOfWeek)
       .eq('is_active', true)
       .single();
-      
+    console.log(`[availability] ${profile?.first_name} dow=${dayOfWeek} schedule=${schedule ? schedule.start_time+'-'+schedule.end_time : 'NONE'}`);
+
     if (!schedule) continue;
     
     // Get existing appointments for this stylist on this date

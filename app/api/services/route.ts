@@ -25,29 +25,44 @@ export async function GET() {
     const headerStore = await headers();
     const tenantSlug = headerStore.get('x-tenant-slug');
     
-    // Get business_id and closed_days from slug
+    // Get business_id from slug
     let businessId: string | null = null;
-    let closedDays: number[] = [0]; // default: Sunday closed
     if (tenantSlug) {
       const { data: business } = await supabase
         .from('businesses')
-        .select('id, closed_days')
+        .select('id')
         .eq('slug', tenantSlug)
         .eq('is_active', true)
         .single();
       businessId = business?.id || null;
-      if (business?.closed_days) closedDays = business.closed_days;
     }
 
     // If no business found, try to get the default Kelatic business
     if (!businessId) {
       const { data: defaultBusiness } = await supabase
         .from('businesses')
-        .select('id, closed_days')
+        .select('id')
         .eq('slug', 'kelatic')
         .single();
       businessId = defaultBusiness?.id || null;
-      if (defaultBusiness?.closed_days) closedDays = defaultBusiness.closed_days;
+    }
+
+    // Derive closed days from business_hours in business_settings
+    let closedDays: number[] = [];
+    if (businessId) {
+      const { data: settings } = await supabase
+        .from('business_settings')
+        .select('business_hours')
+        .eq('business_id', businessId)
+        .single();
+      if (settings?.business_hours) {
+        for (let i = 0; i <= 6; i++) {
+          const day = settings.business_hours[i] ?? settings.business_hours[String(i)];
+          if (!day || (day.open === '00:00' && day.close === '00:00') || (day.open === '' && day.close === '')) {
+            closedDays.push(i);
+          }
+        }
+      }
     }
 
     // Build query with business filter
