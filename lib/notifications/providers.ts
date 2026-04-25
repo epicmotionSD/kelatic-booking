@@ -74,6 +74,10 @@ export function isEmailProviderConfigured(): boolean {
     return Boolean(process.env.SENDGRID_API_KEY)
   }
 
+  if (provider === 'resend') {
+    return Boolean(process.env.RESEND_API_KEY)
+  }
+
   if (provider === 'mailchimp') {
     return Boolean(process.env.MAILCHIMP_TRANSACTIONAL_API_KEY)
   }
