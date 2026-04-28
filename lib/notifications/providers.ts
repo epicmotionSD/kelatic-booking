@@ -1,7 +1,8 @@
 import sgMail from '@sendgrid/mail'
 import twilio from 'twilio'
+import nodemailer from 'nodemailer'
 
-export type EmailProviderName = 'sendgrid' | 'postmark' | 'resend' | 'mailchimp'
+export type EmailProviderName = 'sendgrid' | 'postmark' | 'resend' | 'mailchimp' | 'smtp'
 export type SmsProviderName = 'twilio' | 'telnyx' | 'vonage'
 
 export interface EmailSendParams {
@@ -53,8 +54,8 @@ function initSendGrid() {
 
 export function getEmailProviderName(): EmailProviderName {
   const configured = (process.env.EMAIL_PROVIDER || 'sendgrid').toLowerCase()
-  if (configured === 'postmark' || configured === 'resend' || configured === 'mailchimp') {
-    return configured
+  if (configured === 'postmark' || configured === 'resend' || configured === 'mailchimp' || configured === 'smtp') {
+    return configured as EmailProviderName
   }
   return 'sendgrid'
 }
@@ -80,6 +81,10 @@ export function isEmailProviderConfigured(): boolean {
 
   if (provider === 'mailchimp') {
     return Boolean(process.env.MAILCHIMP_TRANSACTIONAL_API_KEY)
+  }
+
+  if (provider === 'smtp') {
+    return Boolean(process.env.SMTP_HOST && process.env.SMTP_USER && process.env.SMTP_PASS)
   }
 
   return false
@@ -193,6 +198,43 @@ export async function sendEmailMessage(params: EmailSendParams): Promise<Provide
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown Resend error',
+      }
+    }
+  }
+
+  if (provider === 'smtp') {
+    const host = process.env.SMTP_HOST
+    const port = parseInt(process.env.SMTP_PORT || '587', 10)
+    const user = process.env.SMTP_USER
+    const pass = process.env.SMTP_PASS
+    const secure = process.env.SMTP_SECURE === 'true' || port === 465
+
+    if (!host || !user || !pass) {
+      return { success: false, error: 'SMTP credentials not configured' }
+    }
+
+    try {
+      const transporter = nodemailer.createTransport({
+        host,
+        port,
+        secure,
+        auth: { user, pass },
+      })
+
+      const info = await transporter.sendMail({
+        from: params.fromName ? `"${params.fromName}" <${params.fromEmail}>` : params.fromEmail,
+        to: params.to,
+        cc: params.cc?.join(', '),
+        subject: params.subject,
+        html: params.html,
+        text: params.text,
+      })
+
+      return { success: true, messageId: info.messageId }
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown SMTP error',
       }
     }
   }
