@@ -26,8 +26,8 @@ const CATEGORY_LABELS: Record<ServiceCategory, string> = {
 // Category display order
 const CATEGORY_ORDER: ServiceCategory[] = ['locs', 'barber', 'braids', 'natural', 'silk_press', 'color', 'treatments', 'other'];
 
-// Only show locs and barber categories in public booking - Kelatic specializes in locs
-const PUBLIC_CATEGORIES: ServiceCategory[] = ['locs', 'barber'];
+// Categories shown in public booking
+const PUBLIC_CATEGORIES: ServiceCategory[] = ['locs', 'barber', 'braids'];
 
 export function ServiceSelection({
   selectedService,
