@@ -191,7 +191,10 @@ export class NotificationService {
 
       const result = await sendEmailMessage({
         to: user.email,
-        fromEmail: process.env.SENDGRID_FROM_EMAIL || 'info@kelatic.com',
+        fromEmail:
+          process.env.RESEND_FROM_EMAIL ||
+          process.env.SENDGRID_FROM_EMAIL ||
+          'info@kelatic.com',
         fromName: variables.business_name || 'KeLatic',
         subject,
         html: content,

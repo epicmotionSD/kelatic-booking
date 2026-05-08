@@ -53,11 +53,18 @@ function initSendGrid() {
 }
 
 export function getEmailProviderName(): EmailProviderName {
-  const configured = (process.env.EMAIL_PROVIDER || 'sendgrid').toLowerCase()
-  if (configured === 'postmark' || configured === 'resend' || configured === 'mailchimp' || configured === 'smtp') {
+  // Default to Resend — the SendGrid account is blocked and must not be used.
+  const configured = (process.env.EMAIL_PROVIDER || 'resend').toLowerCase()
+  if (
+    configured === 'postmark' ||
+    configured === 'resend' ||
+    configured === 'mailchimp' ||
+    configured === 'smtp' ||
+    configured === 'sendgrid'
+  ) {
     return configured as EmailProviderName
   }
-  return 'sendgrid'
+  return 'resend'
 }
 
 export function getSmsProviderName(): SmsProviderName {

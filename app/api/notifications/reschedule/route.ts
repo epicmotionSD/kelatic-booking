@@ -1,19 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import sgMail from '@sendgrid/mail';
 import twilio from 'twilio';
-
-// Initialize SendGrid
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
+import { isEmailProviderConfigured, sendEmailMessage } from '@/lib/notifications/providers';
 
 // Initialize Twilio
 const twilioClient = process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN
   ? twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN)
   : null;
 
-const FROM_EMAIL = process.env.SENDGRID_FROM_EMAIL || 'bookings@kelatic.com';
+const FROM_EMAIL =
+  process.env.RESEND_FROM_EMAIL ||
+  process.env.SENDGRID_FROM_EMAIL ||
+  'bookings@kelatic.com';
 const FROM_PHONE = process.env.TWILIO_PHONE_NUMBER || '';
 const CC_EMAIL = 'info@kelatic.com';
 const SALON_NAME = 'KeLatic Hair Lounge';
@@ -236,31 +234,29 @@ export async function POST(request: NextRequest) {
     let smsSent = false;
 
     // Send email
-    if (process.env.SENDGRID_API_KEY && client?.email) {
-      try {
-        await sgMail.send({
-          to: client.email,
-          cc: CC_EMAIL,
-          from: {
-            email: FROM_EMAIL,
-            name: SALON_NAME,
-          },
-          subject: `📅 Appointment Rescheduled - ${newDate}`,
-          html: getRescheduleEmailHtml(
-            clientName,
-            serviceName,
-            stylistName,
-            oldDate,
-            oldTime,
-            newDate,
-            newTime,
-            appointmentId
-          ),
-        });
+    if (isEmailProviderConfigured() && client?.email) {
+      const result = await sendEmailMessage({
+        to: client.email,
+        cc: [CC_EMAIL],
+        fromEmail: FROM_EMAIL,
+        fromName: SALON_NAME,
+        subject: `📅 Appointment Rescheduled - ${newDate}`,
+        html: getRescheduleEmailHtml(
+          clientName,
+          serviceName,
+          stylistName,
+          oldDate,
+          oldTime,
+          newDate,
+          newTime,
+          appointmentId
+        ),
+      });
+      if (result.success) {
         emailSent = true;
         console.log(`[Email] Reschedule notification sent to ${client.email}`);
-      } catch (err) {
-        console.error('[Email] Failed to send reschedule notification:', err);
+      } else {
+        console.error('[Email] Failed to send reschedule notification:', result.error);
       }
     }
 
@@ -290,25 +286,22 @@ export async function POST(request: NextRequest) {
     });
 
     // Also notify stylist
-    if (process.env.SENDGRID_API_KEY && stylist?.email) {
-      try {
-        await sgMail.send({
-          to: stylist.email,
-          from: {
-            email: FROM_EMAIL,
-            name: SALON_NAME,
-          },
-          subject: `📅 Rescheduled: ${clientName} - ${newDate}`,
-          html: `
+    if (isEmailProviderConfigured() && stylist?.email) {
+      const stylistResult = await sendEmailMessage({
+        to: stylist.email,
+        fromEmail: FROM_EMAIL,
+        fromName: SALON_NAME,
+        subject: `📅 Rescheduled: ${clientName} - ${newDate}`,
+        html: `
             <h2>Appointment Rescheduled</h2>
             <p><strong>Client:</strong> ${clientName}</p>
             <p><strong>Service:</strong> ${serviceName}</p>
             <p><strong>Previous:</strong> ${oldDate} at ${oldTime}</p>
             <p><strong>New:</strong> ${newDate} at ${newTime}</p>
           `,
-        });
-      } catch (err) {
-        console.error('[Email] Failed to notify stylist:', err);
+      });
+      if (!stylistResult.success) {
+        console.error('[Email] Failed to notify stylist:', stylistResult.error);
       }
     }
 

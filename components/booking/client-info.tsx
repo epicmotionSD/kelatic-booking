@@ -98,7 +98,7 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
 
       if (!res.ok) {
         const error = await res.json();
-        throw new Error(error.message || 'Failed to create booking');
+        throw new Error(error.error || error.message || 'Failed to create booking');
       }
 
       const result = await res.json();
@@ -134,7 +134,6 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
   const servicePrice = bookingData.service?.base_price || 0;
   const addonsPrice = bookingData.addons.reduce((sum, a) => sum + a.base_price, 0);
   const totalPrice = servicePrice + addonsPrice;
-  const depositAmount = bookingData.service?.deposit_amount || 0;
 
   const formatDateTime = () => {
     if (!bookingData.timeSlot) return '';
@@ -175,11 +174,6 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
             {formatCurrency(totalPrice * 100)}
           </span>
         </div>
-        {bookingData.service?.deposit_required && (
-          <p className="text-sm text-amber-400/80 mt-2">
-            A {formatCurrency(depositAmount * 100)} deposit is required to secure your appointment
-          </p>
-        )}
       </div>
 
       {/* New/Returning Client Toggle */}
@@ -368,8 +362,6 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black" />
                 Processing...
               </>
-            ) : bookingData.service?.deposit_required ? (
-              `Pay ${formatCurrency(depositAmount * 100)} Deposit`
             ) : (
               'Confirm Booking'
             )}
