@@ -240,7 +240,7 @@ export async function POST(request: NextRequest) {
         cc: [CC_EMAIL],
         fromEmail: FROM_EMAIL,
         fromName: SALON_NAME,
-        subject: `📅 Appointment Rescheduled - ${newDate}`,
+        subject: `Appointment rescheduled - ${newDate}`,
         html: getRescheduleEmailHtml(
           clientName,
           serviceName,
@@ -291,7 +291,7 @@ export async function POST(request: NextRequest) {
         to: stylist.email,
         fromEmail: FROM_EMAIL,
         fromName: SALON_NAME,
-        subject: `📅 Rescheduled: ${clientName} - ${newDate}`,
+        subject: `Rescheduled: ${clientName} - ${newDate}`,
         html: `
             <h2>Appointment Rescheduled</h2>
             <p><strong>Client:</strong> ${clientName}</p>

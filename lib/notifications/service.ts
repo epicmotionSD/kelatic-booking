@@ -40,9 +40,32 @@ function getBrandGradient(business: Business): string {
   return `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor} 100%)`;
 }
 
-// Get from email
+// Get provider-aware from email to avoid using an unverified sender domain.
 function getFromEmail(ctx: BusinessContext): string {
-  return process.env.RESEND_FROM_EMAIL
+  const provider = getEmailProviderName();
+
+  if (provider === 'sendgrid') {
+    return ctx.settings?.sendgrid_from_email
+      || process.env.SENDGRID_FROM_EMAIL
+      || process.env.RESEND_FROM_EMAIL
+      || `bookings@${ROOT_DOMAIN}`;
+  }
+
+  if (provider === 'resend') {
+    return process.env.RESEND_FROM_EMAIL
+      || process.env.SENDGRID_FROM_EMAIL
+      || `bookings@${ROOT_DOMAIN}`;
+  }
+
+  if (provider === 'smtp') {
+    return process.env.SMTP_USER
+      || process.env.RESEND_FROM_EMAIL
+      || process.env.SENDGRID_FROM_EMAIL
+      || `bookings@${ROOT_DOMAIN}`;
+  }
+
+  return process.env.SENDGRID_FROM_EMAIL
+    || process.env.RESEND_FROM_EMAIL
     || ctx.settings?.sendgrid_from_email
     || `bookings@${ROOT_DOMAIN}`;
 }
@@ -550,8 +573,8 @@ export async function sendConfirmationEmail(appointment: AppointmentDetails, ctx
       fromEmail,
       fromName: business.name,
       subject: isPending
-        ? `⏳ Appointment Pending Deposit - ${formatDate(appointment.appointment_date)}`
-        : `✨ Appointment Confirmed - ${formatDate(appointment.appointment_date)}`,
+        ? `Appointment pending - ${formatDate(appointment.appointment_date)}`
+        : `Appointment confirmed - ${formatDate(appointment.appointment_date)}`,
       html: getConfirmationEmailHtml(appointment, ctx),
     });
 
@@ -584,7 +607,7 @@ export async function sendReminderEmail(appointment: AppointmentDetails, hoursUn
       to: appointment.client_email,
       fromEmail,
       fromName: business.name,
-      subject: `⏰ Reminder: Your appointment is ${hoursUntil === 24 ? 'tomorrow' : 'today'}!`,
+      subject: `Reminder: your appointment is ${hoursUntil === 24 ? 'tomorrow' : 'today'}`,
       html: getReminderEmailHtml(appointment, hoursUntil, ctx),
     });
 
@@ -900,7 +923,7 @@ export async function notifyStylistNewBooking(
         to: stylistEmail,
         fromEmail,
         fromName: business.name,
-        subject: `📅 New Booking: ${appointment.client_name} — ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}`,
+        subject: `New booking: ${appointment.client_name} - ${formatDate(appointment.appointment_date)} at ${formatTime(appointment.appointment_time)}`,
         html: getStylistNotificationEmailHtml(appointment, ctx),
       });
 
