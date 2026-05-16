@@ -47,3 +47,6 @@ next-env.d.ts
 .env*.local
 nul
 database.sql
+
+# Claude Code local prefs
+.claude/settings.local.json
