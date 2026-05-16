@@ -7,7 +7,6 @@ import {
   notifyStylistNewBooking,
   type AppointmentDetails,
 } from '@/lib/notifications/service';
-import { queryBluehost } from '@/lib/mysql/bluehost';
 
 // Send confirmation notifications directly (no internal HTTP fetch)
 async function sendConfirmationNotifications(appointmentId: string) {
@@ -177,12 +176,12 @@ interface BookingRequestBody {
 
 interface BookingDiagnostics {
   requestId: string;
-  stage: 'received' | 'conflict_supabase' | 'conflict_amelia' | 'created' | 'failed';
+  stage: 'received' | 'conflict_supabase' | 'created' | 'failed';
   businessId: string | null;
   serviceId: string;
   stylistId: string;
   startTime: string;
-  source: 'supabase' | 'amelia' | 'booking_api';
+  source: 'supabase' | 'booking_api';
   appointmentId?: string;
   reason?: string;
 }
@@ -315,48 +314,6 @@ export async function POST(request: NextRequest) {
         { error: 'This time slot is no longer available' },
         { status: 409 }
       );
-    }
-
-    // Cross-check against Amelia (Bluehost MySQL) — prevents double-booking
-    // between the kelatic.com WordPress booking system and this platform
-    try {
-      if (stylistProfile?.email) {
-        const toMySQL = (d: Date) => d.toISOString().slice(0, 19).replace('T', ' ');
-
-        const ameliaUsers = await queryBluehost<{ id: number }>(
-          `SELECT id FROM gzf_amelia_users WHERE email = ? AND type = 'provider' LIMIT 1`,
-          [stylistProfile.email]
-        );
-
-        if (ameliaUsers.length) {
-          const ameliaConflicts = await queryBluehost<{ id: number }>(
-            `SELECT a.id FROM gzf_amelia_appointments a
-             WHERE a.providerId = ?
-               AND a.status NOT IN ('canceled', 'rejected', 'no-show')
-               AND a.bookingStart < ?
-               AND a.bookingEnd   > ?
-             LIMIT 1`,
-            [ameliaUsers[0].id, toMySQL(endTime), toMySQL(startTime)]
-          );
-
-          if (ameliaConflicts.length) {
-            console.warn('[BookingAPI] diagnostics', {
-              ...baseDiagnostics,
-              stage: 'conflict_amelia',
-              source: 'amelia',
-              reason: `amelia_appointment_${ameliaConflicts[0].id}`,
-            } satisfies BookingDiagnostics);
-
-            return NextResponse.json(
-              { error: 'This time slot is not available — stylist has an existing appointment' },
-              { status: 409 }
-            );
-          }
-        }
-      }
-    } catch (ameliaError) {
-      // Non-blocking: log but don't reject the booking if MySQL is unreachable
-      console.error('[BookingAPI] Amelia cross-check failed (non-blocking):', ameliaError);
     }
 
     // Find or create client profile
