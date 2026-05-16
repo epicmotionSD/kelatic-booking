@@ -1,6 +1,7 @@
 import { createServerSupabaseClient, createAdminClient } from '../supabase/client';
 import { createPaymentIntent } from '../stripe';
 import { toCents } from '../currency';
+import { queryBluehost } from '@/lib/mysql/bluehost';
 import type {
   Appointment,
   AppointmentWithDetails,
@@ -22,6 +23,62 @@ interface ExtendedAvailabilityRequest {
   date: string;
   duration?: number;
   exclude_appointment?: string;
+}
+
+interface BusyRange {
+  start_time: string;
+  end_time: string;
+}
+
+function toMySQLDatetimeFromIso(isoDateTime: string): string {
+  return isoDateTime.slice(0, 19).replace('T', ' ');
+}
+
+async function getAmeliaBusyRangesForStylist(
+  stylistEmail: string | undefined,
+  startIso: string,
+  endIso: string
+): Promise<BusyRange[]> {
+  if (!stylistEmail) return [];
+
+  try {
+    const providers = await queryBluehost<{ id: number }>(
+      `SELECT id
+       FROM gzf_amelia_users
+       WHERE email = ?
+         AND type = 'provider'
+       LIMIT 1`,
+      [stylistEmail]
+    );
+
+    if (!providers.length) {
+      return [];
+    }
+
+    const providerId = providers[0].id;
+    const startMySql = toMySQLDatetimeFromIso(startIso);
+    const endMySql = toMySQLDatetimeFromIso(endIso);
+
+    const conflicts = await queryBluehost<{ bookingStart: string; bookingEnd: string }>(
+      `SELECT a.bookingStart, a.bookingEnd
+       FROM gzf_amelia_appointments a
+       WHERE a.providerId = ?
+         AND a.status NOT IN ('canceled', 'rejected', 'no-show')
+         AND a.bookingStart < ?
+         AND a.bookingEnd   > ?`,
+      [providerId, endMySql, startMySql]
+    );
+
+    return conflicts.map((row) => ({
+      // Interpret stored values as UTC for parity with booking conflict checks.
+      start_time: new Date(`${row.bookingStart}Z`).toISOString(),
+      end_time: new Date(`${row.bookingEnd}Z`).toISOString(),
+    }));
+  } catch (error) {
+    // Non-blocking: if Bluehost is unavailable, keep local availability behavior.
+    console.error('[availability] Amelia cross-check failed (non-blocking):', error);
+    return [];
+  }
 }
 
 export async function getAvailability({
@@ -78,7 +135,7 @@ export async function getAvailability({
     // Get stylist info
     const { data: stylist } = await supabase
       .from('profiles')
-      .select('id, first_name, last_name, is_active, business_id')
+      .select('id, first_name, last_name, email, is_active, business_id')
       .eq('id', stylist_id)
       .eq('is_active', true)
       .single();
@@ -129,6 +186,13 @@ export async function getAvailability({
     }
     
     const { data: existingAppointments } = await appointmentsQuery;
+
+    const ameliaBusyRanges = await getAmeliaBusyRangesForStylist(
+      stylist.email || undefined,
+      startOfDay,
+      endOfDay
+    );
+    const allAppointments = [...(existingAppointments || []), ...ameliaBusyRanges];
       
     // Get time-off
     const { data: timeOff } = await supabase
@@ -155,7 +219,7 @@ export async function getAvailability({
         const isAvailable = !hasConflict(
           slotStart,
           slotEnd,
-          existingAppointments || [],
+          allAppointments,
           timeOff || []
         );
         
@@ -186,6 +250,7 @@ export async function getAvailability({
         id,
         first_name,
         last_name,
+          email,
         is_active
       )
     `)
@@ -237,6 +302,13 @@ export async function getAvailability({
     }
     
     const { data: existingAppointments } = await appointmentsQuery;
+
+    const ameliaBusyRanges = await getAmeliaBusyRangesForStylist(
+      profile.email || undefined,
+      startOfDay,
+      endOfDay
+    );
+    const allAppointments = [...(existingAppointments || []), ...ameliaBusyRanges];
       
     // Get time-off
     const { data: timeOff } = await supabase
@@ -258,7 +330,7 @@ export async function getAvailability({
       const isAvailable = !hasConflict(
         slotStart,
         slotEnd,
-        existingAppointments || [],
+        allAppointments,
         timeOff || []
       );
       

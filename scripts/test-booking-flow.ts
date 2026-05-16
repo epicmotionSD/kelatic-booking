@@ -87,12 +87,17 @@ async function run() {
     throw new Error('No availability found in the next 14 days');
   }
 
+  const bookingStylistId = useStylistFlow ? stylist.id : slot.stylist_id;
+  if (!bookingStylistId) {
+    throw new Error('Selected availability slot is missing stylist_id');
+  }
+
   const timestamp = Date.now();
   const testEmail = `e2e+${timestamp}@kelatic.com`;
 
   const bookingPayload = {
     service_id: service.id,
-    stylist_id: stylist.id,
+    stylist_id: bookingStylistId,
     start_time: slot.start_time,
     addon_ids: [],
     client: {
