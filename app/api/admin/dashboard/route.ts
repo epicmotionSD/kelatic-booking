@@ -90,190 +90,112 @@ export async function GET() {
     // Use business timezone for date calculations (default to Chicago if not set)
     const timezone = business?.timezone || 'America/Chicago';
     const { now, todayStart, todayEnd, weekStart, monthStart } = getDateBoundaries(timezone);
+    const sevenDaysOut = new Date(todayStart.getTime() + 7 * 24 * 60 * 60 * 1000);
+    const activeStatuses = '("cancelled","no_show")';
 
-    // Today's appointments count (include walk-ins, require service_id)
-    const { count: todayAppointments } = await supabase
-      .from('appointments')
-      .select('*', { count: 'exact', head: true })
-      .eq('business_id', business.id)
-      .gte('start_time', todayStart.toISOString())
-      .lt('start_time', todayEnd.toISOString())
-      .not('status', 'in', '("cancelled","no_show")')
-      .not('service_id', 'is', null);
+    // Counts — today, week-to-date, month-to-date
+    const [{ count: todayAppointments }, { count: weekAppointments }, { count: monthAppointments }] = await Promise.all([
+      supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', business.id)
+        .gte('start_time', todayStart.toISOString())
+        .lt('start_time', todayEnd.toISOString())
+        .not('status', 'in', activeStatuses)
+        .not('service_id', 'is', null),
+      supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', business.id)
+        .gte('start_time', weekStart.toISOString())
+        .lt('start_time', todayEnd.toISOString())
+        .not('status', 'in', activeStatuses)
+        .not('service_id', 'is', null),
+      supabase
+        .from('appointments')
+        .select('*', { count: 'exact', head: true })
+        .eq('business_id', business.id)
+        .gte('start_time', monthStart.toISOString())
+        .lt('start_time', todayEnd.toISOString())
+        .not('status', 'in', activeStatuses)
+        .not('service_id', 'is', null),
+    ]);
 
-    // This week's appointments (include walk-ins, require service_id)
-    const { count: weekAppointments } = await supabase
-      .from('appointments')
-      .select('*', { count: 'exact', head: true })
-      .eq('business_id', business.id)
-      .gte('start_time', weekStart.toISOString())
-      .lt('start_time', todayEnd.toISOString())
-      .not('status', 'in', '("cancelled","no_show")')
-      .not('service_id', 'is', null);
+    // Revenue from appointments.quoted_price (Stripe/deposits are disabled; payments
+    // table is no longer populated by the booking flow, so we use quoted_price as
+    // the revenue-recognized figure for confirmed/completed appointments).
+    const [{ data: weekRevenueRows }, { data: monthRevenueRows }] = await Promise.all([
+      supabase
+        .from('appointments')
+        .select('quoted_price')
+        .eq('business_id', business.id)
+        .gte('start_time', weekStart.toISOString())
+        .lt('start_time', todayEnd.toISOString())
+        .not('status', 'in', activeStatuses)
+        .not('service_id', 'is', null),
+      supabase
+        .from('appointments')
+        .select('quoted_price')
+        .eq('business_id', business.id)
+        .gte('start_time', monthStart.toISOString())
+        .lt('start_time', todayEnd.toISOString())
+        .not('status', 'in', activeStatuses)
+        .not('service_id', 'is', null),
+    ]);
 
-    // Today's revenue from completed appointments
-    const { data: todayPayments } = await supabase
-      .from('payments')
-      .select('total_amount, appointments!inner(business_id)')
-      .gte('created_at', todayStart.toISOString())
-      .lt('created_at', todayEnd.toISOString())
-      .eq('status', 'paid')
-      .eq('appointments.business_id', business.id);
+    const weekRevenue = (weekRevenueRows || []).reduce((sum, a) => sum + (a.quoted_price || 0), 0);
+    const monthRevenue = (monthRevenueRows || []).reduce((sum, a) => sum + (a.quoted_price || 0), 0);
 
-    const todayRevenue = todayPayments?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
-
-    // Week revenue
-    const { data: weekPayments } = await supabase
-      .from('payments')
-      .select('total_amount, appointments!inner(business_id)')
-      .gte('created_at', weekStart.toISOString())
-      .lt('created_at', todayEnd.toISOString())
-      .eq('status', 'paid')
-      .eq('appointments.business_id', business.id);
-
-    const weekRevenue = weekPayments?.reduce((sum, p) => sum + p.total_amount, 0) || 0;
-
-    // New clients this month (from both profiles and clients tables)
-    const { count: newProfileClients } = await supabase
-      .from('profiles')
-      .select('*', { count: 'exact', head: true })
-      .eq('business_id', business.id)
-      .eq('role', 'client')
-      .gte('created_at', monthStart.toISOString());
-
-    const { count: newTableClients } = await supabase
-      .from('clients')
-      .select('*', { count: 'exact', head: true })
-      .eq('business_id', business.id)
-      .gte('created_at', monthStart.toISOString());
-
-    const newClients = (newProfileClients || 0) + (newTableClients || 0);
-
-    // Pending deposits
-    const { count: pendingDeposits } = await supabase
-      .from('appointments')
-      .select('*', { count: 'exact', head: true })
-      .eq('business_id', business.id)
-      .eq('status', 'pending')
-      .not('service_id', 'is', null)
-      .not('start_time', 'is', null)
-      .gte('start_time', todayStart.toISOString());
-
-    // Upcoming appointments today
+    // Upcoming appointments — next 7 days (rolling). Used to populate the dashboard list.
     const { data: upcomingAppointmentsRaw } = await supabase
       .from('appointments')
       .select(`
         id,
         start_time,
+        end_time,
         status,
+        quoted_price,
+        is_walk_in,
         services!inner(name),
-        profiles!appointments_stylist_id_fkey(first_name, last_name),
-        client:profiles!appointments_client_id_fkey(first_name, last_name),
-        walk_in_name
+        stylist:profiles!appointments_stylist_id_fkey(first_name, last_name),
+        client:profiles!appointments_client_id_fkey(first_name, last_name)
       `)
       .eq('business_id', business.id)
       .gte('start_time', now.toISOString())
-      .lt('start_time', todayEnd.toISOString())
-      .not('status', 'in', '("cancelled","no_show","completed")')
+      .lt('start_time', sevenDaysOut.toISOString())
+      .not('status', 'in', activeStatuses)
+      .not('service_id', 'is', null)
       .order('start_time')
-      .limit(5);
+      .limit(50);
 
     const upcomingAppointments = upcomingAppointmentsRaw?.map((apt: any) => ({
       id: apt.id,
-      client_name: apt.client 
-        ? `${apt.client.first_name} ${apt.client.last_name}`
-        : apt.walk_in_name || 'Walk-in',
+      client_name: apt.client
+        ? `${apt.client.first_name} ${apt.client.last_name}`.trim()
+        : apt.is_walk_in
+        ? 'Walk-in'
+        : 'Guest',
       service_name: apt.services?.name,
-      stylist_name: apt.profiles 
-        ? `${apt.profiles.first_name} ${apt.profiles.last_name}`
+      stylist_name: apt.stylist
+        ? `${apt.stylist.first_name} ${apt.stylist.last_name}`.trim()
         : 'Unassigned',
-      time: new Date(apt.start_time).toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-        timeZone: timezone,
-      }),
+      start_time: apt.start_time,
       status: apt.status,
+      quoted_price: apt.quoted_price || 0,
     })) || [];
 
-    // Recent payments
-    const { data: recentPaymentsRaw } = await supabase
-      .from('payments')
-      .select(`
-        id,
-        total_amount,
-        method,
-        created_at,
-        appointments!inner(
-          business_id,
-          services!inner(name),
-          client:profiles!appointments_client_id_fkey(first_name, last_name),
-          walk_in_name
-        )
-      `)
-      .eq('appointments.business_id', business.id)
-      .eq('status', 'succeeded')
-      .order('created_at', { ascending: false })
-      .limit(5);
-
-    const recentPayments = recentPaymentsRaw?.map((payment: any) => {
-      const apt = payment.appointments;
-      const createdAt = new Date(payment.created_at);
-      const diffMs = now.getTime() - createdAt.getTime();
-      const diffMins = Math.floor(diffMs / 60000);
-      const diffHours = Math.floor(diffMs / 3600000);
-      
-      let time_ago = '';
-      if (diffMins < 60) {
-        time_ago = `${diffMins}m ago`;
-      } else if (diffHours < 24) {
-        time_ago = `${diffHours}h ago`;
-      } else {
-        time_ago = createdAt.toLocaleDateString();
-      }
-
-      return {
-        id: payment.id,
-        client_name: apt?.client
-          ? `${apt.client.first_name} ${apt.client.last_name}`
-          : apt?.walk_in_name || 'Walk-in',
-        service_name: apt?.services?.name,
-        amount: payment.total_amount,
-        method: payment.method,
-        time_ago,
-      };
-    }) || [];
-
-    // Top services this week
-    const { data: topServicesRaw } = await supabase
-      .from('appointments')
-      .select('services!inner(name)')
-      .eq('business_id', business.id)
-      .gte('start_time', weekStart.toISOString())
-      .lt('start_time', todayEnd.toISOString())
-      .eq('status', 'completed');
-
-    const serviceCounts = topServicesRaw?.reduce((acc: any, apt: any) => {
-      const name = apt.services.name;
-      acc[name] = (acc[name] || 0) + 1;
-      return acc;
-    }, {}) || {};
-
-    const topServices = Object.entries(serviceCounts)
-      .map(([name, count]) => ({ name, count: count as number }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 5);
-
     return NextResponse.json({
-      todayAppointments: todayAppointments || 0,
-      weekAppointments: weekAppointments || 0,
-      todayRevenue,
-      weekRevenue,
-      newClients: newClients || 0,
-      pendingDeposits: pendingDeposits || 0,
+      timezone,
+      counts: {
+        today: todayAppointments || 0,
+        week: weekAppointments || 0,
+        month: monthAppointments || 0,
+      },
+      revenue: {
+        week: weekRevenue,
+        month: monthRevenue,
+      },
       upcomingAppointments,
-      recentPayments,
-      topServices,
     });
   } catch (error) {
     console.error('Dashboard error:', error);
