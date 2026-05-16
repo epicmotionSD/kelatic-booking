@@ -175,7 +175,21 @@ interface BookingRequestBody {
   notes?: string;
 }
 
+interface BookingDiagnostics {
+  requestId: string;
+  stage: 'received' | 'conflict_supabase' | 'conflict_amelia' | 'created' | 'failed';
+  businessId: string | null;
+  serviceId: string;
+  stylistId: string;
+  startTime: string;
+  source: 'supabase' | 'amelia' | 'booking_api';
+  appointmentId?: string;
+  reason?: string;
+}
+
 export async function POST(request: NextRequest) {
+  const requestId = crypto.randomUUID();
+
   try {
     const body: BookingRequestBody = await request.json();
 
@@ -209,6 +223,20 @@ export async function POST(request: NextRequest) {
         );
       }
     }
+
+    const baseDiagnostics = {
+      requestId,
+      businessId,
+      serviceId: body.service_id,
+      stylistId: body.stylist_id,
+      startTime: body.start_time,
+    };
+
+    console.log('[BookingAPI] diagnostics', {
+      ...baseDiagnostics,
+      stage: 'received',
+      source: 'booking_api',
+    } satisfies BookingDiagnostics);
 
     // Get service details (filtered by business)
     const { data: service, error: serviceError } = await admin
@@ -276,6 +304,13 @@ export async function POST(request: NextRequest) {
       .limit(1);
 
     if (conflicts?.length) {
+      console.warn('[BookingAPI] diagnostics', {
+        ...baseDiagnostics,
+        stage: 'conflict_supabase',
+        source: 'supabase',
+        reason: 'overlapping_appointment',
+      } satisfies BookingDiagnostics);
+
       return NextResponse.json(
         { error: 'This time slot is no longer available' },
         { status: 409 }
@@ -305,6 +340,13 @@ export async function POST(request: NextRequest) {
           );
 
           if (ameliaConflicts.length) {
+            console.warn('[BookingAPI] diagnostics', {
+              ...baseDiagnostics,
+              stage: 'conflict_amelia',
+              source: 'amelia',
+              reason: `amelia_appointment_${ameliaConflicts[0].id}`,
+            } satisfies BookingDiagnostics);
+
             return NextResponse.json(
               { error: 'This time slot is not available — stylist has an existing appointment' },
               { status: 409 }
@@ -318,46 +360,89 @@ export async function POST(request: NextRequest) {
     }
 
     // Find or create client profile
+    const clientEmail = body.client.email.toLowerCase();
     let clientId: string | null = null;
 
-    // Check if client exists by email (within business)
+    // profiles.email is UNIQUE globally, so look up by email (not by email+business).
+    // This also covers customers who previously booked at any business.
     const { data: existingClient } = await admin
       .from('profiles')
-      .select('id')
-      .eq('email', body.client.email.toLowerCase())
-      .eq('business_id', businessId)
-      .single();
+      .select('id, business_id')
+      .eq('email', clientEmail)
+      .maybeSingle();
 
     if (existingClient) {
       clientId = existingClient.id;
-      
-      // Update phone if provided
-      if (body.client.phone) {
-        await admin
-          .from('profiles')
-          .update({ phone: body.client.phone })
-          .eq('id', clientId);
+
+      // Backfill phone + business_id if missing
+      const updates: Record<string, any> = {};
+      if (body.client.phone) updates.phone = body.client.phone;
+      if (!existingClient.business_id && businessId) updates.business_id = businessId;
+      if (Object.keys(updates).length) {
+        await admin.from('profiles').update(updates).eq('id', clientId);
       }
     } else {
-      // Create new client profile for this business
-      const { data: newClient, error: clientError } = await admin
-        .from('profiles')
-        .insert({
+      // No profile. profiles.id is FK to auth.users(id), so create an auth user first.
+      // email_confirm=true skips the verify step — the booking confirmation email serves
+      // as proof of ownership; customers can claim the account later via password reset.
+      const { data: created, error: createUserError } = await admin.auth.admin.createUser({
+        email: clientEmail,
+        email_confirm: true,
+        user_metadata: {
           first_name: body.client.first_name,
           last_name: body.client.last_name,
-          email: body.client.email.toLowerCase(),
           phone: body.client.phone || null,
           role: 'client',
-          business_id: businessId,
-        })
-        .select('id')
-        .single();
+        },
+      });
 
-      if (clientError) {
-        console.error('Error creating client:', clientError);
-        // Continue without client_id, store as walk-in
-      } else {
-        clientId = newClient.id;
+      let authUserId = created?.user?.id ?? null;
+
+      if (!authUserId && createUserError) {
+        // Most likely cause: an auth user exists for this email but no profile row.
+        // Look them up via the admin Users list and reuse the id.
+        const alreadyRegistered = /already.*(registered|exist)/i.test(createUserError.message || '');
+        if (alreadyRegistered) {
+          // listUsers has no email filter; page through until we find them.
+          // Most installations have <1000 users, so a single page suffices.
+          const { data: list } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+          authUserId = list?.users?.find((u) => u.email?.toLowerCase() === clientEmail)?.id ?? null;
+        }
+        if (!authUserId) {
+          console.error('[BookingAPI] auth.admin.createUser failed', {
+            requestId,
+            email: clientEmail,
+            error: createUserError.message,
+          });
+        }
+      }
+
+      if (authUserId) {
+        const { data: newClient, error: clientError } = await admin
+          .from('profiles')
+          .insert({
+            id: authUserId,
+            first_name: body.client.first_name,
+            last_name: body.client.last_name,
+            email: clientEmail,
+            phone: body.client.phone || null,
+            role: 'client',
+            business_id: businessId,
+          })
+          .select('id')
+          .single();
+
+        if (clientError) {
+          console.error('[BookingAPI] Failed to insert profile after auth user create', {
+            requestId,
+            email: clientEmail,
+            authUserId,
+            error: clientError.message,
+          });
+          // Fall through to walk-in
+        } else {
+          clientId = newClient.id;
+        }
       }
     }
 
@@ -391,6 +476,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (appointmentError || !appointment) {
+      console.error('[BookingAPI] diagnostics', {
+        ...baseDiagnostics,
+        stage: 'failed',
+        source: 'booking_api',
+        reason: appointmentError?.message || 'appointment_insert_failed',
+      } satisfies BookingDiagnostics);
+
       console.error('Error creating appointment:', appointmentError);
       return NextResponse.json(
         { error: 'Failed to create appointment' },
@@ -422,6 +514,13 @@ export async function POST(request: NextRequest) {
 
     // Use after() to send notifications after response — keeps function alive on Vercel
     const appointmentId = appointment.id;
+    console.log('[BookingAPI] diagnostics', {
+      ...baseDiagnostics,
+      stage: 'created',
+      source: 'booking_api',
+      appointmentId,
+    } satisfies BookingDiagnostics);
+
     after(async () => {
       console.log('[BookingAPI] after() running for appointment:', appointmentId);
       await sendConfirmationNotifications(appointmentId);
@@ -431,10 +530,24 @@ export async function POST(request: NextRequest) {
       appointment,
       paymentIntent: null,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.error('[BookingAPI] diagnostics', {
+      requestId,
+      stage: 'failed',
+      businessId: null,
+      serviceId: 'unknown',
+      stylistId: 'unknown',
+      startTime: 'unknown',
+      source: 'booking_api',
+      reason: error?.message || 'unexpected_error',
+    } satisfies BookingDiagnostics);
+
     console.error('Booking error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: 'We hit a problem creating your booking. Please try again.',
+        requestId,
+      },
       { status: 500 }
     );
   }
