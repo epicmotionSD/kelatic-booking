@@ -1,41 +1,23 @@
 // =============================================================================
 // GET /api/reactivation/ghost-clients
-// Merges inactive clients from BOTH databases:
-//   1. Bluehost MySQL (Amelia WordPress) — historical bookings
-//   2. Supabase — current platform bookings
-// Deduplicates by email (Supabase takes precedence for fresher data)
-// Returns SegmentedLead[] ready to feed into /api/reactivation/launch
+// Aggregates inactive clients from Supabase appointments (registered profiles
+// and walk-ins). Returns SegmentedLead[] ready to feed into
+// /api/reactivation/launch.
 //
 // Segmentation:
 //   ghost     → last visit > 90 days ago  (cold, hardest to reactivate)
 //   near-miss → last visit 45–90 days ago (warm, highest conversion rate)
 //
 // Usage:
-//   GET /api/reactivation/ghost-clients                         → all 45+ days (both DBs)
+//   GET /api/reactivation/ghost-clients?businessId=<uuid>       → required
 //   GET /api/reactivation/ghost-clients?minDays=60              → 60+ days only
 //   GET /api/reactivation/ghost-clients?segment=ghost           → 90+ days only
 //   GET /api/reactivation/ghost-clients?limit=100
-//   GET /api/reactivation/ghost-clients?businessId=<uuid>       → include Supabase clients
-//   GET /api/reactivation/ghost-clients?source=amelia           → Amelia only
-//   GET /api/reactivation/ghost-clients?source=supabase         → Supabase only
 // =============================================================================
 
 import { NextRequest, NextResponse } from 'next/server'
-import { queryBluehost } from '@/lib/mysql/bluehost'
 import { createAdminClient } from '@/lib/supabase/client'
 import type { SegmentedLead, Segment, RiskProfile, ScriptVariant } from '@/types/reactivation'
-
-interface AmeliaClientRow {
-  userId: number
-  firstName: string
-  lastName: string
-  email: string
-  phone: string | null
-  lastVisit: string
-  firstVisit: string
-  daysSince: number
-  totalVisits: number
-}
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -70,76 +52,7 @@ function estimateValue(totalVisits: number): number {
 }
 
 // ---------------------------------------------------------------------------
-// Source 1: Bluehost MySQL (Amelia)
-// ---------------------------------------------------------------------------
-
-async function fetchAmeliaLeads(
-  effectiveMinDays: number,
-  effectiveMaxDays: number,
-  limit: number,
-): Promise<Map<string, SegmentedLead>> {
-  const leadMap = new Map<string, SegmentedLead>()
-
-  try {
-    const rows = await queryBluehost<AmeliaClientRow>(`
-      SELECT
-        u.id                                          AS userId,
-        u.firstName,
-        u.lastName,
-        u.email,
-        u.phone,
-        DATE_FORMAT(MAX(a.bookingStart), '%Y-%m-%dT%H:%i:%sZ')  AS lastVisit,
-        DATE_FORMAT(MIN(a.bookingStart), '%Y-%m-%dT%H:%i:%sZ')  AS firstVisit,
-        DATEDIFF(NOW(), MAX(a.bookingStart))          AS daysSince,
-        COUNT(DISTINCT a.id)                          AS totalVisits
-      FROM gzf_amelia_users u
-      JOIN gzf_amelia_customer_bookings cb ON cb.customerId = u.id
-      JOIN gzf_amelia_appointments a       ON a.id = cb.appointmentId
-      WHERE u.type = 'customer'
-        AND u.status = 'visible'
-        AND u.email IS NOT NULL
-        AND u.email != ''
-        AND cb.status NOT IN ('canceled', 'rejected', 'no-show')
-        AND a.status  NOT IN ('canceled', 'rejected', 'no-show')
-      GROUP BY u.id, u.firstName, u.lastName, u.email, u.phone
-      HAVING daysSince >= ? AND daysSince <= ?
-      ORDER BY daysSince DESC
-      LIMIT ?
-    `, [effectiveMinDays, effectiveMaxDays, limit])
-
-    for (const row of rows) {
-      const email = row.email.toLowerCase().trim()
-      if (!email) continue
-
-      const seg   = segmentFromDays(row.daysSince)
-      const risk  = riskFromDays(row.daysSince, row.totalVisits)
-      const value = estimateValue(row.totalVisits)
-
-      leadMap.set(email, {
-        id:               `amelia_${row.userId}`,
-        firstName:        row.firstName,
-        lastName:         row.lastName,
-        email,
-        phone:            cleanPhone(row.phone),
-        source:           'amelia',
-        firstContact:     row.firstVisit,
-        lastContact:      row.lastVisit,
-        segment:          seg,
-        riskProfile:      risk,
-        estimatedValue:   value,
-        daysSinceContact: row.daysSince,
-        recommendedScript: scriptFromSegment(seg),
-      })
-    }
-  } catch (err) {
-    console.error('[GhostClients] Amelia query failed (non-blocking):', err)
-  }
-
-  return leadMap
-}
-
-// ---------------------------------------------------------------------------
-// Source 2: Supabase (kelatic-booking platform appointments)
+// Supabase aggregation (kelatic-booking platform appointments)
 // ---------------------------------------------------------------------------
 
 async function fetchSupabaseLeads(
@@ -286,7 +199,10 @@ export async function GET(request: NextRequest) {
     const segment    = searchParams.get('segment') as Segment | null
     const limit      = Math.min(Number(searchParams.get('limit') || '500'), 1000)
     const businessId = searchParams.get('businessId') || null
-    const source     = searchParams.get('source')    || 'both' // 'both' | 'amelia' | 'supabase'
+
+    if (!businessId) {
+      return NextResponse.json({ error: 'businessId is required' }, { status: 400 })
+    }
 
     // Resolve effective date range from segment shorthand
     const effectiveMinDays = segment === 'ghost'
@@ -297,45 +213,17 @@ export async function GET(request: NextRequest) {
       ? Math.min(maxDays, 89)
       : maxDays
 
-    // -----------------------------------------------------------------
-    // Fetch from each source (parallel where possible)
-    // -----------------------------------------------------------------
-    const [ameliaMap, supabaseMap] = await Promise.all([
-      source !== 'supabase'
-        ? fetchAmeliaLeads(effectiveMinDays, effectiveMaxDays, limit)
-        : Promise.resolve(new Map<string, SegmentedLead>()),
-      source !== 'amelia' && businessId
-        ? fetchSupabaseLeads(businessId, effectiveMinDays, effectiveMaxDays)
-        : Promise.resolve(new Map<string, SegmentedLead>()),
-    ])
-
-    // -----------------------------------------------------------------
-    // Merge: Supabase data wins on email collision (fresher platform data)
-    // -----------------------------------------------------------------
-    const merged = new Map<string, SegmentedLead>()
-
-    // Insert Amelia leads first
-    for (const [email, lead] of ameliaMap) {
-      merged.set(email, lead)
-    }
-
-    // Supabase leads overwrite any Amelia duplicate
-    for (const [email, lead] of supabaseMap) {
-      merged.set(email, lead)
-    }
+    const leadMap = await fetchSupabaseLeads(businessId, effectiveMinDays, effectiveMaxDays)
 
     // Sort by daysSince DESC, cap at limit
-    const leads: SegmentedLead[] = [...merged.values()]
+    const leads: SegmentedLead[] = [...leadMap.values()]
       .sort((a, b) => b.daysSinceContact - a.daysSinceContact)
       .slice(0, limit)
 
-    // Summary stats
     const summary = {
       total:    leads.length,
       ghost:    leads.filter(l => l.segment === 'ghost').length,
       nearMiss: leads.filter(l => l.segment === 'near-miss').length,
-      fromAmelia:   leads.filter(l => l.source === 'amelia').length,
-      fromSupabase: leads.filter(l => l.source === 'supabase').length,
       totalEstimatedValue: leads.reduce((s, l) => s + l.estimatedValue, 0),
       avgDaysSince: leads.length
         ? Math.round(leads.reduce((s, l) => s + l.daysSinceContact, 0) / leads.length)

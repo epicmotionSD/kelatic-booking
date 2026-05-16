@@ -17,7 +17,7 @@ BUSINESS CONTEXT:
 - Brand: "The Loc Gawd" — premium, professional, community-rooted
 - Team: 2 Content Managers (Manager 1 handles Social & Video, Manager 2 handles Email & Blog)
 - AI Tools: Trinity content suite powered by Claude
-- Stack: Next.js + Supabase + Stripe + Amelia booking + Vercel
+- Stack: Next.js + Supabase + Stripe + Vercel
 
 YOUR 6 OPERATING DOMAINS:
 1. Social Intelligence — engagement patterns, best post times, platform performance

@@ -36,7 +36,7 @@ export async function GET() {
       console.error('Error fetching profile clients:', profileError);
     }
 
-    // Get clients from clients table (imported from Amelia / walk-ins)
+    // Get clients from clients table (legacy import + walk-ins)
     const { data: importedClients, error: importedError } = await supabase
       .from('clients')
       .select(`
