@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { after } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
-import { createPaymentIntent } from '@/lib/stripe';
+import { createPaymentIntent, cancelPaymentIntent } from '@/lib/stripe';
 import { toCents } from '@/lib/currency';
 import {
   sendBookingConfirmation,
@@ -480,6 +480,7 @@ export async function POST(request: NextRequest) {
     // to 'confirmed' on payment_intent.succeeded (see /api/webhooks/stripe).
     let paymentIntent: { id: string; client_secret: string | null } | null = null;
     if (needsDeposit) {
+      let intentId: string | null = null;
       try {
         const intent = await createPaymentIntent({
           amount: toCents(depositAmount),
@@ -490,10 +491,10 @@ export async function POST(request: NextRequest) {
             client_name: `${body.client.first_name} ${body.client.last_name}`,
           },
         });
-
+        intentId = intent.id;
         paymentIntent = { id: intent.id, client_secret: intent.client_secret };
 
-        await admin.from('payments').insert({
+        const { error: paymentRowError } = await admin.from('payments').insert({
           appointment_id: appointment.id,
           client_id: clientId,
           amount: depositAmount,
@@ -504,13 +505,34 @@ export async function POST(request: NextRequest) {
           stripe_payment_intent_id: intent.id,
           is_deposit: true,
         });
+
+        if (paymentRowError) {
+          // PaymentIntent exists at Stripe but we have no DB record linking it
+          // to the appointment. If the customer paid the orphan intent, the
+          // webhook would have no payments row to update. Cancel the intent
+          // and roll back.
+          throw new Error(`payments insert failed: ${paymentRowError.message}`);
+        }
       } catch (stripeErr: any) {
-        console.error('[BookingAPI] Stripe payment intent failed', {
+        console.error('[BookingAPI] Deposit setup failed', {
           requestId,
           appointmentId: appointment.id,
+          intentId,
           error: stripeErr?.message || String(stripeErr),
         });
-        // Roll back the pending appointment so the slot frees up for retry.
+        // Best-effort: cancel the Stripe intent if one was created, then
+        // delete the appointment so the slot frees up for retry.
+        if (intentId) {
+          try {
+            await cancelPaymentIntent(intentId);
+          } catch (cancelErr: any) {
+            console.error('[BookingAPI] Failed to cancel orphan PaymentIntent', {
+              requestId,
+              intentId,
+              error: cancelErr?.message || String(cancelErr),
+            });
+          }
+        }
         await admin.from('appointments').delete().eq('id', appointment.id);
         return NextResponse.json(
           { error: 'Could not start payment. Please try again.', requestId },
