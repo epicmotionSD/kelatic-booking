@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { after } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
+import { createPaymentIntent } from '@/lib/stripe';
+import { toCents } from '@/lib/currency';
 import {
   sendBookingConfirmation,
   notifyStylistNewBooking,
@@ -403,8 +405,15 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Create appointment — deposits removed, all bookings go straight to confirmed
-    const needsDeposit = false;
+    // Deposit policy: per-service. A service requires a deposit only when
+    // deposit_required=true AND deposit_amount>0 on the services row. No
+    // category or stylist overrides — set the flags in the DB to control this.
+    const needsDeposit =
+      Boolean(service.deposit_required) &&
+      typeof service.deposit_amount === 'number' &&
+      service.deposit_amount > 0;
+    const depositAmount = needsDeposit ? Number(service.deposit_amount) : 0;
+
     const appointmentData: any = {
       service_id: body.service_id,
       stylist_id: body.stylist_id,
@@ -413,7 +422,7 @@ export async function POST(request: NextRequest) {
       end_time: endTime.toISOString(),
       quoted_price: totalPrice,
       client_notes: body.notes || null,
-      status: 'confirmed',
+      status: needsDeposit ? 'pending' : 'confirmed',
     };
 
     if (clientId) {
@@ -466,10 +475,53 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // No deposit required — Stripe payment skipped
-    const paymentIntent = null;
+    // Create a Stripe PaymentIntent for the deposit when required. The
+    // appointment is created in 'pending' status above; the webhook flips it
+    // to 'confirmed' on payment_intent.succeeded (see /api/webhooks/stripe).
+    let paymentIntent: { id: string; client_secret: string | null } | null = null;
+    if (needsDeposit) {
+      try {
+        const intent = await createPaymentIntent({
+          amount: toCents(depositAmount),
+          appointmentId: appointment.id,
+          isDeposit: true,
+          metadata: {
+            client_email: body.client.email,
+            client_name: `${body.client.first_name} ${body.client.last_name}`,
+          },
+        });
 
-    // Use after() to send notifications after response — keeps function alive on Vercel
+        paymentIntent = { id: intent.id, client_secret: intent.client_secret };
+
+        await admin.from('payments').insert({
+          appointment_id: appointment.id,
+          client_id: clientId,
+          amount: depositAmount,
+          tip_amount: 0,
+          total_amount: depositAmount,
+          status: 'pending',
+          method: 'card_online',
+          stripe_payment_intent_id: intent.id,
+          is_deposit: true,
+        });
+      } catch (stripeErr: any) {
+        console.error('[BookingAPI] Stripe payment intent failed', {
+          requestId,
+          appointmentId: appointment.id,
+          error: stripeErr?.message || String(stripeErr),
+        });
+        // Roll back the pending appointment so the slot frees up for retry.
+        await admin.from('appointments').delete().eq('id', appointment.id);
+        return NextResponse.json(
+          { error: 'Could not start payment. Please try again.', requestId },
+          { status: 502 }
+        );
+      }
+    }
+
+    // Use after() to send notifications after response — keeps function alive on Vercel.
+    // Notifications fire even for deposit-pending appointments; the booking is
+    // effectively reserved and the customer is moments away from paying.
     const appointmentId = appointment.id;
     console.log('[BookingAPI] diagnostics', {
       ...baseDiagnostics,
@@ -485,7 +537,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       appointment,
-      paymentIntent: null,
+      paymentIntent: paymentIntent?.client_secret
+        ? { id: paymentIntent.id, clientSecret: paymentIntent.client_secret }
+        : null,
     });
   } catch (error: any) {
     console.error('[BookingAPI] diagnostics', {
