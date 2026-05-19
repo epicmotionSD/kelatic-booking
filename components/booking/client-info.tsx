@@ -134,6 +134,9 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
   const servicePrice = bookingData.service?.base_price || 0;
   const addonsPrice = bookingData.addons.reduce((sum, a) => sum + a.base_price, 0);
   const totalPrice = servicePrice + addonsPrice;
+  const depositRequired = Boolean(bookingData.service?.deposit_required);
+  const depositAmount = depositRequired ? Number(bookingData.service?.deposit_amount || 0) : 0;
+  const balanceDue = Math.max(totalPrice - depositAmount, 0);
 
   const formatDateTime = () => {
     if (!bookingData.timeSlot) return '';
@@ -168,12 +171,32 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
           <p className="text-white/60">{formatDateTime()}</p>
           <p className="text-white/60">with {bookingData.timeSlot?.stylist_name}</p>
         </div>
-        <div className="mt-3 pt-3 border-t border-amber-400/20 flex justify-between">
-          <span className="font-medium text-white">Total</span>
-          <span className="font-bold text-amber-400">
-            {formatCurrency(totalPrice * 100)}
-          </span>
+        <div className="mt-3 pt-3 border-t border-amber-400/20 space-y-1.5">
+          <div className="flex justify-between text-sm">
+            <span className="text-white/70">Service total</span>
+            <span className="text-white">{formatCurrency(totalPrice * 100)}</span>
+          </div>
+          {depositRequired && depositAmount > 0 && (
+            <>
+              <div className="flex justify-between text-sm">
+                <span className="text-amber-400 font-medium">Deposit due now</span>
+                <span className="text-amber-400 font-semibold">
+                  {formatCurrency(depositAmount * 100)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-white/60">Balance at appointment</span>
+                <span className="text-white/70">{formatCurrency(balanceDue * 100)}</span>
+              </div>
+            </>
+          )}
         </div>
+        {depositRequired && depositAmount > 0 && (
+          <p className="mt-3 text-xs text-white/40 leading-relaxed">
+            A {formatCurrency(depositAmount * 100)} non-refundable deposit secures your appointment.
+            The remaining balance is due at the salon.
+          </p>
+        )}
       </div>
 
       {/* New/Returning Client Toggle */}
@@ -362,6 +385,8 @@ export function ClientInfo({ bookingData, onSubmit, onBack }: ClientInfoProps) {
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black" />
                 Processing...
               </>
+            ) : depositRequired && depositAmount > 0 ? (
+              `Pay ${formatCurrency(depositAmount * 100)} Deposit`
             ) : (
               'Confirm Booking'
             )}
