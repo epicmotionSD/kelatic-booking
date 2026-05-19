@@ -55,18 +55,65 @@ export async function PUT(
         commission_rate: body.commission_rate,
       })
       .eq('id', id)
-      .select()
+      .select('id, business_id')
       .single();
 
-    if (error) {
+    if (error || !stylist) {
       console.error('Error updating stylist:', error);
-      return NextResponse.json({ error: 'Failed to update stylist' }, { status: 500 });
+      return NextResponse.json(
+        { error: error?.message || 'Failed to update stylist' },
+        { status: 500 }
+      );
+    }
+
+    // Replace service assignments when serviceIds is provided (undefined = leave alone).
+    if (Array.isArray(body.serviceIds)) {
+      const { error: deleteError } = await supabase
+        .from('stylist_services')
+        .delete()
+        .eq('stylist_id', id);
+
+      if (deleteError) {
+        console.error('[admin/stylists] Failed to clear existing service assignments', {
+          stylistId: id,
+          error: deleteError.message,
+        });
+        return NextResponse.json(
+          { error: `Failed to update service assignments: ${deleteError.message}` },
+          { status: 500 }
+        );
+      }
+
+      if (body.serviceIds.length > 0) {
+        const rows = body.serviceIds.map((serviceId: string) => ({
+          stylist_id: id,
+          service_id: serviceId,
+          business_id: stylist.business_id,
+          is_active: true,
+        }));
+        const { error: insertError } = await supabase
+          .from('stylist_services')
+          .insert(rows);
+        if (insertError) {
+          console.error('[admin/stylists] Failed to insert service assignments', {
+            stylistId: id,
+            error: insertError.message,
+          });
+          return NextResponse.json(
+            { error: `Failed to assign services: ${insertError.message}` },
+            { status: 500 }
+          );
+        }
+      }
     }
 
     return NextResponse.json({ stylist });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update stylist error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
 

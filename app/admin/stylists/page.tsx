@@ -279,6 +279,13 @@ interface StylistModalProps {
   onSave: () => void;
 }
 
+interface ServiceOption {
+  id: string;
+  name: string;
+  category: string;
+  base_price: number;
+}
+
 function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
   const [formData, setFormData] = useState({
     first_name: stylist?.first_name || '',
@@ -292,6 +299,73 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [allServices, setAllServices] = useState<ServiceOption[]>([]);
+  const [selectedServiceIds, setSelectedServiceIds] = useState<Set<string>>(new Set());
+  const [servicesLoading, setServicesLoading] = useState(true);
+
+  // Fetch all active services and the stylist's current assignments (if editing).
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      setServicesLoading(true);
+      try {
+        const [servicesRes, assignmentsRes] = await Promise.all([
+          fetch('/api/services'),
+          stylist
+            ? fetch(`/api/admin/stylists/${stylist.id}`)
+            : Promise.resolve(null),
+        ]);
+
+        const servicesData = await servicesRes.json();
+        const services: ServiceOption[] = (servicesData.services || []).map((s: any) => ({
+          id: s.id,
+          name: s.name,
+          category: s.category,
+          base_price: s.base_price,
+        }));
+        if (cancelled) return;
+        setAllServices(services);
+
+        if (assignmentsRes) {
+          const data = await assignmentsRes.json();
+          const ids = new Set<string>(
+            (data.stylist?.stylist_services || [])
+              .map((ss: any) => ss.services?.id)
+              .filter(Boolean)
+          );
+          if (!cancelled) setSelectedServiceIds(ids);
+        }
+      } catch (err) {
+        console.error('Failed to load services for stylist modal:', err);
+      } finally {
+        if (!cancelled) setServicesLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [stylist]);
+
+  function toggleService(id: string) {
+    setSelectedServiceIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleAllInCategory(category: string, select: boolean) {
+    setSelectedServiceIds((prev) => {
+      const next = new Set(prev);
+      for (const s of allServices) {
+        if (s.category !== category) continue;
+        if (select) next.add(s.id);
+        else next.delete(s.id);
+      }
+      return next;
+    });
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -310,6 +384,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
           ? formData.specialties.split(',').map((s) => s.trim())
           : [],
         commission_rate: parseFloat(formData.commission_rate),
+        serviceIds: Array.from(selectedServiceIds),
       };
 
       const res = await fetch(
@@ -333,6 +408,15 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
       setLoading(false);
     }
   }
+
+  // Group services by category for nicer UI
+  const servicesByCategory = allServices.reduce<Record<string, ServiceOption[]>>(
+    (acc, s) => {
+      (acc[s.category] = acc[s.category] || []).push(s);
+      return acc;
+    },
+    {}
+  );
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -469,6 +553,80 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               }
               className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
             />
+          </div>
+
+          {/* Services this stylist can perform */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-sm font-medium text-white/70">
+                Services this stylist can perform
+              </label>
+              <span className="text-xs text-white/40">
+                {selectedServiceIds.size} of {allServices.length} selected
+              </span>
+            </div>
+            {servicesLoading ? (
+              <div className="text-sm text-white/40 py-3 text-center bg-zinc-800/50 rounded-xl border border-white/10">
+                Loading services…
+              </div>
+            ) : allServices.length === 0 ? (
+              <div className="text-sm text-white/40 py-3 text-center bg-zinc-800/50 rounded-xl border border-white/10">
+                No active services to assign.
+              </div>
+            ) : (
+              <div className="bg-zinc-800/50 border border-white/10 rounded-xl max-h-64 overflow-y-auto">
+                {Object.entries(servicesByCategory)
+                  .sort(([a], [b]) => a.localeCompare(b))
+                  .map(([category, services]) => {
+                    const allSelected = services.every((s) =>
+                      selectedServiceIds.has(s.id)
+                    );
+                    return (
+                      <div
+                        key={category}
+                        className="border-b border-white/8 last:border-b-0"
+                      >
+                        <div className="flex items-center justify-between px-3 py-2 bg-white/3">
+                          <span className="text-xs font-semibold text-white/60 uppercase tracking-wider">
+                            {category}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              toggleAllInCategory(category, !allSelected)
+                            }
+                            className="text-xs text-amber-400 hover:text-amber-300"
+                          >
+                            {allSelected ? 'Clear' : 'Select all'}
+                          </button>
+                        </div>
+                        <ul className="divide-y divide-white/5">
+                          {services
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map((s) => (
+                              <li key={s.id}>
+                                <label className="flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-white/5">
+                                  <input
+                                    type="checkbox"
+                                    checked={selectedServiceIds.has(s.id)}
+                                    onChange={() => toggleService(s.id)}
+                                    className="w-4 h-4 rounded border-white/30 bg-zinc-900 text-amber-500 focus:ring-amber-500"
+                                  />
+                                  <span className="flex-1 text-sm text-white">
+                                    {s.name}
+                                  </span>
+                                  <span className="text-xs text-white/40">
+                                    ${s.base_price}
+                                  </span>
+                                </label>
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </div>
 
           {error && (

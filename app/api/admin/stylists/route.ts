@@ -202,6 +202,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Optional initial service assignments
+    if (Array.isArray(body.serviceIds) && body.serviceIds.length > 0) {
+      const rows = body.serviceIds.map((serviceId: string) => ({
+        stylist_id: stylist.id,
+        service_id: serviceId,
+        business_id: businessId,
+        is_active: true,
+      }));
+      const { error: insertError } = await supabase
+        .from('stylist_services')
+        .insert(rows);
+      if (insertError) {
+        // Non-fatal: stylist created but services not assigned. Owner can fix
+        // in the edit modal. Log for diagnosis.
+        console.error('[admin/stylists] Failed to assign initial services', {
+          stylistId: stylist.id,
+          error: insertError.message,
+        });
+      }
+    }
+
     return NextResponse.json({ stylist });
   } catch (error: any) {
     console.error('Create stylist error:', error);
