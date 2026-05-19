@@ -144,23 +144,49 @@ async function gatherBusinessSnapshot() {
 
   // ── Customer counts that include walk-ins ─────────────────────────────────
   // Until the recent profile-creation fix, every new customer was stored as a
-  // walk-in (is_walk_in=true with email/phone on the appointment). Counting only
-  // profiles drastically understates real customer activity.
-  const walkInKey = (a: { walk_in_email?: string | null; walk_in_phone?: string | null }) =>
-    (a.walk_in_email?.toLowerCase() || a.walk_in_phone || '').trim();
+  // walk-in (is_walk_in=true with email/phone on the appointment). To correctly
+  // distinguish new vs. returning walk-ins, we need each identity's *first*
+  // appointment date — which means walking ALL their appointments, not just
+  // last-30-day ones. We aggregate client-side because PostgREST doesn't
+  // expose GROUP BY easily.
+  const { data: walkinAllRows } = await scope(
+    supabase
+      .from('appointments')
+      .select('walk_in_email, walk_in_phone, start_time')
+      .eq('is_walk_in', true)
+  );
 
-  const walkInIdentities30 = new Set<string>();
-  for (const a of appts30 || []) {
-    if (a.is_walk_in) {
-      const key = walkInKey(a);
-      if (key) walkInIdentities30.add(key);
+  const walkInKey = (a: { walk_in_email?: string | null; walk_in_phone?: string | null }) =>
+    (a.walk_in_email?.toLowerCase()?.trim() || a.walk_in_phone?.trim() || '');
+
+  const walkinIdentities = new Map<string, { first: number; last: number }>();
+  for (const a of (walkinAllRows as any[]) || []) {
+    const key = walkInKey(a);
+    if (!key) continue;
+    const t = new Date(a.start_time).getTime();
+    const existing = walkinIdentities.get(key);
+    if (!existing) {
+      walkinIdentities.set(key, { first: t, last: t });
+    } else {
+      if (t < existing.first) existing.first = t;
+      if (t > existing.last) existing.last = t;
     }
   }
 
-  const newCustomers30 = (newProfileClients30 ?? 0) + walkInIdentities30.size;
-  // Total customers is a lower bound: profile clients + distinct walk-in identities
-  // we've actually seen booking. Good enough for the snapshot.
-  const totalCustomers = (totalProfileClients ?? 0) + walkInIdentities30.size;
+  const thirtyAgoMs = new Date(thirtyAgo).getTime();
+  let walkinTrulyNew30 = 0;
+  let walkinReturning30 = 0;
+  for (const v of walkinIdentities.values()) {
+    if (v.first >= thirtyAgoMs) {
+      walkinTrulyNew30 += 1;
+    } else if (v.last >= thirtyAgoMs) {
+      walkinReturning30 += 1;
+    }
+  }
+
+  const totalCustomers = (totalProfileClients ?? 0) + walkinIdentities.size;
+  const newCustomers30 = (newProfileClients30 ?? 0) + walkinTrulyNew30;
+  const returningCustomers30 = walkinReturning30; // profile clients are all new (per the recent fix), so returning are walk-in only for now
 
   // Platform coverage in upcoming calendar
   const upcomingPosts = calendarPosts || [];
@@ -201,9 +227,12 @@ async function gatherBusinessSnapshot() {
     clients: {
       total: totalCustomers,
       newLast30Days: newCustomers30,
+      returningLast30Days: returningCustomers30,
       newProfileClients30: newProfileClients30 ?? 0,
-      newWalkInIdentities30: walkInIdentities30.size,
-      note: 'Walk-in counts dedupe by lowercased email or phone from appointments.',
+      newWalkInIdentities30: walkinTrulyNew30,
+      returningWalkInIdentities30: walkinReturning30,
+      totalWalkInIdentitiesAllTime: walkinIdentities.size,
+      note: 'Walk-in identities dedupe by lowercased email or phone across all appointments (all-time). new = first appointment within 30d. returning = previously seen, booked again in last 30d.',
     },
     content: {
       upcomingPostsCount: upcomingPosts.length,
