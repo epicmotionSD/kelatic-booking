@@ -1,0 +1,3 @@
+# Force LF on SQL migrations so the Supabase CLI's content hash matches the
+# remote tracker regardless of which OS edited the file.
+*.sql text eol=lf
