@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/client';
+import { requireBusiness, getBusinessBySlug } from '@/lib/tenant/server';
 
 export async function GET() {
   try {
@@ -86,44 +87,127 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const supabase = createAdminClient();
 
-    // Check if email already exists
+    if (!body.first_name || !body.last_name || !body.email) {
+      return NextResponse.json(
+        { error: 'first_name, last_name, and email are required' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = createAdminClient();
+    const email = body.email.toLowerCase();
+
+    // Resolve business — admin UI runs on a tenant subdomain or custom domain.
+    let businessId: string | null = null;
+    try {
+      businessId = (await requireBusiness()).id;
+    } catch {
+      const fallback = await getBusinessBySlug('kelatic');
+      businessId = fallback?.id ?? null;
+    }
+    if (!businessId) {
+      return NextResponse.json({ error: 'Business not found' }, { status: 404 });
+    }
+
+    // Check if a profile already exists for this email (profiles.email is UNIQUE
+    // globally). maybeSingle so 0-rows isn't an error.
     const { data: existing } = await supabase
       .from('profiles')
-      .select('id')
-      .eq('email', body.email.toLowerCase())
-      .single();
+      .select('id, role')
+      .eq('email', email)
+      .maybeSingle();
 
     if (existing) {
-      return NextResponse.json({ error: 'Email already exists' }, { status: 400 });
+      return NextResponse.json(
+        { error: `Email already in use (existing role: ${existing.role})` },
+        { status: 400 }
+      );
+    }
+
+    // profiles.id is a NOT NULL FK to auth.users(id), so create the auth user
+    // first. email_confirm=true skips verification — the stylist will get an
+    // invite/reset link via the /api/admin/stylists/invite endpoint.
+    const { data: created, error: createUserError } = await supabase.auth.admin.createUser({
+      email,
+      email_confirm: true,
+      user_metadata: {
+        first_name: body.first_name,
+        last_name: body.last_name,
+        phone: body.phone || null,
+        role: 'stylist',
+      },
+    });
+
+    let authUserId = created?.user?.id ?? null;
+
+    if (!authUserId && createUserError) {
+      // Auth user might exist from a prior partial attempt — find them and reuse.
+      const alreadyRegistered = /already.*(registered|exist)/i.test(createUserError.message || '');
+      if (alreadyRegistered) {
+        const { data: list } = await supabase.auth.admin.listUsers({ page: 1, perPage: 1000 });
+        authUserId = list?.users?.find((u) => u.email?.toLowerCase() === email)?.id ?? null;
+      }
+      if (!authUserId) {
+        console.error('[admin/stylists] auth.admin.createUser failed', {
+          email,
+          error: createUserError.message,
+        });
+        return NextResponse.json(
+          { error: `Failed to create auth account: ${createUserError.message}` },
+          { status: 500 }
+        );
+      }
+    }
+
+    if (!authUserId) {
+      return NextResponse.json({ error: 'Could not create auth user' }, { status: 500 });
     }
 
     const { data: stylist, error } = await supabase
       .from('profiles')
       .insert({
+        id: authUserId,
         first_name: body.first_name,
         last_name: body.last_name,
-        email: body.email.toLowerCase(),
-        phone: body.phone,
+        email,
+        phone: body.phone || null,
         role: 'stylist',
-        bio: body.bio,
-        specialties: body.specialties,
-        instagram_handle: body.instagram_handle,
-        commission_rate: body.commission_rate,
+        business_id: businessId,
+        bio: body.bio || null,
+        specialties: body.specialties || null,
+        instagram_handle: body.instagram_handle || null,
+        commission_rate: body.commission_rate ?? null,
         is_active: true,
       })
       .select()
       .single();
 
     if (error) {
-      console.error('Error creating stylist:', error);
-      return NextResponse.json({ error: 'Failed to create stylist' }, { status: 500 });
+      console.error('[admin/stylists] Profile insert failed after auth user create', {
+        email,
+        authUserId,
+        error: error.message,
+      });
+      // Roll back the orphan auth user so a retry works cleanly.
+      await supabase.auth.admin.deleteUser(authUserId).catch((cleanupErr) => {
+        console.error('[admin/stylists] Failed to clean up orphan auth user', {
+          authUserId,
+          error: cleanupErr?.message,
+        });
+      });
+      return NextResponse.json(
+        { error: `Failed to create stylist profile: ${error.message}` },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ stylist });
-  } catch (error) {
+  } catch (error: any) {
     console.error('Create stylist error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json(
+      { error: error?.message || 'Internal server error' },
+      { status: 500 }
+    );
   }
 }
