@@ -1,53 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { Footer } from '@/components/layout/footer';
 import { PublicAuthLinks } from '@/components/layout/public-auth-links';
-import type { Profile } from '@/types/database';
 
-const HEARD_ABOUT_OPTIONS = [
-  'Instagram',
-  'Google Search',
-  'Friend/Family',
-  'Walked by',
-  'Returning client',
-  'Other',
-];
+interface CheckInResult {
+  matched: boolean;
+  clientName?: string;
+}
 
-export default function WalkInPage() {
-  const [stylists, setStylists] = useState<Profile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
+export default function CheckInPage() {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [heardAbout, setHeardAbout] = useState('');
-  const [preferredStylistId, setPreferredStylistId] = useState('');
-
-  useEffect(() => {
-    async function fetchStylists() {
-      try {
-        const res = await fetch('/api/stylists');
-        const data = await res.json();
-        setStylists(data.stylists || []);
-      } catch (err) {
-        console.error('Failed to load stylists:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchStylists();
-  }, []);
+  const [submitting, setSubmitting] = useState(false);
+  const [result, setResult] = useState<CheckInResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setSuccess(false);
+    setResult(null);
 
     if (!name.trim() || !phone.trim()) {
       setError('Please enter your name and phone number.');
@@ -57,189 +30,141 @@ export default function WalkInPage() {
     setSubmitting(true);
 
     try {
-      const preferredStylist = stylists.find((s) => s.id === preferredStylistId);
       const res = await fetch('/api/walk-in', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: name.trim(),
           phone: phone.trim(),
-          email: email.trim() || null,
-          heard_about: heardAbout || null,
-          preferred_stylist_id: preferredStylistId || null,
-          preferred_stylist_name: preferredStylist
-            ? `${preferredStylist.first_name} ${preferredStylist.last_name}`
-            : null,
         }),
       });
 
+      const data = await res.json();
+
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to submit walk-in request');
+        throw new Error(data.error || 'Sign-in failed');
       }
 
-      setSuccess(true);
+      setResult({ matched: !!data.matched, clientName: data.clientName });
       setName('');
       setPhone('');
-      setEmail('');
-      setHeardAbout('');
-      setPreferredStylistId('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit walk-in request');
+      setError(err instanceof Error ? err.message : 'Sign-in failed');
     } finally {
       setSubmitting(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* Header */}
+    <div className="min-h-screen bg-black text-white flex flex-col">
       <header className="bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <span className="text-black font-black">K</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-sm text-white">KELATIC</span>
-                <span className="text-[9px] tracking-widest text-amber-400">WALK-IN</span>
-              </div>
-            </Link>
-            <div className="flex items-center gap-4">
-              <PublicAuthLinks />
-              <Link href="/book" className="text-sm text-white/60 hover:text-amber-400 transition-colors">
-                Book appointment
-              </Link>
-            </div>
-          </div>
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+          <Link href="/" className="font-bold text-white">
+            KeLatic
+          </Link>
+          <PublicAuthLinks />
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-12">
-        <div className="grid lg:grid-cols-2 gap-8">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-amber-400">
-              Walk-in Check-In
-            </div>
-            <h1 className="text-3xl md:text-4xl font-bold mt-4">Check in for a walk-in visit</h1>
-            <p className="text-white/60 mt-3">
-              Tell us a bit about you and we&apos;ll get you into the queue. If you&apos;re a returning client, you can
-              sign in to save your info.
-            </p>
+      <main className="flex-1 max-w-md mx-auto w-full px-4 py-12">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold">Sign In</h1>
+          <p className="text-white/60 mt-3">
+            Let us know you&apos;re here — whether you have an appointment or just walked in.
+          </p>
+        </div>
 
-            <div className="mt-6 p-4 rounded-2xl border border-white/10 bg-zinc-900">
-              <p className="text-white/70 text-sm">Already a client?</p>
-              <Link
-                href="/login?type=client&redirect=/account"
-                className="inline-flex items-center mt-2 text-amber-400 hover:text-amber-300 text-sm font-medium"
+        <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6">
+          {result ? (
+            <div className="text-center space-y-4">
+              <div className="w-14 h-14 mx-auto rounded-full bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-2xl">
+                ✓
+              </div>
+              {result.matched ? (
+                <>
+                  <h2 className="text-xl font-semibold text-emerald-300">
+                    Welcome{result.clientName ? `, ${result.clientName}` : ''}!
+                  </h2>
+                  <p className="text-white/70 text-sm">
+                    We see your appointment — your stylist will be with you shortly.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <h2 className="text-xl font-semibold text-emerald-300">
+                    You&apos;re signed in
+                  </h2>
+                  <p className="text-white/70 text-sm">
+                    Have a seat — we&apos;ll be with you as soon as we can.
+                  </p>
+                </>
+              )}
+              <button
+                type="button"
+                onClick={() => setResult(null)}
+                className="text-amber-400 hover:text-amber-300 text-sm font-medium"
               >
-                Sign in to save your details →
-              </Link>
+                Sign in another person →
+              </button>
             </div>
-          </div>
-
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6">
-            <h2 className="text-xl font-semibold text-white mb-4">Walk-in Details</h2>
-
-            {success && (
-              <div className="mb-4 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3 text-emerald-300 text-sm">
-                Thanks! You&apos;re checked in. We&apos;ll call you shortly.
-              </div>
-            )}
-
-            {error && (
-              <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-rose-300 text-sm">
-                {error}
-              </div>
-            )}
-
+          ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
+              {error && (
+                <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-rose-300 text-sm">
+                  {error}
+                </div>
+              )}
+
               <div>
-                <label className="block text-sm text-white/70 mb-2">Name *</label>
+                <label htmlFor="checkin-name" className="block text-sm text-white/70 mb-2">
+                  Name
+                </label>
                 <input
+                  id="checkin-name"
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Full name"
+                  autoComplete="name"
                   className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
+                  required
                 />
               </div>
 
               <div>
-                <label className="block text-sm text-white/70 mb-2">Phone *</label>
+                <label htmlFor="checkin-phone" className="block text-sm text-white/70 mb-2">
+                  Phone
+                </label>
                 <input
+                  id="checkin-phone"
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="(555) 555-5555"
+                  autoComplete="tel"
                   className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
+                  required
                 />
-              </div>
-
-              <div>
-                <label className="block text-sm text-white/70 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm text-white/70 mb-2">How did you hear about us?</label>
-                <select
-                  title="How did you hear about us?"
-                  aria-label="How did you hear about us?"
-                  value={heardAbout}
-                  onChange={(e) => setHeardAbout(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
-                >
-                  <option value="">Select one</option>
-                  {HEARD_ABOUT_OPTIONS.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm text-white/70 mb-2">Preferred stylist</label>
-                <select
-                  title="Preferred stylist"
-                  aria-label="Preferred stylist"
-                  value={preferredStylistId}
-                  onChange={(e) => setPreferredStylistId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
-                >
-                  <option value="">Any available stylist</option>
-                  {loading ? (
-                    <option value="" disabled>
-                      Loading stylists...
-                    </option>
-                  ) : (
-                    stylists.map((stylist) => (
-                      <option key={stylist.id} value={stylist.id}>
-                        {stylist.first_name} {stylist.last_name}
-                      </option>
-                    ))
-                  )}
-                </select>
               </div>
 
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-60"
+                className="w-full py-4 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold text-lg hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-60"
               >
-                {submitting ? 'Submitting...' : 'Check in'}
+                {submitting ? 'Signing in…' : "I'm Here"}
               </button>
             </form>
-          </div>
+          )}
         </div>
+
+        <p className="text-center text-xs text-white/40 mt-6">
+          Booked online?{' '}
+          <Link href="/login?type=client&redirect=/account" className="text-amber-400 hover:text-amber-300">
+            Sign in to your account
+          </Link>{' '}
+          for receipts and history.
+        </p>
       </main>
 
       <Footer />
