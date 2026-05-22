@@ -16,6 +16,7 @@ export default function POSPage() {
   const [isWalkInOpen, setIsWalkInOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'ready' | 'completed'>('ready');
+  const [dateRange, setDateRange] = useState<'today' | 'yesterday' | 'past_7d' | 'past_30d'>('today');
   const [walkInRequests, setWalkInRequests] = useState<Array<{
     id: string;
     name: string;
@@ -35,14 +36,17 @@ export default function POSPage() {
   const [walkInLoading, setWalkInLoading] = useState(true);
 
   useEffect(() => {
-    fetchTodaysAppointments();
+    fetchAppointments();
+  }, [dateRange]);
+
+  useEffect(() => {
     fetchWalkInRequests();
   }, []);
 
-  async function fetchTodaysAppointments() {
+  async function fetchAppointments() {
     setLoading(true);
     try {
-      const res = await fetch('/api/pos/appointments');
+      const res = await fetch(`/api/pos/appointments?range=${dateRange}`);
       const data = await res.json();
       setAppointments(data.appointments || []);
     } catch (error) {
@@ -51,6 +55,10 @@ export default function POSPage() {
       setLoading(false);
     }
   }
+
+  // Backwards-compatible alias for the few places that still reference the
+  // old function name (walk-in completion callback below).
+  const fetchTodaysAppointments = fetchAppointments;
 
   async function fetchWalkInRequests() {
     setWalkInLoading(true);
@@ -229,14 +237,39 @@ export default function POSPage() {
           )}
         </div>
 
-        {/* Filter Tabs */}
+        {/* Date Range Pills */}
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-xs uppercase tracking-wider text-white/40 font-semibold">Date range</span>
+          {[
+            { key: 'today', label: 'Today' },
+            { key: 'yesterday', label: 'Yesterday' },
+            { key: 'past_7d', label: 'Past 7 days' },
+            { key: 'past_30d', label: 'Past 30 days' },
+          ].map((opt) => (
+            <button
+              type="button"
+              key={opt.key}
+              onClick={() => setDateRange(opt.key as typeof dateRange)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                dateRange === opt.key
+                  ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                  : 'bg-white/3 text-white/60 hover:text-white border border-white/10'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Status Filter Tabs */}
         <div className="flex gap-2 mb-6">
           {[
             { key: 'ready', label: 'Ready to Pay' },
             { key: 'completed', label: 'Completed' },
-            { key: 'all', label: 'All Today' },
+            { key: 'all', label: 'All' },
           ].map((tab) => (
             <button
+              type="button"
               key={tab.key}
               onClick={() => setFilter(tab.key as typeof filter)}
               className={`px-4 py-2 rounded-xl font-medium transition-all ${
@@ -317,29 +350,53 @@ export default function POSPage() {
                   </div>
 
                   {/* Price & Actions */}
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-lg font-bold text-amber-400">
-                        {formatCurrency((apt.final_price || apt.quoted_price) * 100)}
-                      </p>
-                      {apt.payments?.some((p) => p.is_deposit && p.status === 'paid') && (
-                        <p className="text-xs text-green-400 flex items-center gap-1">
-                          <CheckCircle className="w-3 h-3" />
-                          Deposit paid
-                        </p>
-                      )}
-                    </div>
+                  {(() => {
+                    const serviceTotal = Number(apt.final_price || apt.quoted_price || 0);
+                    const depositPaid = (apt.payments || [])
+                      .filter((p: any) => p.is_deposit && p.status === 'paid')
+                      .reduce((s: number, p: any) => s + Number(p.amount || 0), 0);
+                    const balanceDue = Math.max(serviceTotal - depositPaid, 0);
+                    const hasDeposit = depositPaid > 0;
+                    const inactive = apt.status === 'completed' || apt.status === 'cancelled';
+                    return (
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          {hasDeposit ? (
+                            <>
+                              <p className="text-xs text-white/40">
+                                Service total {formatCurrency(serviceTotal * 100)}
+                              </p>
+                              <p className="text-xs text-green-400 flex items-center gap-1">
+                                <CheckCircle className="w-3 h-3 shrink-0" />
+                                {formatCurrency(depositPaid * 100)} deposit paid
+                              </p>
+                              <p className="text-xl font-bold text-amber-400 mt-0.5">
+                                {formatCurrency(balanceDue * 100)}{' '}
+                                <span className="text-xs font-medium text-white/50">
+                                  due at checkout
+                                </span>
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-lg font-bold text-amber-400">
+                              {formatCurrency(serviceTotal * 100)}
+                            </p>
+                          )}
+                        </div>
 
-                    {apt.status !== 'completed' && apt.status !== 'cancelled' && (
-                      <button
-                        onClick={() => handleCheckout(apt)}
-                        className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2"
-                      >
-                        <CreditCard className="w-4 h-4" />
-                        Checkout
-                      </button>
-                    )}
-                  </div>
+                        {!inactive && (
+                          <button
+                            type="button"
+                            onClick={() => handleCheckout(apt)}
+                            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 shrink-0"
+                          >
+                            <CreditCard className="w-4 h-4" />
+                            {hasDeposit ? `Collect ${formatCurrency(balanceDue * 100)}` : 'Checkout'}
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             ))}
@@ -349,6 +406,7 @@ export default function POSPage() {
         {/* Walk-in Button */}
         <div className="fixed bottom-6 right-6">
           <button
+            type="button"
             onClick={() => {
               setConvertingRequestId(null);
               setWalkInPrefill(null);
