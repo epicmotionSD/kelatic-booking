@@ -8,6 +8,7 @@ import {
   Home,
   Layers,
   Calendar,
+  CalendarOff,
   CreditCard,
   Briefcase,
   Users,
@@ -56,6 +57,11 @@ const NAV_ITEMS = [
     label: 'Schedules',
     href: '/admin/stylists/schedule',
     icon: <Calendar className="w-5 h-5" />,
+  },
+  {
+    label: 'Closures',
+    href: '/admin/closures',
+    icon: <CalendarOff className="w-5 h-5" />,
   },
   {
     label: 'Clients',
