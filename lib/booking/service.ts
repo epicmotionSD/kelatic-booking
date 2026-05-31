@@ -129,15 +129,19 @@ export async function getAvailability({
     }
     
     const { data: existingAppointments } = await appointmentsQuery;
-      
-    // Get time-off
+
+    // Time-off: this stylist's own entries plus any business-wide closures
+    // (stylist_id IS NULL means "shop closed" — applies to every stylist).
+    const stylistOrBusinessClosure = businessId
+      ? `stylist_id.eq.${stylist_id},and(stylist_id.is.null,business_id.eq.${businessId})`
+      : `stylist_id.eq.${stylist_id}`;
     const { data: timeOff } = await supabase
       .from('stylist_time_off')
       .select('start_datetime, end_datetime')
-      .eq('stylist_id', stylist_id)
+      .or(stylistOrBusinessClosure)
       .lte('start_datetime', endOfDay)
       .gte('end_datetime', startOfDay);
-    
+
     // Generate time slots for each schedule block
     for (const schedule of schedules) {
       const scheduleStart = parseTime(schedule.start_time);
@@ -238,11 +242,15 @@ export async function getAvailability({
     
     const { data: existingAppointments } = await appointmentsQuery;
       
-    // Get time-off
+    // Time-off: this stylist's own entries plus any business-wide closures
+    // (stylist_id IS NULL applies to every stylist in the business).
+    const stylistOrBusinessClosure = businessId
+      ? `stylist_id.eq.${ss.stylist_id},and(stylist_id.is.null,business_id.eq.${businessId})`
+      : `stylist_id.eq.${ss.stylist_id}`;
     const { data: timeOff } = await supabase
       .from('stylist_time_off')
       .select('start_datetime, end_datetime')
-      .eq('stylist_id', ss.stylist_id)
+      .or(stylistOrBusinessClosure)
       .lte('start_datetime', endOfDay)
       .gte('end_datetime', startOfDay);
     
