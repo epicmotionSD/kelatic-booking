@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { stripe, constructWebhookEvent } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/client';
+import { sendConfirmationByAppointmentId } from '@/lib/notifications/service';
 import type Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -37,12 +39,22 @@ export async function POST(request: NextRequest) {
           })
           .eq('stripe_payment_intent_id', paymentIntent.id);
 
-        // If this completes a deposit, confirm the appointment
+        // If this completes a deposit, confirm the appointment and send the
+        // booking confirmation email/SMS — the booking POST skips the immediate
+        // send for pending bookings so we don't tell customers "you're booked"
+        // before they've actually paid.
         if (paymentIntent.metadata?.is_deposit === 'true') {
+          const appointmentId = paymentIntent.metadata.appointment_id;
           await supabase
             .from('appointments')
             .update({ status: 'confirmed' })
-            .eq('id', paymentIntent.metadata.appointment_id);
+            .eq('id', appointmentId);
+
+          if (appointmentId) {
+            after(async () => {
+              await sendConfirmationByAppointmentId(appointmentId, 'stripe_webhook');
+            });
+          }
         }
 
         console.log(`Payment succeeded: ${paymentIntent.id}`);

@@ -9,6 +9,7 @@ import {
   sendEmailMessage,
   sendSmsMessage,
 } from '@/lib/notifications/providers';
+import { createAdminClient } from '@/lib/supabase/server';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
 
@@ -1020,5 +1021,140 @@ export async function sendNewsletterEmail(
   } catch (error) {
     console.error('[Email] Failed to send newsletter:', error);
     return false;
+  }
+}
+
+// ─── Send confirmation by appointment id ─────────────────────────────────────
+// Used by both the booking POST handler (when no deposit is required) and the
+// Stripe webhook (when a deposit lands and the appointment flips confirmed).
+// Logs the result to notification_logs and de-dupes — if a confirmation has
+// already been logged for this appointment, this is a no-op.
+export async function sendConfirmationByAppointmentId(
+  appointmentId: string,
+  source: 'booking_api' | 'stripe_webhook'
+): Promise<void> {
+  try {
+    const admin = createAdminClient();
+
+    // De-dupe: don't send a confirmation twice. The booking-api path skips
+    // sending for pending bookings, so the webhook is the source for those.
+    // But if anything ever calls both, this guards against duplicates.
+    const { data: existingLog } = await admin
+      .from('notification_logs')
+      .select('id')
+      .eq('appointment_id', appointmentId)
+      .eq('notification_type', 'confirmation')
+      .maybeSingle();
+    if (existingLog) {
+      console.log(`[${source}] Confirmation already sent for ${appointmentId}, skipping`);
+      return;
+    }
+
+    const { data: appointment, error } = await admin
+      .from('appointments')
+      .select(`
+        id,
+        status,
+        start_time,
+        business_id,
+        is_walk_in,
+        walk_in_name,
+        walk_in_email,
+        walk_in_phone,
+        client:profiles!appointments_client_id_fkey (
+          id, first_name, last_name, email, phone
+        ),
+        stylist:profiles!appointments_stylist_id_fkey (
+          id, first_name, last_name, email, phone
+        ),
+        service:services (
+          id, name, duration
+        ),
+        appointment_addons (
+          service:services (name)
+        )
+      `)
+      .eq('id', appointmentId)
+      .single();
+
+    if (error || !appointment) {
+      console.error(`[${source}] Appointment not found for notification:`, { error, appointmentId });
+      return;
+    }
+
+    const client = Array.isArray(appointment.client) ? appointment.client[0] : appointment.client;
+    const stylist = Array.isArray(appointment.stylist) ? appointment.stylist[0] : appointment.stylist;
+    const service = Array.isArray(appointment.service) ? appointment.service[0] : appointment.service;
+
+    const clientName = client
+      ? `${client.first_name} ${client.last_name}`
+      : appointment.walk_in_name || 'Guest';
+    const clientEmail = client?.email || appointment.walk_in_email;
+    const clientPhone = client?.phone || appointment.walk_in_phone;
+
+    if (!clientEmail) {
+      console.error(`[${source}] No client email for ${appointmentId}, skipping`);
+      return;
+    }
+
+    const { data: businessRow } = await admin
+      .from('businesses')
+      .select('*')
+      .eq('id', appointment.business_id)
+      .single();
+    if (!businessRow) {
+      console.error(`[${source}] Business not found for notification`);
+      return;
+    }
+
+    const { data: settingsRow } = await admin
+      .from('business_settings')
+      .select('*')
+      .eq('business_id', appointment.business_id)
+      .maybeSingle();
+
+    const timezone = businessRow?.timezone || 'America/Chicago';
+    const startTime = new Date(appointment.start_time);
+    const appointmentDate = startTime.toLocaleDateString('en-CA', { timeZone: timezone });
+    const appointmentTime = startTime.toLocaleTimeString('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+      timeZone: timezone,
+    });
+
+    const appointmentDetails: AppointmentDetails = {
+      id: appointment.id,
+      status: appointment.status,
+      client_name: clientName,
+      client_email: clientEmail,
+      client_phone: clientPhone || undefined,
+      stylist_name: `${stylist?.first_name ?? ''} ${stylist?.last_name ?? ''}`.trim(),
+      service_name: service?.name || 'Service',
+      service_duration: service?.duration || 60,
+      appointment_date: appointmentDate,
+      appointment_time: appointmentTime,
+      add_ons: appointment.appointment_addons?.map((a: any) => a.service?.name).filter(Boolean),
+    };
+
+    const ctx = { business: businessRow, settings: settingsRow || null };
+
+    const result = await sendBookingConfirmation(appointmentDetails, ctx as any);
+    console.log(`[${source}] Confirmation result:`, result);
+
+    if (stylist?.email) {
+      await notifyStylistNewBooking(stylist.email, stylist.phone, appointmentDetails, ctx as any);
+    }
+
+    await admin.from('notification_logs').insert({
+      appointment_id: appointmentId,
+      notification_type: 'confirmation',
+      email_sent: result?.email || false,
+      sms_sent: result?.sms || false,
+      recipient_email: clientEmail,
+      recipient_phone: clientPhone,
+    });
+  } catch (err) {
+    console.error(`[${source}] Failed to send confirmation:`, err);
   }
 }
