@@ -14,7 +14,6 @@ import {
   Users,
   UserCheck,
   BarChart3,
-  TrendingUp,
   Settings,
   HelpCircle,
   Menu,
@@ -72,11 +71,6 @@ const NAV_ITEMS = [
     label: 'Reports',
     href: '/admin/reports',
     icon: <BarChart3 className="w-5 h-5" />,
-  },
-  {
-    label: 'Analytics',
-    href: '/admin/analytics',
-    icon: <TrendingUp className="w-5 h-5" />,
   },
   {
     label: 'Settings',
@@ -141,7 +135,7 @@ export default function AdminLayout({
         </Link>
         <button
           onClick={handleSidebarToggle}
-          aria-expanded={sidebarOpen}
+          aria-expanded={sidebarOpen ? 'true' : 'false'}
           aria-controls="sidebar-navigation"
           aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
           className="p-2 rounded-md text-white/60 hover:bg-white/10 hover:text-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"

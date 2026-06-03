@@ -126,10 +126,13 @@ export default function ClientsPage() {
     .filter((client) => {
       if (!search) return true;
       const searchLower = search.toLowerCase();
+      const first = client.first_name?.toLowerCase() ?? '';
+      const last = client.last_name?.toLowerCase() ?? '';
+      const email = client.email?.toLowerCase() ?? '';
       return (
-        client.first_name.toLowerCase().includes(searchLower) ||
-        client.last_name.toLowerCase().includes(searchLower) ||
-        client.email.toLowerCase().includes(searchLower) ||
+        first.includes(searchLower) ||
+        last.includes(searchLower) ||
+        email.includes(searchLower) ||
         client.phone?.includes(search)
       );
     })
