@@ -217,3 +217,10 @@ body {
 .x3o-term .font-playfair {
   font-family: inherit;
 }
+
+/* Keep page titles from dominating the phone viewport (legacy pages use
+   text-3xl/4xl). Commerce pages already use <= 2xl so they're unaffected. */
+@media (max-width: 640px) {
+  .x3o-term h1 { font-size: 1.5rem; line-height: 2rem; }
+  .x3o-term h2 { font-size: 1.25rem; line-height: 1.75rem; }
+}
