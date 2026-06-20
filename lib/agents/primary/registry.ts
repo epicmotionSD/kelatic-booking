@@ -11,6 +11,7 @@
 
 import type { PrimaryAgent, PrimaryAgentId, AgentModule } from './types';
 import { contentModuleManifest } from '@/lib/agents/modules/content';
+import { loyaltyModuleManifest } from '@/lib/agents/modules/loyalty';
 
 // Content Studio module reuses the manifest exported by the content module,
 // adapted to the mutable AgentModule shape.
@@ -21,6 +22,15 @@ const contentModule: AgentModule = {
   icon: contentModuleManifest.icon,
   adminPath: contentModuleManifest.adminPath,
   tools: contentModuleManifest.tools.map((t) => ({ ...t })),
+};
+
+const loyaltyModule: AgentModule = {
+  id: loyaltyModuleManifest.id,
+  name: loyaltyModuleManifest.name,
+  description: loyaltyModuleManifest.description,
+  icon: loyaltyModuleManifest.icon,
+  adminPath: loyaltyModuleManifest.adminPath,
+  tools: loyaltyModuleManifest.tools.map((t) => ({ ...t })),
 };
 
 export const PRIMARY_AGENTS: PrimaryAgent[] = [
@@ -112,6 +122,7 @@ export const PRIMARY_AGENTS: PrimaryAgent[] = [
           { id: 'reminders.preferences', name: 'Notification preferences', endpoint: '/api/notifications/preferences', method: 'GET' },
         ],
       },
+      loyaltyModule,
     ],
   },
 ];

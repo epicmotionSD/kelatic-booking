@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { after } from 'next/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
+import { awardPointsForEvent } from '@/lib/agents/modules/loyalty';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,12 +19,12 @@ export async function POST(request: NextRequest) {
     const business = await requireBusiness();
     const business_id = business.id;
 
-    // Get the appointment with client info
+    // Get the appointment with client info (incl. contact for loyalty earn)
     const { data: appointment } = await supabase
       .from('appointments')
       .select(`
         *,
-        client:profiles!appointments_client_id_fkey (id),
+        client:profiles!appointments_client_id_fkey (id, email, phone, first_name, last_name),
         service:services (id, name)
       `)
       .eq('id', appointmentId)
@@ -52,6 +54,32 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Loyalty earn for the completed appointment. Runs after the response
+    // so a slow earn / notification can't stall the POS flow. Idempotent on
+    // appointment_id, so re-completing the same appointment is a no-op.
+    after(async () => {
+      try {
+        const admin = createAdminClient();
+        const profile = Array.isArray(appointment.client)
+          ? appointment.client[0]
+          : appointment.client;
+        await awardPointsForEvent(admin, {
+          businessId: business_id,
+          trigger: 'appointment.completed',
+          appointmentId,
+          customerEmail: profile?.email ?? undefined,
+          customerPhone: profile?.phone ?? appointment.walk_in_phone ?? undefined,
+          customerName:
+            [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') ||
+            appointment.walk_in_name ||
+            undefined,
+          metadata: { fired_on: 'mark_complete' },
+        });
+      } catch (err) {
+        console.error('Loyalty earn (appointment.completed) failed:', err);
+      }
+    });
 
     // Update client's last visit date
     if (appointment.client?.id) {

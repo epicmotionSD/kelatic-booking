@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { formatCurrency } from '@/lib/currency';
-import { ArrowLeft, Loader2 } from 'lucide-react';
+import { ArrowLeft, Gem, Loader2 } from 'lucide-react';
 import { readCart, cartSubtotal, type CartLine } from '@/lib/commerce/cart';
+import type { EligibleReward, RedemptionPreview } from '@/lib/agents/modules/loyalty';
 
 let stripePromise: Promise<any> | null = null;
 const getStripe = () => {
@@ -28,6 +29,9 @@ export default function CheckoutPage() {
   const [orderId, setOrderId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<RedemptionPreview | null>(null);
+  const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
+  const previewSeq = useRef(0);
 
   useEffect(() => {
     setCart(readCart());
@@ -35,7 +39,45 @@ export default function CheckoutPage() {
 
   const subtotal = useMemo(() => cartSubtotal(cart), [cart]);
   const tipCents = Math.max(0, Math.round((parseFloat(tip || '0') || 0) * 100));
-  const total = subtotal + tipCents;
+  const selectedReward: EligibleReward | undefined = preview?.eligibleRewards.find(
+    (r) => r.id === selectedRewardId
+  );
+  const discountCents = selectedReward?.discountPreviewCents ?? 0;
+  const total = Math.max(0, subtotal - discountCents) + tipCents;
+
+  // Look up the customer's loyalty balance + eligible rewards once we have
+  // an email and a subtotal. Debounced so typing doesn't spam the endpoint.
+  useEffect(() => {
+    const trimmed = email.trim();
+    if (!trimmed || subtotal <= 0 || clientSecret) {
+      setPreview(null);
+      return;
+    }
+    const seq = ++previewSeq.current;
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch('/api/loyalty/redemption-preview', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: trimmed, subtotalCents: subtotal }),
+        });
+        if (!res.ok || seq !== previewSeq.current) return;
+        const data = (await res.json()) as RedemptionPreview;
+        if (seq !== previewSeq.current) return;
+        setPreview(data);
+        // Drop the selection if it's no longer eligible
+        if (
+          selectedRewardId &&
+          !data.eligibleRewards.find((r) => r.id === selectedRewardId)
+        ) {
+          setSelectedRewardId(null);
+        }
+      } catch {
+        // best-effort
+      }
+    }, 400);
+    return () => clearTimeout(t);
+  }, [email, subtotal, clientSecret, selectedRewardId]);
 
   async function startPayment() {
     setError(null);
@@ -53,6 +95,7 @@ export default function CheckoutPage() {
           customer: { name: name.trim(), email: email.trim(), phone: phone.trim() },
           tip_cents: tipCents,
           notes: notes.trim() || undefined,
+          loyalty: selectedRewardId ? { rewardId: selectedRewardId } : undefined,
         }),
       });
       const data = await res.json();
@@ -93,6 +136,15 @@ export default function CheckoutPage() {
               <Field label="Name *"><input className={inp} value={name} onChange={(e) => setName(e.target.value)} /></Field>
               <Field label="Email *"><input type="email" className={inp} value={email} onChange={(e) => setEmail(e.target.value)} /></Field>
               <Field label="Phone"><input className={inp} value={phone} onChange={(e) => setPhone(e.target.value)} /></Field>
+
+              {preview?.customerView && preview.eligibleRewards.length > 0 && (
+                <RewardsPicker
+                  preview={preview}
+                  selectedId={selectedRewardId}
+                  onSelect={setSelectedRewardId}
+                />
+              )}
+
               <Field label="Order notes"><textarea rows={2} className={inp} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Allergies, pickup time, etc." /></Field>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-[#1f3d2b]/70">Add a tip</span>
@@ -137,6 +189,15 @@ export default function CheckoutPage() {
             </ul>
             <div className="border-t border-[#1f3d2b]/10 pt-3 space-y-1 text-sm">
               <div className="flex justify-between"><span className="text-[#1f3d2b]/60">Subtotal</span><span>{formatCurrency(subtotal)}</span></div>
+              {discountCents > 0 && (
+                <div className="flex justify-between text-[#3f7d4f]">
+                  <span className="inline-flex items-center gap-1">
+                    <Gem className="w-3.5 h-3.5" />
+                    {selectedReward?.name ?? 'Reward'}
+                  </span>
+                  <span>-{formatCurrency(discountCents)}</span>
+                </div>
+              )}
               {tipCents > 0 && <div className="flex justify-between"><span className="text-[#1f3d2b]/60">Tip</span><span>{formatCurrency(tipCents)}</span></div>}
               <div className="flex justify-between font-bold pt-1"><span>Total</span><span>{formatCurrency(total)}</span></div>
             </div>
@@ -192,6 +253,69 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
     <div>
       <label className="block text-sm font-medium text-[#1f3d2b]/80 mb-1">{label}</label>
       {children}
+    </div>
+  );
+}
+
+function RewardsPicker({
+  preview,
+  selectedId,
+  onSelect,
+}: {
+  preview: RedemptionPreview;
+  selectedId: string | null;
+  onSelect: (id: string | null) => void;
+}) {
+  const view = preview.customerView!;
+  return (
+    <div className="rounded-xl border border-[#3f7d4f]/30 bg-[#eef4ec] p-3">
+      <div className="flex items-center gap-2 mb-2">
+        <Gem className="w-4 h-4 text-[#3f7d4f]" />
+        <span className="text-sm font-semibold text-[#1f3d2b]">
+          {view.balance} {view.currencyLabel}
+        </span>
+        {view.currentTier && (
+          <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full bg-[#3f7d4f]/15 text-[#3f7d4f]">
+            {view.currentTier}
+          </span>
+        )}
+        <span className="text-xs text-[#1f3d2b]/60 ml-auto">Use a reward?</span>
+      </div>
+      <div className="space-y-1.5">
+        {preview.eligibleRewards.map((r) => {
+          const selected = r.id === selectedId;
+          const disabled = r.discountPreviewCents <= 0;
+          return (
+            <button
+              key={r.id}
+              type="button"
+              onClick={() => onSelect(selected ? null : r.id)}
+              disabled={disabled}
+              className={`w-full text-left px-3 py-2 rounded-lg border text-sm transition-colors ${
+                selected
+                  ? 'border-[#3f7d4f] bg-white'
+                  : 'border-[#1f3d2b]/10 bg-white hover:border-[#3f7d4f]/50'
+              } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="font-medium">{r.name}</span>
+                <span className="text-xs text-[#1f3d2b]/60 data-mono shrink-0">
+                  {r.costPoints} {view.currencyLabel}
+                </span>
+              </div>
+              <div className="text-xs text-[#3f7d4f] mt-0.5">
+                {r.discountPreviewCents > 0
+                  ? `-${formatCurrency(r.discountPreviewCents)} off this order`
+                  : r.reason === 'below_min_spend'
+                  ? 'Add more to qualify'
+                  : r.reason === 'unsupported_at_checkout'
+                  ? 'In-store only'
+                  : 'Not applicable to this cart'}
+              </div>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

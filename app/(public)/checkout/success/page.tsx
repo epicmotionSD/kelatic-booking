@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, Leaf } from 'lucide-react';
 import { clearCart } from '@/lib/commerce/cart';
+import { LoyaltyWidget } from '@/components/loyalty/LoyaltyWidget';
 
 function SuccessInner() {
   const params = useSearchParams();
@@ -23,8 +24,9 @@ function SuccessInner() {
   const failed = redirectStatus === 'failed';
 
   return (
-    <div className="min-h-screen bg-[#f7f4ec] text-[#1f3d2b] flex items-center justify-center px-5">
-      <div className="bg-white rounded-2xl shadow-sm p-8 max-w-md w-full text-center">
+    <div className="min-h-screen bg-[#f7f4ec] text-[#1f3d2b] flex items-center justify-center px-5 py-8">
+      <div className="max-w-md w-full space-y-4">
+      <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
         {failed ? (
           <>
             <h1 className="text-2xl font-bold mb-2">Payment didn&apos;t go through</h1>
@@ -51,6 +53,10 @@ function SuccessInner() {
             </Link>
           </>
         )}
+      </div>
+      {!failed && orderId && (
+        <LoyaltyWidget orderId={orderId} variant="light" />
+      )}
       </div>
     </div>
   );

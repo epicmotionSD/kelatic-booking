@@ -3,6 +3,7 @@ import { after } from 'next/server';
 import { stripe, constructWebhookEvent } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/client';
 import { sendConfirmationByAppointmentId } from '@/lib/notifications/service';
+import { awardPointsForEvent, redeemReward } from '@/lib/agents/modules/loyalty';
 import type Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -65,6 +66,66 @@ export async function POST(request: NextRequest) {
           }
 
           console.log(`Order paid: ${orderId}`);
+
+          // Loyalty earn — runs after the response is sent so a slow earn
+          // can't stall the webhook ack. Idempotent on order_id.
+          after(async () => {
+            try {
+              const { data: order } = await supabase
+                .from('orders')
+                .select('business_id, customer_email, customer_phone, customer_name, subtotal_cents')
+                .eq('id', orderId)
+                .single();
+              if (!order) return;
+              await awardPointsForEvent(supabase, {
+                businessId: order.business_id,
+                trigger: 'order.paid',
+                orderId,
+                amountCents: order.subtotal_cents ?? 0,
+                customerEmail: order.customer_email ?? undefined,
+                customerPhone: order.customer_phone ?? undefined,
+                customerName: order.customer_name ?? undefined,
+              });
+            } catch (err) {
+              console.error('Loyalty earn failed (order):', err);
+            }
+          });
+
+          // Loyalty redemption — only if checkout attached a reward to
+          // the PaymentIntent metadata. The actual account debit happens
+          // here, not at checkout time, so a failed/cancelled payment
+          // never deducts points. redeemReward is idempotent via the
+          // (account_id, reason='redeem', order_id) shape -- a webhook
+          // replay won't double-redeem.
+          const rewardId = paymentIntent.metadata?.loyalty_reward_id;
+          const loyaltyClientId = paymentIntent.metadata?.loyalty_client_id;
+          if (rewardId && loyaltyClientId) {
+            after(async () => {
+              try {
+                const { data: order } = await supabase
+                  .from('orders')
+                  .select('business_id')
+                  .eq('id', orderId)
+                  .single();
+                if (!order) return;
+                const { data: existing } = await supabase
+                  .from('loyalty_transactions')
+                  .select('id')
+                  .eq('order_id', orderId)
+                  .eq('reason', 'redeem')
+                  .maybeSingle();
+                if (existing) return;
+                await redeemReward(supabase, {
+                  businessId: order.business_id,
+                  clientId: loyaltyClientId,
+                  rewardId,
+                  orderId,
+                });
+              } catch (err) {
+                console.error('Loyalty redeem failed (order):', err);
+              }
+            });
+          }
         }
 
         // If this completes a deposit, confirm the appointment and send the
@@ -82,6 +143,8 @@ export async function POST(request: NextRequest) {
             after(async () => {
               await sendConfirmationByAppointmentId(appointmentId, 'stripe_webhook');
             });
+            // Note: loyalty earn for appointments fires on actual completion,
+            // not on deposit-paid -- see app/api/pos/complete-appointment.
           }
         }
 

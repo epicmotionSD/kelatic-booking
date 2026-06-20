@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
 import { stripe } from '@/lib/stripe';
+import {
+  computeRewardDiscount,
+  getProgramForBusiness,
+} from '@/lib/agents/modules/loyalty';
 
 interface CartLine { product_id: string; quantity: number }
+interface LoyaltyApply { rewardId: string }
 
 // POST /api/shop/checkout — create an order + Stripe PaymentIntent (online card)
 // body: { items: CartLine[], customer: {name,email,phone}, tip_cents?, notes? }
@@ -63,7 +68,74 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No valid items in cart' }, { status: 400 });
   }
 
-  const total = subtotal + tipCents;
+  // ─────────────────────────────────────────────────────────────────────
+  // Loyalty redemption (optional). Server validates the reward, recomputes
+  // the discount, and stamps the PaymentIntent metadata. The actual account
+  // debit + ledger row happen in the Stripe webhook after payment succeeds.
+  // ─────────────────────────────────────────────────────────────────────
+  const apply = body.loyalty as LoyaltyApply | undefined;
+  let discountCents = 0;
+  let loyaltyClientId: string | null = null;
+  let loyaltyRewardId: string | null = null;
+
+  if (apply?.rewardId && customer.email) {
+    const program = await getProgramForBusiness(supabase, businessId);
+    if (program) {
+      const { data: rewardRow } = await supabase
+        .from('loyalty_rewards')
+        .select(
+          'id, name, cost_points, reward_type, service_id, product_id, config, tier_required, is_active, sort_order, description, program_id'
+        )
+        .eq('id', apply.rewardId)
+        .eq('program_id', program.id)
+        .eq('is_active', true)
+        .maybeSingle();
+      const { data: clientRow } = await supabase
+        .from('clients')
+        .select('id')
+        .eq('business_id', businessId)
+        .eq('email', String(customer.email).trim().toLowerCase())
+        .maybeSingle();
+      const { data: account } = clientRow
+        ? await supabase
+            .from('loyalty_accounts')
+            .select('id, balance, current_tier')
+            .eq('program_id', program.id)
+            .eq('client_id', clientRow.id)
+            .maybeSingle()
+        : { data: null };
+
+      if (rewardRow && clientRow && account) {
+        const eligible =
+          account.balance >= rewardRow.cost_points &&
+          (!rewardRow.tier_required ||
+            rewardRow.tier_required === account.current_tier);
+
+        if (eligible) {
+          const discount = computeRewardDiscount(
+            {
+              rewardType: rewardRow.reward_type as
+                | 'percent_off'
+                | 'amount_off'
+                | 'free_product'
+                | 'free_service'
+                | 'free_addon',
+              config: (rewardRow.config as Record<string, unknown>) ?? {},
+              isActive: rewardRow.is_active,
+            },
+            subtotal
+          );
+          if (discount.discountCents > 0) {
+            discountCents = discount.discountCents;
+            loyaltyClientId = clientRow.id;
+            loyaltyRewardId = rewardRow.id;
+          }
+        }
+      }
+    }
+  }
+
+  const total = Math.max(0, subtotal - discountCents) + tipCents;
 
   // Create the order (pending)
   const { data: order, error: orderErr } = await supabase
@@ -75,6 +147,7 @@ export async function POST(request: NextRequest) {
       customer_phone: customer.phone || null,
       subtotal_cents: subtotal,
       tip_cents: tipCents,
+      discount_cents: discountCents,
       total_cents: total,
       status: 'pending',
       fulfillment_type: 'pickup',
@@ -92,16 +165,23 @@ export async function POST(request: NextRequest) {
 
   // Create the PaymentIntent (online card; metadata.order_id drives fulfillment)
   try {
+    const piMetadata: Record<string, string> = {
+      order_id: order.id,
+      business_id: businessId,
+      order_type: 'product',
+    };
+    if (loyaltyRewardId && loyaltyClientId && discountCents > 0) {
+      piMetadata.loyalty_reward_id = loyaltyRewardId;
+      piMetadata.loyalty_client_id = loyaltyClientId;
+      piMetadata.loyalty_discount_cents = String(discountCents);
+    }
+
     const pi = await stripe.paymentIntents.create({
       amount: total,
       currency: 'usd',
       automatic_payment_methods: { enabled: true },
       receipt_email: customer.email,
-      metadata: {
-        order_id: order.id,
-        business_id: businessId,
-        order_type: 'product',
-      },
+      metadata: piMetadata,
     });
 
     await supabase
@@ -113,6 +193,7 @@ export async function POST(request: NextRequest) {
       orderId: order.id,
       clientSecret: pi.client_secret,
       amount: total,
+      discountCents,
     });
   } catch (err) {
     console.error('Checkout PaymentIntent error:', err);

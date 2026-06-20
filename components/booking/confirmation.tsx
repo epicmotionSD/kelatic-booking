@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
 import { formatDateTime } from '@/lib/date-utils';
 import { trackBookingConversion } from '@/lib/google-ads';
+import { LoyaltyWidget } from '@/components/loyalty/LoyaltyWidget';
 import type { BookingData } from '@/app/(public)/book/page';
 
 interface ConfirmationProps {
@@ -160,6 +161,16 @@ export function Confirmation({ bookingData }: ConfirmationProps) {
           </div>
         </div>
       </div>
+
+      {/* Loyalty */}
+      {bookingData.appointmentId && (
+        <div className="mb-6">
+          <LoyaltyWidget
+            appointmentId={bookingData.appointmentId}
+            variant="dark"
+          />
+        </div>
+      )}
 
       {/* Actions */}
       <div className="space-y-3">
