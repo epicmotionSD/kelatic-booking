@@ -110,7 +110,12 @@ export async function POST(request: NextRequest) {
   // ---- CARD (Stripe Terminal reader) ----
   try {
     const readers = await listTerminalReaders();
-    const reader = readers.data?.[0];
+    // Pin to a specific shared reader when configured (same physical reader
+    // across tenants); otherwise use the first online reader on the account.
+    const preferredId = process.env.STRIPE_TERMINAL_READER_ID;
+    const reader = preferredId
+      ? readers.data?.find((r) => r.id === preferredId) ?? readers.data?.[0]
+      : readers.data?.[0];
     if (!reader) {
       // Roll back order so it doesn't linger as pending
       await supabase.from('orders').update({ status: 'cancelled' }).eq('id', order.id);
