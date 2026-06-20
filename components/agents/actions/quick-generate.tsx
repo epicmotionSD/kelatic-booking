@@ -23,6 +23,8 @@ const CAMPAIGN_TYPES: { value: string; label: string }[] = [
 
 const TONES = ['professional', 'casual', 'playful', 'inspiring'];
 
+const inp = 'w-full border border-border bg-background text-foreground rounded px-2 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-[#00ffb2]';
+
 export default function QuickGenerate({
   action,
   businessId,
@@ -69,7 +71,6 @@ export default function QuickGenerate({
         setError(data.error || 'Generation failed.');
         return;
       }
-      // content route returns { content }, marketing returns { content }
       const text =
         typeof data.content === 'string'
           ? data.content
@@ -90,36 +91,28 @@ export default function QuickGenerate({
   }
 
   return (
-    <div className="mt-3 bg-gray-50 border border-gray-200 rounded-xl p-4">
+    <div className="mt-3 bg-muted/40 border border-border rounded p-3">
       {needsBusiness ? (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           Connect a business to run campaign generation. Content generation works without one.
         </p>
       ) : (
         <>
           <div className="grid sm:grid-cols-3 gap-2 mb-2">
-            <select
-              value={type}
-              onChange={(e) => setType(e.target.value)}
-              className="border border-gray-300 rounded-lg px-2 py-2 text-sm bg-white"
-            >
+            <select value={type} onChange={(e) => setType(e.target.value)} className={inp}>
               {types.map((t) => (
-                <option key={t.value} value={t.value}>{t.label}</option>
+                <option key={t.value} value={t.value} className="bg-background">{t.label}</option>
               ))}
             </select>
-            <select
-              value={tone}
-              onChange={(e) => setTone(e.target.value)}
-              className="border border-gray-300 rounded-lg px-2 py-2 text-sm bg-white capitalize"
-            >
+            <select value={tone} onChange={(e) => setTone(e.target.value)} className={`${inp} capitalize`}>
               {TONES.map((t) => (
-                <option key={t} value={t} className="capitalize">{t}</option>
+                <option key={t} value={t} className="bg-background capitalize">{t}</option>
               ))}
             </select>
             <button
               onClick={run}
               disabled={loading}
-              className="inline-flex items-center justify-center gap-2 text-white text-sm font-medium rounded-lg px-3 py-2 disabled:opacity-50"
+              className="inline-flex items-center justify-center gap-2 text-black text-sm font-medium rounded px-3 py-2 disabled:opacity-50"
               style={{ backgroundColor: color }}
             >
               {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
@@ -130,22 +123,22 @@ export default function QuickGenerate({
             value={topic}
             onChange={(e) => setTopic(e.target.value)}
             placeholder={isCampaign ? 'Campaign topic — e.g. Wednesday retwist special' : 'Topic — e.g. benefits of regular retwists'}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+            className={inp}
             onKeyDown={(e) => { if (e.key === 'Enter') run(); }}
           />
 
-          {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+          {error && <p className="text-sm text-[#ef4444] mt-2">{error}</p>}
 
           {result && (
             <div className="mt-3">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-xs uppercase tracking-wide text-gray-400">Result</span>
-                <button onClick={copy} className="inline-flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700">
+                <span className="term-label text-muted-foreground">Result</span>
+                <button onClick={copy} className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground">
                   {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                   {copied ? 'Copied' : 'Copy'}
                 </button>
               </div>
-              <pre className="whitespace-pre-wrap text-sm text-gray-800 bg-white border border-gray-200 rounded-lg p-3 max-h-72 overflow-auto">
+              <pre className="whitespace-pre-wrap text-sm text-foreground/90 bg-background border border-border rounded p-3 max-h-72 overflow-auto">
                 {result}
               </pre>
             </div>

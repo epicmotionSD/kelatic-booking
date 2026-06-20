@@ -23,6 +23,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import { SkipLink, useAriaLiveRegion } from '@/lib/accessibility';
+import { Clock } from '@/components/terminal';
 
 type NavItem = {
   label: string;
@@ -178,57 +179,49 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Skip Links */}
+    <div className="x3o-term min-h-screen">
       <SkipLink href="#main-content">Skip to main content</SkipLink>
       <SkipLink href="#navigation">Skip to navigation</SkipLink>
-      
-      {/* Mobile menu button */}
-      <div className="lg:hidden flex items-center justify-between p-4 bg-zinc-900 border-b border-white/10">
-        <Link href="/admin" className="flex items-center">
-          <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
-            {brandLabel}
-          </h1>
+
+      {/* Mobile bar */}
+      <div className="lg:hidden flex items-center justify-between px-4 h-12 bg-card border-b border-border">
+        <Link href="/admin" className="flex items-center gap-2">
+          <span className="term-dot text-[#00ffb2]" />
+          <span className="font-bold tracking-tight">x3o<span className="text-[#00ffb2]">.ai</span></span>
         </Link>
         <button
           onClick={handleSidebarToggle}
           aria-expanded={sidebarOpen ? 'true' : 'false'}
           aria-controls="sidebar-navigation"
           aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          className="p-2 rounded-md text-white/60 hover:bg-white/10 hover:text-amber-400 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-black"
+          className="p-2 rounded text-muted-foreground hover:text-foreground"
         >
-          {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
         </button>
       </div>
 
-      {/* Mobile sidebar overlay */}
+      {/* Mobile overlay */}
       {sidebarOpen && isMobile && (
-        <div
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-          aria-hidden="true"
-        />
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 lg:hidden" onClick={() => setSidebarOpen(false)} aria-hidden="true" />
       )}
 
       {/* Sidebar */}
       <aside
         id="sidebar-navigation"
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-zinc-900 border-r border-white/10 transform transition-transform lg:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-60 bg-card border-r border-border flex flex-col transform transition-transform lg:translate-x-0 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         aria-label="Main navigation"
       >
-        {/* Logo */}
-        <div className="h-16 flex items-center px-6 border-b border-white/10">
-          <Link href="/admin" className="flex items-center focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 rounded-md">
-            <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
-              {brandLabel}
-            </h1>
-          </Link>
+        {/* Brand */}
+        <div className="h-12 shrink-0 flex items-center gap-2 px-4 border-b border-border">
+          <span className="term-dot text-[#00ffb2]" />
+          <Link href="/admin" className="font-bold tracking-tight">x3o<span className="text-[#00ffb2]">.ai</span></Link>
+          <span className="ml-auto term-label text-muted-foreground truncate max-w-[96px]">{brandLabel}</span>
         </div>
 
         {/* Navigation */}
-        <nav id="navigation" className="p-3 space-y-1" role="navigation" aria-label="Admin panel navigation">
+        <nav id="navigation" className="flex-1 overflow-y-auto p-2 space-y-0.5" role="navigation" aria-label="Admin panel navigation">
           {navItems.map((item) => {
             if (item.children) {
               const open = openGroups[item.label] ?? false;
@@ -238,14 +231,14 @@ export default function AdminLayout({
                     type="button"
                     onClick={() => setOpenGroups((g) => ({ ...g, [item.label]: !open }))}
                     aria-expanded={open}
-                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-amber-400 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors focus:outline-none focus:ring-1 focus:ring-[#00ffb2]"
                   >
                     {item.icon}
-                    <span className="text-sm flex-1 text-left">{item.label}</span>
-                    <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                    <span className="flex-1 text-left">{item.label}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
                   </button>
                   {open && (
-                    <div className="ml-4 mt-1 space-y-1 border-l border-white/10 pl-2">
+                    <div className="ml-3 mt-0.5 space-y-0.5 border-l border-border pl-2">
                       {item.children.map((child) => {
                         const childActive =
                           pathname === child.href ||
@@ -256,10 +249,10 @@ export default function AdminLayout({
                             href={child.href}
                             onClick={() => isMobile && setSidebarOpen(false)}
                             aria-current={childActive ? 'page' : undefined}
-                            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                            className={`flex items-center gap-2.5 px-3 py-1.5 rounded text-sm transition-colors focus:outline-none focus:ring-1 focus:ring-[#00ffb2] ${
                               childActive
-                                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold'
-                                : 'text-white/60 hover:bg-white/10 hover:text-amber-400'
+                                ? 'text-[#00ffb2] bg-[#00ffb2]/10'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-white/5'
                             }`}
                           >
                             {child.icon}
@@ -283,78 +276,73 @@ export default function AdminLayout({
                 href={item.href!}
                 onClick={() => isMobile && setSidebarOpen(false)}
                 aria-current={isActive ? 'page' : undefined}
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
+                className={`flex items-center gap-2.5 px-3 py-2 rounded text-sm border-l-2 transition-colors focus:outline-none focus:ring-1 focus:ring-[#00ffb2] ${
                   isActive
-                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold shadow-lg shadow-amber-500/20'
-                    : 'text-white/70 hover:bg-white/10 hover:text-amber-400'
+                    ? 'border-[#00ffb2] text-[#00ffb2] bg-[#00ffb2]/10 font-medium'
+                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-white/5'
                 }`}
               >
                 {item.icon}
-                <span className="text-sm">{item.label}</span>
+                <span>{item.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* User Profile */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-white/10">
-          <div className="flex items-center gap-3 px-4 py-3 bg-white/5 rounded-xl border border-white/10">
-            <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center shadow-lg shadow-amber-500/20">
-              <span className="text-sm text-black font-bold">K</span>
-            </div>
+        {/* User / logout */}
+        <div className="shrink-0 p-2 border-t border-border">
+          <div className="flex items-center gap-2.5 px-2 py-1.5">
+            <div className="w-8 h-8 rounded bg-[#00ffb2]/15 text-[#00ffb2] flex items-center justify-center text-xs font-bold data-mono">x3</div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-white font-bold truncate">Admin</p>
-              <p className="text-xs text-white/50 truncate">kelatic@admin.com</p>
+              <p className="text-xs font-semibold truncate">Admin</p>
+              <p className="text-[10px] text-muted-foreground truncate data-mono">{brandLabel}</p>
             </div>
             <button
-              className="text-xs text-red-400 hover:text-red-300 transition-colors font-medium"
+              className="term-label text-[#ef4444] hover:text-red-300 transition-colors"
               onClick={async () => {
                 const supabase = (await import('@/lib/supabase/client')).createClient();
                 await supabase.auth.signOut();
                 window.location.href = '/login';
               }}
             >
-              Logout
+              Exit
             </button>
           </div>
         </div>
       </aside>
 
       {/* Main content */}
-      <div className="lg:pl-64">
-        {/* Top Bar */}
-        <header className="h-16 bg-zinc-900 border-b border-white/10 flex items-center px-4 lg:px-8 sticky top-0 z-30">
-          {/* Mobile menu button */}
+      <div className="lg:pl-60">
+        <header className="h-12 bg-card/80 backdrop-blur border-b border-border flex items-center px-4 lg:px-6 sticky top-0 z-30 gap-4">
           <button
             onClick={handleSidebarToggle}
             aria-label="Open navigation menu"
-            className="p-2 -ml-2 text-white/60 hover:text-amber-400 lg:hidden focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 rounded-md"
+            className="p-1.5 -ml-1 text-muted-foreground hover:text-foreground lg:hidden"
           >
-            <Menu className="w-6 h-6" />
+            <Menu className="w-5 h-5" />
           </button>
 
-          {/* Page title - populated by page */}
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="term-dot text-[#00ffb2]" />
+            <span className="term-label text-muted-foreground truncate max-w-[160px]">{brandLabel} · live</span>
+          </div>
+
           <div className="flex-1" />
 
-          {/* Quick Actions */}
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              target="_blank"
-              className="text-sm text-white/60 hover:text-amber-400 transition-colors hidden sm:block font-medium focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 rounded-md px-2 py-1"
-              rel="noopener noreferrer"
-            >
-              View Site
-            </Link>
-            <NotificationBell />
-          </div>
+          <Clock className="text-xs text-muted-foreground hidden sm:block" />
+          <Link
+            href="/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-muted-foreground hover:text-[#00ffb2] transition-colors hidden sm:block"
+          >
+            View Site
+          </Link>
+          <NotificationBell />
         </header>
 
-        {/* Page content */}
-        <main id="main-content" className="p-4 lg:p-8" role="main" aria-label="Main content area">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+        <main id="main-content" className="p-4 lg:p-6" role="main" aria-label="Main content area">
+          <div className="max-w-[1400px] mx-auto">{children}</div>
         </main>
       </div>
     </div>

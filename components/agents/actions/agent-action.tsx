@@ -20,30 +20,25 @@ interface Props {
   color: string;
 }
 
-// Dispatcher: routes each runnable tool to the right inline UI.
+const inp = 'border border-border bg-background text-foreground rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#00ffb2]';
+const wrap = 'mt-3 bg-muted/40 border border-border rounded p-3';
+
 export default function AgentAction({ action, endpoint, businessId, color }: Props) {
   if (action === 'generate-content' || action === 'generate-campaign') {
     return <QuickGenerate action={action} businessId={businessId} color={color} />;
   }
-
   if (!businessId) {
     return (
-      <div className="mt-3 bg-gray-50 border border-gray-200 rounded-xl p-4">
-        <p className="text-sm text-gray-500">Connect a business to run this action.</p>
+      <div className={wrap}>
+        <p className="text-sm text-muted-foreground">Connect a business to run this action.</p>
       </div>
     );
   }
-
-  if (action === 'support-chat') {
-    return <SupportChat endpoint={endpoint || ''} businessId={businessId} color={color} />;
-  }
-  if (action === 'knowledge-search') {
-    return <KnowledgeSearch endpoint={endpoint || ''} businessId={businessId} color={color} />;
-  }
+  if (action === 'support-chat') return <SupportChat endpoint={endpoint || ''} businessId={businessId} color={color} />;
+  if (action === 'knowledge-search') return <KnowledgeSearch endpoint={endpoint || ''} businessId={businessId} color={color} />;
   return <FetchView action={action} endpoint={endpoint || ''} businessId={businessId} color={color} />;
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
 function firstArray(data: unknown): unknown[] | null {
   if (Array.isArray(data)) return data;
   if (data && typeof data === 'object') {
@@ -74,19 +69,19 @@ function ResultView({ data }: { data: unknown }) {
     <div className="mt-3">
       {items ? (
         <>
-          <div className="text-xs uppercase tracking-wide text-gray-400 mb-1">{items.length} results</div>
+          <div className="term-label text-muted-foreground mb-1">{items.length} results</div>
           {items.length > 0 ? (
-            <ul className="divide-y divide-gray-100 bg-white border border-gray-200 rounded-lg max-h-64 overflow-auto">
+            <ul className="divide-y divide-border bg-background border border-border rounded max-h-64 overflow-auto">
               {items.slice(0, 50).map((it, i) => (
-                <li key={i} className="px-3 py-2 text-sm text-gray-700">{itemLabel(it)}</li>
+                <li key={i} className="px-3 py-2 text-sm text-foreground/90 data-mono">{itemLabel(it)}</li>
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-gray-500">Nothing found.</p>
+            <p className="text-sm text-muted-foreground">Nothing found.</p>
           )}
         </>
       ) : (
-        <pre className="whitespace-pre-wrap text-sm text-gray-800 bg-white border border-gray-200 rounded-lg p-3 max-h-64 overflow-auto">
+        <pre className="whitespace-pre-wrap text-sm text-foreground/90 bg-background border border-border rounded p-3 max-h-64 overflow-auto">
           {typeof data === 'string' ? data : JSON.stringify(data, null, 2)}
         </pre>
       )}
@@ -98,7 +93,6 @@ function useRunner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<unknown>(null);
-
   async function call(url: string, init?: RequestInit) {
     setLoading(true);
     setError(null);
@@ -106,10 +100,7 @@ function useRunner() {
     try {
       const res = await fetch(url, init);
       const json = await res.json();
-      if (!res.ok) {
-        setError(json.error || 'Request failed.');
-        return;
-      }
+      if (!res.ok) { setError(json.error || 'Request failed.'); return; }
       setData(json);
     } catch (e) {
       console.error(e);
@@ -118,7 +109,6 @@ function useRunner() {
       setLoading(false);
     }
   }
-
   return { loading, error, data, call };
 }
 
@@ -127,7 +117,7 @@ function RunButton({ loading, color, label, onClick }: { loading: boolean; color
     <button
       onClick={onClick}
       disabled={loading}
-      className="inline-flex items-center justify-center gap-2 text-white text-sm font-medium rounded-lg px-3 py-2 disabled:opacity-50"
+      className="inline-flex items-center justify-center gap-2 text-black text-sm font-medium rounded px-3 py-1.5 disabled:opacity-50"
       style={{ backgroundColor: color }}
     >
       {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Play className="w-4 h-4" />}
@@ -136,18 +126,9 @@ function RunButton({ loading, color, label, onClick }: { loading: boolean; color
   );
 }
 
-// ── Fetch & view (ghost-clients, find-gaps, view-tickets) ──────────────────
 function FetchView({
-  action,
-  endpoint,
-  businessId,
-  color,
-}: {
-  action: 'find-gaps' | 'ghost-clients' | 'view-tickets';
-  endpoint: string;
-  businessId: string;
-  color: string;
-}) {
+  action, endpoint, businessId, color,
+}: { action: 'find-gaps' | 'ghost-clients' | 'view-tickets'; endpoint: string; businessId: string; color: string }) {
   const { loading, error, data, call } = useRunner();
   const today = new Date().toISOString().slice(0, 10);
   const in14 = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
@@ -158,78 +139,60 @@ function FetchView({
   function run() {
     const p = new URLSearchParams({ businessId });
     if (action === 'ghost-clients') p.set('minDays', minDays);
-    if (action === 'find-gaps') {
-      p.set('startDate', startDate);
-      p.set('endDate', endDate);
-      p.set('analyze', 'true');
-    }
+    if (action === 'find-gaps') { p.set('startDate', startDate); p.set('endDate', endDate); p.set('analyze', 'true'); }
     call(`${endpoint}?${p.toString()}`);
   }
 
   return (
-    <div className="mt-3 bg-gray-50 border border-gray-200 rounded-xl p-4">
+    <div className={wrap}>
       <div className="flex flex-wrap items-end gap-2">
         {action === 'ghost-clients' && (
-          <label className="text-sm text-gray-600">
-            Inactive for ≥
-            <input value={minDays} onChange={(e) => setMinDays(e.target.value)} inputMode="numeric"
-              className="mx-1 w-16 border border-gray-300 rounded px-2 py-1 text-sm" /> days
+          <label className="text-sm text-muted-foreground">
+            Inactive ≥ <input value={minDays} onChange={(e) => setMinDays(e.target.value)} inputMode="numeric" className={`mx-1 w-16 ${inp}`} /> days
           </label>
         )}
         {action === 'find-gaps' && (
           <>
-            <label className="text-sm text-gray-600">From
-              <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)}
-                className="ml-1 border border-gray-300 rounded px-2 py-1 text-sm" />
-            </label>
-            <label className="text-sm text-gray-600">to
-              <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)}
-                className="ml-1 border border-gray-300 rounded px-2 py-1 text-sm" />
-            </label>
+            <label className="text-sm text-muted-foreground">From <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className={`ml-1 ${inp}`} /></label>
+            <label className="text-sm text-muted-foreground">to <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className={`ml-1 ${inp}`} /></label>
           </>
         )}
         <RunButton loading={loading} color={color}
           label={action === 'ghost-clients' ? 'Find ghost clients' : action === 'find-gaps' ? 'Find gaps' : 'Load tickets'}
           onClick={run} />
       </div>
-      {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+      {error && <p className="text-sm text-[#ef4444] mt-2">{error}</p>}
       {data != null && <ResultView data={data} />}
     </div>
   );
 }
 
-// ── Knowledge search ───────────────────────────────────────────────────────
 function KnowledgeSearch({ endpoint, businessId, color }: { endpoint: string; businessId: string; color: string }) {
   const { loading, error, data, call } = useRunner();
   const [query, setQuery] = useState('');
-
   function run() {
     if (!query.trim()) return;
     const p = new URLSearchParams({ businessId, query: query.trim() });
     call(`${endpoint}?${p.toString()}`);
   }
-
   return (
-    <div className="mt-3 bg-gray-50 border border-gray-200 rounded-xl p-4">
+    <div className={wrap}>
       <div className="flex gap-2">
-        <input value={query} onChange={(e) => setQuery(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') run(); }}
-          placeholder="Search the knowledge base…"
-          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+        <input value={query} onChange={(e) => setQuery(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') run(); }}
+          placeholder="Search the knowledge base…" className={`flex-1 ${inp}`} />
         <RunButton loading={loading} color={color} label="Search" onClick={run} />
       </div>
-      {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+      {error && <p className="text-sm text-[#ef4444] mt-2">{error}</p>}
       {data != null && <ResultView data={data} />}
     </div>
   );
 }
 
-// ── Support chat ───────────────────────────────────────────────────────────
 function SupportChat({ endpoint, businessId, color }: { endpoint: string; businessId: string; color: string }) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [reply, setReply] = useState<string>('');
+  const [reply, setReply] = useState('');
 
   async function send() {
     if (!message.trim()) return;
@@ -243,14 +206,9 @@ function SupportChat({ endpoint, businessId, color }: { endpoint: string; busine
         body: JSON.stringify({ businessId, message: message.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || 'Request failed.');
-        return;
-      }
-      const text =
-        data.response || data.reply || data.message ||
-        (typeof data.content === 'string' ? data.content : null) ||
-        JSON.stringify(data, null, 2);
+      if (!res.ok) { setError(data.error || 'Request failed.'); return; }
+      const text = data.response || data.reply || data.message ||
+        (typeof data.content === 'string' ? data.content : null) || JSON.stringify(data, null, 2);
       setReply(text);
     } catch (e) {
       console.error(e);
@@ -261,22 +219,20 @@ function SupportChat({ endpoint, businessId, color }: { endpoint: string; busine
   }
 
   return (
-    <div className="mt-3 bg-gray-50 border border-gray-200 rounded-xl p-4">
+    <div className={wrap}>
       <div className="flex gap-2">
-        <input value={message} onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={(e) => { if (e.key === 'Enter') send(); }}
-          placeholder="Ask the support agent a client question…"
-          className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm" />
+        <input value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send(); }}
+          placeholder="Ask the support agent a client question…" className={`flex-1 ${inp}`} />
         <button onClick={send} disabled={loading}
-          className="inline-flex items-center gap-2 text-white text-sm font-medium rounded-lg px-3 py-2 disabled:opacity-50"
+          className="inline-flex items-center gap-2 text-black text-sm font-medium rounded px-3 py-1.5 disabled:opacity-50"
           style={{ backgroundColor: color }}>
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           Ask
         </button>
       </div>
-      {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
+      {error && <p className="text-sm text-[#ef4444] mt-2">{error}</p>}
       {reply && (
-        <pre className="mt-3 whitespace-pre-wrap text-sm text-gray-800 bg-white border border-gray-200 rounded-lg p-3 max-h-64 overflow-auto">
+        <pre className="mt-3 whitespace-pre-wrap text-sm text-foreground/90 bg-background border border-border rounded p-3 max-h-64 overflow-auto">
           {reply}
         </pre>
       )}

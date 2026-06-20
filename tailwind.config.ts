@@ -43,6 +43,10 @@ const config: Config = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        mint: '#00ffb2',
+        up: '#00ffb2',
+        down: '#ef4444',
+        warn: '#f59e0b',
       },
       borderRadius: {
         lg: 'var(--radius)',
