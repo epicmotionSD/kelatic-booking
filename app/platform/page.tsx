@@ -1,424 +1,292 @@
-'use client'
+'use client';
 
-import { useState } from 'react'
-import './x3o-styles.css'
+import { useState } from 'react';
+import {
+  Sparkles,
+  ArrowRight,
+  Megaphone,
+  RotateCcw,
+  MessageCircle,
+  Check,
+  Menu,
+  X,
+} from 'lucide-react';
 
-type TabKey = 'overview' | 'team' | 'proof' | 'pricing' | 'start'
+const MINT = '#00FFB2';
 
-function Tag({ color, children }: { color: string; children: React.ReactNode }) {
-  return <span className={`x3o-tag x3o-tag-${color}`}>{children}</span>
-}
-
-function Dot({ color }: { color: string }) {
-  return <span style={{
-    display: 'inline-block',
-    width: 8,
-    height: 8,
-    borderRadius: '50%',
-    backgroundColor: color,
-    marginRight: 8,
-  }} />
-}
-
+// The three agents — showcased as the product.
 const AGENTS = [
-  { icon: '✍️', name: 'Trinity', role: 'Content & brand creative', desc: 'Writes posts, captions, and campaigns in your brand voice — and keeps your content calendar full.' },
-  { icon: '📣', name: 'Marketing Agent', role: 'Campaign operator', desc: 'Plans and runs your email, SMS, and social campaigns, then tracks what actually drove bookings.' },
-  { icon: '🔁', name: 'Retention Agent', role: 'Win-back operator', desc: 'Notices clients who have gone quiet and runs personalized win-back sequences automatically.' },
-  { icon: '📅', name: 'Scheduling Agent', role: 'Calendar operator', desc: 'Finds and fills gaps in your calendar, sends reminders, and cuts down no-shows.' },
-  { icon: '💬', name: 'Support Agent', role: 'Front-desk operator', desc: 'Answers client questions and handles requests 24/7 from your own knowledge base.' },
-]
+  {
+    name: 'Attract',
+    tagline: 'Fills the top of your funnel.',
+    color: '#a78bfa',
+    icon: Megaphone,
+    body: 'Keeps your storefront and content fresh and runs campaigns on its own, so new and returning customers keep coming in.',
+    items: ['On-brand content & posts', 'Email, SMS & social campaigns'],
+  },
+  {
+    name: 'Retain',
+    tagline: 'Brings customers back.',
+    color: '#2dd4bf',
+    icon: RotateCcw,
+    body: 'Notices when someone drifts away and reaches out automatically, and quietly fills the gaps in your calendar.',
+    items: ['Automatic customer win-back', 'Rebooking & fewer no-shows'],
+  },
+  {
+    name: 'Serve',
+    tagline: 'Looks after your customers.',
+    color: '#60a5fa',
+    icon: MessageCircle,
+    body: 'Answers client questions day or night and keeps everyone informed with timely reminders.',
+    items: ['24/7 client answers', 'Reminders & notifications'],
+  },
+];
 
-const PLATFORM = [
-  { icon: '🗓️', label: 'Online booking' },
-  { icon: '🛍️', label: 'Branded storefront + checkout' },
-  { icon: '💳', label: 'In-person POS' },
-  { icon: '💵', label: 'Payments' },
-  { icon: '✉️', label: 'Email & SMS' },
-  { icon: '👥', label: 'Client records' },
-]
+const INCLUDED = ['Online booking', 'Branded storefront', 'In-person POS', 'Payments', 'Email & SMS', 'Customer records'];
+
+const PLANS = [
+  { name: 'Starter', price: '$97', popular: false, features: ['Booking, storefront & payments', 'The Attract agent', 'Customer records & messaging', 'Email support'] },
+  { name: 'Growth', price: '$297', popular: true, features: ['Everything in Starter', 'Add the Retain agent', 'Win-back + a calendar that fills itself', 'Campaigns across email, SMS & social', 'Priority support'] },
+  { name: 'Enterprise', price: '$897', popular: false, features: ['Everything in Growth', 'Add the Serve agent (24/7)', 'Multiple locations & brands', 'Custom domain & white-label', 'Dedicated account manager'] },
+];
 
 export default function PlatformPage() {
-  const [activeTab, setActiveTab] = useState<TabKey>('overview')
-
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: 'overview', label: 'Overview' },
-    { key: 'team', label: 'Your AI Team' },
-    { key: 'proof', label: 'Proof · KeLatic' },
-    { key: 'pricing', label: 'Pricing' },
-    { key: 'start', label: 'Get Started' },
-  ]
+  const [menu, setMenu] = useState(false);
 
   return (
-    <div className="x3o-root">
-      {/* ── Topbar ── */}
-      <header className="x3o-topbar">
-        <div className="x3o-topbar-inner">
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <span className="x3o-logo">x3o<span className="x3o-logo-dot">.ai</span></span>
-            <Tag color="amber">Powered by Claude</Tag>
-          </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <a href="https://kelatic.x3o.ai" className="x3o-btn x3o-btn-ghost" target="_blank" rel="noopener noreferrer">
-              See it live → kelatic.x3o.ai
+    <div className="min-h-screen bg-[#0a0a0a] text-white antialiased">
+      {/* Announcement bar */}
+      <div className="w-full text-center text-xs sm:text-sm py-2.5 px-4 border-b border-white/10 text-white/70">
+        Now live: <span className="text-white">Kelatic Hair Lounge</span> &amp;{' '}
+        <span className="text-white">Kelatic Vitality House</span> run on x3o
+        <span className="hidden sm:inline"> · Powered by Claude</span>
+      </div>
+
+      {/* Nav */}
+      <header className="sticky top-0 z-50 bg-[#0a0a0a]/80 backdrop-blur border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
+          <a href="#top" className="text-xl font-bold tracking-tight">
+            x3o<span style={{ color: MINT }}>.ai</span>
+          </a>
+          <nav className="hidden md:flex items-center gap-8 text-sm text-white/70">
+            <a href="#agents" className="hover:text-white">The agents</a>
+            <a href="#proof" className="hover:text-white">Results</a>
+            <a href="#pricing" className="hover:text-white">Pricing</a>
+            <a href="https://kelatic.x3o.ai" target="_blank" rel="noopener noreferrer" className="hover:text-white">See it live</a>
+            <a href="#start" className="px-4 py-2 rounded-full font-semibold text-black" style={{ backgroundColor: MINT }}>
+              Start free trial
             </a>
-            <a href="#start" className="x3o-btn x3o-btn-primary" onClick={(e) => { e.preventDefault(); setActiveTab('start') }}>
-              Start Free Trial
-            </a>
-          </div>
+          </nav>
+          <button className="md:hidden p-2 text-white/80" onClick={() => setMenu((v) => !v)} aria-label="Menu">
+            {menu ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
+        {menu && (
+          <div className="md:hidden border-t border-white/10 px-5 py-4 flex flex-col gap-3 text-sm text-white/80">
+            <a href="#agents" onClick={() => setMenu(false)}>The agents</a>
+            <a href="#proof" onClick={() => setMenu(false)}>Results</a>
+            <a href="#pricing" onClick={() => setMenu(false)}>Pricing</a>
+            <a href="https://kelatic.x3o.ai" target="_blank" rel="noopener noreferrer">See it live</a>
+            <a href="#start" onClick={() => setMenu(false)} className="px-4 py-2 rounded-full font-semibold text-black text-center" style={{ backgroundColor: MINT }}>
+              Start free trial
+            </a>
+          </div>
+        )}
       </header>
 
-      {/* ── Navigation ── */}
-      <nav className="x3o-nav">
-        <div className="x3o-nav-inner">
-          {tabs.map(t => (
-            <button
-              key={t.key}
-              className={`x3o-nav-tab${activeTab === t.key ? ' active' : ''}`}
-              onClick={() => setActiveTab(t.key)}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </nav>
-
-      {/* ══════════════ Overview ══════════════ */}
-      {activeTab === 'overview' && (
-        <main className="x3o-main">
-          <div className="x3o-hero-strip">
-            <h1>Your business, run by a team of AI agents.</h1>
-            <p className="x3o-hero-sub">Hire your AI operations team — live in a day.</p>
-            <p style={{ color: 'var(--x3o-muted)', maxWidth: 640, margin: '0 auto' }}>
-              x3o gives every local business a team of AI agents — for marketing, retention, scheduling,
-              support, and content — running on top of a full booking, storefront, and payments platform.
-              You set the goal. The agents do the work.
-            </p>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
-              <a href="#start" className="x3o-btn x3o-btn-primary" onClick={(e) => { e.preventDefault(); setActiveTab('start') }}>
-                Start Free Trial
-              </a>
-              <a href="https://kelatic.x3o.ai" className="x3o-btn x3o-btn-ghost" target="_blank" rel="noopener noreferrer">
-                See it live →
-              </a>
-            </div>
+      {/* Hero */}
+      <section id="top" className="relative overflow-hidden">
+        <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full blur-3xl opacity-20" style={{ backgroundColor: MINT }} />
+        <div className="relative max-w-4xl mx-auto px-5 pt-20 pb-16 text-center">
+          <div className="inline-flex items-center gap-2 text-xs uppercase tracking-widest font-semibold mb-6" style={{ color: MINT }}>
+            <Sparkles className="w-4 h-4" /> The AI business platform
           </div>
-
-          <div className="x3o-g4">
-            <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val x3o-val-green">+$5,510</div>
-              <div className="x3o-metric-label">Revenue recovered / mo (KeLatic)</div>
-            </div>
-            <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">18.5×</div>
-              <div className="x3o-metric-label">ROI on the Growth plan</div>
-            </div>
-            <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">5</div>
-              <div className="x3o-metric-label">AI agents on your team</div>
-            </div>
-            <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">~24h</div>
-              <div className="x3o-metric-label">From signup to live</div>
-            </div>
-          </div>
-
-          {/* Problem / Solution */}
-          <div className="x3o-g2">
-            <div className="x3o-card">
-              <Tag color="red">The problem</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>You&apos;re wearing every hat</h3>
-              <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
-                <li>Marketing slips — no time to post or run campaigns</li>
-                <li>Past clients quietly disappear, with no follow-up</li>
-                <li>The calendar has gaps nobody fills</li>
-                <li>Questions pile up after hours</li>
-                <li>&quot;AI tools&quot; so far just mean more dashboards to read</li>
-              </ul>
-            </div>
-            <div className="x3o-card-accent">
-              <Tag color="green">The x3o way</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>A team that does the work</h3>
-              <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
-                <li><strong>Trinity</strong> creates your content & campaigns</li>
-                <li><strong>Marketing</strong> runs them across email, SMS & social</li>
-                <li><strong>Retention</strong> wins back clients who drifted away</li>
-                <li><strong>Scheduling</strong> fills your calendar & cuts no-shows</li>
-                <li><strong>Support</strong> answers clients around the clock</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Why it's different */}
-          <div className="x3o-g3" style={{ marginTop: 24 }}>
-            <div className="x3o-card">
-              <Tag color="purple">A team, not a dashboard</Tag>
-              <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>
-                x3o agents take action — they post, message, follow up, and book — instead of handing you
-                another chart to interpret.
-              </p>
-            </div>
-            <div className="x3o-card">
-              <Tag color="blue">Runs the whole business</Tag>
-              <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>
-                Booking, storefront, POS, payments, and client comms are built in — so the agents operate a
-                real business end-to-end.
-              </p>
-            </div>
-            <div className="x3o-card">
-              <Tag color="green">In your brand</Tag>
-              <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>
-                Fully white-label — your name, your colors, your domain. Your customers never see &quot;x3o.&quot;
-              </p>
-            </div>
-          </div>
-        </main>
-      )}
-
-      {/* ══════════════ Your AI Team ══════════════ */}
-      {activeTab === 'team' && (
-        <main className="x3o-main">
-          <h2>Meet your AI team</h2>
-          <p style={{ color: 'var(--x3o-muted)', marginBottom: 24, maxWidth: 680 }}>
-            Five agents, each with a job. They work together, in your brand voice, on top of the platform
-            that actually runs your business.
+          <h1 className="text-4xl sm:text-6xl font-black leading-[1.05] tracking-tight">
+            Three AI agents that run{' '}
+            <span style={{ color: MINT }}>your whole business.</span>
+          </h1>
+          <p className="text-lg text-white/60 mt-6 max-w-2xl mx-auto">
+            Meet Attract, Retain, and Serve — they handle your marketing, your rebooking, and your front desk,
+            so you can focus on customers instead of running ten apps.
           </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-9">
+            <a href="#start" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-black" style={{ backgroundColor: MINT }}>
+              Start free trial <ArrowRight className="w-4 h-4" />
+            </a>
+            <a href="#agents" className="px-6 py-3.5 rounded-full font-semibold border border-white/20 text-white/90 hover:bg-white/5">
+              Meet the agents →
+            </a>
+          </div>
+          <p className="text-xs text-white/40 mt-5">Live in about a day · No setup headaches · Powered by Claude</p>
+        </div>
+      </section>
 
-          <div className="x3o-g3">
+      {/* Problem */}
+      <section className="border-t border-white/10 bg-[#0d0d0d]">
+        <div className="max-w-6xl mx-auto px-5 py-20">
+          <div className="text-center mb-12">
+            <div className="text-xs uppercase tracking-widest font-semibold text-white/40 mb-2">The problem</div>
+            <h2 className="text-3xl sm:text-4xl font-bold">Running a local business is too many jobs</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {[
+              { t: 'Marketing falls behind', b: 'There’s never enough time to post, email, and run promotions — so growth stalls.' },
+              { t: 'Customers slip away', b: 'Regulars quietly stop coming, and no one follows up to bring them back.' },
+              { t: 'The front desk never sleeps', b: 'Questions and bookings pile up after hours, and no-shows eat into the day.' },
+            ].map((c) => (
+              <div key={c.t} className="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+                <h3 className="font-semibold text-lg">{c.t}</h3>
+                <p className="text-white/55 text-sm mt-2 leading-relaxed">{c.b}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* The three agents */}
+      <section id="agents" className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 py-20">
+          <div className="text-center mb-12">
+            <div className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: MINT }}>Your AI team</div>
+            <h2 className="text-3xl sm:text-4xl font-bold">Meet your three agents</h2>
+            <p className="text-white/55 mt-3 max-w-2xl mx-auto">
+              You set the goal. Attract, Retain, and Serve handle the rest — quietly, in your brand, around the clock.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
             {AGENTS.map((a) => (
-              <div className="x3o-card" key={a.name}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <span style={{ fontSize: 26 }}>{a.icon}</span>
-                  <Tag color="green">Active</Tag>
+              <div key={a.name} className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 flex flex-col">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style={{ backgroundColor: `${a.color}22`, color: a.color }}>
+                  <a.icon className="w-6 h-6" />
                 </div>
-                <h4 style={{ margin: '10px 0 2px' }}>{a.name}</h4>
-                <div style={{ fontSize: 12, color: 'var(--x3o-accent)', marginBottom: 6 }}>{a.role}</div>
-                <p style={{ fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>{a.desc}</p>
+                <h3 className="text-xl font-bold">{a.name}</h3>
+                <p className="text-sm font-medium mb-3" style={{ color: a.color }}>{a.tagline}</p>
+                <p className="text-white/55 text-sm leading-relaxed flex-1">{a.body}</p>
+                <ul className="mt-4 space-y-2">
+                  {a.items.map((it) => (
+                    <li key={it} className="flex items-start gap-2 text-sm text-white/75">
+                      <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: MINT }} /> {it}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
 
-          {/* Platform underneath */}
-          <div className="x3o-card" style={{ marginTop: 32 }}>
-            <h3 style={{ marginBottom: 6 }}>The platform underneath</h3>
-            <p style={{ color: 'var(--x3o-muted)', marginBottom: 16, fontSize: 14 }}>
-              The agents can do real work because they run on a real operational stack — all included.
-            </p>
-            <div className="x3o-g3">
-              {PLATFORM.map((p) => (
-                <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                  <span style={{ fontSize: 22 }}>{p.icon}</span>
-                  <span style={{ fontSize: 14 }}>{p.label}</span>
-                </div>
+          {/* Included band */}
+          <div className="mt-10 bg-white/[0.03] border border-white/10 rounded-2xl p-6">
+            <div className="text-sm text-white/50 mb-3">All three run on one platform — everything included, no extra tools to buy:</div>
+            <div className="flex flex-wrap gap-2">
+              {INCLUDED.map((i) => (
+                <span key={i} className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-full border border-white/10 text-white/80">
+                  <Check className="w-3.5 h-3.5" style={{ color: MINT }} /> {i}
+                </span>
               ))}
             </div>
           </div>
-        </main>
-      )}
+        </div>
+      </section>
 
-      {/* ══════════════ Proof · KeLatic ══════════════ */}
-      {activeTab === 'proof' && (
-        <main className="x3o-main">
-          <div className="x3o-cs-hero">
-            <Tag color="green">Live · Production</Tag>
-            <h2 style={{ margin: '12px 0 4px' }}>What KeLatic&apos;s agents recovered</h2>
-            <p style={{ color: 'var(--x3o-muted)' }}>
-              The first business run on x3o — a premium loc studio in Houston, TX. Same owner now runs a second
-              brand, KeLatic Vitality House, on the same platform.
-            </p>
-            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
-              <a href="https://kelatic.x3o.ai" className="x3o-btn x3o-btn-primary" target="_blank" rel="noopener noreferrer">
-                Visit kelatic.x3o.ai →
-              </a>
-              <a href="https://kelaticvitalityhouse.com" className="x3o-btn x3o-btn-ghost" target="_blank" rel="noopener noreferrer">
-                kelaticvitalityhouse.com →
-              </a>
-            </div>
+      {/* Proof */}
+      <section id="proof" className="border-t border-white/10 bg-[#0d0d0d]">
+        <div className="max-w-6xl mx-auto px-5 py-20">
+          <div className="text-center mb-12">
+            <div className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: MINT }}>Real results</div>
+            <h2 className="text-3xl sm:text-4xl font-bold">What the agents did for Kelatic</h2>
+            <p className="text-white/55 mt-3">A Houston studio — now running a second brand on the same platform.</p>
           </div>
-
-          <div className="x3o-g4">
-            <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val x3o-val-green">+$5,510</div>
-              <div className="x3o-metric-label">Monthly revenue recovered</div>
-            </div>
-            <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">18.5×</div>
-              <div className="x3o-metric-label">ROI on $297/mo plan</div>
-            </div>
-            <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">23%</div>
-              <div className="x3o-metric-label">Ghost clients won back</div>
-            </div>
-            <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">142</div>
-              <div className="x3o-metric-label">Active clients managed</div>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+            {[
+              { v: '+$5,510', l: 'recovered every month' },
+              { v: '18.5×', l: 'return on the Growth plan' },
+              { v: '23%', l: 'of lost clients won back' },
+              { v: '~24h', l: 'from signup to live' },
+            ].map((s) => (
+              <div key={s.l} className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 text-center">
+                <div className="text-3xl font-black" style={{ color: MINT }}>{s.v}</div>
+                <div className="text-xs text-white/50 mt-1">{s.l}</div>
+              </div>
+            ))}
           </div>
-
-          <div className="x3o-card" style={{ marginTop: 24 }}>
-            <h3 style={{ marginBottom: 16 }}>Where the lift came from</h3>
-            <div className="x3o-table-wrap">
-              <table className="x3o-table">
-                <thead>
-                  <tr><th>Outcome</th><th>Monthly impact</th><th>Which agent</th></tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Clients won back</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>+$3,200</td>
-                    <td>Retention Agent</td>
-                  </tr>
-                  <tr>
-                    <td>Calendar gaps filled</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>+$1,100</td>
-                    <td>Scheduling Agent</td>
-                  </tr>
-                  <tr>
-                    <td>Bookings from content</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>+$680</td>
-                    <td>Trinity + Marketing</td>
-                  </tr>
-                  <tr>
-                    <td>Upsells & add-ons</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>+$530</td>
-                    <td>Marketing Agent</td>
-                  </tr>
-                  <tr style={{ fontWeight: 600, borderTop: '1px solid rgba(255,255,255,.1)' }}>
-                    <td>Total monthly lift</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>+$5,510</td>
-                    <td>18.5× ROI on $297/mo</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </main>
-      )}
-
-      {/* ══════════════ Pricing ══════════════ */}
-      {activeTab === 'pricing' && (
-        <main className="x3o-main">
-          <h2>Pricing</h2>
-          <p style={{ color: 'var(--x3o-muted)', marginBottom: 24 }}>
-            Every plan is white-label, includes the full platform, and is live in about a day. Pick how big a
-            team you want working for you.
-          </p>
-
-          <div className="x3o-g3">
-            <div className="x3o-price-card">
-              <Tag color="green">Starter</Tag>
-              <div className="x3o-price">$97<span className="x3o-price-period">/mo</span></div>
-              <ul className="x3o-price-features">
-                <li><Dot color="var(--x3o-green)" />Booking, storefront & payments</li>
-                <li><Dot color="var(--x3o-green)" />Trinity content agent</li>
-                <li><Dot color="var(--x3o-green)" />Monthly content calendar</li>
-                <li><Dot color="var(--x3o-green)" />Client records & messaging</li>
-                <li><Dot color="var(--x3o-green)" />Email support</li>
-              </ul>
-              <button className="x3o-btn x3o-btn-ghost" style={{ width: '100%' }} onClick={() => setActiveTab('start')}>Start Free Trial</button>
-            </div>
-
-            <div className="x3o-price-card x3o-price-featured">
-              <Tag color="amber">Most Popular</Tag>
-              <div className="x3o-price">$297<span className="x3o-price-period">/mo</span></div>
-              <ul className="x3o-price-features">
-                <li><Dot color="var(--x3o-green)" />Everything in Starter</li>
-                <li><Dot color="var(--x3o-accent)" />Retention agent (auto win-back)</li>
-                <li><Dot color="var(--x3o-accent)" />Marketing agent (email/SMS/social)</li>
-                <li><Dot color="var(--x3o-accent)" />Scheduling agent (fill gaps)</li>
-                <li><Dot color="var(--x3o-accent)" />Weekly AI content</li>
-                <li><Dot color="var(--x3o-accent)" />Priority support + Slack</li>
-              </ul>
-              <button className="x3o-btn x3o-btn-primary" style={{ width: '100%' }} onClick={() => setActiveTab('start')}>Start Free Trial</button>
-            </div>
-
-            <div className="x3o-price-card">
-              <Tag color="purple">Enterprise</Tag>
-              <div className="x3o-price">$897<span className="x3o-price-period">/mo</span></div>
-              <ul className="x3o-price-features">
-                <li><Dot color="var(--x3o-green)" />Everything in Growth</li>
-                <li><Dot color="var(--x3o-purple)" />Support agent (24/7 front desk)</li>
-                <li><Dot color="var(--x3o-purple)" />Multi-location & multi-brand</li>
-                <li><Dot color="var(--x3o-purple)" />Custom agent instructions</li>
-                <li><Dot color="var(--x3o-purple)" />Dedicated account manager</li>
-                <li><Dot color="var(--x3o-purple)" />Custom domain & white-label</li>
-              </ul>
-              <button className="x3o-btn x3o-btn-ghost" style={{ width: '100%' }} onClick={() => setActiveTab('start')}>Contact Sales</button>
-            </div>
-          </div>
-        </main>
-      )}
-
-      {/* ══════════════ Get Started ══════════════ */}
-      {activeTab === 'start' && (
-        <main className="x3o-main" id="start">
-          <h2>Live in about a day</h2>
-          <p style={{ color: 'var(--x3o-muted)', marginBottom: 24, maxWidth: 640 }}>
-            No long setup, no migration headache. Tell us about your business and your AI team goes to work.
-          </p>
-
-          <div className="x3o-g3">
-            <div className="x3o-card-accent">
-              <Tag color="green">Step 1</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>Tell us about your business</h3>
-              <p style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, fontSize: 14 }}>
-                Your services or menu, your brand, your hours. A few minutes is all it takes.
-              </p>
-            </div>
-            <div className="x3o-card">
-              <Tag color="amber">Step 2</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>We deploy your site & agents</h3>
-              <p style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, fontSize: 14 }}>
-                Within ~24 hours: a branded booking site or storefront, payments, and your AI team configured.
-              </p>
-            </div>
-            <div className="x3o-card">
-              <Tag color="blue">Step 3</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>Approve and go live</h3>
-              <p style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, fontSize: 14 }}>
-                Review your site and first campaigns, point your domain, and your agents start working.
-              </p>
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'center', margin: '32px 0' }}>
-            <a href="https://kelatic.x3o.ai" className="x3o-btn x3o-btn-primary" target="_blank" rel="noopener noreferrer">
-              Start Free Trial
+          <div className="text-center mt-8">
+            <a href="https://kelaticvitalityhouse.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white">
+              See the second brand → kelaticvitalityhouse.com
             </a>
           </div>
+        </div>
+      </section>
 
-          {/* FAQ */}
-          <div className="x3o-card">
-            <h3 style={{ marginBottom: 16 }}>Common questions</h3>
-            <div style={{ display: 'grid', gap: 16 }}>
-              <div>
-                <strong>Do my customers see &quot;x3o&quot;?</strong>
-                <p style={{ color: 'var(--x3o-muted)', fontSize: 14, marginTop: 4 }}>No. Everything is white-label — your name, your colors, your domain (like kelatic.com or kelaticvitalityhouse.com).</p>
-              </div>
-              <div>
-                <strong>Do the agents act on their own?</strong>
-                <p style={{ color: 'var(--x3o-muted)', fontSize: 14, marginTop: 4 }}>They draft and run the work; you stay in control and can review or approve campaigns and messages.</p>
-              </div>
-              <div>
-                <strong>What kinds of businesses is this for?</strong>
-                <p style={{ color: 'var(--x3o-muted)', fontSize: 14, marginTop: 4 }}>Local service & retail — salons, barbershops, cafés, studios, spas. If you book appointments or sell products, x3o fits.</p>
-              </div>
-              <div>
-                <strong>Is payment processing included?</strong>
-                <p style={{ color: 'var(--x3o-muted)', fontSize: 14, marginTop: 4 }}>Yes — online checkout and in-person POS run on Stripe, built in.</p>
-              </div>
-            </div>
+      {/* Pricing */}
+      <section id="pricing" className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 py-20">
+          <div className="text-center mb-12">
+            <div className="text-xs uppercase tracking-widest font-semibold mb-2" style={{ color: MINT }}>Pricing</div>
+            <h2 className="text-3xl sm:text-4xl font-bold">Add agents as you grow</h2>
+            <p className="text-white/55 mt-3">White-label and live in about a day. Cancel anytime.</p>
           </div>
-        </main>
-      )}
+          <div className="grid md:grid-cols-3 gap-5">
+            {PLANS.map((p) => (
+              <div
+                key={p.name}
+                className={`rounded-2xl p-6 border ${p.popular ? 'bg-white/[0.05]' : 'bg-white/[0.03] border-white/10'}`}
+                style={p.popular ? { borderColor: MINT } : undefined}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold">{p.name}</span>
+                  {p.popular && (
+                    <span className="text-[10px] uppercase tracking-wide font-bold px-2 py-1 rounded-full text-black" style={{ backgroundColor: MINT }}>
+                      Most popular
+                    </span>
+                  )}
+                </div>
+                <div className="mt-4 text-4xl font-black">
+                  {p.price}<span className="text-base font-medium text-white/40">/mo</span>
+                </div>
+                <ul className="mt-5 space-y-2.5">
+                  {p.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2 text-sm text-white/75">
+                      <Check className="w-4 h-4 mt-0.5 shrink-0" style={{ color: MINT }} /> {f}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href="#start"
+                  className={`mt-6 block text-center px-4 py-2.5 rounded-full font-semibold ${p.popular ? 'text-black' : 'border border-white/20 text-white hover:bg-white/5'}`}
+                  style={p.popular ? { backgroundColor: MINT } : undefined}
+                >
+                  {p.name === 'Enterprise' ? 'Contact sales' : 'Start free trial'}
+                </a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-      {/* ── Footer ── */}
-      <footer className="x3o-footer">
-        <p>x3o.ai — your business, run by a team of AI agents.</p>
-        <p style={{ marginTop: 8 }}>
-          © {new Date().getFullYear()} Sonnier Ventures. All rights reserved.
-        </p>
+      {/* Final CTA */}
+      <section id="start" className="border-t border-white/10 bg-[#0d0d0d]">
+        <div className="max-w-3xl mx-auto px-5 py-20 text-center">
+          <h2 className="text-3xl sm:text-5xl font-black leading-tight">
+            Your three agents can be working{' '}
+            <span style={{ color: MINT }}>by tomorrow.</span>
+          </h2>
+          <p className="text-white/60 mt-5">
+            Tell us about your business and we&apos;ll have your site, payments, and agents live in about a day.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+            <a href="https://kelatic.x3o.ai" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full font-semibold text-black" style={{ backgroundColor: MINT }}>
+              Start free trial <ArrowRight className="w-4 h-4" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="border-t border-white/10">
+        <div className="max-w-6xl mx-auto px-5 py-10 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white/50">
+          <div className="text-white font-bold">x3o<span style={{ color: MINT }}>.ai</span></div>
+          <div>© {new Date().getFullYear()} Sonnier Ventures. All rights reserved.</div>
+        </div>
       </footer>
     </div>
-  )
+  );
 }
