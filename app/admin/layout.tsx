@@ -20,7 +20,8 @@ import {
   X,
   ShoppingBag,
   Package,
-  ChevronDown
+  ChevronDown,
+  Gem,
 } from 'lucide-react';
 import { SkipLink, useAriaLiveRegion } from '@/lib/accessibility';
 import { Clock } from '@/components/terminal';
@@ -79,6 +80,11 @@ const NAV_ITEMS: NavItem[] = [
     icon: <UserCheck className="w-5 h-5" />,
   },
   {
+    label: 'Loyalty',
+    href: '/admin/loyalty',
+    icon: <Gem className="w-5 h-5" />,
+  },
+  {
     label: 'Reports',
     href: '/admin/reports',
     icon: <BarChart3 className="w-5 h-5" />,
@@ -102,6 +108,7 @@ const COMMERCE_NAV: NavItem[] = [
   { label: 'Point of Sale', href: '/admin/register', icon: <CreditCard className="w-5 h-5" /> },
   { label: 'Orders', href: '/admin/orders', icon: <ShoppingBag className="w-5 h-5" /> },
   { label: 'Products', href: '/admin/products', icon: <Package className="w-5 h-5" /> },
+  { label: 'Loyalty', href: '/admin/loyalty', icon: <Gem className="w-5 h-5" /> },
   {
     label: 'Booking',
     icon: <Calendar className="w-5 h-5" />,
@@ -182,23 +189,6 @@ export default function AdminLayout({
     <div className="x3o-term min-h-screen">
       <SkipLink href="#main-content">Skip to main content</SkipLink>
       <SkipLink href="#navigation">Skip to navigation</SkipLink>
-
-      {/* Mobile bar */}
-      <div className="lg:hidden flex items-center justify-between px-4 h-12 bg-card border-b border-border">
-        <Link href="/admin" className="flex items-center gap-2">
-          <span className="term-dot text-[#00ffb2]" />
-          <span className="font-bold tracking-tight">x3o<span className="text-[#00ffb2]">.ai</span></span>
-        </Link>
-        <button
-          onClick={handleSidebarToggle}
-          aria-expanded={sidebarOpen ? 'true' : 'false'}
-          aria-controls="sidebar-navigation"
-          aria-label={sidebarOpen ? 'Close navigation menu' : 'Open navigation menu'}
-          className="p-2 rounded text-muted-foreground hover:text-foreground"
-        >
-          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
-      </div>
 
       {/* Mobile overlay */}
       {sidebarOpen && isMobile && (
@@ -322,7 +312,12 @@ export default function AdminLayout({
             <Menu className="w-5 h-5" />
           </button>
 
-          <div className="hidden sm:flex items-center gap-2">
+          {/* Brand on mobile (sidebar hidden there); live status on desktop */}
+          <Link href="/admin" className="lg:hidden flex items-center gap-1.5 font-bold tracking-tight">
+            <span className="term-dot text-[#00ffb2]" />
+            x3o<span className="text-[#00ffb2]">.ai</span>
+          </Link>
+          <div className="hidden lg:flex items-center gap-2">
             <span className="term-dot text-[#00ffb2]" />
             <span className="term-label text-muted-foreground truncate max-w-[160px]">{brandLabel} · live</span>
           </div>
