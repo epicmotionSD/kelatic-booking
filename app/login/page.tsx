@@ -97,8 +97,10 @@ function LoginForm() {
       }
     }
 
-    setLoading(false);
-    router.push(redirectTo);
+    // Full-page navigation (not router.push) so the freshly-set Supabase auth
+    // cookie is committed and sent with the request to /admin. Soft client
+    // navigation can race the cookie write on mobile Safari and bounce to login.
+    window.location.assign(redirectTo);
   } catch (networkError) {
     setLoading(false);
     setError('Network error - try incognito mode or disable browser extensions');
