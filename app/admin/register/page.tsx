@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { formatCurrency } from '@/lib/currency';
 import { CreditCard, Banknote, Plus, Minus, Trash2, Loader2, CheckCircle2, X } from 'lucide-react';
 import type { Product, ProductCategory } from '@/types/commerce';
+import { StatusDot } from '@/components/terminal';
 
 interface CartItem { product: Product; quantity: number }
+interface Reader { id?: string; label?: string; status?: string; device_type?: string; serial_number?: string }
 
 export default function RegisterPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -17,6 +19,11 @@ export default function RegisterPage() {
   const [processing, setProcessing] = useState<null | 'cash' | 'card'>(null);
   const [status, setStatus] = useState<string>('');
   const [done, setDone] = useState(false);
+
+  // Stripe Terminal reader (shared smart reader, server-driven)
+  const [reader, setReader] = useState<Reader | null>(null);
+  const [readerLoading, setReaderLoading] = useState(true);
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     (async () => {
@@ -34,6 +41,27 @@ export default function RegisterPage() {
       }
     })();
   }, []);
+
+  // Poll reader status so the register is clearly linked to the reader
+  useEffect(() => {
+    let live = true;
+    const fetchReader = async () => {
+      try {
+        const r = await fetch('/api/pos/reader-status');
+        const d = await r.json();
+        if (live) setReader(d.reader || null);
+      } catch {
+        /* ignore */
+      } finally {
+        if (live) setReaderLoading(false);
+      }
+    };
+    fetchReader();
+    const id = setInterval(fetchReader, 20000);
+    return () => { live = false; clearInterval(id); };
+  }, []);
+
+  const readerOnline = reader?.status === 'online';
 
   const cartLines = Object.values(cart);
   const subtotal = useMemo(
@@ -71,11 +99,18 @@ export default function RegisterPage() {
     setCart({});
     setTip('');
   }
+  function stopPoll() {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
+  }
 
   async function charge(method: 'cash' | 'card_terminal') {
     if (cartLines.length === 0) return;
+    if (method === 'card_terminal' && !readerOnline) {
+      setStatus('Card reader is offline. Connect the reader or take cash.');
+      return;
+    }
     setProcessing(method === 'cash' ? 'cash' : 'card');
-    setStatus(method === 'cash' ? 'Recording sale…' : 'Sending to card reader…');
+    setStatus(method === 'cash' ? 'Recording sale…' : 'Sending total to the reader…');
     setDone(false);
     try {
       const res = await fetch('/api/admin/pos/order', {
@@ -97,13 +132,14 @@ export default function RegisterPage() {
         finish();
         return;
       }
-      // Poll terminal payment status
+      // Card pushed to the reader — poll for completion
       const pi = data.paymentIntentId;
-      setStatus('Waiting for customer to tap/insert card…');
+      setStatus('Tap, insert, or swipe on the reader…');
       const started = Date.now();
-      const poll = setInterval(async () => {
+      stopPoll();
+      pollRef.current = setInterval(async () => {
         if (Date.now() - started > 120000) {
-          clearInterval(poll);
+          stopPoll();
           setStatus('Timed out. Check the reader.');
           setProcessing(null);
           return;
@@ -111,10 +147,10 @@ export default function RegisterPage() {
         const sRes = await fetch(`/api/pos/payment-status?id=${pi}`);
         const s = await sRes.json();
         if (s.status === 'succeeded') {
-          clearInterval(poll);
+          stopPoll();
           finish();
         } else if (s.status === 'canceled' || s.status === 'requires_payment_method') {
-          clearInterval(poll);
+          stopPoll();
           setStatus('Card declined or cancelled.');
           setProcessing(null);
         }
@@ -126,7 +162,21 @@ export default function RegisterPage() {
     }
   }
 
+  async function cancelCard() {
+    stopPoll();
+    setStatus('Cancelling on the reader…');
+    try {
+      await fetch('/api/pos/cancel-reader', { method: 'POST' });
+    } catch {
+      /* ignore */
+    }
+    setProcessing(null);
+    setStatus('Cancelled.');
+    setTimeout(() => setStatus(''), 2000);
+  }
+
   function finish() {
+    stopPoll();
     setProcessing(null);
     setStatus('');
     setDone(true);
@@ -137,7 +187,7 @@ export default function RegisterPage() {
   const visible = activeCat === 'all' ? products : products.filter((p) => p.category_id === activeCat);
 
   return (
-    <div className="">
+    <div>
       <div className="grid lg:grid-cols-3 gap-5">
         {/* Catalog */}
         <div className="lg:col-span-2">
@@ -179,7 +229,10 @@ export default function RegisterPage() {
 
         {/* Cart */}
         <div className="bg-card border border-border rounded-2xl p-4 h-fit lg:sticky lg:top-4">
-          <h2 className="font-semibold text-foreground mb-3">Current Order</h2>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-foreground">Current Order</h2>
+            <ReaderChip reader={reader} loading={readerLoading} />
+          </div>
 
           {cartLines.length === 0 ? (
             <p className="text-muted-foreground text-sm py-8 text-center">Cart is empty</p>
@@ -230,7 +283,7 @@ export default function RegisterPage() {
             <div className="mt-3 text-sm text-muted-foreground flex items-center gap-2">
               {processing && <Loader2 className="w-4 h-4 animate-spin" />} {status}
               {processing === 'card' && (
-                <button onClick={() => setProcessing(null)} className="ml-auto text-muted-foreground">
+                <button onClick={cancelCard} className="ml-auto text-[#ef4444] hover:brightness-110" title="Cancel on reader">
                   <X className="w-4 h-4" />
                 </button>
               )}
@@ -253,12 +306,18 @@ export default function RegisterPage() {
             </button>
             <button
               onClick={() => charge('card_terminal')}
-              disabled={cartLines.length === 0 || !!processing}
+              disabled={cartLines.length === 0 || !!processing || !readerOnline}
+              title={!readerOnline ? 'Card reader offline' : undefined}
               className="flex items-center justify-center gap-2 bg-[#00ffb2] hover:brightness-95 disabled:opacity-40 text-black py-2.5 rounded-lg text-sm font-medium"
             >
               <CreditCard className="w-4 h-4" /> Card
             </button>
           </div>
+          {!readerLoading && !readerOnline && (
+            <p className="text-[11px] text-[#f59e0b] mt-2 text-center">
+              Reader offline — card payments unavailable. Cash still works.
+            </p>
+          )}
           {cartLines.length > 0 && !processing && (
             <button onClick={clear} className="w-full text-xs text-muted-foreground mt-2 hover:text-foreground">
               Clear order
@@ -267,6 +326,29 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+function ReaderChip({ reader, loading }: { reader: Reader | null; loading: boolean }) {
+  if (loading) {
+    return (
+      <span className="inline-flex items-center gap-1.5 term-label text-muted-foreground">
+        <StatusDot tone="idle" /> reader…
+      </span>
+    );
+  }
+  if (!reader) {
+    return (
+      <span className="inline-flex items-center gap-1.5 term-label text-[#ef4444]">
+        <StatusDot tone="down" /> no reader
+      </span>
+    );
+  }
+  const online = reader.status === 'online';
+  return (
+    <span className={`inline-flex items-center gap-1.5 term-label ${online ? 'text-[#00ffb2]' : 'text-[#f59e0b]'}`}>
+      <StatusDot tone={online ? 'up' : 'warn'} /> {reader.label || 'reader'}{online ? '' : ' · offline'}
+    </span>
   );
 }
 
