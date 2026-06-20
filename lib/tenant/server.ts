@@ -4,6 +4,11 @@ import type { Business, BusinessSettings, TenantContext } from './index';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
 
+// Temporary subdomain → tenant-slug aliases (until custom domains are live).
+const SUBDOMAIN_ALIASES: Record<string, string> = {
+  kelaticvitalityhouse: 'vitality',
+};
+
 /**
  * Get tenant slug from request headers/cookies (server-side)
  */
@@ -30,14 +35,14 @@ export async function getTenantSlug(): Promise<string | null> {
   if (cleanHost.includes('localhost')) {
     const parts = cleanHost.split('.');
     if (parts.length > 1 && parts[0] !== 'www') {
-      return parts[0];
+      return SUBDOMAIN_ALIASES[parts[0]] ?? parts[0];
     }
   }
 
   if (cleanHost.endsWith(`.${ROOT_DOMAIN}`)) {
     const subdomain = cleanHost.replace(`.${ROOT_DOMAIN}`, '');
     if (subdomain && subdomain !== 'www' && subdomain !== 'app') {
-      return subdomain;
+      return SUBDOMAIN_ALIASES[subdomain] ?? subdomain;
     }
   }
 

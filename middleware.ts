@@ -3,6 +3,11 @@ import { createClient } from '@/lib/supabase/middleware';
 
 const ROOT_DOMAIN = process.env.NEXT_PUBLIC_ROOT_DOMAIN || 'x3o.ai';
 
+// Temporary subdomain → tenant-slug aliases (until custom domains are live).
+const SUBDOMAIN_ALIASES: Record<string, string> = {
+  kelaticvitalityhouse: 'vitality',
+};
+
 // Barber Block domain aliases — all resolve to Kelatic tenant with barber branding
 const BARBER_DOMAINS = ['barbershopblock.ai', 'www.barbershopblock.ai'];
 
@@ -77,7 +82,10 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const hostname = request.headers.get('host') || '';
 
-  const subdomain = extractSubdomain(hostname);
+  let subdomain = extractSubdomain(hostname);
+  if (subdomain && SUBDOMAIN_ALIASES[subdomain]) {
+    subdomain = SUBDOMAIN_ALIASES[subdomain];
+  }
 
   // Propagate tenant slug via request headers so server components can read it
   if (subdomain) {
