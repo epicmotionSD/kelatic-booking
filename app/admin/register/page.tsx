@@ -187,7 +187,7 @@ export default function RegisterPage() {
   const visible = activeCat === 'all' ? products : products.filter((p) => p.category_id === activeCat);
 
   return (
-    <div>
+    <div className="pb-24 lg:pb-0">
       <div className="grid lg:grid-cols-3 gap-5">
         {/* Catalog */}
         <div className="lg:col-span-2">
@@ -325,6 +325,32 @@ export default function RegisterPage() {
           )}
         </div>
       </div>
+
+      {/* Mobile sticky pay bar — charge without scrolling */}
+      {cartLines.length > 0 && (
+        <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-card border-t border-border px-4 py-3 flex items-center gap-3">
+          <div className="min-w-0">
+            <div className="data-mono text-lg font-bold text-foreground leading-none">{formatCurrency(total)}</div>
+            <div className="text-[11px] text-muted-foreground">{cartLines.reduce((n, l) => n + l.quantity, 0)} items</div>
+          </div>
+          <div className="flex-1" />
+          <button
+            onClick={() => charge('cash')}
+            disabled={!!processing}
+            className="flex items-center gap-1.5 bg-white/10 hover:bg-white/15 disabled:opacity-40 text-foreground px-4 py-2.5 rounded-lg text-sm font-medium"
+          >
+            <Banknote className="w-4 h-4" /> Cash
+          </button>
+          <button
+            onClick={() => charge('card_terminal')}
+            disabled={!!processing || !readerOnline}
+            title={!readerOnline ? 'Card reader offline' : undefined}
+            className="flex items-center gap-1.5 bg-[#00ffb2] hover:brightness-95 disabled:opacity-40 text-black px-4 py-2.5 rounded-lg text-sm font-medium"
+          >
+            <CreditCard className="w-4 h-4" /> Card
+          </button>
+        </div>
+      )}
     </div>
   );
 }

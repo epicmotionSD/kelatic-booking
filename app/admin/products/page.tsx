@@ -246,7 +246,7 @@ export default function ProductsPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Package className="w-6 h-6 text-[#00ffb2]" /> Products
@@ -257,7 +257,7 @@ export default function ProductsPage() {
           onClick={openCreate}
           className="inline-flex items-center gap-2 bg-[#00ffb2] hover:brightness-95 text-black px-4 py-2 rounded-lg text-sm font-medium"
         >
-          <Plus className="w-4 h-4" /> New Product
+          <Plus className="w-4 h-4" /> <span className="sm:hidden">New</span><span className="hidden sm:inline">New Product</span>
         </button>
       </div>
 
@@ -307,7 +307,7 @@ export default function ProductsPage() {
                     <span className="text-xs bg-white/5 text-muted-foreground px-2 py-0.5 rounded">Hidden</span>
                   )}
                 </div>
-                <div className="text-sm text-muted-foreground flex items-center gap-2 mt-0.5">
+                <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5">
                   <span>{catName(p.category_id)}</span>
                   {p.track_inventory && (
                     <span className="text-xs text-muted-foreground">· {p.stock_quantity ?? 0} in stock</span>
