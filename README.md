@@ -1,20 +1,22 @@
-# x3o.ai - White-Label Booking Platform
+# x3o.ai — AI Business Platform for Local Businesses
 
-A multi-tenant, AI-powered booking platform for salons, barbershops, spas, and beauty agencies. Built on the proven Kelatic booking system.
+A multi-tenant, AI-powered platform for local service and retail businesses — salons, barbershops, spas, and cafés. One Next.js app and one Supabase database serve every tenant, each with its own branding, domain, data isolation, and a team of three AI agents (Attract, Retain, Serve). Built on the proven Kelatic booking system.
 
 **Platform URL:** x3o.ai
-**First Tenant:** kelatic.x3o.ai (Kelatic Hair Lounge)
+**Tenants:** kelatic.x3o.ai (Kelatic Hair Lounge · also Barber Block) · kelaticvitalityhouse.com (Kelatic Vitality House — café commerce)
+
+> **New here?** Read [ARCHITECTURE.md](ARCHITECTURE.md) for the system overview and [docs/INDEX.md](docs/INDEX.md) for the full documentation index.
 
 ## Platform Architecture
 
 ```text
-x3o.ai (Root)
-├── Landing page, signup, onboarding
+x3o.ai (root)              → marketing site (Attract / Retain / Serve)
 ├── Platform admin & billing
-└── Tenant subdomains:
-    ├── kelatic.x3o.ai    → Kelatic Hair Lounge
-    ├── example.x3o.ai    → Future tenant
-    └── *.x3o.ai          → Any new business
+└── Tenants (subdomain or custom domain):
+    ├── kelatic.x3o.ai / kelatic.com  → Kelatic Hair Lounge (appointments)
+    ├── barbershopblock.ai            → Barber Block (same tenant)
+    ├── kelaticvitalityhouse.com      → Kelatic Vitality House (café commerce)
+    └── *.x3o.ai                      → any new business
 ```
 
 ## Tech Stack
@@ -22,8 +24,8 @@ x3o.ai (Root)
 - **Frontend**: Next.js 15+ (App Router) + TypeScript + Tailwind CSS
 - **Database**: Supabase (PostgreSQL with Row-Level Security)
 - **Auth**: Supabase Auth (multi-tenant aware)
-- **Payments**: Stripe Connect (platform + tenant payouts)
-- **AI**: Claude API (Anthropic) - Trinity AI Content Generation
+- **Payments**: Stripe — online checkout + in-person Terminal POS; product orders for commerce tenants
+- **AI**: Claude (Anthropic) — three primary agents (Attract / Retain / Serve); Trinity content engine
 - **Email**: SendGrid (per-tenant configuration)
 - **SMS**: Twilio (per-tenant configuration)
 - **Deployment**: Vercel (wildcard subdomains)

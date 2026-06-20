@@ -5,6 +5,24 @@
 
 ---
 
+## Status — 2026-06-20 (current)
+
+Since this roadmap was approved, the platform expanded well beyond booking:
+
+**Shipped**
+- **Commerce** — Kelatic Vitality House (café) launched as a `vitality` tenant: products, orders, in-person POS, public storefront + Stripe checkout, order fulfillment via webhook (migration `050`).
+- **Three primary agents** — Attract / Retain / Serve now wrap the marketing/retention/scheduling/support/content capabilities, with a registry-driven admin UI (`/admin/agents`) and inline live actions.
+- **x3o.ai marketing site** redesigned (openconductor-style) to showcase the three agents.
+- **Multi-tenant nav** adapts per tenant (commerce vs salon).
+
+**Next**
+- Seed Kelatic Vitality House's real menu; point `kelaticvitalityhouse.com` DNS at the app and set `custom_domain_verified = true`.
+- Revisit the original billing/onboarding goals below now that commerce + agents are in-platform.
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the current system. The sections below are the original Feb 2026 plan, kept for reference.
+
+---
+
 ## TL;DR
 
 Ship three things to hit the $1,700 MRR target: **(1)** Stripe subscription billing so the $1,500 sprint and $297/mo plan actually collect money, **(2)** integrate the campaign dashboard prototype into the admin panel with real data, and **(3)** automate tenant onboarding so new salons go from signup → payment → live subdomain without manual intervention.
