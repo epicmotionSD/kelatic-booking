@@ -327,6 +327,16 @@ export async function POST(request: NextRequest) {
     if (needsDeposit) {
       let intentId: string | null = null;
       try {
+        // Look up Connect routing fields so the deposit lands on the
+        // tenant's connected account (when they've finished onboarding).
+        const { data: bizRow } = businessId
+          ? await admin
+              .from('businesses')
+              .select('stripe_account_id, stripe_account_status, platform_fee_percent')
+              .eq('id', businessId)
+              .maybeSingle()
+          : { data: null };
+
         const intent = await createPaymentIntent({
           amount: toCents(depositAmount),
           appointmentId: appointment.id,
@@ -335,6 +345,7 @@ export async function POST(request: NextRequest) {
             client_email: body.client.email,
             client_name: `${body.client.first_name} ${body.client.last_name}`,
           },
+          business: bizRow ?? undefined,
         });
         intentId = intent.id;
         paymentIntent = { id: intent.id, client_secret: intent.client_secret };

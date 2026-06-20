@@ -1,4 +1,5 @@
 import Stripe from 'stripe';
+import { buildConnectRouting } from './connect';
 
 // Lazy initialization of server-side Stripe client
 let stripeInstance: Stripe | null = null;
@@ -29,6 +30,17 @@ interface CreatePaymentIntentParams {
   appointmentId: string;
   isDeposit?: boolean;
   metadata?: Record<string, string>;
+  /**
+   * Optional business context — when set with a connected Stripe account
+   * and status='active', the PI is created on the tenant's account with
+   * an application fee. Without this (or for tenants not yet onboarded),
+   * payments flow through the platform account exactly as before.
+   */
+  business?: {
+    stripe_account_id: string | null;
+    stripe_account_status?: string | null;
+    platform_fee_percent?: number | string | null;
+  };
 }
 
 export async function createPaymentIntent({
@@ -37,20 +49,29 @@ export async function createPaymentIntent({
   appointmentId,
   isDeposit = false,
   metadata = {},
+  business,
 }: CreatePaymentIntentParams) {
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount,
-    currency: 'usd',
-    customer: customerId,
-    metadata: {
-      appointment_id: appointmentId,
-      is_deposit: String(isDeposit),
-      ...metadata,
+  const routing = business ? buildConnectRouting(business, amount) : {};
+
+  const paymentIntent = await stripe.paymentIntents.create(
+    {
+      amount,
+      currency: 'usd',
+      customer: customerId,
+      metadata: {
+        appointment_id: appointmentId,
+        is_deposit: String(isDeposit),
+        ...metadata,
+      },
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      ...(routing.applicationFeeAmount
+        ? { application_fee_amount: routing.applicationFeeAmount }
+        : {}),
     },
-    automatic_payment_methods: {
-      enabled: true,
-    },
-  });
+    routing.requestOptions
+  );
 
   return paymentIntent;
 }

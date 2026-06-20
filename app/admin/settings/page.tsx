@@ -434,7 +434,13 @@ export default function SettingsPage() {
                 Connected
               </span>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
+              <a
+                href="/admin/settings/payments"
+                className="px-4 py-2 bg-[#00ffb2] text-black rounded-xl hover:bg-[#00e0a0] transition-colors text-sm font-semibold"
+              >
+                Manage Stripe Connect
+              </a>
               <a
                 href="https://dashboard.stripe.com"
                 target="_blank"
@@ -443,7 +449,7 @@ export default function SettingsPage() {
               >
                 Open Dashboard
               </a>
-              <button className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-border">
+              <button type="button" className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-border">
                 Manage Terminal
               </button>
             </div>

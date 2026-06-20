@@ -26,9 +26,11 @@ export interface Business {
   website_url: string | null;
   stripe_account_id: string | null;
   stripe_account_status: string;
+  platform_fee_percent: number | string | null;
   plan: string;
   features: Record<string, boolean>;
   custom_domain: string | null;
+  custom_domain_verified: boolean | null;
   is_active: boolean;
 }
 

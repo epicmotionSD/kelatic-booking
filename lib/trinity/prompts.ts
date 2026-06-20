@@ -334,9 +334,11 @@ const TRINITY_BASE_BUSINESS: Business = {
   website_url: null,
   stripe_account_id: null,
   stripe_account_status: 'not_connected',
+  platform_fee_percent: 0,
   plan: 'pro',
   features: {},
   custom_domain: null,
+  custom_domain_verified: false,
   is_active: true,
 };
 

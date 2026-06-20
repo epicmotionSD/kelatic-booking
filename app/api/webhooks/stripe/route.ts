@@ -4,6 +4,7 @@ import { stripe, constructWebhookEvent } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/client';
 import { sendConfirmationByAppointmentId } from '@/lib/notifications/service';
 import { awardPointsForEvent, redeemReward } from '@/lib/agents/modules/loyalty';
+import { summarizeAccount } from '@/lib/stripe/connect';
 import type Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -342,6 +343,21 @@ export async function POST(request: NextRequest) {
           // TODO: Track Revenue Sprint purchase and trigger campaign setup
           console.log(`Revenue Sprint purchased: ${session.id}`);
         }
+        break;
+      }
+
+      // Connected-account status changes (KYC complete, capability flipped,
+      // requirements added, etc.). Keep businesses.stripe_account_status in
+      // sync so the admin badge + payment routing react without the owner
+      // having to refresh the settings page.
+      case 'account.updated': {
+        const account = event.data.object as Stripe.Account;
+        const summary = summarizeAccount(account);
+        await supabase
+          .from('businesses')
+          .update({ stripe_account_status: summary.status })
+          .eq('stripe_account_id', account.id);
+        console.log(`Connect account updated: ${account.id} → ${summary.status}`);
         break;
       }
 

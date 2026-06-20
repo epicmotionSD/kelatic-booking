@@ -6,6 +6,7 @@ import {
   computeRewardDiscount,
   getProgramForBusiness,
 } from '@/lib/agents/modules/loyalty';
+import { buildConnectRouting } from '@/lib/stripe/connect';
 
 interface CartLine { product_id: string; quantity: number }
 interface LoyaltyApply { rewardId: string }
@@ -176,13 +177,31 @@ export async function POST(request: NextRequest) {
       piMetadata.loyalty_discount_cents = String(discountCents);
     }
 
-    const pi = await stripe.paymentIntents.create({
-      amount: total,
-      currency: 'usd',
-      automatic_payment_methods: { enabled: true },
-      receipt_email: customer.email,
-      metadata: piMetadata,
-    });
+    // Route via Stripe Connect when the tenant has finished onboarding.
+    // For tenants without a connected account this is a no-op and payments
+    // continue to flow through the platform account exactly as before.
+    const routing = buildConnectRouting(
+      {
+        stripe_account_id: business.stripe_account_id ?? null,
+        stripe_account_status: business.stripe_account_status ?? null,
+        platform_fee_percent: business.platform_fee_percent ?? null,
+      },
+      total
+    );
+
+    const pi = await stripe.paymentIntents.create(
+      {
+        amount: total,
+        currency: 'usd',
+        automatic_payment_methods: { enabled: true },
+        receipt_email: customer.email,
+        metadata: piMetadata,
+        ...(routing.applicationFeeAmount
+          ? { application_fee_amount: routing.applicationFeeAmount }
+          : {}),
+      },
+      routing.requestOptions
+    );
 
     await supabase
       .from('orders')
