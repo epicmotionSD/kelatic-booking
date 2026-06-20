@@ -24,7 +24,9 @@ export interface AgentTool {
     | 'ghost-clients'
     | 'view-tickets'
     | 'knowledge-search'
-    | 'support-chat';
+    | 'support-chat'
+    | 'loyalty-list'
+    | 'loyalty-balance';
 }
 
 export interface AgentModule {
@@ -47,6 +49,3 @@ export interface PrimaryAgent {
   description: string;
   icon: string;
   /** Brand accent color (hex) for UI. */
-  color: string;
-  modules: AgentModule[];
-}

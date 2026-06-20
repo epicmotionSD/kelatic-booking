@@ -71,15 +71,13 @@ export async function POST(req: NextRequest) {
       nonCompliant: tcpaValidation.summary.nonCompliantCount,
     }
     
-    // TODO: Store in database
-    // await db.leads.createMany({
-    //   data: segmentedLeads.map(lead => ({
-    //     ...lead,
-    //     tenantId,
-    //     tcpaCompliant: tcpaValidation.compliant.some(c => c.id === lead.id),
-    //   })),
-    // })
-    
+    // NOTE: Parsed leads are intentionally NOT persisted here. This is the
+    // onboarding/preview step — there is no campaign yet, and `campaign_leads`
+    // requires a `campaign_id` + a real `business_id`. Persistence happens when
+    // the owner launches a campaign: POST /api/reactivation/launch creates the
+    // campaign and inserts these leads into `campaign_leads`. The segmented
+    // leads are returned below so the UI can hold them in state until launch.
+
     // Return summary for UI + full data for state
     return NextResponse.json({
       success: true,
@@ -87,13 +85,4 @@ export async function POST(req: NextRequest) {
       leads: segmentedLeads,
       tcpaWarnings: tcpaValidation.warnings,
       filePath, // For reference
-    })
-    
-  } catch (error) {
-    console.error('Parse error:', error)
-    return NextResponse.json(
-      { error: 'Failed to parse contacts', details: String(error) },
-      { status: 500 }
-    )
-  }
-}
+   

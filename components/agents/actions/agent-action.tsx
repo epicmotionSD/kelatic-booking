@@ -11,7 +11,9 @@ export type ActionKind =
   | 'ghost-clients'
   | 'view-tickets'
   | 'knowledge-search'
-  | 'support-chat';
+  | 'support-chat'
+  | 'loyalty-list'
+  | 'loyalty-balance';
 
 interface Props {
   action: ActionKind;
@@ -36,6 +38,7 @@ export default function AgentAction({ action, endpoint, businessId, color }: Pro
   }
   if (action === 'support-chat') return <SupportChat endpoint={endpoint || ''} businessId={businessId} color={color} />;
   if (action === 'knowledge-search') return <KnowledgeSearch endpoint={endpoint || ''} businessId={businessId} color={color} />;
+  if (action === 'loyalty-balance') return <LoyaltyBalance endpoint={endpoint || ''} businessId={businessId} color={color} />;
   return <FetchView action={action} endpoint={endpoint || ''} businessId={businessId} color={color} />;
 }
 
@@ -128,7 +131,7 @@ function RunButton({ loading, color, label, onClick }: { loading: boolean; color
 
 function FetchView({
   action, endpoint, businessId, color,
-}: { action: 'find-gaps' | 'ghost-clients' | 'view-tickets'; endpoint: string; businessId: string; color: string }) {
+}: { action: 'find-gaps' | 'ghost-clients' | 'view-tickets' | 'loyalty-list'; endpoint: string; businessId: string; color: string }) {
   const { loading, error, data, call } = useRunner();
   const today = new Date().toISOString().slice(0, 10);
   const in14 = new Date(Date.now() + 14 * 864e5).toISOString().slice(0, 10);
@@ -158,7 +161,7 @@ function FetchView({
           </>
         )}
         <RunButton loading={loading} color={color}
-          label={action === 'ghost-clients' ? 'Find ghost clients' : action === 'find-gaps' ? 'Find gaps' : 'Load tickets'}
+          label={action === 'ghost-clients' ? 'Find ghost clients' : action === 'find-gaps' ? 'Find gaps' : action === 'loyalty-list' ? 'Load' : 'Load tickets'}
           onClick={run} />
       </div>
       {error && <p className="text-sm text-[#ef4444] mt-2">{error}</p>}
@@ -188,6 +191,27 @@ function KnowledgeSearch({ endpoint, businessId, color }: { endpoint: string; bu
   );
 }
 
+function LoyaltyBalance({ endpoint, businessId, color }: { endpoint: string; businessId: string; color: string }) {
+  const { loading, error, data, call } = useRunner();
+  const [clientId, setClientId] = useState('');
+  function run() {
+    if (!clientId.trim()) return;
+    const p = new URLSearchParams({ businessId, clientId: clientId.trim() });
+    call(`${endpoint}?${p.toString()}`);
+  }
+  return (
+    <div className={wrap}>
+      <div className="flex gap-2">
+        <input value={clientId} onChange={(e) => setClientId(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') run(); }}
+          placeholder="Client ID (UUID)…" className={`flex-1 ${inp}`} />
+        <RunButton loading={loading} color={color} label="Check balance" onClick={run} />
+      </div>
+      {error && <p className="text-sm text-[#ef4444] mt-2">{error}</p>}
+      {data != null && <ResultView data={data} />}
+    </div>
+  );
+}
+
 function SupportChat({ endpoint, businessId, color }: { endpoint: string; businessId: string; color: string }) {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
@@ -208,34 +232,4 @@ function SupportChat({ endpoint, businessId, color }: { endpoint: string; busine
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Request failed.'); return; }
       const text = data.response || data.reply || data.message ||
-        (typeof data.content === 'string' ? data.content : null) || JSON.stringify(data, null, 2);
-      setReply(text);
-    } catch (e) {
-      console.error(e);
-      setError('Something went wrong.');
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div className={wrap}>
-      <div className="flex gap-2">
-        <input value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send(); }}
-          placeholder="Ask the support agent a client question…" className={`flex-1 ${inp}`} />
-        <button onClick={send} disabled={loading}
-          className="inline-flex items-center gap-2 text-black text-sm font-medium rounded px-3 py-1.5 disabled:opacity-50"
-          style={{ backgroundColor: color }}>
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-          Ask
-        </button>
-      </div>
-      {error && <p className="text-sm text-[#ef4444] mt-2">{error}</p>}
-      {reply && (
-        <pre className="mt-3 whitespace-pre-wrap text-sm text-foreground/90 bg-background border border-border rounded p-3 max-h-64 overflow-auto">
-          {reply}
-        </pre>
-      )}
-    </div>
-  );
-}
+        (typeof data.content === 'string' ? data.content : null) || JSON.strin

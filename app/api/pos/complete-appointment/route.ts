@@ -74,41 +74,4 @@ export async function POST(request: NextRequest) {
             [profile?.first_name, profile?.last_name].filter(Boolean).join(' ') ||
             appointment.walk_in_name ||
             undefined,
-          metadata: { fired_on: 'mark_complete' },
-        });
-      } catch (err) {
-        console.error('Loyalty earn (appointment.completed) failed:', err);
-      }
-    });
-
-    // Update client's last visit date
-    if (appointment.client?.id) {
-      await supabase
-        .from('profiles')
-        .update({ last_visit_at: new Date().toISOString() })
-        .eq('id', appointment.client.id);
-
-      // Create rebooking reminder for maintenance services (locs, etc.)
-      if (appointment.service?.name?.toLowerCase().includes('retwist')) {
-        const reminderDate = new Date();
-        reminderDate.setDate(reminderDate.getDate() + 42); // 6 weeks
-
-        await supabase.from('rebooking_reminders').insert({
-          client_id: appointment.client.id,
-          service_id: appointment.service.id,
-          last_appointment_at: new Date().toISOString(),
-          recommended_interval_days: 42,
-          reminder_date: reminderDate.toISOString().split('T')[0],
-        });
-      }
-    }
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error('Complete appointment error:', error);
-    return NextResponse.json(
-      { error: 'Failed to complete appointment' },
-      { status: 500 }
-    );
-  }
-}
+ 
