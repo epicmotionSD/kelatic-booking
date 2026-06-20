@@ -292,7 +292,50 @@ export default function AppointmentsPage() {
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Mobile cards */}
+          <div className="lg:hidden grid gap-3">
+            {appointments.map((apt) => (
+              <div key={apt.id} className="rounded-xl border border-border bg-card p-4">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0">
+                    <div className="font-semibold text-foreground truncate">{apt.client_name || 'Walk-in'}</div>
+                    {apt.client_phone && <div className="text-xs text-muted-foreground">{apt.client_phone}</div>}
+                  </div>
+                  <span className={`shrink-0 px-2 py-1 rounded-full text-xs font-medium border ${STATUS_COLORS[apt.status] || 'bg-white/10 text-white/40'}`}>
+                    {apt.status.replace('_', ' ')}
+                  </span>
+                </div>
+                <div className="mt-3 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 text-sm">
+                  <span className="text-muted-foreground">Date</span>
+                  <span className="text-right text-foreground data-mono">{new Date(apt.start_time).toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: timezone })}</span>
+                  <span className="text-muted-foreground">Time</span>
+                  <span className="text-right text-foreground data-mono">{formatTime(apt.start_time, timezone)}–{formatTime(apt.end_time, timezone)}</span>
+                  <span className="text-muted-foreground">Service</span>
+                  <span className="text-right text-foreground truncate">{apt.service_name}</span>
+                  <span className="text-muted-foreground">Stylist</span>
+                  <span className="text-right text-foreground truncate">{apt.stylist_name}</span>
+                  <span className="text-muted-foreground">Price</span>
+                  <span className="text-right text-foreground data-mono">{formatCurrency(apt.quoted_price * 100)}{apt.deposit_paid > 0 ? ` · ${formatCurrency(apt.deposit_paid * 100)} dep` : ''}</span>
+                </div>
+                <div className="mt-3 flex items-center gap-2 border-t border-border pt-3">
+                  {apt.status === 'pending' && (
+                    <button onClick={() => updateStatus(apt.id, 'confirmed')} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#00ffb2] text-black">Confirm</button>
+                  )}
+                  {apt.status === 'confirmed' && (
+                    <button onClick={() => updateStatus(apt.id, 'in_progress')} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-white/10 text-foreground">Start</button>
+                  )}
+                  {apt.status === 'in_progress' && (
+                    <Link href={`/admin/pos?appointment=${apt.id}`} className="px-3 py-1.5 rounded-lg text-xs font-medium bg-[#00ffb2] text-black">Checkout</Link>
+                  )}
+                  <Link href={`/admin/appointments/${apt.id}`} className="ml-auto text-xs text-muted-foreground hover:text-foreground">View →</Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-white/5 border-b border-border">
@@ -436,6 +479,7 @@ export default function AppointmentsPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
     </div>
