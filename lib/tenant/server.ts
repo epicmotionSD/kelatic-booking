@@ -48,6 +48,9 @@ export async function getTenantSlug(): Promise<string | null> {
   if (cleanHost === 'barbershopblock.ai' || cleanHost === 'www.barbershopblock.ai') {
     return 'kelatic';
   }
+  if (cleanHost === 'kelaticvitalityhouse.com' || cleanHost === 'www.kelaticvitalityhouse.com') {
+    return 'vitality';
+  }
 
   return null;
 }

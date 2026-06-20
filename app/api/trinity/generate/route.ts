@@ -1,72 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateContent, GenerationRequest } from '@/lib/trinity/service';
-import {
-  BARBER_BLOCK_CONTEXT,
-  ContentType,
-  KELATIC_DEFAULT_CONTEXT,
-  LOC_ACADEMY_CONTEXT,
-} from '@/lib/trinity/prompts';
-import type { BusinessContext } from '@/lib/trinity/prompts';
+import { runContentGeneration, ContentModuleError } from '@/lib/agents/modules/content';
 
-function getBrandContext(brand?: string): BusinessContext {
-  switch (brand) {
-    case 'barber-block':
-      return BARBER_BLOCK_CONTEXT;
-    case 'loc-academy':
-      return LOC_ACADEMY_CONTEXT;
-    default:
-      return KELATIC_DEFAULT_CONTEXT;
-  }
-}
-
+// Thin delegator — content generation now lives in the ATTRACT agent's
+// Content Studio module (lib/agents/modules/content). This route just adapts
+// the HTTP request/response around the module tool.
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Validate required fields
-    if (!body.type || !body.topic) {
-      return NextResponse.json(
-        { error: 'Missing required fields: type and topic' },
-        { status: 400 }
-      );
-    }
-
-    // Validate content type
-    const validTypes: ContentType[] = [
-      'social',
-      'email',
-      'blog',
-      'video',
-      'education',
-      'graphics',
-      'newsletter',
-    ];
-
-    if (!validTypes.includes(body.type)) {
-      return NextResponse.json(
-        { error: `Invalid type. Must be one of: ${validTypes.join(', ')}` },
-        { status: 400 }
-      );
-    }
-
-    const request_data: GenerationRequest = {
+    const result = await runContentGeneration({
       type: body.type,
       topic: body.topic,
       context: body.context,
       tone: body.tone,
       targetAudience: body.targetAudience,
       additionalInstructions: body.additionalInstructions,
-      businessContext: body.businessContext || getBrandContext(body.brand),
-    };
-
-    const result = await generateContent(request_data);
+      brand: body.brand,
+      businessContext: body.businessContext,
+    });
 
     return NextResponse.json(result);
   } catch (error) {
+    if (error instanceof ContentModuleError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Trinity generation error:', error);
-    return NextResponse.json(
-      { error: 'Failed to generate content' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate content' }, { status: 500 });
   }
 }

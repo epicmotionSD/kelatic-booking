@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import './x3o-styles.css'
 
-type TabKey = 'overview' | 'architecture' | 'casestudy' | 'marketplace' | 'pricing' | 'gtm'
+type TabKey = 'overview' | 'team' | 'proof' | 'pricing' | 'start'
 
 function Tag({ color, children }: { color: string; children: React.ReactNode }) {
   return <span className={`x3o-tag x3o-tag-${color}`}>{children}</span>
@@ -20,16 +20,32 @@ function Dot({ color }: { color: string }) {
   }} />
 }
 
+const AGENTS = [
+  { icon: '✍️', name: 'Trinity', role: 'Content & brand creative', desc: 'Writes posts, captions, and campaigns in your brand voice — and keeps your content calendar full.' },
+  { icon: '📣', name: 'Marketing Agent', role: 'Campaign operator', desc: 'Plans and runs your email, SMS, and social campaigns, then tracks what actually drove bookings.' },
+  { icon: '🔁', name: 'Retention Agent', role: 'Win-back operator', desc: 'Notices clients who have gone quiet and runs personalized win-back sequences automatically.' },
+  { icon: '📅', name: 'Scheduling Agent', role: 'Calendar operator', desc: 'Finds and fills gaps in your calendar, sends reminders, and cuts down no-shows.' },
+  { icon: '💬', name: 'Support Agent', role: 'Front-desk operator', desc: 'Answers client questions and handles requests 24/7 from your own knowledge base.' },
+]
+
+const PLATFORM = [
+  { icon: '🗓️', label: 'Online booking' },
+  { icon: '🛍️', label: 'Branded storefront + checkout' },
+  { icon: '💳', label: 'In-person POS' },
+  { icon: '💵', label: 'Payments' },
+  { icon: '✉️', label: 'Email & SMS' },
+  { icon: '👥', label: 'Client records' },
+]
+
 export default function PlatformPage() {
   const [activeTab, setActiveTab] = useState<TabKey>('overview')
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: 'overview', label: 'Overview' },
-    { key: 'architecture', label: 'Architecture' },
-    { key: 'casestudy', label: 'Case Study · KeLatic' },
-    { key: 'marketplace', label: 'Marketplace' },
+    { key: 'team', label: 'Your AI Team' },
+    { key: 'proof', label: 'Proof · KeLatic' },
     { key: 'pricing', label: 'Pricing' },
-    { key: 'gtm', label: 'GTM Strategy' },
+    { key: 'start', label: 'Get Started' },
   ]
 
   return (
@@ -43,10 +59,10 @@ export default function PlatformPage() {
           </div>
           <div style={{ display: 'flex', gap: 8 }}>
             <a href="https://kelatic.x3o.ai" className="x3o-btn x3o-btn-ghost" target="_blank" rel="noopener noreferrer">
-              Live Demo → kelatic.x3o.ai
+              See it live → kelatic.x3o.ai
             </a>
-            <a href="#pricing" className="x3o-btn x3o-btn-primary" onClick={(e) => { e.preventDefault(); setActiveTab('pricing') }}>
-              Get Started
+            <a href="#start" className="x3o-btn x3o-btn-primary" onClick={(e) => { e.preventDefault(); setActiveTab('start') }}>
+              Start Free Trial
             </a>
           </div>
         </div>
@@ -67,253 +83,163 @@ export default function PlatformPage() {
         </div>
       </nav>
 
-      {/* ══════════════ Tab: Overview ══════════════ */}
+      {/* ══════════════ Overview ══════════════ */}
       {activeTab === 'overview' && (
         <main className="x3o-main">
           <div className="x3o-hero-strip">
-            <h1>x3o Intelligence</h1>
-            <p className="x3o-hero-sub">Claude-Powered B2B Intelligence Marketplace</p>
-            <p style={{ color: 'var(--x3o-muted)', maxWidth: 620, margin: '0 auto' }}>
-              We deploy Claude as domain-specific AI operators for service businesses.
-              Each vertical gets a white-label intelligence layer — social metrics,
-              competitor intel, campaign performance, booking funnel analysis, content
-              calendars, and automated client re-engagement — all orchestrated through
-              Anthropic&apos;s API.
+            <h1>Your business, run by a team of AI agents.</h1>
+            <p className="x3o-hero-sub">Hire your AI operations team — live in a day.</p>
+            <p style={{ color: 'var(--x3o-muted)', maxWidth: 640, margin: '0 auto' }}>
+              x3o gives every local business a team of AI agents — for marketing, retention, scheduling,
+              support, and content — running on top of a full booking, storefront, and payments platform.
+              You set the goal. The agents do the work.
             </p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', marginTop: 20 }}>
+              <a href="#start" className="x3o-btn x3o-btn-primary" onClick={(e) => { e.preventDefault(); setActiveTab('start') }}>
+                Start Free Trial
+              </a>
+              <a href="https://kelatic.x3o.ai" className="x3o-btn x3o-btn-ghost" target="_blank" rel="noopener noreferrer">
+                See it live →
+              </a>
+            </div>
           </div>
 
           <div className="x3o-g4">
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">$297</div>
-              <div className="x3o-metric-label">Avg MRR / Tenant</div>
+              <div className="x3o-metric-val x3o-val-green">+$5,510</div>
+              <div className="x3o-metric-label">Revenue recovered / mo (KeLatic)</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
               <div className="x3o-metric-val">18.5×</div>
-              <div className="x3o-metric-label">Client ROI (KeLatic)</div>
+              <div className="x3o-metric-label">ROI on the Growth plan</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">6</div>
-              <div className="x3o-metric-label">Verticals Targeted</div>
+              <div className="x3o-metric-val">5</div>
+              <div className="x3o-metric-label">AI agents on your team</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
-              <div className="x3o-metric-val">~$1.2M</div>
-              <div className="x3o-metric-label">Year-1 Revenue Target</div>
+              <div className="x3o-metric-val">~24h</div>
+              <div className="x3o-metric-label">From signup to live</div>
             </div>
           </div>
 
           {/* Problem / Solution */}
           <div className="x3o-g2">
             <div className="x3o-card">
-              <Tag color="red">Problem</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>Service Businesses Are Flying Blind</h3>
+              <Tag color="red">The problem</Tag>
+              <h3 style={{ margin: '12px 0 8px' }}>You&apos;re wearing every hat</h3>
               <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
-                <li>No visibility into social engagement trends</li>
-                <li>Manual competitor monitoring (or none at all)</li>
-                <li>No data-driven content calendar</li>
-                <li>Ghost clients disappear without follow-up</li>
-                <li>Campaign ROI is a guess</li>
+                <li>Marketing slips — no time to post or run campaigns</li>
+                <li>Past clients quietly disappear, with no follow-up</li>
+                <li>The calendar has gaps nobody fills</li>
+                <li>Questions pile up after hours</li>
+                <li>&quot;AI tools&quot; so far just mean more dashboards to read</li>
               </ul>
             </div>
             <div className="x3o-card-accent">
-              <Tag color="green">Solution</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>Claude as Your Business AI Operator</h3>
+              <Tag color="green">The x3o way</Tag>
+              <h3 style={{ margin: '12px 0 8px' }}>A team that does the work</h3>
               <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
-                <li><strong>Social Intelligence</strong> — real-time engagement analysis</li>
-                <li><strong>Competitor Radar</strong> — automated positioning alerts</li>
-                <li><strong>Campaign Analytics</strong> — ROI tracking &amp; optimization</li>
-                <li><strong>Booking Funnel AI</strong> — drop-off detection &amp; recovery</li>
-                <li><strong>Content Engine</strong> — AI-generated calendar &amp; copy</li>
-                <li><strong>Client Re-engagement</strong> — automated win-back sequences</li>
+                <li><strong>Trinity</strong> creates your content & campaigns</li>
+                <li><strong>Marketing</strong> runs them across email, SMS & social</li>
+                <li><strong>Retention</strong> wins back clients who drifted away</li>
+                <li><strong>Scheduling</strong> fills your calendar & cuts no-shows</li>
+                <li><strong>Support</strong> answers clients around the clock</li>
               </ul>
             </div>
           </div>
 
-          {/* Claude Ecosystem */}
-          <div className="x3o-card" style={{ marginTop: 24 }}>
-            <h3 style={{ marginBottom: 16 }}>Claude Ecosystem Mapping</h3>
-            <div className="x3o-g3">
-              <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <Tag color="purple">Claude API</Tag>
-                <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)' }}>
-                  Powers all AI intelligence — social analysis, content generation,
-                  campaign recommendations, and natural-language dashboard queries.
-                </p>
-              </div>
-              <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <Tag color="blue">MCP Server</Tag>
-                <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)' }}>
-                  Exposes x3o tools to Claude Desktop &amp; third-party agents via
-                  the Model Context Protocol. Each vertical becomes an MCP toolset.
-                </p>
-              </div>
-              <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <Tag color="green">Marketplace Listing</Tag>
-                <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)' }}>
-                  Listed on Anthropic&apos;s marketplace as a B2B intelligence
-                  provider — giving Claude users direct access to vertical-specific
-                  business tools.
-                </p>
-              </div>
+          {/* Why it's different */}
+          <div className="x3o-g3" style={{ marginTop: 24 }}>
+            <div className="x3o-card">
+              <Tag color="purple">A team, not a dashboard</Tag>
+              <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>
+                x3o agents take action — they post, message, follow up, and book — instead of handing you
+                another chart to interpret.
+              </p>
+            </div>
+            <div className="x3o-card">
+              <Tag color="blue">Runs the whole business</Tag>
+              <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>
+                Booking, storefront, POS, payments, and client comms are built in — so the agents operate a
+                real business end-to-end.
+              </p>
+            </div>
+            <div className="x3o-card">
+              <Tag color="green">In your brand</Tag>
+              <p style={{ marginTop: 8, fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>
+                Fully white-label — your name, your colors, your domain. Your customers never see &quot;x3o.&quot;
+              </p>
             </div>
           </div>
         </main>
       )}
 
-      {/* ══════════════ Tab: Architecture ══════════════ */}
-      {activeTab === 'architecture' && (
+      {/* ══════════════ Your AI Team ══════════════ */}
+      {activeTab === 'team' && (
         <main className="x3o-main">
-          <h2>System Architecture</h2>
-          <p style={{ color: 'var(--x3o-muted)', marginBottom: 24 }}>
-            x3o Intelligence is built as a composable pipeline: ingest → enrich → act.
-            Claude sits at the centre of every decision node.
+          <h2>Meet your AI team</h2>
+          <p style={{ color: 'var(--x3o-muted)', marginBottom: 24, maxWidth: 680 }}>
+            Five agents, each with a job. They work together, in your brand voice, on top of the platform
+            that actually runs your business.
           </p>
 
-          {/* Data Flow */}
-          <div className="x3o-card" style={{ marginBottom: 24 }}>
-            <h3 style={{ marginBottom: 16 }}>Data Flow</h3>
-            <div className="x3o-arch-flow">
-              <div className="x3o-arch-node">
-                <div className="x3o-arch-node-title">Data Sources</div>
-                <div className="x3o-arch-node-body">
-                  Instagram API · Google Business · Stripe · Booking System · CRM
+          <div className="x3o-g3">
+            {AGENTS.map((a) => (
+              <div className="x3o-card" key={a.name}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
+                  <span style={{ fontSize: 26 }}>{a.icon}</span>
+                  <Tag color="green">Active</Tag>
                 </div>
+                <h4 style={{ margin: '10px 0 2px' }}>{a.name}</h4>
+                <div style={{ fontSize: 12, color: 'var(--x3o-accent)', marginBottom: 6 }}>{a.role}</div>
+                <p style={{ fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>{a.desc}</p>
               </div>
-              <div className="x3o-arch-arrow">→</div>
-              <div className="x3o-arch-node x3o-arch-node-highlight">
-                <div className="x3o-arch-node-title">Claude API</div>
-                <div className="x3o-arch-node-body">
-                  Analysis · Classification · Generation · Recommendations
-                </div>
-              </div>
-              <div className="x3o-arch-arrow">→</div>
-              <div className="x3o-arch-node">
-                <div className="x3o-arch-node-title">Intelligence Layer</div>
-                <div className="x3o-arch-node-body">
-                  Dashboards · Alerts · Automations · Content Calendar
-                </div>
-              </div>
-              <div className="x3o-arch-arrow">→</div>
-              <div className="x3o-arch-node">
-                <div className="x3o-arch-node-title">Business Outcomes</div>
-                <div className="x3o-arch-node-body">
-                  Revenue ↑ · Retention ↑ · Costs ↓ · Time Saved
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Code Samples */}
-          <div className="x3o-g2">
-            <div className="x3o-card">
-              <h4 style={{ marginBottom: 12 }}>Claude API Integration</h4>
-              <pre className="x3o-code">{`const analysis = await anthropic.messages.create({
-  model: "claude-sonnet-4-20250514",
-  max_tokens: 1024,
-  system: verticalPrompts[business.vertical],
-  messages: [{
-    role: "user",
-    content: \`Analyze engagement trends:
-    \${JSON.stringify(metrics)}\`
-  }]
-});`}</pre>
-            </div>
-            <div className="x3o-card">
-              <h4 style={{ marginBottom: 12 }}>MCP Server Config</h4>
-              <pre className="x3o-code">{`{
-  "mcpServers": {
-    "x3o-intelligence": {
-      "url": "https://x3o.ai/mcp",
-      "tools": [
-        "analyze_social_metrics",
-        "get_competitor_intel",
-        "generate_content_calendar",
-        "check_booking_funnel",
-        "run_campaign_analysis"
-      ]
-    }
-  }
-}`}</pre>
-            </div>
-          </div>
-
-          {/* Vertical System Prompts */}
-          <div className="x3o-card" style={{ marginTop: 24 }}>
-            <h3 style={{ marginBottom: 16 }}>Vertical System Prompts</h3>
-            <p style={{ color: 'var(--x3o-muted)', marginBottom: 16 }}>
-              Each vertical gets a specialized Claude system prompt that understands
-              domain-specific metrics, terminology, and success patterns.
+          {/* Platform underneath */}
+          <div className="x3o-card" style={{ marginTop: 32 }}>
+            <h3 style={{ marginBottom: 6 }}>The platform underneath</h3>
+            <p style={{ color: 'var(--x3o-muted)', marginBottom: 16, fontSize: 14 }}>
+              The agents can do real work because they run on a real operational stack — all included.
             </p>
-            <div className="x3o-table-wrap">
-              <table className="x3o-table">
-                <thead>
-                  <tr><th>Vertical</th><th>Key Metrics</th><th>Domain Knowledge</th></tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td><Tag color="purple">Beauty &amp; Locs</Tag></td>
-                    <td>Rebooking rate, avg ticket, ghost client %</td>
-                    <td>Service duration, product upsells, seasonal trends</td>
-                  </tr>
-                  <tr>
-                    <td><Tag color="amber">Restaurants</Tag></td>
-                    <td>Table turnover, avg check, review velocity</td>
-                    <td>Menu optimization, peak hours, delivery mix</td>
-                  </tr>
-                  <tr>
-                    <td><Tag color="green">Fitness</Tag></td>
-                    <td>Member retention, class fill rate, LTV</td>
-                    <td>Session packages, trainer utilization, churn signals</td>
-                  </tr>
-                  <tr>
-                    <td><Tag color="blue">Retail</Tag></td>
-                    <td>Foot traffic, conversion rate, basket size</td>
-                    <td>Inventory turns, seasonal planning, loyalty program</td>
-                  </tr>
-                  <tr>
-                    <td><Tag color="teal">Med Spas</Tag></td>
-                    <td>Treatment rebooking, package conversion, referral rate</td>
-                    <td>Treatment protocols, consent flows, provider scheduling</td>
-                  </tr>
-                  <tr>
-                    <td><Tag color="red">Legal</Tag></td>
-                    <td>Consultation conversion, case pipeline, billing efficiency</td>
-                    <td>Practice area routing, intake qualification, trust accounting</td>
-                  </tr>
-                </tbody>
-              </table>
+            <div className="x3o-g3">
+              {PLATFORM.map((p) => (
+                <div key={p.label} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: 14, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
+                  <span style={{ fontSize: 22 }}>{p.icon}</span>
+                  <span style={{ fontSize: 14 }}>{p.label}</span>
+                </div>
+              ))}
             </div>
           </div>
         </main>
       )}
 
-      {/* ══════════════ Tab: Case Study · KeLatic ══════════════ */}
-      {activeTab === 'casestudy' && (
+      {/* ══════════════ Proof · KeLatic ══════════════ */}
+      {activeTab === 'proof' && (
         <main className="x3o-main">
           <div className="x3o-cs-hero">
             <Tag color="green">Live · Production</Tag>
-            <h2 style={{ margin: '12px 0 4px' }}>
-              KeLatic — Loc Intelligence Platform
-            </h2>
+            <h2 style={{ margin: '12px 0 4px' }}>What KeLatic&apos;s agents recovered</h2>
             <p style={{ color: 'var(--x3o-muted)' }}>
-              First x3o vertical deployment. Full-stack AI operations for a premium
-              loc studio in Houston, TX.
+              The first business run on x3o — a premium loc studio in Houston, TX. Same owner now runs a second
+              brand, KeLatic Vitality House, on the same platform.
             </p>
-            <a
-              href="https://kelatic.x3o.ai"
-              className="x3o-btn x3o-btn-primary"
-              style={{ marginTop: 16 }}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Visit kelatic.x3o.ai →
-            </a>
+            <div style={{ display: 'flex', gap: 8, marginTop: 16 }}>
+              <a href="https://kelatic.x3o.ai" className="x3o-btn x3o-btn-primary" target="_blank" rel="noopener noreferrer">
+                Visit kelatic.x3o.ai →
+              </a>
+              <a href="https://kelaticvitalityhouse.com" className="x3o-btn x3o-btn-ghost" target="_blank" rel="noopener noreferrer">
+                kelaticvitalityhouse.com →
+              </a>
+            </div>
           </div>
 
-          {/* Metrics */}
           <div className="x3o-g4">
             <div className="x3o-card" style={{ textAlign: 'center' }}>
               <div className="x3o-metric-val x3o-val-green">+$5,510</div>
-              <div className="x3o-metric-label">Monthly Revenue Recovered</div>
+              <div className="x3o-metric-label">Monthly revenue recovered</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
               <div className="x3o-metric-val">18.5×</div>
@@ -321,97 +247,44 @@ export default function PlatformPage() {
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
               <div className="x3o-metric-val">23%</div>
-              <div className="x3o-metric-label">Ghost Client Recovery</div>
+              <div className="x3o-metric-label">Ghost clients won back</div>
             </div>
             <div className="x3o-card" style={{ textAlign: 'center' }}>
               <div className="x3o-metric-val">142</div>
-              <div className="x3o-metric-label">Active Clients Managed</div>
+              <div className="x3o-metric-label">Active clients managed</div>
             </div>
           </div>
 
-          {/* Deployed Modules */}
-          <h3 style={{ margin: '32px 0 16px' }}>Deployed Intelligence Modules</h3>
-          <div className="x3o-g3">
-            {[
-              {
-                icon: '📊',
-                title: 'Social Intelligence',
-                desc: 'Instagram engagement analysis, optimal posting times, hashtag performance, competitor content monitoring.',
-                tag: { color: 'green', label: 'Active' },
-              },
-              {
-                icon: '👻',
-                title: 'Ghost Client Recovery',
-                desc: '90-day no-show detection, personalized win-back sequences, automated SMS/email campaigns with Claude-generated copy.',
-                tag: { color: 'green', label: 'Active' },
-              },
-              {
-                icon: '📅',
-                title: 'Content Calendar AI',
-                desc: 'Weekly content plans generated by Claude, aligned with booking availability, holidays, and trending topics.',
-                tag: { color: 'green', label: 'Active' },
-              },
-              {
-                icon: '🔍',
-                title: 'Competitor Radar',
-                desc: 'Automated monitoring of competitor pricing, services, reviews, and social engagement within 10-mile radius.',
-                tag: { color: 'amber', label: 'Beta' },
-              },
-              {
-                icon: '📈',
-                title: 'Campaign Analytics',
-                desc: 'Track ROI across email, SMS, and social campaigns. Claude provides optimization recommendations.',
-                tag: { color: 'amber', label: 'Beta' },
-              },
-              {
-                icon: '🎯',
-                title: 'Booking Funnel AI',
-                desc: 'Drop-off detection at each funnel stage, price sensitivity analysis, and conversion optimization.',
-                tag: { color: 'blue', label: 'Development' },
-              },
-            ].map((mod) => (
-              <div className="x3o-card" key={mod.title}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
-                  <span style={{ fontSize: 24 }}>{mod.icon}</span>
-                  <Tag color={mod.tag.color}>{mod.tag.label}</Tag>
-                </div>
-                <h4 style={{ margin: '8px 0 4px' }}>{mod.title}</h4>
-                <p style={{ fontSize: 13, color: 'var(--x3o-muted)', lineHeight: 1.6 }}>{mod.desc}</p>
-              </div>
-            ))}
-          </div>
-
-          {/* ROI Breakdown */}
           <div className="x3o-card" style={{ marginTop: 24 }}>
-            <h3 style={{ marginBottom: 16 }}>ROI Breakdown</h3>
+            <h3 style={{ marginBottom: 16 }}>Where the lift came from</h3>
             <div className="x3o-table-wrap">
               <table className="x3o-table">
                 <thead>
-                  <tr><th>Revenue Stream</th><th>Monthly Impact</th><th>Method</th></tr>
+                  <tr><th>Outcome</th><th>Monthly impact</th><th>Which agent</th></tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Ghost Client Recovery</td>
+                    <td>Clients won back</td>
                     <td style={{ color: 'var(--x3o-green)' }}>+$3,200</td>
-                    <td>AI-generated win-back campaigns</td>
+                    <td>Retention Agent</td>
                   </tr>
                   <tr>
-                    <td>Rebooking Optimization</td>
+                    <td>Calendar gaps filled</td>
                     <td style={{ color: 'var(--x3o-green)' }}>+$1,100</td>
-                    <td>Smart scheduling &amp; reminders</td>
+                    <td>Scheduling Agent</td>
                   </tr>
                   <tr>
-                    <td>Social-Driven Bookings</td>
+                    <td>Bookings from content</td>
                     <td style={{ color: 'var(--x3o-green)' }}>+$680</td>
-                    <td>Optimized content calendar</td>
+                    <td>Trinity + Marketing</td>
                   </tr>
                   <tr>
-                    <td>Upsell Intelligence</td>
+                    <td>Upsells & add-ons</td>
                     <td style={{ color: 'var(--x3o-green)' }}>+$530</td>
-                    <td>Service recommendations</td>
+                    <td>Marketing Agent</td>
                   </tr>
                   <tr style={{ fontWeight: 600, borderTop: '1px solid rgba(255,255,255,.1)' }}>
-                    <td>Total Monthly Lift</td>
+                    <td>Total monthly lift</td>
                     <td style={{ color: 'var(--x3o-green)' }}>+$5,510</td>
                     <td>18.5× ROI on $297/mo</td>
                   </tr>
@@ -422,360 +295,117 @@ export default function PlatformPage() {
         </main>
       )}
 
-      {/* ══════════════ Tab: Marketplace ══════════════ */}
-      {activeTab === 'marketplace' && (
-        <main className="x3o-main">
-          <h2>Vertical Marketplace</h2>
-          <p style={{ color: 'var(--x3o-muted)', marginBottom: 24 }}>
-            Each vertical is a standalone intelligence product with domain-specific
-            Claude prompts, metrics, and automations. Businesses subscribe to their
-            vertical — we deploy the full intelligence stack.
-          </p>
-
-          <div className="x3o-g3">
-            {[
-              {
-                icon: '💇',
-                title: 'Beauty & Locs',
-                desc: 'Rebooking AI, ghost client recovery, social content for stylists.',
-                status: 'Live',
-                statusColor: 'green' as const,
-                tenant: 'kelatic.x3o.ai',
-              },
-              {
-                icon: '🍽️',
-                title: 'Restaurants',
-                desc: 'Review management, menu optimization, reservation intelligence.',
-                status: 'Live',
-                statusColor: 'green' as const,
-                tenant: 'Coming soon',
-              },
-              {
-                icon: '🏋️',
-                title: 'Fitness',
-                desc: 'Member retention AI, class scheduling, churn prediction.',
-                status: 'Live',
-                statusColor: 'green' as const,
-                tenant: 'Coming soon',
-              },
-              {
-                icon: '🛍️',
-                title: 'Retail',
-                desc: 'Inventory intelligence, foot traffic analysis, loyalty optimization.',
-                status: 'Q2 2026',
-                statusColor: 'amber' as const,
-                tenant: 'Coming soon',
-              },
-              {
-                icon: '💉',
-                title: 'Med Spas',
-                desc: 'Treatment rebooking, consent automation, provider scheduling.',
-                status: 'Q2 2026',
-                statusColor: 'amber' as const,
-                tenant: 'Coming soon',
-              },
-              {
-                icon: '⚖️',
-                title: 'Legal',
-                desc: 'Intake qualification, case pipeline, billing analytics.',
-                status: 'Q3 2026',
-                statusColor: 'blue' as const,
-                tenant: 'Coming soon',
-              },
-            ].map((v) => (
-              <div className="x3o-vert-card" key={v.title}>
-                <span style={{ fontSize: 32 }}>{v.icon}</span>
-                <h3>{v.title}</h3>
-                <p>{v.desc}</p>
-                <Tag color={v.statusColor}>{v.status}</Tag>
-                <div className="x3o-vert-tenant">{v.tenant}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Revenue Model */}
-          <div className="x3o-card" style={{ marginTop: 32 }}>
-            <h3 style={{ marginBottom: 16 }}>Revenue Model</h3>
-            <div className="x3o-table-wrap">
-              <table className="x3o-table">
-                <thead>
-                  <tr><th>Stream</th><th>Model</th><th>Target Y1</th></tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>SaaS Subscriptions</td>
-                    <td>$97–$897/mo per tenant</td>
-                    <td>$720K</td>
-                  </tr>
-                  <tr>
-                    <td>Anthropic Revenue Share</td>
-                    <td>Marketplace referral fees</td>
-                    <td>$180K</td>
-                  </tr>
-                  <tr>
-                    <td>API / MCP Access</td>
-                    <td>Usage-based for integrators</td>
-                    <td>$120K</td>
-                  </tr>
-                  <tr>
-                    <td>White-Label Licensing</td>
-                    <td>Per-vertical reseller agreements</td>
-                    <td>$96K</td>
-                  </tr>
-                  <tr>
-                    <td>Setup &amp; Onboarding</td>
-                    <td>One-time deployment fee</td>
-                    <td>$84K</td>
-                  </tr>
-                  <tr style={{ fontWeight: 600, borderTop: '1px solid rgba(255,255,255,.1)' }}>
-                    <td>Total</td>
-                    <td />
-                    <td>~$1.2M</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </main>
-      )}
-
-      {/* ══════════════ Tab: Pricing ══════════════ */}
+      {/* ══════════════ Pricing ══════════════ */}
       {activeTab === 'pricing' && (
         <main className="x3o-main">
           <h2>Pricing</h2>
           <p style={{ color: 'var(--x3o-muted)', marginBottom: 24 }}>
-            Every plan includes Claude-powered intelligence. Pick your tier, we deploy
-            your vertical.
+            Every plan is white-label, includes the full platform, and is live in about a day. Pick how big a
+            team you want working for you.
           </p>
 
           <div className="x3o-g3">
-            {/* Starter */}
             <div className="x3o-price-card">
               <Tag color="green">Starter</Tag>
               <div className="x3o-price">$97<span className="x3o-price-period">/mo</span></div>
               <ul className="x3o-price-features">
-                <li><Dot color="var(--x3o-green)" />Social intelligence dashboard</li>
-                <li><Dot color="var(--x3o-green)" />Ghost client detection</li>
+                <li><Dot color="var(--x3o-green)" />Booking, storefront & payments</li>
+                <li><Dot color="var(--x3o-green)" />Trinity content agent</li>
                 <li><Dot color="var(--x3o-green)" />Monthly content calendar</li>
-                <li><Dot color="var(--x3o-green)" />Basic competitor monitoring</li>
+                <li><Dot color="var(--x3o-green)" />Client records & messaging</li>
                 <li><Dot color="var(--x3o-green)" />Email support</li>
               </ul>
-              <button className="x3o-btn x3o-btn-ghost" style={{ width: '100%' }}>Start Free Trial</button>
+              <button className="x3o-btn x3o-btn-ghost" style={{ width: '100%' }} onClick={() => setActiveTab('start')}>Start Free Trial</button>
             </div>
 
-            {/* Growth — Featured */}
             <div className="x3o-price-card x3o-price-featured">
               <Tag color="amber">Most Popular</Tag>
               <div className="x3o-price">$297<span className="x3o-price-period">/mo</span></div>
               <ul className="x3o-price-features">
                 <li><Dot color="var(--x3o-green)" />Everything in Starter</li>
-                <li><Dot color="var(--x3o-accent)" />Automated win-back campaigns</li>
-                <li><Dot color="var(--x3o-accent)" />Campaign ROI analytics</li>
-                <li><Dot color="var(--x3o-accent)" />Booking funnel optimization</li>
-                <li><Dot color="var(--x3o-accent)" />Weekly AI content generation</li>
+                <li><Dot color="var(--x3o-accent)" />Retention agent (auto win-back)</li>
+                <li><Dot color="var(--x3o-accent)" />Marketing agent (email/SMS/social)</li>
+                <li><Dot color="var(--x3o-accent)" />Scheduling agent (fill gaps)</li>
+                <li><Dot color="var(--x3o-accent)" />Weekly AI content</li>
                 <li><Dot color="var(--x3o-accent)" />Priority support + Slack</li>
               </ul>
-              <button className="x3o-btn x3o-btn-primary" style={{ width: '100%' }}>Start Free Trial</button>
+              <button className="x3o-btn x3o-btn-primary" style={{ width: '100%' }} onClick={() => setActiveTab('start')}>Start Free Trial</button>
             </div>
 
-            {/* Enterprise */}
             <div className="x3o-price-card">
               <Tag color="purple">Enterprise</Tag>
               <div className="x3o-price">$897<span className="x3o-price-period">/mo</span></div>
               <ul className="x3o-price-features">
                 <li><Dot color="var(--x3o-green)" />Everything in Growth</li>
-                <li><Dot color="var(--x3o-purple)" />Multi-location support</li>
-                <li><Dot color="var(--x3o-purple)" />Custom Claude system prompts</li>
-                <li><Dot color="var(--x3o-purple)" />API / MCP access</li>
+                <li><Dot color="var(--x3o-purple)" />Support agent (24/7 front desk)</li>
+                <li><Dot color="var(--x3o-purple)" />Multi-location & multi-brand</li>
+                <li><Dot color="var(--x3o-purple)" />Custom agent instructions</li>
                 <li><Dot color="var(--x3o-purple)" />Dedicated account manager</li>
-                <li><Dot color="var(--x3o-purple)" />White-label option</li>
+                <li><Dot color="var(--x3o-purple)" />Custom domain & white-label</li>
               </ul>
-              <button className="x3o-btn x3o-btn-ghost" style={{ width: '100%' }}>Contact Sales</button>
-            </div>
-          </div>
-
-          {/* Comparison */}
-          <div className="x3o-card" style={{ marginTop: 32 }}>
-            <h3 style={{ marginBottom: 16 }}>Competitive Comparison</h3>
-            <div className="x3o-table-wrap">
-              <table className="x3o-table">
-                <thead>
-                  <tr>
-                    <th>Capability</th>
-                    <th style={{ color: 'var(--x3o-accent)' }}>x3o Intelligence</th>
-                    <th>Generic CRM</th>
-                    <th>Manual / Agency</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>AI-Powered Analysis</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>✓ Claude</td>
-                    <td style={{ color: 'var(--x3o-red)' }}>✗</td>
-                    <td style={{ color: 'var(--x3o-red)' }}>✗</td>
-                  </tr>
-                  <tr>
-                    <td>Vertical-Specific</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>✓</td>
-                    <td style={{ color: 'var(--x3o-red)' }}>✗ Generic</td>
-                    <td style={{ color: 'var(--x3o-accent)' }}>~ Varies</td>
-                  </tr>
-                  <tr>
-                    <td>Automated Campaigns</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>✓</td>
-                    <td style={{ color: 'var(--x3o-accent)' }}>~ Basic</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>✓ Manual</td>
-                  </tr>
-                  <tr>
-                    <td>Content Generation</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>✓ AI</td>
-                    <td style={{ color: 'var(--x3o-red)' }}>✗</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>✓ Human</td>
-                  </tr>
-                  <tr>
-                    <td>Setup Time</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>24 hours</td>
-                    <td>1–2 weeks</td>
-                    <td>2–4 weeks</td>
-                  </tr>
-                  <tr>
-                    <td>Monthly Cost</td>
-                    <td style={{ color: 'var(--x3o-green)' }}>$97–$897</td>
-                    <td>$200–$500</td>
-                    <td>$2,000–$5,000</td>
-                  </tr>
-                </tbody>
-              </table>
+              <button className="x3o-btn x3o-btn-ghost" style={{ width: '100%' }} onClick={() => setActiveTab('start')}>Contact Sales</button>
             </div>
           </div>
         </main>
       )}
 
-      {/* ══════════════ Tab: GTM Strategy ══════════════ */}
-      {activeTab === 'gtm' && (
-        <main className="x3o-main">
-          <h2>Go-to-Market Strategy</h2>
-          <p style={{ color: 'var(--x3o-muted)', marginBottom: 24 }}>
-            Three-phase approach: prove with KeLatic → expand verticals → scale
-            through Anthropic marketplace.
+      {/* ══════════════ Get Started ══════════════ */}
+      {activeTab === 'start' && (
+        <main className="x3o-main" id="start">
+          <h2>Live in about a day</h2>
+          <p style={{ color: 'var(--x3o-muted)', marginBottom: 24, maxWidth: 640 }}>
+            No long setup, no migration headache. Tell us about your business and your AI team goes to work.
           </p>
 
-          {/* Phases */}
           <div className="x3o-g3">
             <div className="x3o-card-accent">
-              <Tag color="green">Phase 1 · COMPLETE</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>Prove</h3>
-              <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.8, paddingLeft: 18 }}>
-                <li>KeLatic as flagship case study</li>
-                <li>Document ROI with real numbers</li>
-                <li>Build MCP server for Anthropic</li>
-                <li>Submit to Claude marketplace</li>
-                <li>Target: 10 beauty vertical clients</li>
-              </ul>
+              <Tag color="green">Step 1</Tag>
+              <h3 style={{ margin: '12px 0 8px' }}>Tell us about your business</h3>
+              <p style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, fontSize: 14 }}>
+                Your services or menu, your brand, your hours. A few minutes is all it takes.
+              </p>
             </div>
             <div className="x3o-card">
-              <Tag color="amber">Phase 2 · NOW</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>Expand</h3>
-              <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.8, paddingLeft: 18 }}>
-                <li>Launch restaurant &amp; fitness verticals</li>
-                <li>Build vertical-specific system prompts</li>
-                <li>Hire 2 vertical specialists</li>
-                <li>Partnership with POS / booking platforms</li>
-                <li>Target: 50 total tenants</li>
-              </ul>
+              <Tag color="amber">Step 2</Tag>
+              <h3 style={{ margin: '12px 0 8px' }}>We deploy your site & agents</h3>
+              <p style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, fontSize: 14 }}>
+                Within ~24 hours: a branded booking site or storefront, payments, and your AI team configured.
+              </p>
             </div>
             <div className="x3o-card">
-              <Tag color="blue">Phase 3 · Q2-Q3 2026</Tag>
-              <h3 style={{ margin: '12px 0 8px' }}>Scale</h3>
-              <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.8, paddingLeft: 18 }}>
-                <li>All 6 verticals live</li>
-                <li>Anthropic marketplace traction</li>
-                <li>White-label reseller program</li>
-                <li>API access for integrators</li>
-                <li>Target: 200 tenants, $100K MRR</li>
-              </ul>
+              <Tag color="blue">Step 3</Tag>
+              <h3 style={{ margin: '12px 0 8px' }}>Approve and go live</h3>
+              <p style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, fontSize: 14 }}>
+                Review your site and first campaigns, point your domain, and your agents start working.
+              </p>
             </div>
           </div>
 
-          {/* Anthropic Partnership */}
-          <div className="x3o-card" style={{ marginTop: 32 }}>
-            <h3 style={{ marginBottom: 16 }}>Anthropic Partnership Pitch</h3>
-            <div className="x3o-g3">
-              <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <h4 style={{ color: 'var(--x3o-accent)', marginBottom: 8 }}>For Anthropic</h4>
-                <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
-                  <li>Showcase Claude in B2B vertical AI</li>
-                  <li>Real revenue attribution (18.5× ROI)</li>
-                  <li>MCP adoption use case</li>
-                  <li>Marketplace content &amp; listings</li>
-                </ul>
-              </div>
-              <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <h4 style={{ color: 'var(--x3o-accent)', marginBottom: 8 }}>For x3o</h4>
-                <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
-                  <li>Featured marketplace placement</li>
-                  <li>API credits / discount program</li>
-                  <li>Co-marketing opportunities</li>
-                  <li>Early access to new Claude features</li>
-                </ul>
-              </div>
-              <div style={{ padding: 16, background: 'rgba(255,255,255,.03)', borderRadius: 8 }}>
-                <h4 style={{ color: 'var(--x3o-accent)', marginBottom: 8 }}>Mutual Value</h4>
-                <ul style={{ color: 'var(--x3o-muted)', lineHeight: 1.7, paddingLeft: 18 }}>
-                  <li>Prove AI-driven SMB transformation</li>
-                  <li>Template for vertical AI deployments</li>
-                  <li>Revenue share on marketplace referrals</li>
-                  <li>Joint case studies &amp; PR</li>
-                </ul>
-              </div>
-            </div>
+          <div style={{ textAlign: 'center', margin: '32px 0' }}>
+            <a href="https://kelatic.x3o.ai" className="x3o-btn x3o-btn-primary" target="_blank" rel="noopener noreferrer">
+              Start Free Trial
+            </a>
           </div>
 
-          {/* Timeline */}
-          <div className="x3o-card" style={{ marginTop: 24 }}>
-            <h3 style={{ marginBottom: 16 }}>Execution Timeline</h3>
-            <div className="x3o-timeline">
-              <div className="x3o-tl-item x3o-tl-done">
-                <div className="x3o-tl-dot" />
-                <div>
-                  <strong>Jan 2025</strong>
-                  <p>KeLatic deployment complete, collecting production data</p>
-                </div>
+          {/* FAQ */}
+          <div className="x3o-card">
+            <h3 style={{ marginBottom: 16 }}>Common questions</h3>
+            <div style={{ display: 'grid', gap: 16 }}>
+              <div>
+                <strong>Do my customers see &quot;x3o&quot;?</strong>
+                <p style={{ color: 'var(--x3o-muted)', fontSize: 14, marginTop: 4 }}>No. Everything is white-label — your name, your colors, your domain (like kelatic.com or kelaticvitalityhouse.com).</p>
               </div>
-              <div className="x3o-tl-item x3o-tl-done">
-                <div className="x3o-tl-dot" />
-                <div>
-                  <strong>Feb 2025</strong>
-                  <p>MCP server live, Anthropic marketplace submission, x3o.ai relaunch</p>
-                </div>
+              <div>
+                <strong>Do the agents act on their own?</strong>
+                <p style={{ color: 'var(--x3o-muted)', fontSize: 14, marginTop: 4 }}>They draft and run the work; you stay in control and can review or approve campaigns and messages.</p>
               </div>
-              <div className="x3o-tl-item x3o-tl-done">
-                <div className="x3o-tl-dot" />
-                <div>
-                  <strong>Q2–Q4 2025</strong>
-                  <p>10 beauty tenants onboarded, onboarding funnel optimized, restaurant &amp; fitness verticals launched</p>
-                </div>
+              <div>
+                <strong>What kinds of businesses is this for?</strong>
+                <p style={{ color: 'var(--x3o-muted)', fontSize: 14, marginTop: 4 }}>Local service & retail — salons, barbershops, cafés, studios, spas. If you book appointments or sell products, x3o fits.</p>
               </div>
-              <div className="x3o-tl-item x3o-tl-active">
-                <div className="x3o-tl-dot" />
-                <div>
-                  <strong>Q1 2026</strong>
-                  <p>50 total tenants, Trust Stack integration, OpenConductor SDK v1.4</p>
-                </div>
-              </div>
-              <div className="x3o-tl-item x3o-tl-future">
-                <div className="x3o-tl-dot" />
-                <div>
-                  <strong>Q2 2026</strong>
-                  <p>Retail &amp; med spa verticals, white-label program launch</p>
-                </div>
-              </div>
-              <div className="x3o-tl-item x3o-tl-future">
-                <div className="x3o-tl-dot" />
-                <div>
-                  <strong>Q3–Q4 2026</strong>
-                  <p>Legal vertical, 200 tenants, $100K MRR milestone</p>
-                </div>
+              <div>
+                <strong>Is payment processing included?</strong>
+                <p style={{ color: 'var(--x3o-muted)', fontSize: 14, marginTop: 4 }}>Yes — online checkout and in-person POS run on Stripe, built in.</p>
               </div>
             </div>
           </div>
@@ -784,7 +414,7 @@ export default function PlatformPage() {
 
       {/* ── Footer ── */}
       <footer className="x3o-footer">
-        <p>x3o.ai is where you start.</p>
+        <p>x3o.ai — your business, run by a team of AI agents.</p>
         <p style={{ marginTop: 8 }}>
           © {new Date().getFullYear()} Sonnier Ventures. All rights reserved.
         </p>

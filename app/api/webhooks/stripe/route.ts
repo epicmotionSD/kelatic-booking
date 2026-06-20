@@ -39,6 +39,34 @@ export async function POST(request: NextRequest) {
           })
           .eq('stripe_payment_intent_id', paymentIntent.id);
 
+        // Product order paid (Vitality House storefront or in-store register).
+        // metadata.order_id is set by /api/shop/checkout and /api/admin/pos/order.
+        const orderId = paymentIntent.metadata?.order_id;
+        if (orderId) {
+          await supabase.from('orders').update({ status: 'paid' }).eq('id', orderId);
+
+          const { data: existingPay } = await supabase
+            .from('payments')
+            .select('id')
+            .eq('stripe_payment_intent_id', paymentIntent.id)
+            .maybeSingle();
+
+          if (!existingPay) {
+            await supabase.from('payments').insert({
+              order_id: orderId,
+              business_id: paymentIntent.metadata?.business_id || null,
+              amount: paymentIntent.amount / 100,
+              total_amount: paymentIntent.amount / 100,
+              status: 'paid',
+              method: 'card_online',
+              stripe_payment_intent_id: paymentIntent.id,
+              stripe_charge_id: paymentIntent.latest_charge as string,
+            });
+          }
+
+          console.log(`Order paid: ${orderId}`);
+        }
+
         // If this completes a deposit, confirm the appointment and send the
         // booking confirmation email/SMS — the booking POST skips the immediate
         // send for pending bookings so we don't tell customers "you're booked"

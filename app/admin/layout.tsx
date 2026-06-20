@@ -17,19 +17,29 @@ import {
   Settings,
   HelpCircle,
   Menu,
-  X
+  X,
+  ShoppingBag,
+  Package,
+  ChevronDown
 } from 'lucide-react';
 import { SkipLink, useAriaLiveRegion } from '@/lib/accessibility';
 
-const NAV_ITEMS = [
+type NavItem = {
+  label: string;
+  href?: string;
+  icon: React.ReactNode;
+  children?: { label: string; href: string; icon: React.ReactNode }[];
+};
+
+const NAV_ITEMS: NavItem[] = [
   {
     label: 'Dashboard',
     href: '/admin',
     icon: <Home className="w-5 h-5" />,
   },
   {
-    label: 'Trinity',
-    href: '/admin/trinity',
+    label: 'Agents',
+    href: '/admin/agents',
     icon: <Layers className="w-5 h-5" />,
   },
   {
@@ -84,6 +94,41 @@ const NAV_ITEMS = [
   },
 ];
 
+// Simplified navigation for commerce/cafe tenants (e.g. Kelatic Vitality House).
+// Hides all salon-specific links — only Dashboard, POS, Orders, Products.
+const COMMERCE_NAV: NavItem[] = [
+  { label: 'Dashboard', href: '/admin', icon: <Home className="w-5 h-5" /> },
+  { label: 'Point of Sale', href: '/admin/register', icon: <CreditCard className="w-5 h-5" /> },
+  { label: 'Orders', href: '/admin/orders', icon: <ShoppingBag className="w-5 h-5" /> },
+  { label: 'Products', href: '/admin/products', icon: <Package className="w-5 h-5" /> },
+  {
+    label: 'Booking',
+    icon: <Calendar className="w-5 h-5" />,
+    children: [
+      { label: 'Agents', href: '/admin/agents', icon: <Layers className="w-4 h-4" /> },
+      { label: 'Appointments', href: '/admin/appointments', icon: <Calendar className="w-4 h-4" /> },
+      { label: 'Appointments POS', href: '/admin/pos', icon: <CreditCard className="w-4 h-4" /> },
+      { label: 'Services', href: '/admin/services', icon: <Briefcase className="w-4 h-4" /> },
+      { label: 'Stylists', href: '/admin/stylists', icon: <Users className="w-4 h-4" /> },
+      { label: 'Schedules', href: '/admin/stylists/schedule', icon: <Calendar className="w-4 h-4" /> },
+      { label: 'Closures', href: '/admin/closures', icon: <CalendarOff className="w-4 h-4" /> },
+      { label: 'Clients', href: '/admin/clients', icon: <UserCheck className="w-4 h-4" /> },
+      { label: 'Reports', href: '/admin/reports', icon: <BarChart3 className="w-4 h-4" /> },
+      { label: 'Settings', href: '/admin/settings', icon: <Settings className="w-4 h-4" /> },
+      { label: 'Help', href: '/admin/help', icon: <HelpCircle className="w-4 h-4" /> },
+    ],
+  },
+];
+
+// Tenant slugs that use the simplified commerce navigation.
+const COMMERCE_TENANTS = ['vitality'];
+
+function readTenantSlug(): string | null {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|;\s*)x-tenant-slug=([^;]+)/);
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
 export default function AdminLayout({
   children,
 }: {
@@ -92,7 +137,19 @@ export default function AdminLayout({
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [navItems, setNavItems] = useState<NavItem[]>(NAV_ITEMS);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
+  const [brandLabel, setBrandLabel] = useState('Kelatic Admin');
   const { announce } = useAriaLiveRegion();
+
+  // Pick navigation based on the current tenant (commerce vs salon)
+  useEffect(() => {
+    const slug = readTenantSlug();
+    if (slug && COMMERCE_TENANTS.includes(slug)) {
+      setNavItems(COMMERCE_NAV);
+      setBrandLabel('Vitality House');
+    }
+  }, []);
 
   // Mobile detection and responsive handling
   useEffect(() => {
@@ -110,9 +167,9 @@ export default function AdminLayout({
 
   // Announce page changes for screen readers
   useEffect(() => {
-    const pageName = NAV_ITEMS.find(item => item.href === pathname)?.label || 'Page';
+    const pageName = navItems.find(item => item.href === pathname)?.label || 'Page';
     announce(`Navigated to ${pageName}`);
-  }, [pathname, announce]);
+  }, [pathname, announce, navItems]);
 
   const handleSidebarToggle = () => {
     const newState = !sidebarOpen;
@@ -130,7 +187,7 @@ export default function AdminLayout({
       <div className="lg:hidden flex items-center justify-between p-4 bg-zinc-900 border-b border-white/10">
         <Link href="/admin" className="flex items-center">
           <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
-            Kelatic Admin
+            {brandLabel}
           </h1>
         </Link>
         <button
@@ -165,22 +222,65 @@ export default function AdminLayout({
         <div className="h-16 flex items-center px-6 border-b border-white/10">
           <Link href="/admin" className="flex items-center focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 rounded-md">
             <h1 className="text-xl font-playfair font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
-              Kelatic Admin
+              {brandLabel}
             </h1>
           </Link>
         </div>
 
         {/* Navigation */}
         <nav id="navigation" className="p-3 space-y-1" role="navigation" aria-label="Admin panel navigation">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
+            if (item.children) {
+              const open = openGroups[item.label] ?? false;
+              return (
+                <div key={item.label}>
+                  <button
+                    type="button"
+                    onClick={() => setOpenGroups((g) => ({ ...g, [item.label]: !open }))}
+                    aria-expanded={open}
+                    className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-white/70 hover:bg-white/10 hover:text-amber-400 transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900"
+                  >
+                    {item.icon}
+                    <span className="text-sm flex-1 text-left">{item.label}</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
+                  </button>
+                  {open && (
+                    <div className="ml-4 mt-1 space-y-1 border-l border-white/10 pl-2">
+                      {item.children.map((child) => {
+                        const childActive =
+                          pathname === child.href ||
+                          (child.href !== '/admin' && pathname.startsWith(child.href));
+                        return (
+                          <Link
+                            key={child.href}
+                            href={child.href}
+                            onClick={() => isMobile && setSidebarOpen(false)}
+                            aria-current={childActive ? 'page' : undefined}
+                            className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 ${
+                              childActive
+                                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold'
+                                : 'text-white/60 hover:bg-white/10 hover:text-amber-400'
+                            }`}
+                          >
+                            {child.icon}
+                            <span>{child.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
             const isActive =
               pathname === item.href ||
-              (item.href !== '/admin' && pathname.startsWith(item.href));
+              (!!item.href && item.href !== '/admin' && pathname.startsWith(item.href));
 
             return (
               <Link
                 key={item.href}
-                href={item.href}
+                href={item.href!}
                 onClick={() => isMobile && setSidebarOpen(false)}
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-zinc-900 ${
