@@ -53,7 +53,7 @@ const BOARD_MEMBERS = [
     role: 'CFO',
     icon: DollarSign,
     color: '#f59e0b',
-    gradient: 'from-amber-500 to-orange-600',
+    gradient: 'from-[#00ffb2] to-orange-600',
     description: 'Revenue & financial operations',
     capabilities: [
       { name: 'Revenue Analysis', accuracy: 97 },
@@ -225,7 +225,7 @@ function HeroVisualizer({
               {/* Capability tooltip on hover */}
               <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none z-20">
                 <div className="bg-slate-800 border border-slate-700 rounded-lg p-3 text-xs whitespace-nowrap">
-                  <p className="text-gray-400 mb-1">{agent.description}</p>
+                  <p className="text-muted-foreground mb-1">{agent.description}</p>
                   <p style={{ color: agent.color }} className="font-medium">Click to see capabilities</p>
                 </div>
               </div>
@@ -248,7 +248,7 @@ function HeroVisualizer({
             className="w-3 h-3 rounded-full animate-pulse"
             style={{ backgroundColor: BOARD_MEMBERS[activeAgent].color }}
           />
-          <span className="text-sm md:text-base text-gray-200 font-medium">{BOARD_MEMBERS[activeAgent].description}</span>
+          <span className="text-sm md:text-base text-foreground/80 font-medium">{BOARD_MEMBERS[activeAgent].description}</span>
           <Zap className="w-4 h-4" style={{ color: BOARD_MEMBERS[activeAgent].color }} />
         </div>
       </div>
@@ -270,7 +270,7 @@ function HeroVisualizer({
             {BOARD_MEMBERS[selectedAgent].capabilities.map((cap, i) => (
               <div key={i}>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-300">{cap.name}</span>
+                  <span className="text-muted-foreground">{cap.name}</span>
                   <span style={{ color: BOARD_MEMBERS[selectedAgent].color }}>{cap.accuracy}%</span>
                 </div>
                 <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
@@ -340,7 +340,7 @@ function FullVisualizer({
             <div className="p-5 bg-slate-800/80 rounded-2xl border border-slate-700 hover:border-cyan-500/50 transition-all duration-300 hover:scale-105 backdrop-blur-sm">
               <div className="text-3xl mb-2">🏢</div>
               <p className="text-sm font-bold text-white">Your Agency</p>
-              <p className="text-xs text-gray-500">Beauty & Wellness</p>
+              <p className="text-xs text-muted-foreground">Beauty & Wellness</p>
             </div>
           </div>
 
@@ -445,7 +445,7 @@ function FullVisualizer({
               <p className="text-xl md:text-2xl font-bold transition-all group-hover:scale-110" style={{ color: stat.color }}>
                 {stat.value}
               </p>
-              <p className="text-xs text-gray-500">{stat.label}</p>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
             </div>
           )
         })}

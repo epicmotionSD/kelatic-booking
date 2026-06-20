@@ -46,7 +46,7 @@ function isSameLocalDay(a: Date, b: Date, timezone: string) {
 
 function MetricCard({ label, value, sublabel }: { label: string; value: string; sublabel?: string }) {
   return (
-    <div className="rounded-[12px] border border-white/10 bg-zinc-900 p-5">
+    <div className="rounded-[12px] border border-border bg-card p-5">
       <p className="text-xs uppercase tracking-[0.12em] text-white/40 font-semibold">{label}</p>
       <p className="text-[34px] font-bold mt-2 leading-none text-white">{value}</p>
       {sublabel && <p className="text-xs text-white/50 mt-1">{sublabel}</p>}
@@ -83,7 +83,7 @@ function UpcomingList({
               </p>
             </div>
             <div className="text-right shrink-0">
-              <p className={`text-sm font-mono ${today ? 'text-amber-400' : 'text-white/70'}`}>
+              <p className={`text-sm font-mono ${today ? 'text-[#00ffb2]' : 'text-white/70'}`}>
                 {fmtDateTime(apt.start_time, timezone)}
               </p>
               <p className="text-xs text-white/40">{fmtMoney(apt.quoted_price)}</p>
@@ -125,7 +125,7 @@ export default function RevenueMigrationDashboard({
   return (
     <div className={`p-4 lg:p-8 space-y-6 ${maxWidthClass}`}>
       <div>
-        <h1 className="text-[26px] font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
+        <h1 className="text-[26px] font-bold text-[#00ffb2]">
           Bookings Dashboard
         </h1>
         <p className="text-white/50 mt-1 text-sm">Live appointments + revenue from the booking system.</p>
@@ -160,12 +160,12 @@ export default function RevenueMigrationDashboard({
         />
       </div>
 
-      <section className="rounded-[14px] border border-white/10 bg-zinc-900 p-4 md:p-5">
+      <section className="rounded-[14px] border border-border bg-card p-4 md:p-5">
         <div className="flex items-center justify-between mb-3">
           <h2 className="text-xs uppercase tracking-[0.12em] text-white/40 font-semibold">Upcoming — next 7 days</h2>
           <a
             href="/admin/appointments"
-            className="text-xs text-amber-400 hover:text-amber-300 tracking-widest uppercase transition-colors"
+            className="text-xs text-[#00ffb2] hover:text-[#00ffb2] tracking-widest uppercase transition-colors"
           >
             All appointments →
           </a>

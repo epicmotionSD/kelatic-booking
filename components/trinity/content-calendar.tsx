@@ -61,15 +61,15 @@ const PLATFORM_ICONS: Record<Platform, React.ReactNode> = {
 const PLATFORM_COLORS: Record<Platform, string> = {
   instagram: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
   facebook: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  tiktok: 'bg-white/10 text-white/70 border-white/20',
+  tiktok: 'bg-white/10 text-white/70 border-border',
   youtube: 'bg-red-500/20 text-red-400 border-red-500/30',
-  email: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  email: 'bg-[#00ffb2]/20 text-[#00ffb2] border-[#00ffb2]/30',
   all: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
 };
 
 const STATUS_CONFIG: Record<Status, { label: string; color: string; icon: React.ReactNode }> = {
-  idea: { label: 'Idea', color: 'text-white/40 bg-white/5 border-white/10', icon: <Sparkles className="w-3 h-3" /> },
-  draft: { label: 'Draft', color: 'text-amber-400 bg-amber-500/10 border-amber-500/20', icon: <Edit3 className="w-3 h-3" /> },
+  idea: { label: 'Idea', color: 'text-white/40 bg-white/5 border-border', icon: <Sparkles className="w-3 h-3" /> },
+  draft: { label: 'Draft', color: 'text-[#00ffb2] bg-[#00ffb2]/10 border-[#00ffb2]/20', icon: <Edit3 className="w-3 h-3" /> },
   scheduled: { label: 'Scheduled', color: 'text-blue-400 bg-blue-500/10 border-blue-500/20', icon: <Clock className="w-3 h-3" /> },
   approved: { label: 'Approved', color: 'text-green-400 bg-green-500/10 border-green-500/20', icon: <CheckCircle className="w-3 h-3" /> },
   published: { label: 'Published', color: 'text-purple-400 bg-purple-500/10 border-purple-500/20', icon: <CheckCircle className="w-3 h-3" /> },
@@ -267,7 +267,7 @@ export default function ContentCalendar() {
           <select
             value={filterManager}
             onChange={(e) => setFilterManager(e.target.value)}
-            className="bg-white/5 border border-white/10 text-white/80 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
+            className="bg-white/5 border border-border text-white/80 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-[#00ffb2]"
             title="Filter by manager"
           >
             <option value="all">All Managers</option>
@@ -278,7 +278,7 @@ export default function ContentCalendar() {
           <select
             value={filterPlatform}
             onChange={(e) => setFilterPlatform(e.target.value as Platform | 'all')}
-            className="bg-white/5 border border-white/10 text-white/80 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
+            className="bg-white/5 border border-border text-white/80 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-[#00ffb2]"
             title="Filter by platform"
           >
             <option value="all">All Platforms</option>
@@ -288,17 +288,17 @@ export default function ContentCalendar() {
           </select>
 
           {/* View Toggle */}
-          <div className="flex bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+          <div className="flex bg-white/5 border border-border rounded-xl overflow-hidden">
             <button
               onClick={() => setViewMode('calendar')}
-              className={`p-2 transition-colors ${viewMode === 'calendar' ? 'bg-amber-400 text-black' : 'text-white/50 hover:text-white'}`}
+              className={`p-2 transition-colors ${viewMode === 'calendar' ? 'bg-[#00ffb2] text-black' : 'text-white/50 hover:text-white'}`}
               title="Calendar view"
             >
               <CalendarDays className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 transition-colors ${viewMode === 'list' ? 'bg-amber-400 text-black' : 'text-white/50 hover:text-white'}`}
+              className={`p-2 transition-colors ${viewMode === 'list' ? 'bg-[#00ffb2] text-black' : 'text-white/50 hover:text-white'}`}
               title="List view"
             >
               <List className="w-4 h-4" />
@@ -311,20 +311,20 @@ export default function ContentCalendar() {
       <div className="flex items-center gap-3">
         <button
           onClick={goBack30}
-          className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/60 hover:text-white transition-colors"
+          className="p-2 bg-white/5 hover:bg-white/10 border border-border rounded-xl text-white/60 hover:text-white transition-colors"
           title="Previous 30 days"
         >
           <ChevronLeft className="w-4 h-4" />
         </button>
         <button
           onClick={goToday}
-          className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/60 hover:text-white text-sm transition-colors"
+          className="px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-border rounded-xl text-white/60 hover:text-white text-sm transition-colors"
         >
           Today
         </button>
         <button
           onClick={goForward30}
-          className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/60 hover:text-white transition-colors"
+          className="p-2 bg-white/5 hover:bg-white/10 border border-border rounded-xl text-white/60 hover:text-white transition-colors"
           title="Next 30 days"
         >
           <ChevronRight className="w-4 h-4" />
@@ -332,7 +332,7 @@ export default function ContentCalendar() {
         <div className="flex gap-3 ml-auto flex-wrap">
           {MANAGERS.map((m, i) => (
             <div key={m} className="flex items-center gap-1.5">
-              <div className={`w-2.5 h-2.5 rounded-full ${i === 0 ? 'bg-purple-400' : 'bg-amber-400'}`} />
+              <div className={`w-2.5 h-2.5 rounded-full ${i === 0 ? 'bg-purple-400' : 'bg-[#00ffb2]'}`} />
               <span className="text-xs text-white/50">{m}</span>
             </div>
           ))}
@@ -372,17 +372,17 @@ export default function ContentCalendar() {
                 key={dateStr}
                 className={`min-h-[120px] rounded-xl border flex flex-col transition-all ${
                   isToday
-                    ? 'border-amber-400/50 bg-amber-400/5'
+                    ? 'border-[#00ffb2]/50 bg-[#00ffb2]/5'
                     : isPast
-                    ? 'border-white/5 bg-black/20 opacity-60'
-                    : 'border-white/10 bg-white/3 hover:border-white/20'
+                    ? 'border-white/5 bg-background/20 opacity-60'
+                    : 'border-border bg-white/3 hover:border-border'
                 }`}
               >
                 {/* Day Header */}
-                <div className={`px-2 pt-2 pb-1 flex items-start justify-between ${isToday ? 'text-amber-400' : 'text-white/50'}`}>
+                <div className={`px-2 pt-2 pb-1 flex items-start justify-between ${isToday ? 'text-[#00ffb2]' : 'text-white/50'}`}>
                   <div>
                     <div className="text-xs">{weekday}</div>
-                    <div className={`text-sm font-bold ${isToday ? 'text-amber-400' : 'text-white/70'}`}>
+                    <div className={`text-sm font-bold ${isToday ? 'text-[#00ffb2]' : 'text-white/70'}`}>
                       {dayNum}
                     </div>
                     {day.getDate() === 1 && (
@@ -391,7 +391,7 @@ export default function ContentCalendar() {
                   </div>
                   <button
                     onClick={() => openNewPost(day)}
-                    className="p-0.5 text-white/20 hover:text-amber-400 transition-colors"
+                    className="p-0.5 text-white/20 hover:text-[#00ffb2] transition-colors"
                     title="Add post"
                   >
                     <Plus className="w-3.5 h-3.5" />
@@ -402,7 +402,7 @@ export default function ContentCalendar() {
                 <div className="flex-1 px-1.5 pb-1.5 space-y-1 overflow-y-auto max-h-28">
                   {loading && dayPosts.length === 0 ? null : dayPosts.map((post) => {
                     const mgIdx = MANAGERS.indexOf(post.assigned_to ?? '');
-                    const dotColor = mgIdx === 0 ? 'bg-purple-400' : mgIdx === 1 ? 'bg-amber-400' : 'bg-white/20';
+                    const dotColor = mgIdx === 0 ? 'bg-purple-400' : mgIdx === 1 ? 'bg-[#00ffb2]' : 'bg-white/20';
                     return (
                       <div
                         key={post.id}
@@ -497,10 +497,10 @@ export default function ContentCalendar() {
 
       {/* Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col">
+        <div className="fixed inset-0 bg-background/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col">
             {/* Modal Header */}
-            <div className="flex items-center justify-between p-5 border-b border-white/10 shrink-0">
+            <div className="flex items-center justify-between p-5 border-b border-border shrink-0">
               <h3 className="font-bold text-white">
                 {editingPost ? 'Edit Post' : `New Post — ${form.scheduled_date}`}
               </h3>
@@ -521,7 +521,7 @@ export default function ContentCalendar() {
                   type="date"
                   value={form.scheduled_date}
                   onChange={(e) => setForm((f) => ({ ...f, scheduled_date: e.target.value }))}
-                  className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white/5 border border-border text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
                 />
               </div>
 
@@ -532,11 +532,11 @@ export default function ContentCalendar() {
                   <select
                     value={form.platform}
                     onChange={(e) => setForm((f) => ({ ...f, platform: e.target.value as Platform }))}
-                    className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white/5 border border-border text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
                     title="Platform"
                   >
                     {(['instagram', 'facebook', 'tiktok', 'youtube', 'email', 'all'] as Platform[]).map((p) => (
-                      <option key={p} value={p} className="capitalize bg-zinc-800">
+                      <option key={p} value={p} className="capitalize bg-muted">
                         {p.charAt(0).toUpperCase() + p.slice(1)}
                       </option>
                     ))}
@@ -547,11 +547,11 @@ export default function ContentCalendar() {
                   <select
                     value={form.content_type}
                     onChange={(e) => setForm((f) => ({ ...f, content_type: e.target.value as ContentType }))}
-                    className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white/5 border border-border text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
                     title="Content type"
                   >
                     {(['reel', 'post', 'story', 'carousel', 'email', 'blog', 'video'] as ContentType[]).map((c) => (
-                      <option key={c} value={c} className="capitalize bg-zinc-800">
+                      <option key={c} value={c} className="capitalize bg-muted">
                         {c.charAt(0).toUpperCase() + c.slice(1)}
                       </option>
                     ))}
@@ -567,7 +567,7 @@ export default function ContentCalendar() {
                   value={form.title ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="e.g., Loc retwist tips for summer"
-                  className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white/5 border border-border text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
                 />
               </div>
 
@@ -579,7 +579,7 @@ export default function ContentCalendar() {
                   onChange={(e) => setForm((f) => ({ ...f, caption: e.target.value }))}
                   placeholder="Write your caption here..."
                   rows={4}
-                  className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500 resize-none"
+                  className="w-full bg-white/5 border border-border text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2] resize-none"
                 />
               </div>
 
@@ -591,7 +591,7 @@ export default function ContentCalendar() {
                   value={form.hashtags ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, hashtags: e.target.value }))}
                   placeholder="#locsofhouston #kelatic #loclife"
-                  className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white/5 border border-border text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
                 />
               </div>
 
@@ -603,7 +603,7 @@ export default function ContentCalendar() {
                   value={form.asset_url ?? ''}
                   onChange={(e) => setForm((f) => ({ ...f, asset_url: e.target.value }))}
                   placeholder="Paste asset URL from library"
-                  className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                  className="w-full bg-white/5 border border-border text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
                 />
               </div>
 
@@ -614,10 +614,10 @@ export default function ContentCalendar() {
                   <select
                     value={form.assigned_to ?? MANAGERS[0]}
                     onChange={(e) => setForm((f) => ({ ...f, assigned_to: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white/5 border border-border text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
                     title="Assign to manager"
                   >
-                    {MANAGERS.map((m) => <option key={m} value={m} className="bg-zinc-800">{m}</option>)}
+                    {MANAGERS.map((m) => <option key={m} value={m} className="bg-muted">{m}</option>)}
                   </select>
                 </div>
                 <div>
@@ -625,11 +625,11 @@ export default function ContentCalendar() {
                   <select
                     value={form.status}
                     onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as Status }))}
-                    className="w-full bg-white/5 border border-white/10 text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                    className="w-full bg-white/5 border border-border text-white rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
                     title="Status"
                   >
                     {(Object.keys(STATUS_CONFIG) as Status[]).map((s) => (
-                      <option key={s} value={s} className="bg-zinc-800">{STATUS_CONFIG[s].label}</option>
+                      <option key={s} value={s} className="bg-muted">{STATUS_CONFIG[s].label}</option>
                     ))}
                   </select>
                 </div>
@@ -643,13 +643,13 @@ export default function ContentCalendar() {
                   onChange={(e) => setForm((f) => ({ ...f, manager_notes: e.target.value }))}
                   placeholder="Internal notes, feedback, revisions needed..."
                   rows={2}
-                  className="w-full bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-amber-500 resize-none"
+                  className="w-full bg-white/5 border border-border text-white placeholder-white/20 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2] resize-none"
                 />
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="flex gap-3 p-5 border-t border-white/10 shrink-0">
+            <div className="flex gap-3 p-5 border-t border-border shrink-0">
               {editingPost && (
                 <button
                   onClick={() => handleDelete(editingPost.id)}
@@ -668,7 +668,7 @@ export default function ContentCalendar() {
               <button
                 onClick={handleSave}
                 disabled={saving || !form.scheduled_date}
-                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold rounded-xl text-sm hover:shadow-lg hover:shadow-amber-500/20 transition-all disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-[#00ffb2] text-black font-bold rounded-xl text-sm  transition-all disabled:opacity-50"
               >
                 {saving ? (
                   <div className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />

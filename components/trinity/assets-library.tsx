@@ -57,7 +57,7 @@ const TYPE_COLORS: Record<string, string> = {
   image: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
   video: 'bg-red-500/20 text-red-400 border-red-500/30',
   graphic: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  document: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  document: 'bg-[#00ffb2]/20 text-[#00ffb2] border-[#00ffb2]/30',
 };
 
 const MANAGERS = ['Manager 1', 'Manager 2'];
@@ -220,7 +220,7 @@ export default function AssetsLibrary() {
           <select
             value={uploadManager}
             onChange={(e) => setUploadManager(e.target.value)}
-            className="bg-white/5 border border-white/10 text-white/80 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500"
+            className="bg-white/5 border border-border text-white/80 text-sm rounded-xl px-3 py-2 focus:outline-none focus:border-[#00ffb2]"
             title="Select manager"
           >
             {MANAGERS.map((m) => (
@@ -229,7 +229,7 @@ export default function AssetsLibrary() {
           </select>
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold px-4 py-2 rounded-xl hover:shadow-lg hover:shadow-amber-500/20 transition-all text-sm"
+            className="flex items-center gap-2 bg-[#00ffb2] text-black font-bold px-4 py-2 rounded-xl  transition-all text-sm"
           >
             <Plus className="w-4 h-4" />
             Upload Assets
@@ -250,20 +250,20 @@ export default function AssetsLibrary() {
       {uploading.length > 0 && (
         <div className="space-y-2">
           {uploading.map((u) => (
-            <div key={u.id} className="bg-white/5 border border-white/10 rounded-xl p-3 flex items-center gap-3">
+            <div key={u.id} className="bg-white/5 border border-border rounded-xl p-3 flex items-center gap-3">
               {u.status === 'done' ? (
                 <CheckCircle className="w-4 h-4 text-green-400 shrink-0" />
               ) : u.status === 'error' ? (
                 <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
               ) : (
-                <div className="w-4 h-4 border-2 border-amber-400 border-t-transparent rounded-full animate-spin shrink-0" />
+                <div className="w-4 h-4 border-2 border-[#00ffb2] border-t-transparent rounded-full animate-spin shrink-0" />
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white/80 truncate">{u.name}</p>
                 {u.status === 'uploading' && (
                   <div className="mt-1 h-1 bg-white/10 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-amber-400 transition-all duration-300"
+                      className="h-full bg-[#00ffb2] transition-all duration-300"
                       style={{ width: `${u.progress}%` }}
                     />
                   </div>
@@ -288,13 +288,13 @@ export default function AssetsLibrary() {
         onClick={() => fileInputRef.current?.click()}
         className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
           isDragging
-            ? 'border-amber-400 bg-amber-400/10'
-            : 'border-white/10 bg-white/2 hover:border-white/20 hover:bg-white/5'
+            ? 'border-[#00ffb2] bg-[#00ffb2]/10'
+            : 'border-border bg-white/2 hover:border-border hover:bg-white/5'
         }`}
       >
-        <Upload className={`w-8 h-8 mx-auto mb-3 ${isDragging ? 'text-amber-400' : 'text-white/30'}`} />
+        <Upload className={`w-8 h-8 mx-auto mb-3 ${isDragging ? 'text-[#00ffb2]' : 'text-white/30'}`} />
         <p className="text-white/50 text-sm">
-          Drop files here or <span className="text-amber-400 font-medium">browse to upload</span>
+          Drop files here or <span className="text-[#00ffb2] font-medium">browse to upload</span>
         </p>
         <p className="text-white/30 text-xs mt-1">Images, Videos, PDFs, SVGs, AI, PSD files</p>
       </div>
@@ -308,7 +308,7 @@ export default function AssetsLibrary() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search assets..."
-            className="w-full bg-white/5 border border-white/10 text-white placeholder-white/30 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+            className="w-full bg-white/5 border border-border text-white placeholder-white/30 rounded-xl pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
           />
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -318,14 +318,14 @@ export default function AssetsLibrary() {
               onClick={() => setFilterType(type)}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all ${
                 filterType === type
-                  ? 'bg-amber-400 text-black'
-                  : 'bg-white/5 text-white/60 hover:bg-white/10 border border-white/10'
+                  ? 'bg-[#00ffb2] text-black'
+                  : 'bg-white/5 text-white/60 hover:bg-white/10 border border-border'
               }`}
             >
               {type !== 'all' && TYPE_ICONS[type]}
               <span className="capitalize">{type}</span>
               <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                filterType === type ? 'bg-black/20 text-black/80' : 'bg-white/10 text-white/40'
+                filterType === type ? 'bg-background/20 text-black/80' : 'bg-white/10 text-white/40'
               }`}>
                 {counts[type]}
               </span>
@@ -354,10 +354,10 @@ export default function AssetsLibrary() {
             <div
               key={asset.id}
               onClick={() => setSelectedAsset(asset)}
-              className="group relative bg-white/5 border border-white/10 rounded-xl overflow-hidden cursor-pointer hover:border-amber-500/50 hover:bg-white/8 transition-all"
+              className="group relative bg-white/5 border border-border rounded-xl overflow-hidden cursor-pointer hover:border-[#00ffb2]/50 hover:bg-white/8 transition-all"
             >
               {/* Thumbnail */}
-              <div className="aspect-square flex items-center justify-center bg-black/20">
+              <div className="aspect-square flex items-center justify-center bg-background/20">
                 {asset.file_type === 'image' && asset.public_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -396,7 +396,7 @@ export default function AssetsLibrary() {
               </div>
 
               {/* Hover Actions */}
-              <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+              <div className="absolute inset-0 bg-background/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 {asset.public_url && (
                   <a
                     href={asset.public_url}
@@ -423,9 +423,9 @@ export default function AssetsLibrary() {
 
       {/* Asset Detail Modal */}
       {selectedAsset && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg shadow-2xl">
-            <div className="flex items-center justify-between p-5 border-b border-white/10">
+        <div className="fixed inset-0 bg-background/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-lg shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-border">
               <h3 className="font-bold text-white">{selectedAsset.name}</h3>
               <button
                 onClick={() => setSelectedAsset(null)}
@@ -437,7 +437,7 @@ export default function AssetsLibrary() {
 
             <div className="p-5 space-y-4">
               {/* Preview */}
-              <div className="bg-black/30 rounded-xl overflow-hidden flex items-center justify-center h-48">
+              <div className="bg-background/30 rounded-xl overflow-hidden flex items-center justify-center h-48">
                 {selectedAsset.file_type === 'image' && selectedAsset.public_url ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
@@ -492,7 +492,7 @@ export default function AssetsLibrary() {
                     <input
                       readOnly
                       value={selectedAsset.public_url}
-                      className="flex-1 bg-white/5 border border-white/10 text-white/60 text-xs rounded-lg px-3 py-2 truncate"
+                      className="flex-1 bg-white/5 border border-border text-white/60 text-xs rounded-lg px-3 py-2 truncate"
                     />
                     <button
                       onClick={() => navigator.clipboard.writeText(selectedAsset.public_url!)}

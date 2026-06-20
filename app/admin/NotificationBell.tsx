@@ -99,14 +99,14 @@ export default function NotificationBell() {
     <div className="relative">
       <button
         ref={bellRef}
-        className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+        className="relative p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors"
         onClick={() => setOpen(!open)}
         aria-label="Notifications"
       >
-        <Bell className={`w-5 h-5 ${pendingCount > 0 ? 'text-amber-500' : ''}`} />
+        <Bell className={`w-5 h-5 ${pendingCount > 0 ? 'text-[#00ffb2]' : ''}`} />
         {totalCount > 0 && (
           <span className={`absolute -top-1 -right-1 min-w-[1.25rem] h-5 flex items-center justify-center rounded-full text-xs font-bold text-white ${
-            pendingCount > 0 ? 'bg-amber-500' : 'bg-blue-500'
+            pendingCount > 0 ? 'bg-[#00ffb2]' : 'bg-blue-500'
           }`}>
             {totalCount > 99 ? '99+' : totalCount}
           </span>
@@ -114,17 +114,17 @@ export default function NotificationBell() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-96 bg-white border border-gray-200 rounded-xl shadow-lg z-50 overflow-hidden">
+        <div className="absolute right-0 mt-2 w-96 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
           {/* Header */}
-          <div className="p-4 border-b bg-gray-50">
+          <div className="p-4 border-b bg-muted">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+              <h3 className="font-semibold text-foreground flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 Appointments
               </h3>
               <button
                 onClick={() => setOpen(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-muted-foreground hover:text-muted-foreground"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -132,7 +132,7 @@ export default function NotificationBell() {
             {(pendingCount > 0 || upcomingCount > 0) && (
               <div className="flex gap-3 mt-2 text-xs">
                 {pendingCount > 0 && (
-                  <span className="px-2 py-1 bg-amber-100 text-amber-700 rounded-full font-medium">
+                  <span className="px-2 py-1 bg-[#00ffb2] text-[#00ffb2] rounded-full font-medium">
                     {pendingCount} pending
                   </span>
                 )}
@@ -150,22 +150,22 @@ export default function NotificationBell() {
             {loading ? (
               <div className="p-8 text-center">
                 <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
-                <p className="text-gray-500 mt-2">Loading...</p>
+                <p className="text-muted-foreground mt-2">Loading...</p>
               </div>
             ) : appointments.length === 0 ? (
               <div className="p-8 text-center">
-                <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-gray-500 font-medium">No upcoming appointments</p>
-                <p className="text-gray-400 text-sm">You're all caught up!</p>
+                <Calendar className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground font-medium">No upcoming appointments</p>
+                <p className="text-muted-foreground text-sm">You're all caught up!</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-border">
                 {appointments.map((appointment) => (
                   <a
                     key={appointment.id}
                     href={`/admin/appointments?highlight=${appointment.id}`}
-                    className={`block p-4 hover:bg-gray-50 transition-colors ${
-                      appointment.status === 'pending' ? 'bg-amber-50/50' : ''
+                    className={`block p-4 hover:bg-muted transition-colors ${
+                      appointment.status === 'pending' ? 'bg-[#00ffb2]/10' : ''
                     }`}
                     onClick={() => setOpen(false)}
                   >
@@ -173,7 +173,7 @@ export default function NotificationBell() {
                       {/* Status Icon */}
                       <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
                         appointment.status === 'pending' 
-                          ? 'bg-amber-100 text-amber-600' 
+                          ? 'bg-[#00ffb2] text-[#00ffb2]' 
                           : 'bg-blue-100 text-blue-600'
                       }`}>
                         {appointment.status === 'pending' ? (
@@ -186,7 +186,7 @@ export default function NotificationBell() {
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between gap-2">
-                          <h4 className="font-medium text-sm text-gray-900 truncate">
+                          <h4 className="font-medium text-sm text-foreground truncate">
                             {appointment.clients 
                               ? `${appointment.clients.first_name} ${appointment.clients.last_name}`
                               : 'Unknown Client'
@@ -194,18 +194,18 @@ export default function NotificationBell() {
                           </h4>
                           <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
                             appointment.status === 'pending'
-                              ? 'bg-amber-100 text-amber-700'
+                              ? 'bg-[#00ffb2] text-[#00ffb2]'
                               : 'bg-green-100 text-green-700'
                           }`}>
                             {appointment.status === 'pending' ? 'Pending' : 'Confirmed'}
                           </span>
                         </div>
                         
-                        <p className="text-sm text-gray-600 truncate mt-0.5">
+                        <p className="text-sm text-muted-foreground truncate mt-0.5">
                           {appointment.services?.name || 'Service'}
                         </p>
                         
-                        <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
                           <span className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {formatAppointmentTime(appointment.start_time)}
@@ -219,7 +219,7 @@ export default function NotificationBell() {
                         </div>
                       </div>
 
-                      <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-muted-foreground flex-shrink-0" />
                     </div>
                   </a>
                 ))}
@@ -228,11 +228,11 @@ export default function NotificationBell() {
           </div>
 
           {/* Footer */}
-          <div className="p-3 border-t bg-gray-50">
+          <div className="p-3 border-t bg-muted">
             <a
               href="/admin/appointments"
               onClick={() => setOpen(false)}
-              className="w-full text-center text-sm text-gray-600 hover:text-gray-800 font-medium flex items-center justify-center gap-2"
+              className="w-full text-center text-sm text-muted-foreground hover:text-foreground font-medium flex items-center justify-center gap-2"
             >
               <Calendar className="w-4 h-4" />
               View all appointments

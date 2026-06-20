@@ -84,13 +84,13 @@ const ICON_MAP: Record<string, React.ReactNode> = {
 
 const PRIORITY_STYLES = {
   high:   'border-red-500/40 bg-red-500/8',
-  medium: 'border-amber-500/40 bg-amber-500/8',
-  low:    'border-white/10 bg-white/3',
+  medium: 'border-[#00ffb2]/40 bg-[#00ffb2]/8',
+  low:    'border-border bg-white/3',
 };
 
 const PRIORITY_DOT = {
   high:   'bg-red-400',
-  medium: 'bg-amber-400',
+  medium: 'bg-[#00ffb2]',
   low:    'bg-white/30',
 };
 
@@ -102,14 +102,14 @@ const TREND_ICON = {
 
 const URGENCY_CONFIG = {
   today:      { label: 'Today',      color: 'text-red-400 bg-red-500/10 border-red-500/30' },
-  this_week:  { label: 'This Week',  color: 'text-amber-400 bg-amber-500/10 border-amber-500/30' },
+  this_week:  { label: 'This Week',  color: 'text-[#00ffb2] bg-[#00ffb2]/10 border-[#00ffb2]/30' },
   this_month: { label: 'This Month', color: 'text-blue-400 bg-blue-500/10 border-blue-500/30' },
 };
 
 const OWNER_DOT: Record<string, string> = {
   'Manager 1':    'bg-purple-400',
-  'Manager 2':    'bg-amber-400',
-  'Both Managers':'bg-gradient-to-r from-purple-400 to-amber-400',
+  'Manager 2':    'bg-[#00ffb2]',
+  'Both Managers':'bg-gradient-to-r from-purple-400 to-[#00ffb2]',
   'Admin':        'bg-green-400',
 };
 
@@ -118,14 +118,14 @@ function InsightCard({ insight }: { insight: Insight }) {
     <div className={`rounded-xl border p-4 flex flex-col gap-2 ${PRIORITY_STYLES[insight.priority]}`}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-amber-400 shrink-0">
+          <div className="w-7 h-7 rounded-lg bg-white/5 border border-border flex items-center justify-center text-[#00ffb2] shrink-0">
             {ICON_MAP[insight.icon] || <Brain className="w-4 h-4" />}
           </div>
           <span className="text-xs text-white/40 font-medium uppercase tracking-wider">{insight.category}</span>
         </div>
         <div className="flex items-center gap-2 shrink-0">
           {insight.value && (
-            <span className="text-xs font-bold text-white/80 bg-white/5 border border-white/10 px-2 py-0.5 rounded-full">
+            <span className="text-xs font-bold text-white/80 bg-white/5 border border-border px-2 py-0.5 rounded-full">
               {insight.value}
             </span>
           )}
@@ -143,8 +143,8 @@ function ActionCard({ action }: { action: Action }) {
   const urgency = URGENCY_CONFIG[action.urgency];
   return (
     <div className="flex items-start gap-3 bg-white/3 border border-white/8 rounded-xl p-3 hover:border-white/15 transition-colors">
-      <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5">
-        <ChevronRight className="w-3 h-3 text-amber-400" />
+      <div className="w-6 h-6 rounded-full bg-white/5 border border-border flex items-center justify-center shrink-0 mt-0.5">
+        <ChevronRight className="w-3 h-3 text-[#00ffb2]" />
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-2">
@@ -195,7 +195,7 @@ const PILLARS = [
     icon: <Target className="w-5 h-5" />,
     title: 'Booking Funnel AI',
     desc: 'Drop-off detection & recovery — where clients abandon and how to recover them.',
-    color: 'from-amber-500/15 to-yellow-500/5 border-amber-500/25',
+    color: 'from-[#00ffb2]/10 to-[#00ffb2]/5 border-[#00ffb2]/25',
     prompt: 'Analyze the Kelatic booking funnel. Where are clients dropping off before completing a booking? What are the top 3 recovery tactics we should implement this week to reduce no-shows and abandoned bookings?',
   },
   {
@@ -389,7 +389,7 @@ export default function AIInsights() {
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-white flex items-center gap-2">
-            <Brain className="w-5 h-5 text-amber-400" />
+            <Brain className="w-5 h-5 text-[#00ffb2]" />
             Claude as Your Business AI Operator
           </h2>
           <p className="text-white/40 text-sm mt-0.5">
@@ -401,8 +401,8 @@ export default function AIInsights() {
             onClick={() => setActiveView('overview')}
             className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
               activeView === 'overview'
-                ? 'bg-amber-400 text-black'
-                : 'bg-white/5 text-white/50 hover:text-white border border-white/10'
+                ? 'bg-[#00ffb2] text-black'
+                : 'bg-white/5 text-white/50 hover:text-white border border-border'
             }`}
           >
             Dashboard
@@ -411,13 +411,13 @@ export default function AIInsights() {
             onClick={() => setActiveView('chat')}
             className={`px-3 py-1.5 rounded-xl text-sm font-medium transition-colors ${
               activeView === 'chat'
-                ? 'bg-amber-400 text-black'
-                : 'bg-white/5 text-white/50 hover:text-white border border-white/10'
+                ? 'bg-[#00ffb2] text-black'
+                : 'bg-white/5 text-white/50 hover:text-white border border-border'
             }`}
           >
             Chat
             {messages.length > 0 && (
-              <span className="ml-1.5 text-xs bg-amber-400/20 text-amber-400 px-1.5 py-0.5 rounded-full">
+              <span className="ml-1.5 text-xs bg-[#00ffb2]/20 text-[#00ffb2] px-1.5 py-0.5 rounded-full">
                 {messages.filter(m => m.role === 'user').length}
               </span>
             )}
@@ -425,7 +425,7 @@ export default function AIInsights() {
           <button
             onClick={fetchInsights}
             disabled={loading}
-            className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/40 hover:text-white transition-colors"
+            className="p-2 bg-white/5 hover:bg-white/10 border border-border rounded-xl text-white/40 hover:text-white transition-colors"
             title="Refresh insights"
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -455,7 +455,7 @@ export default function AIInsights() {
                   {report.score >= 75 ? (
                     <CheckCircle className="w-3.5 h-3.5 text-green-400" />
                   ) : report.score >= 50 ? (
-                    <Clock className="w-3.5 h-3.5 text-amber-400" />
+                    <Clock className="w-3.5 h-3.5 text-[#00ffb2]" />
                   ) : (
                     <AlertTriangle className="w-3.5 h-3.5 text-red-400" />
                   )}
@@ -510,14 +510,14 @@ export default function AIInsights() {
                   className={`text-left bg-gradient-to-br ${pillar.color} border rounded-xl p-4 hover:scale-[1.01] transition-all group`}
                 >
                   <div className="flex items-start justify-between mb-2">
-                    <div className="w-8 h-8 rounded-lg bg-white/8 border border-white/10 flex items-center justify-center text-white/70 group-hover:text-amber-400 transition-colors">
+                    <div className="w-8 h-8 rounded-lg bg-white/8 border border-border flex items-center justify-center text-white/70 group-hover:text-[#00ffb2] transition-colors">
                       {pillar.icon}
                     </div>
-                    <Zap className="w-3.5 h-3.5 text-white/20 group-hover:text-amber-400 transition-colors" />
+                    <Zap className="w-3.5 h-3.5 text-white/20 group-hover:text-[#00ffb2] transition-colors" />
                   </div>
                   <h4 className="text-sm font-semibold text-white mb-1">{pillar.title}</h4>
                   <p className="text-xs text-white/40 leading-relaxed">{pillar.desc}</p>
-                  <div className="mt-3 flex items-center gap-1 text-xs text-amber-400/60 group-hover:text-amber-400 transition-colors">
+                  <div className="mt-3 flex items-center gap-1 text-xs text-[#00ffb2]/60 group-hover:text-[#00ffb2] transition-colors">
                     <span>Ask Claude</span>
                     <ChevronRight className="w-3 h-3" />
                   </div>
@@ -553,7 +553,7 @@ export default function AIInsights() {
           {/* Quick Chat Prompt */}
           <div className="bg-white/3 border border-white/8 rounded-2xl p-4">
             <div className="flex items-center gap-2 mb-3">
-              <MessageSquare className="w-4 h-4 text-amber-400" />
+              <MessageSquare className="w-4 h-4 text-[#00ffb2]" />
               <span className="text-sm font-medium text-white/70">Ask your AI Operator</span>
             </div>
             <div className="flex gap-2">
@@ -565,12 +565,12 @@ export default function AIInsights() {
                   if (e.key === 'Enter') { sendMessage(input); }
                 }}
                 placeholder="e.g. 'Write a win-back SMS for clients who missed their retwist appointment...'"
-                className="flex-1 bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500"
+                className="flex-1 bg-white/5 border border-border text-white placeholder-white/20 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#00ffb2]"
               />
               <button
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || streaming}
-                className="px-4 py-2.5 bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold rounded-xl text-sm hover:shadow-lg hover:shadow-amber-500/20 transition-all disabled:opacity-50"
+                className="px-4 py-2.5 bg-[#00ffb2] text-black font-bold rounded-xl text-sm  transition-all disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
               </button>
@@ -598,7 +598,7 @@ export default function AIInsights() {
                     <button
                       key={s}
                       onClick={() => sendMessage(s)}
-                      className="text-xs bg-white/5 border border-white/10 text-white/50 hover:text-white hover:border-amber-500/50 px-3 py-1.5 rounded-full transition-colors"
+                      className="text-xs bg-white/5 border border-border text-white/50 hover:text-white hover:border-[#00ffb2]/50 px-3 py-1.5 rounded-full transition-colors"
                     >
                       {s}
                     </button>
@@ -609,15 +609,15 @@ export default function AIInsights() {
               messages.map((msg, i) => (
                 <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   {msg.role === 'assistant' && (
-                    <div className="w-7 h-7 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shrink-0 mr-2.5 mt-0.5">
+                    <div className="w-7 h-7 rounded-full bg-[#00ffb2] flex items-center justify-center shrink-0 mr-2.5 mt-0.5">
                       <Brain className="w-3.5 h-3.5 text-black" />
                     </div>
                   )}
                   <div
                     className={`max-w-[82%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
                       msg.role === 'user'
-                        ? 'bg-amber-400/15 border border-amber-400/30 text-white'
-                        : 'bg-white/5 border border-white/10 text-white/80'
+                        ? 'bg-[#00ffb2]/15 border border-[#00ffb2]/30 text-white'
+                        : 'bg-white/5 border border-border text-white/80'
                     }`}
                   >
                     {msg.role === 'assistant' ? (
@@ -649,8 +649,8 @@ export default function AIInsights() {
                   onClick={() => handlePillarClick(p)}
                   className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs whitespace-nowrap border transition-colors ${
                     activePillar === p.id
-                      ? 'bg-amber-400/20 border-amber-400/50 text-amber-400'
-                      : 'bg-white/3 border-white/10 text-white/40 hover:text-white/70'
+                      ? 'bg-[#00ffb2]/20 border-[#00ffb2]/50 text-[#00ffb2]'
+                      : 'bg-white/3 border-border text-white/40 hover:text-white/70'
                   }`}
                 >
                   <span className="text-xs">{p.icon}</span>
@@ -671,13 +671,13 @@ export default function AIInsights() {
                 }}
                 onKeyDown={handleKeyDown}
                 placeholder="Ask anything — content strategy, client scripts, analytics, positioning..."
-                className="flex-1 bg-white/5 border border-white/10 text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-amber-500 resize-none overflow-hidden"
+                className="flex-1 bg-white/5 border border-border text-white placeholder-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#00ffb2] resize-none overflow-hidden"
                 disabled={streaming}
               />
               <button
                 onClick={() => sendMessage(input)}
                 disabled={!input.trim() || streaming}
-                className="p-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl hover:shadow-lg hover:shadow-amber-500/20 transition-all disabled:opacity-50 shrink-0"
+                className="p-3 bg-[#00ffb2] text-black rounded-xl  transition-all disabled:opacity-50 shrink-0"
               >
                 {streaming ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
