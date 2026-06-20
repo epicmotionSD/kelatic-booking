@@ -173,3 +173,47 @@ body {
   font-size: 0.66rem;
   font-weight: 600;
 }
+
+/* ============================================================
+   x3o Terminal — admin form controls & mobile polish
+   Forces every input/select/textarea in the admin to the dark
+   theme so text is always legible (fixes white-on-white fields),
+   and gives comfortable touch targets on phones.
+   Scoped to .x3o-term so public storefronts are untouched.
+   ============================================================ */
+.x3o-term input:not([type="checkbox"]):not([type="radio"]),
+.x3o-term select,
+.x3o-term textarea {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  border-color: hsl(var(--border));
+}
+.x3o-term input::placeholder,
+.x3o-term textarea::placeholder {
+  color: hsl(var(--muted-foreground));
+}
+.x3o-term select option {
+  background-color: hsl(var(--card));
+  color: hsl(var(--foreground));
+}
+/* Make date/time picker glyphs visible on dark */
+.x3o-term input[type="date"]::-webkit-calendar-picker-indicator,
+.x3o-term input[type="time"]::-webkit-calendar-picker-indicator,
+.x3o-term input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  filter: invert(1) opacity(0.55);
+}
+
+/* Comfortable tap targets on touch screens */
+@media (max-width: 768px) {
+  .x3o-term input:not([type="checkbox"]):not([type="radio"]),
+  .x3o-term select,
+  .x3o-term textarea {
+    min-height: 44px;
+    font-size: 16px; /* also prevents mobile focus zoom */
+  }
+}
+
+/* In the admin, use the clean terminal sans for headings (not the salon serif) */
+.x3o-term .font-playfair {
+  font-family: inherit;
+}
