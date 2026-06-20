@@ -232,4 +232,34 @@ function SupportChat({ endpoint, businessId, color }: { endpoint: string; busine
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Request failed.'); return; }
       const text = data.response || data.reply || data.message ||
-        (typeof data.content === 'string' ? data.content : null) || JSON.strin
+        (typeof data.content === 'string' ? data.content : null) || JSON.stringify(data, null, 2);
+      setReply(text);
+    } catch (e) {
+      console.error(e);
+      setError('Something went wrong.');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className={wrap}>
+      <div className="flex gap-2">
+        <input value={message} onChange={(e) => setMessage(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') send(); }}
+          placeholder="Ask the support agent a client question…" className={`flex-1 ${inp}`} />
+        <button onClick={send} disabled={loading}
+          className="inline-flex items-center gap-2 text-black text-sm font-medium rounded px-3 py-1.5 disabled:opacity-50"
+          style={{ backgroundColor: color }}>
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+          Ask
+        </button>
+      </div>
+      {error && <p className="text-sm text-[#ef4444] mt-2">{error}</p>}
+      {reply && (
+        <pre className="mt-3 whitespace-pre-wrap text-sm text-foreground/90 bg-background border border-border rounded p-3 max-h-64 overflow-auto">
+          {reply}
+        </pre>
+      )}
+    </div>
+  );
+}

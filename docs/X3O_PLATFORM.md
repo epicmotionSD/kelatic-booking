@@ -45,7 +45,7 @@ Pre-built, white-label platforms that businesses can deploy instantly.
 | Template | Description | Status |
 |----------|-------------|--------|
 | **Trinity Booking** | Full-featured booking system for salons, barbershops, spas | LIVE |
-| E-commerce | Product sales, inventory, payments | Planned |
+| **Commerce** | Product catalog, in-person POS + online checkout, pickup/shipping fulfillment | LIVE (Vitality House) |
 | Membership | Community, subscriptions, content | Planned |
 | Academy | Courses, training, certifications | Planned |
 
@@ -59,23 +59,39 @@ Pre-built, white-label platforms that businesses can deploy instantly.
 - Newsletter system
 - Blog/SEO pages
 
-### 2. Sub-Agents
+**Commerce Features:**
 
-AI-powered integrations that enhance platform capabilities.
+- Product categories + modifiers (option groups, price deltas)
+- Public storefront with cart + Stripe Payment Element checkout
+- Admin orders queue + in-person register (Stripe Terminal)
+- `payments.order_id` reuses the same Stripe/webhook pipeline as bookings
+- Tenant-aware admin nav (commerce vs salon)
 
-| Sub-Agent | Purpose | Status |
-|-----------|---------|--------|
-| **AI Marketing Automation** | Content generation for social, email, blog, video | LIVE |
-| AI Customer Support | Chatbot, FAQ, ticket routing | Planned |
-| AI Analytics | Business insights, predictions, recommendations | Planned |
-| AI Scheduling | Optimal appointment scheduling, demand forecasting | Planned |
+### 2. Primary Agents (with Modules)
 
-**AI Marketing Automation:**
-- Powered by Claude AI
-- Multi-tenant context awareness
-- Auto-includes booking URLs
-- x3o.ai branding in generated content
-- Content types: Social, Email, Blog, Video, Education, Graphics
+The owner interacts with **three** AI agents. Each owns modules; each module exposes tools. Source of truth lives in `lib/agents/primary/registry.ts` and is the same shape every UI surface and API caller consumes.
+
+| Primary Agent | Modules (LIVE) | What it does |
+| ------------- | -------------- | ------------ |
+| **Attract** | Content Studio (Trinity), Campaigns | Generates on-brand content and runs email / SMS / social campaigns |
+| **Retain** | Win-Back, Rebooking & Scheduling | Reactivates ghost clients and fills calendar gaps |
+| **Serve** | Client Support, Reminders & Notifications, Loyalty & Rewards | 24/7 client answers, appointment reminders, two-sided loyalty + referrals |
+
+**Loyalty & Rewards (newest module on Serve):**
+
+- Flexible JSONB earn rules — same schema covers appointment-per-visit *and* commerce-per-dollar
+- Polymorphic rewards catalog (percent_off / amount_off / free_product / free_service / free_addon)
+- Two-sided referrals — referee earns on signup, referrer earns on referee's first paid event
+- Customer-facing widget on checkout success + booking confirmation
+- Commerce checkout redemption (account only debited after Stripe confirms succeeded)
+- Optional cross-brand wallet via `program_group_id` (one owner, multiple tenants)
+
+**Primary orchestrator:** `PrimaryOrchestrator` at `/api/agents/orchestrator` routes intent across the three agents, dispatches tools, and serves the readiness snapshot the admin dashboard renders.
+
+**Planned next:**
+
+- AI Analytics (cross-tenant business insights, predictions)
+- AI Scheduling Optimization (demand forecasting on top of the existing Rebooking module)
 
 ### 3. MCP Servers (OpenConductor)
 
@@ -216,7 +232,9 @@ Revenue splits:
 
 ---
 
-## First Tenant: Kelatic
+## Live Tenants
+
+### Tenant 1 — Kelatic Hair Lounge
 
 **Business:** Kelatic Hair Lounge
 **Domain:** kelatic.com / kelatic.x3o.ai
@@ -224,11 +242,13 @@ Revenue splits:
 **Location:** Houston, TX
 
 **Sub-brands:**
+
 - **Loc Shop** - Professional loc services
 - **Loc Academy** - Training & education
 - **Loc Vitality** - Products & wellness
 
 **Configuration:**
+
 ```json
 {
   "slug": "kelatic",
@@ -241,26 +261,61 @@ Revenue splits:
 }
 ```
 
+### Tenant 2 — Kelatic Vitality House
+
+**Business:** Kelatic Vitality House (same owner, separate brand)
+**Domain:** kelaticvitalityhouse.com
+**Template:** Commerce
+**Location:** Houston, TX
+
+Plant-based wellness café running on the Commerce template (products, modifiers, public storefront, in-person Stripe Terminal register). Same Supabase project + Stripe account; isolated by `business_id`.
+
+**Configuration:**
+
+```json
+{
+  "slug": "vitality",
+  "name": "Kelatic Vitality House",
+  "business_type": "cafe",
+  "primary_color": "#3f7d4f",
+  "ai_tone": "warm"
+}
+```
+
+Loyalty programs for both tenants share a `program_group_id`, so the same owner can flip on a cross-brand wallet later without a schema change.
+
 ---
 
 ## Roadmap
 
-### Phase 1: Foundation (Current)
+### Phase 1: Foundation — COMPLETE
+
 - [x] Trinity Booking template
 - [x] Multi-tenant architecture
-- [x] AI Marketing Automation sub-agent
+- [x] AI Marketing Automation (now Content Studio under Attract)
 - [x] Kelatic as first tenant
-- [ ] Production deployment
-- [ ] Stripe Connect live
+- [x] Production deployment (Vercel + Supabase, custom domain on kelatic.com)
+- [x] Stripe live (PaymentIntents + Terminal for in-person; webhook pipeline shared with commerce)
 
-### Phase 2: Platform Growth
-- [ ] Self-service tenant onboarding
-- [ ] Additional templates
-- [ ] More sub-agents
-- [ ] OpenConductor MCP integration
-- [ ] Agency dashboard
+### Phase 2: Platform Growth — IN PROGRESS
+
+**Shipped:**
+
+- [x] Second template — Commerce (Vitality House live)
+- [x] Three-agent registry (Attract / Retain / Serve) + primary orchestrator
+- [x] Additional modules — Loyalty & Rewards, two-sided Referrals, Reminders & Notifications
+- [x] Multi-tenant scaling — two tenants live on the same codebase + DB
+
+**Next:**
+
+- [ ] Self-service tenant onboarding (signup → choose template → configure → live subdomain)
+- [ ] Agency dashboard (operator-level: cross-tenant health, revenue, plan status)
+- [ ] OpenConductor MCP integration (custom tool servers exposed to the agents)
+- [ ] Stripe Connect (per-tenant payout, not just shared account)
+- [ ] Additional sub-agents (AI Analytics, AI Scheduling Optimization)
 
 ### Phase 3: Scale
+
 - [ ] Marketplace for templates
 - [ ] Third-party sub-agent ecosystem
 - [ ] White-label reseller program

@@ -1741,4 +1741,136 @@ export async function getCustomerView(
   return {
     programName: program.name,
     currencyLabel: program.currencyLabel,
-    balance: balance
+    balance: balance.balance,
+    lifetimePoints: balance.lifetimePoints,
+    currentTier: balance.currentTier ?? null,
+    tierPerks,
+    earnedThisVisit,
+    referralsEnabled: program.referralsEnabled,
+    referralCode,
+    referrerBonusPoints: program.referrerBonusPoints,
+    refereeBonusPoints: program.refereeBonusPoints,
+  };
+}
+
+/**
+ * Resolve a customer's clients.id from any of: an order_id they just paid,
+ * an appointment_id they just booked, or an authenticated email. All three
+ * are scoped to the tenant.
+ */
+async function resolveCustomerClientId(
+  supabase: AdminClient,
+  input: CustomerViewInput
+): Promise<string | null> {
+  // Order path -- order has customer_email / customer_phone (commerce guest checkout)
+  if (input.orderId) {
+    const { data: order } = await supabase
+      .from('orders')
+      .select('business_id, customer_email, customer_phone')
+      .eq('id', input.orderId)
+      .maybeSingle();
+    if (!order || order.business_id !== input.businessId) return null;
+    if (order.customer_email) {
+      const id = await findClientByEmail(
+        supabase,
+        input.businessId,
+        order.customer_email
+      );
+      if (id) return id;
+    }
+    if (order.customer_phone) {
+      const id = await findClientByPhone(
+        supabase,
+        input.businessId,
+        order.customer_phone
+      );
+      if (id) return id;
+    }
+  }
+
+  // Appointment path -- joins profiles for email; falls back to walk_in_phone
+  if (input.appointmentId) {
+    const { data: appt } = await supabase
+      .from('appointments')
+      .select(
+        'business_id, walk_in_phone, profiles:client_id(email, phone)'
+      )
+      .eq('id', input.appointmentId)
+      .maybeSingle();
+    if (!appt || appt.business_id !== input.businessId) return null;
+    const profile = Array.isArray((appt as any).profiles)
+      ? (appt as any).profiles[0]
+      : (appt as any).profiles;
+    if (profile?.email) {
+      const id = await findClientByEmail(supabase, input.businessId, profile.email);
+      if (id) return id;
+    }
+    const phone = profile?.phone ?? appt.walk_in_phone;
+    if (phone) {
+      const id = await findClientByPhone(supabase, input.businessId, phone);
+      if (id) return id;
+    }
+  }
+
+  // Auth path
+  if (input.authEmail) {
+    const id = await findClientByEmail(
+      supabase,
+      input.businessId,
+      input.authEmail
+    );
+    if (id) return id;
+  }
+
+  return null;
+}
+
+async function findClientByEmail(
+  supabase: AdminClient,
+  businessId: string,
+  email: string
+): Promise<string | null> {
+  const { data } = await supabase
+    .from('clients')
+    .select('id')
+    .eq('business_id', businessId)
+    .eq('email', email.trim().toLowerCase())
+    .maybeSingle();
+  return data?.id ?? null;
+}
+
+async function findClientByPhone(
+  supabase: AdminClient,
+  businessId: string,
+  phone: string
+): Promise<string | null> {
+  const { data } = await supabase
+    .from('clients')
+    .select('id')
+    .eq('business_id', businessId)
+    .eq('phone', phone)
+    .maybeSingle();
+  return data?.id ?? null;
+}
+
+// ============================================================
+// MODULE MANIFEST (consumed by the primary-agent registry)
+// ============================================================
+
+export const loyaltyModuleManifest = {
+  id: 'loyalty',
+  name: 'Loyalty & Rewards',
+  description:
+    'Branded loyalty program that earns from appointments OR purchases, with a polymorphic rewards catalog and optional cross-brand wallet.',
+  icon: 'gem',
+  adminPath: '/admin/loyalty',
+  tools: [
+    { id: 'loyalty.balance', name: 'Check balance',   endpoint: '/api/agents/loyalty/balance', method: 'GET',  action: 'loyalty-balance' },
+    { id: 'loyalty.award',   name: 'Award points',    endpoint: '/api/agents/loyalty/award',   method: 'POST' },
+    { id: 'loyalty.redeem',  name: 'Redeem reward',   endpoint: '/api/agents/loyalty/redeem',  method: 'POST' },
+    { id: 'loyalty.rewards', name: 'Rewards catalog', endpoint: '/api/agents/loyalty/rewards', method: 'GET',  action: 'loyalty-list' },
+    { id: 'loyalty.program', name: 'Program config',  endpoint: '/api/agents/loyalty/program', method: 'GET',  action: 'loyalty-list' },
+    { id: 'loyalty.members', name: 'Members',         endpoint: '/api/agents/loyalty/members', method: 'GET',  action: 'loyalty-list' },
+    { id: 'loyalty.referrals', name: 'Referrals',     endpoint: '/api/agents/loyalty/referrals', method: 'GET', action: 'loyalty-list' },
+  ],
+} as const;

@@ -308,4 +308,54 @@ export async function POST(request: NextRequest) {
             .from('businesses')
             .update({ plan_status: 'active' })
             .eq('id', businessId)
-  
+            .eq('plan_status', 'past_due');
+
+          console.log(`Invoice paid: ${invoice.id}`);
+        }
+        break;
+      }
+
+      // Invoice payment failed
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice;
+        const businessId = invoice.subscription_details?.metadata?.business_id;
+
+        if (businessId) {
+          // Update subscription status to past_due
+          await supabase
+            .from('businesses')
+            .update({ plan_status: 'past_due' })
+            .eq('id', businessId);
+
+          // TODO: Send email notification about failed payment
+          console.log(`Invoice payment failed: ${invoice.id}`);
+        }
+        break;
+      }
+
+      // Checkout session completed (for one-time payments like Revenue Sprint)
+      case 'checkout.session.completed': {
+        const session = event.data.object as Stripe.Checkout.Session;
+        const businessId = session.metadata?.business_id;
+
+        if (businessId && session.metadata?.product_type === 'revenue_sprint') {
+          // TODO: Track Revenue Sprint purchase and trigger campaign setup
+          console.log(`Revenue Sprint purchased: ${session.id}`);
+        }
+        break;
+      }
+
+      default:
+        console.log(`Unhandled event type: ${event.type}`);
+    }
+
+    return NextResponse.json({ received: true });
+  } catch (error) {
+    console.error('Webhook handler error:', error);
+    return NextResponse.json(
+      { error: 'Webhook handler failed' },
+      { status: 500 }
+    );
+  }
+}
+
