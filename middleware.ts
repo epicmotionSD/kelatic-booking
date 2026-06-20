@@ -103,7 +103,7 @@ export async function middleware(request: NextRequest) {
 
   // Check authentication for protected routes
   const protectedRoutes = ['/dashboard', '/admin', '/stylist', '/account'];
-  const publicRoutes = ['/login', '/reset-password', '/api', '/platform', '/onboarding', '/auth', '/book', '/_next', '/favicon.ico'];
+  const publicRoutes = ['/login', '/reset-password', '/api', '/platform', '/onboarding', '/get-started', '/auth', '/book', '/_next', '/favicon.ico'];
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
@@ -188,7 +188,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.rewrite(new URL('/platform', request.url));
     }
 
-    if (pathname.startsWith('/platform') || pathname.startsWith('/onboarding') || pathname.startsWith('/auth')) {
+    if (pathname.startsWith('/platform') || pathname.startsWith('/onboarding') || pathname.startsWith('/get-started') || pathname.startsWith('/auth') || pathname.startsWith('/login')) {
       return response;
     }
 

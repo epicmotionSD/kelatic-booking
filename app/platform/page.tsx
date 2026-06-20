@@ -73,7 +73,7 @@ export default function PlatformPage() {
             <a href="#proof" className="hover:text-white">Results</a>
             <a href="#pricing" className="hover:text-white">Pricing</a>
             <a href="https://kelatic.x3o.ai" target="_blank" rel="noopener noreferrer" className="hover:text-white">See it live</a>
-            <a href="#start" className="px-4 py-2 rounded-full font-semibold text-black" style={{ backgroundColor: MINT }}>
+            <a href="/get-started" className="px-4 py-2 rounded-full font-semibold text-black" style={{ backgroundColor: MINT }}>
               Start free trial
             </a>
           </nav>
@@ -87,7 +87,7 @@ export default function PlatformPage() {
             <a href="#proof" onClick={() => setMenu(false)}>Results</a>
             <a href="#pricing" onClick={() => setMenu(false)}>Pricing</a>
             <a href="https://kelatic.x3o.ai" target="_blank" rel="noopener noreferrer">See it live</a>
-            <a href="#start" onClick={() => setMenu(false)} className="px-4 py-2 rounded-full font-semibold text-black text-center" style={{ backgroundColor: MINT }}>
+            <a href="/get-started" onClick={() => setMenu(false)} className="px-4 py-2 rounded-full font-semibold text-black text-center" style={{ backgroundColor: MINT }}>
               Start free trial
             </a>
           </div>
@@ -110,7 +110,7 @@ export default function PlatformPage() {
             so you can focus on customers instead of running ten apps.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 mt-9">
-            <a href="#start" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-black" style={{ backgroundColor: MINT }}>
+            <a href="/get-started" className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full font-semibold text-black" style={{ backgroundColor: MINT }}>
               Start free trial <ArrowRight className="w-4 h-4" />
             </a>
             <a href="#agents" className="px-6 py-3.5 rounded-full font-semibold border border-white/20 text-white/90 hover:bg-white/5">
@@ -250,7 +250,7 @@ export default function PlatformPage() {
                   ))}
                 </ul>
                 <a
-                  href="#start"
+                  href="/get-started"
                   className={`mt-6 block text-center px-4 py-2.5 rounded-full font-semibold ${p.popular ? 'text-black' : 'border border-white/20 text-white hover:bg-white/5'}`}
                   style={p.popular ? { backgroundColor: MINT } : undefined}
                 >
