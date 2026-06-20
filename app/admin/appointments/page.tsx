@@ -42,10 +42,10 @@ interface Appointment {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  pending: 'bg-[#00ffb2]/20 text-[#00ffb2] border-[#00ffb2]/30',
   confirmed: 'bg-green-500/20 text-green-400 border-green-500/30',
   in_progress: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  completed: 'bg-white/10 text-white/60 border-white/20',
+  completed: 'bg-white/10 text-white/60 border-border',
   cancelled: 'bg-red-500/20 text-red-400 border-red-500/30',
   no_show: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
@@ -136,14 +136,14 @@ export default function AppointmentsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
-            <Calendar className="w-8 h-8 text-amber-400" />
+            <Calendar className="w-8 h-8 text-[#00ffb2]" />
             Appointments
           </h1>
           <p className="text-white/60">{formatDate(filters.date, timezone)}</p>
         </div>
         <Link
           href="/admin/appointments/new"
-          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
+          className="px-4 py-2 bg-[#00ffb2] text-black rounded-xl font-semibold  transition-all flex items-center gap-2 w-fit"
         >
           <Plus className="w-5 h-5" />
           New Appointment
@@ -151,7 +151,7 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-zinc-900 rounded-xl border border-white/10 p-4 mb-6 shadow-sm">
+      <div className="bg-card rounded-xl border border-border p-4 mb-6 shadow-sm">
         <div className="flex flex-wrap gap-4">
           {/* Date */}
           <div>
@@ -165,12 +165,12 @@ export default function AppointmentsPage() {
                 onChange={(e) =>
                   setFilters({ ...filters, date: e.target.value || 'all' })
                 }
-                className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               />
               <button
                 type="button"
                 onClick={() => setFilters({ ...filters, date: 'all' })}
-                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${filters.date === 'all' ? 'bg-amber-500 text-black border-amber-500' : 'bg-zinc-800 text-white border-white/20 hover:bg-zinc-700'}`}
+                className={`px-3 py-2 rounded-xl border text-sm font-medium transition-all ${filters.date === 'all' ? 'bg-[#00ffb2] text-black border-[#00ffb2]' : 'bg-muted text-white border-border hover:bg-muted'}`}
               >
                 All Dates
               </button>
@@ -187,7 +187,7 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, status: e.target.value })
               }
-              className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              className="px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
@@ -209,7 +209,7 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, timeScope: e.target.value })
               }
-              className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              className="px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
             >
               <option value="upcoming">Upcoming</option>
               <option value="past">Past</option>
@@ -226,7 +226,7 @@ export default function AppointmentsPage() {
               onChange={(e) =>
                 setFilters({ ...filters, stylist: e.target.value })
               }
-              className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              className="px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
             >
               <option value="all">All Stylists</option>
               {stylists.map((s) => (
@@ -244,7 +244,7 @@ export default function AppointmentsPage() {
                 const today = new Date().toISOString().split('T')[0];
                 setFilters({ ...filters, date: today });
               }}
-              className="px-4 py-2 bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/20"
+              className="px-4 py-2 bg-muted text-white rounded-xl hover:bg-muted transition-colors border border-border"
             >
               Today
             </button>
@@ -254,7 +254,7 @@ export default function AppointmentsPage() {
                 tomorrow.setDate(tomorrow.getDate() + 1);
                 setFilters({ ...filters, date: tomorrow.toISOString().split('T')[0] });
               }}
-              className="px-4 py-2 bg-zinc-800 text-white rounded-xl hover:bg-zinc-700 transition-colors border border-white/20"
+              className="px-4 py-2 bg-muted text-white rounded-xl hover:bg-muted transition-colors border border-border"
             >
               Tomorrow
             </button>
@@ -263,10 +263,10 @@ export default function AppointmentsPage() {
       </div>
 
       {/* Appointments List */}
-      <div className="bg-zinc-900 rounded-xl border border-white/10 overflow-hidden">
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]" />
           </div>
         ) : appointments.length === 0 ? (
           <div className="text-center py-12">
@@ -286,7 +286,7 @@ export default function AppointmentsPage() {
             <p className="text-white/40">No appointments found</p>
             <Link
               href="/admin/appointments/new"
-              className="text-amber-400 hover:text-amber-300 mt-2 inline-block"
+              className="text-[#00ffb2] hover:text-[#00ffb2] mt-2 inline-block"
             >
               Create one →
             </Link>
@@ -295,7 +295,7 @@ export default function AppointmentsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-white/5 border-b border-white/10">
+                <tr className="bg-white/5 border-b border-border">
                   <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Date
                   </th>

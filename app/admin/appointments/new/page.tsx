@@ -59,7 +59,7 @@ function NewAppointmentLoading() {
           <div key={s} className="flex-1 h-1 rounded-full bg-white/10" />
         ))}
       </div>
-      <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+      <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
         <div className="h-6 w-32 bg-white/10 rounded animate-pulse mb-4" />
         <div className="space-y-2">
           {[1, 2, 3].map((i) => (
@@ -263,7 +263,7 @@ function NewAppointmentContent() {
           <div
             key={s}
             className={`flex-1 h-1 rounded-full ${
-              s <= step ? 'bg-amber-400' : 'bg-white/10'
+              s <= step ? 'bg-[#00ffb2]' : 'bg-white/10'
             }`}
           />
         ))}
@@ -271,7 +271,7 @@ function NewAppointmentContent() {
 
       {/* Step 1: Select Service */}
       {step === 1 && (
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="font-semibold text-white mb-4">Select Service</h2>
           <div className="space-y-2 max-h-96 overflow-y-auto">
             {services.map((service) => (
@@ -280,8 +280,8 @@ function NewAppointmentContent() {
                 onClick={() => setSelectedService(service)}
                 className={`w-full text-left p-4 rounded-xl border transition-all ${
                   selectedService?.id === service.id
-                    ? 'border-amber-400 bg-amber-400/10'
-                    : 'border-white/10 bg-white/5 hover:border-white/20'
+                    ? 'border-[#00ffb2] bg-[#00ffb2]/10'
+                    : 'border-border bg-white/5 hover:border-border'
                 }`}
               >
                 <div className="flex justify-between items-center">
@@ -289,7 +289,7 @@ function NewAppointmentContent() {
                     <p className="font-medium text-white">{service.name}</p>
                     <p className="text-sm text-white/50">{service.duration} min</p>
                   </div>
-                  <p className="font-semibold text-amber-400">
+                  <p className="font-semibold text-[#00ffb2]">
                     {formatCurrency(service.base_price * 100)}
                   </p>
                 </div>
@@ -299,14 +299,14 @@ function NewAppointmentContent() {
           <div className="flex gap-3 mt-6">
             <Link
               href="/admin/appointments"
-              className="flex-1 py-3 bg-white/5 border border-white/10 text-white text-center rounded-xl font-semibold hover:bg-white/10 transition-colors"
+              className="flex-1 py-3 bg-white/5 border border-border text-white text-center rounded-xl font-semibold hover:bg-white/10 transition-colors"
             >
               Cancel
             </Link>
             <button
               onClick={() => setStep(2)}
               disabled={!selectedService}
-              className="flex-1 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-[#00ffb2] text-black rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue
             </button>
@@ -316,7 +316,7 @@ function NewAppointmentContent() {
 
       {/* Step 2: Select Stylist & Date/Time */}
       {step === 2 && (
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="font-semibold text-white mb-4">Select Stylist & Time</h2>
 
           {/* Stylist Selection */}
@@ -331,7 +331,7 @@ function NewAppointmentContent() {
                 setSelectedStylist(stylist || null);
                 setSelectedSlot(null);
               }}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50"
+              className="w-full px-4 py-2 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50"
             >
               <option value="">Any Available</option>
               {stylists.map((s) => (
@@ -355,7 +355,7 @@ function NewAppointmentContent() {
                 setSelectedDate(e.target.value);
                 setSelectedSlot(null);
               }}
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50"
+              className="w-full px-4 py-2 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50"
             />
           </div>
 
@@ -378,8 +378,8 @@ function NewAppointmentContent() {
                       className={`py-2 px-3 rounded-lg text-center transition-all ${
                         selectedSlot?.start_time === slot.start_time &&
                         selectedSlot?.stylist_id === slot.stylist_id
-                          ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-bold'
-                          : 'bg-white/5 border border-white/10 text-white hover:border-amber-400/50'
+                          ? 'bg-[#00ffb2] text-black font-bold'
+                          : 'bg-white/5 border border-border text-white hover:border-[#00ffb2]/50'
                       }`}
                     >
                       <p className="font-medium">{formatTime(slot.start_time)}</p>
@@ -398,14 +398,14 @@ function NewAppointmentContent() {
           <div className="flex gap-3 mt-6">
             <button
               onClick={() => setStep(1)}
-              className="flex-1 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-colors"
+              className="flex-1 py-3 bg-white/5 border border-border text-white rounded-xl font-semibold hover:bg-white/10 transition-colors"
             >
               Back
             </button>
             <button
               onClick={() => setStep(3)}
               disabled={!selectedSlot}
-              className="flex-1 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-[#00ffb2] text-black rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue
             </button>
@@ -415,11 +415,11 @@ function NewAppointmentContent() {
 
       {/* Step 3: Select Client */}
       {step === 3 && (
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="font-semibold text-white mb-4">Select Client</h2>
 
           {/* Walk-in Toggle */}
-          <div className="flex items-center gap-3 mb-6 p-4 bg-white/5 rounded-xl border border-white/10">
+          <div className="flex items-center gap-3 mb-6 p-4 bg-white/5 rounded-xl border border-border">
             <input
               type="checkbox"
               id="walkIn"
@@ -428,7 +428,7 @@ function NewAppointmentContent() {
                 setIsWalkIn(e.target.checked);
                 if (e.target.checked) setSelectedClient(null);
               }}
-              className="w-4 h-4 rounded border-white/30 bg-transparent text-amber-400 focus:ring-amber-400/50"
+              className="w-4 h-4 rounded border-white/30 bg-transparent text-[#00ffb2] focus:ring-[#00ffb2]/50"
             />
             <label htmlFor="walkIn" className="text-white cursor-pointer">
               Walk-in (no client record)
@@ -445,7 +445,7 @@ function NewAppointmentContent() {
                 value={walkInName}
                 onChange={(e) => setWalkInName(e.target.value)}
                 placeholder="Enter name..."
-                className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50"
+                className="w-full px-4 py-2 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50"
               />
             </div>
           ) : (
@@ -460,8 +460,8 @@ function NewAppointmentContent() {
                     onClick={() => setSelectedClient(client)}
                     className={`w-full text-left p-3 rounded-xl border transition-all ${
                       selectedClient?.id === client.id
-                        ? 'border-amber-400 bg-amber-400/10'
-                        : 'border-white/10 bg-white/5 hover:border-white/20'
+                        ? 'border-[#00ffb2] bg-[#00ffb2]/10'
+                        : 'border-border bg-white/5 hover:border-border'
                     }`}
                   >
                     <p className="font-medium text-white">
@@ -473,7 +473,7 @@ function NewAppointmentContent() {
                 {clients.length === 0 && (
                   <p className="text-center text-white/50 py-4">
                     No clients found.{' '}
-                    <Link href="/admin/clients/new" className="text-amber-400">
+                    <Link href="/admin/clients/new" className="text-[#00ffb2]">
                       Add one
                     </Link>
                   </p>
@@ -485,14 +485,14 @@ function NewAppointmentContent() {
           <div className="flex gap-3 mt-6">
             <button
               onClick={() => setStep(2)}
-              className="flex-1 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-colors"
+              className="flex-1 py-3 bg-white/5 border border-border text-white rounded-xl font-semibold hover:bg-white/10 transition-colors"
             >
               Back
             </button>
             <button
               onClick={() => setStep(4)}
               disabled={!isWalkIn && !selectedClient}
-              className="flex-1 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 py-3 bg-[#00ffb2] text-black rounded-xl font-bold disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Continue
             </button>
@@ -502,19 +502,19 @@ function NewAppointmentContent() {
 
       {/* Step 4: Review & Confirm */}
       {step === 4 && (
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="font-semibold text-white mb-4">Review & Confirm</h2>
 
           <div className="space-y-4 mb-6">
-            <div className="flex justify-between py-2 border-b border-white/10">
+            <div className="flex justify-between py-2 border-b border-border">
               <span className="text-white/60">Service</span>
               <span className="text-white font-medium">{selectedService?.name}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-white/10">
+            <div className="flex justify-between py-2 border-b border-border">
               <span className="text-white/60">Stylist</span>
               <span className="text-white font-medium">{selectedSlot?.stylist_name}</span>
             </div>
-            <div className="flex justify-between py-2 border-b border-white/10">
+            <div className="flex justify-between py-2 border-b border-border">
               <span className="text-white/60">Date & Time</span>
               <span className="text-white font-medium">
                 {selectedDate && new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', {
@@ -525,7 +525,7 @@ function NewAppointmentContent() {
                 at {selectedSlot && formatTime(selectedSlot.start_time)}
               </span>
             </div>
-            <div className="flex justify-between py-2 border-b border-white/10">
+            <div className="flex justify-between py-2 border-b border-border">
               <span className="text-white/60">Client</span>
               <span className="text-white font-medium">
                 {isWalkIn
@@ -535,7 +535,7 @@ function NewAppointmentContent() {
             </div>
             <div className="flex justify-between py-2">
               <span className="text-white/60">Price</span>
-              <span className="text-amber-400 font-bold">
+              <span className="text-[#00ffb2] font-bold">
                 {formatCurrency((selectedService?.base_price || 0) * 100)}
               </span>
             </div>
@@ -551,7 +551,7 @@ function NewAppointmentContent() {
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Any special requests or notes..."
-              className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50"
+              className="w-full px-4 py-2 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50"
             />
           </div>
 
@@ -565,14 +565,14 @@ function NewAppointmentContent() {
             <button
               onClick={() => setStep(3)}
               disabled={loading}
-              className="flex-1 py-3 bg-white/5 border border-white/10 text-white rounded-xl font-semibold hover:bg-white/10 transition-colors disabled:opacity-50"
+              className="flex-1 py-3 bg-white/5 border border-border text-white rounded-xl font-semibold hover:bg-white/10 transition-colors disabled:opacity-50"
             >
               Back
             </button>
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="flex-1 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-[#00ffb2] text-black rounded-xl font-bold disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

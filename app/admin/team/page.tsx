@@ -175,7 +175,7 @@ export default function TeamPage() {
         </div>
         <button
           onClick={() => openModal()}
-          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-[#00ffb2] text-black rounded-lg font-semibold  transition-all"
         >
           <Plus className="w-4 h-4" />
           Add Team Member
@@ -190,17 +190,17 @@ export default function TeamPage() {
           placeholder="Search team members..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+          className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
         />
       </div>
 
       {/* Team Grid */}
       {loading ? (
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]"></div>
         </div>
       ) : filteredTeam.length === 0 ? (
-        <div className="bg-zinc-900 rounded-xl border border-white/10 p-12 text-center">
+        <div className="bg-card rounded-xl border border-border p-12 text-center">
           <Users className="w-12 h-12 text-white/30 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-white mb-2">No team members found</h3>
           <p className="text-white/50 mb-4">
@@ -209,7 +209,7 @@ export default function TeamPage() {
           {!searchQuery && (
             <button
               onClick={() => openModal()}
-              className="text-amber-400 hover:text-amber-300 font-medium"
+              className="text-[#00ffb2] hover:text-[#00ffb2] font-medium"
             >
               + Add Team Member
             </button>
@@ -220,14 +220,14 @@ export default function TeamPage() {
           {filteredTeam.map((member) => (
             <div
               key={member.id}
-              className={`bg-zinc-900 rounded-xl border border-white/10 p-6 ${
+              className={`bg-card rounded-xl border border-border p-6 ${
                 !member.is_active ? 'opacity-60' : ''
               }`}
             >
               {/* Header */}
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-full flex items-center justify-center text-black font-bold text-lg">
+                  <div className="w-12 h-12 bg-[#00ffb2] rounded-full flex items-center justify-center text-black font-bold text-lg">
                     {member.first_name.charAt(0)}{member.last_name.charAt(0)}
                   </div>
                   <div>
@@ -239,7 +239,7 @@ export default function TeamPage() {
                         href={`https://instagram.com/${member.instagram_handle}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1 text-sm text-white/50 hover:text-amber-400"
+                        className="flex items-center gap-1 text-sm text-white/50 hover:text-[#00ffb2]"
                       >
                         <Instagram className="w-3 h-3" />
                         @{member.instagram_handle}
@@ -265,7 +265,7 @@ export default function TeamPage() {
                   {member.specialties.slice(0, 3).map((specialty) => (
                     <span
                       key={specialty}
-                      className="px-2 py-1 bg-amber-500/20 text-amber-400 text-xs rounded-full"
+                      className="px-2 py-1 bg-[#00ffb2]/20 text-[#00ffb2] text-xs rounded-full"
                     >
                       {specialty}
                     </span>
@@ -279,7 +279,7 @@ export default function TeamPage() {
               )}
 
               {/* Stats */}
-              <div className="flex items-center gap-4 text-sm text-white/50 mb-4 pb-4 border-b border-white/10">
+              <div className="flex items-center gap-4 text-sm text-white/50 mb-4 pb-4 border-b border-border">
                 <div className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
                   <span>{member.appointment_count || 0} appts</span>
@@ -289,7 +289,7 @@ export default function TeamPage() {
                   <span>{member.service_count || 0} services</span>
                 </div>
                 {member.commission_rate && (
-                  <div className="text-amber-400 font-medium">
+                  <div className="text-[#00ffb2] font-medium">
                     {member.commission_rate}%
                   </div>
                 )}
@@ -299,14 +299,14 @@ export default function TeamPage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => openModal(member)}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-white/10 text-white rounded-lg hover:bg-white/5 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 border border-border text-white rounded-lg hover:bg-white/5 transition-colors"
                 >
                   <Edit2 className="w-4 h-4" />
                   Edit
                 </button>
                 <Link
                   href={`/admin/team/${member.id}/schedule`}
-                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors"
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-[#00ffb2]/20 text-[#00ffb2] rounded-lg hover:bg-[#00ffb2]/30 transition-colors"
                 >
                   <Calendar className="w-4 h-4" />
                   Schedule
@@ -319,9 +319,9 @@ export default function TeamPage() {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-white/10 flex items-center justify-between sticky top-0 bg-zinc-900">
+        <div className="fixed inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-card border border-border rounded-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b border-border flex items-center justify-between sticky top-0 bg-card">
               <h2 className="text-lg font-semibold text-white">
                 {editingMember ? 'Edit Team Member' : 'Add Team Member'}
               </h2>
@@ -345,7 +345,7 @@ export default function TeamPage() {
                     value={formData.first_name}
                     onChange={(e) => setFormData(prev => ({ ...prev, first_name: e.target.value }))}
                     required
-                    className="w-full px-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                   />
                 </div>
                 <div>
@@ -357,7 +357,7 @@ export default function TeamPage() {
                     value={formData.last_name}
                     onChange={(e) => setFormData(prev => ({ ...prev, last_name: e.target.value }))}
                     required
-                    className="w-full px-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                    className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                   />
                 </div>
               </div>
@@ -374,7 +374,7 @@ export default function TeamPage() {
                     value={formData.email}
                     onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                     required
-                    className="w-full pl-10 pr-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                    className="w-full pl-10 pr-3 py-2 bg-muted border border-border rounded-lg text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                   />
                 </div>
               </div>
@@ -389,7 +389,7 @@ export default function TeamPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                    className="w-full pl-10 pr-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                    className="w-full pl-10 pr-3 py-2 bg-muted border border-border rounded-lg text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                   />
                 </div>
               </div>
@@ -403,7 +403,7 @@ export default function TeamPage() {
                   value={formData.bio}
                   onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
                   rows={3}
-                  className="w-full px-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400 resize-none placeholder-white/40"
+                  className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2] resize-none placeholder-white/40"
                   placeholder="A brief description of this stylist..."
                 />
               </div>
@@ -421,7 +421,7 @@ export default function TeamPage() {
                       onClick={() => toggleSpecialty(specialty)}
                       className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
                         formData.specialties.includes(specialty)
-                          ? 'bg-amber-500 text-black'
+                          ? 'bg-[#00ffb2] text-black'
                           : 'bg-white/10 text-white/70 hover:bg-white/20'
                       }`}
                     >
@@ -443,7 +443,7 @@ export default function TeamPage() {
                     value={formData.instagram_handle}
                     onChange={(e) => setFormData(prev => ({ ...prev, instagram_handle: e.target.value.replace('@', '') }))}
                     placeholder="username"
-                    className="w-full pl-10 pr-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                    className="w-full pl-10 pr-3 py-2 bg-muted border border-border rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                   />
                 </div>
               </div>
@@ -459,7 +459,7 @@ export default function TeamPage() {
                   max="100"
                   value={formData.commission_rate}
                   onChange={(e) => setFormData(prev => ({ ...prev, commission_rate: parseFloat(e.target.value) || 0 }))}
-                  className="w-full px-3 py-2 bg-zinc-800 border border-white/20 rounded-lg text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                  className="w-full px-3 py-2 bg-muted border border-border rounded-lg text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 />
               </div>
 
@@ -473,11 +473,11 @@ export default function TeamPage() {
                   type="button"
                   onClick={() => setFormData(prev => ({ ...prev, is_active: !prev.is_active }))}
                   className={`relative w-12 h-6 rounded-full transition-colors ${
-                    formData.is_active ? 'bg-amber-500' : 'bg-white/20'
+                    formData.is_active ? 'bg-[#00ffb2]' : 'bg-white/20'
                   }`}
                 >
                   <div
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    className={`absolute top-1 w-4 h-4 bg-card rounded-full transition-transform ${
                       formData.is_active ? 'left-7' : 'left-1'
                     }`}
                   ></div>
@@ -496,14 +496,14 @@ export default function TeamPage() {
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="flex-1 px-4 py-2 border border-white/10 text-white rounded-lg hover:bg-white/5 transition-colors"
+                  className="flex-1 px-4 py-2 border border-border text-white rounded-lg hover:bg-white/5 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-lg font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#00ffb2] text-black rounded-lg font-semibold  transition-all disabled:opacity-50"
                 >
                   {saving ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black"></div>

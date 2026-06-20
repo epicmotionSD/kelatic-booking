@@ -163,7 +163,7 @@ export default function NewClientPage() {
       <div className="flex items-center gap-4 mb-8">
         <Link
           href="/admin/clients"
-          className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
+          className="p-2 bg-white/5 border border-border rounded-xl hover:bg-white/10 transition-colors"
         >
           <svg
             className="w-5 h-5 text-white"
@@ -194,7 +194,7 @@ export default function NewClientPage() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Info */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Basic Information</h2>
           <div className="grid md:grid-cols-2 gap-4">
             <div>
@@ -207,7 +207,7 @@ export default function NewClientPage() {
                 value={formData.first_name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
                 placeholder="Enter first name"
               />
             </div>
@@ -221,7 +221,7 @@ export default function NewClientPage() {
                 value={formData.last_name}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
                 placeholder="Enter last name"
               />
             </div>
@@ -229,7 +229,7 @@ export default function NewClientPage() {
         </div>
 
         {/* Contact Info */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Contact Information</h2>
           <p className="text-sm text-white/50 mb-4">
             At least one contact method is required
@@ -244,7 +244,7 @@ export default function NewClientPage() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
                 placeholder="client@email.com"
               />
             </div>
@@ -257,7 +257,7 @@ export default function NewClientPage() {
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
                 placeholder="(713) 555-0123"
               />
             </div>
@@ -273,7 +273,7 @@ export default function NewClientPage() {
                 value={formData.birthday}
                 onChange={handleChange}
                 title="Birthday"
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
               />
             </div>
             <div>
@@ -285,7 +285,7 @@ export default function NewClientPage() {
                 name="zip_code"
                 value={formData.zip_code}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
                 placeholder="77001"
                 maxLength={10}
               />
@@ -294,7 +294,7 @@ export default function NewClientPage() {
         </div>
 
         {/* Communication Preferences */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Communication Preferences</h2>
 
           <div className="grid md:grid-cols-2 gap-4 mb-6">
@@ -306,7 +306,7 @@ export default function NewClientPage() {
                 name="preferred_contact"
                 value={formData.preferred_contact}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
               >
                 <option value="both">Both SMS & Email</option>
                 <option value="sms">SMS Only</option>
@@ -321,7 +321,7 @@ export default function NewClientPage() {
                 name="referral_source"
                 value={formData.referral_source}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
               >
                 <option value="">Select source</option>
                 {REFERRAL_SOURCES.map((source) => (
@@ -339,7 +339,7 @@ export default function NewClientPage() {
                 type="checkbox"
                 checked={formData.sms_opt_in}
                 onChange={(e) => setFormData((prev) => ({ ...prev, sms_opt_in: e.target.checked }))}
-                className="w-5 h-5 rounded border-white/20 bg-white/5 text-amber-400 focus:ring-amber-400/50"
+                className="w-5 h-5 rounded border-border bg-white/5 text-[#00ffb2] focus:ring-[#00ffb2]/50"
               />
               <div>
                 <p className="text-white font-medium">SMS Notifications</p>
@@ -351,7 +351,7 @@ export default function NewClientPage() {
                 type="checkbox"
                 checked={formData.marketing_opt_in}
                 onChange={(e) => setFormData((prev) => ({ ...prev, marketing_opt_in: e.target.checked }))}
-                className="w-5 h-5 rounded border-white/20 bg-white/5 text-amber-400 focus:ring-amber-400/50"
+                className="w-5 h-5 rounded border-border bg-white/5 text-[#00ffb2] focus:ring-[#00ffb2]/50"
               />
               <div>
                 <p className="text-white font-medium">Marketing Messages</p>
@@ -372,8 +372,8 @@ export default function NewClientPage() {
                   onClick={() => togglePreferredTime(time.value)}
                   className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                     formData.preferred_times.includes(time.value)
-                      ? 'bg-amber-400/20 text-amber-400 border border-amber-400/30'
-                      : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
+                      ? 'bg-[#00ffb2]/20 text-[#00ffb2] border border-[#00ffb2]/30'
+                      : 'bg-white/5 text-white/70 border border-border hover:bg-white/10'
                   }`}
                 >
                   {time.label}
@@ -384,7 +384,7 @@ export default function NewClientPage() {
         </div>
 
         {/* Hair Profile */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Hair Profile</h2>
           <p className="text-sm text-white/50 mb-4">
             Optional - helps stylists prepare for appointments
@@ -398,7 +398,7 @@ export default function NewClientPage() {
                 name="hair_type"
                 value={formData.hair_type}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
               >
                 <option value="">Select hair type</option>
                 {HAIR_TYPES.map((type) => (
@@ -416,7 +416,7 @@ export default function NewClientPage() {
                 name="texture"
                 value={formData.texture}
                 onChange={handleChange}
-                className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50"
+                className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50"
               >
                 <option value="">Select texture</option>
                 {TEXTURES.map((texture) => (
@@ -442,7 +442,7 @@ export default function NewClientPage() {
                   className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                     formData.allergies.includes(allergy)
                       ? 'bg-red-500/20 text-red-400 border border-red-500/30'
-                      : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
+                      : 'bg-white/5 text-white/70 border border-border hover:bg-white/10'
                   }`}
                 >
                   {formData.allergies.includes(allergy) && (
@@ -456,14 +456,14 @@ export default function NewClientPage() {
         </div>
 
         {/* Notes */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="text-lg font-semibold text-white mb-4">Additional Notes</h2>
           <textarea
             name="notes"
             value={formData.notes}
             onChange={handleChange}
             rows={4}
-            className="w-full px-4 py-3 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/50 resize-none"
+            className="w-full px-4 py-3 bg-white/5 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50 resize-none"
             placeholder="Any special notes about this client (preferences, reminders, etc.)"
           />
         </div>
@@ -473,7 +473,7 @@ export default function NewClientPage() {
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 py-3 bg-[#00ffb2] text-black rounded-xl font-semibold  transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
@@ -504,7 +504,7 @@ export default function NewClientPage() {
           </button>
           <Link
             href="/admin/clients"
-            className="px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+            className="px-6 py-3 bg-white/5 border border-border text-white rounded-xl hover:bg-white/10 transition-colors"
           >
             Cancel
           </Link>

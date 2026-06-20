@@ -168,7 +168,7 @@ export default function ClientsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
-            <UserCheck className="w-8 h-8 text-amber-400" />
+            <UserCheck className="w-8 h-8 text-[#00ffb2]" />
             Clients
           </h1>
           <p className="text-white/60">{clients.length} total clients</p>
@@ -176,7 +176,7 @@ export default function ClientsPage() {
         <div className="flex gap-2">
           <Link
             href="/admin/stylists/schedule"
-            className="px-4 py-2 bg-zinc-900 border border-white/20 text-white rounded-xl hover:bg-zinc-800 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-card border border-border text-white rounded-xl hover:bg-muted transition-colors flex items-center gap-2"
           >
             <Calendar className="w-5 h-5" />
             Stylist Schedules
@@ -184,14 +184,14 @@ export default function ClientsPage() {
           <button
             type="button"
             onClick={() => setShowImportModal(true)}
-            className="px-4 py-2 bg-zinc-900 border border-white/20 text-white rounded-xl hover:bg-zinc-800 transition-colors flex items-center gap-2"
+            className="px-4 py-2 bg-card border border-border text-white rounded-xl hover:bg-muted transition-colors flex items-center gap-2"
           >
             <Upload className="w-5 h-5" />
             Import
           </button>
           <Link
             href="/admin/clients/new"
-            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2"
+            className="px-4 py-2 bg-[#00ffb2] text-black rounded-xl font-semibold  transition-all flex items-center gap-2"
           >
             <Plus className="w-5 h-5" />
             Add Client
@@ -200,7 +200,7 @@ export default function ClientsPage() {
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-4 mb-6">
+      <div className="bg-card rounded-xl border border-border shadow-lg p-4 mb-6">
         <div className="flex flex-wrap gap-4">
           {/* Search */}
           <div className="flex-1 min-w-[200px]">
@@ -211,7 +211,7 @@ export default function ClientsPage() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search by name, email, or phone..."
-                className="w-full pl-10 pr-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full pl-10 pr-4 py-2 bg-muted border border-border rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               />
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function ClientsPage() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            className="px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+            className="px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
           >
             <option value="recent">Most Recent Visit</option>
             <option value="name">Name (A-Z)</option>
@@ -230,14 +230,14 @@ export default function ClientsPage() {
       </div>
 
       {/* Clients List */}
-      <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg overflow-hidden">
+      <div className="bg-card rounded-xl border border-border shadow-lg overflow-hidden">
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]" />
           </div>
         ) : filteredClients.length === 0 ? (
           <div className="text-center py-12">
-            <Users className="w-12 h-12 mx-auto text-amber-300 mb-4" />
+            <Users className="w-12 h-12 mx-auto text-[#00ffb2] mb-4" />
             <p className="text-white/50">
               {search ? 'No clients match your search' : 'No clients yet'}
             </p>
@@ -246,7 +246,7 @@ export default function ClientsPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-white/5 border-b border-white/10">
+                <tr className="bg-white/5 border-b border-border">
                   <th className="text-left px-6 py-3 text-xs font-medium text-white/50 uppercase tracking-wider">
                     Client
                   </th>
@@ -272,8 +272,8 @@ export default function ClientsPage() {
                   <tr key={client.id} className="hover:bg-white/5 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center">
-                          <span className="text-amber-400 font-medium">
+                        <div className="w-10 h-10 bg-[#00ffb2]/20 rounded-full flex items-center justify-center">
+                          <span className="text-[#00ffb2] font-medium">
                             {client.first_name[0]}
                             {client.last_name[0]}
                           </span>
@@ -297,12 +297,12 @@ export default function ClientsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="text-sm text-white flex items-center gap-1">
-                        <Calendar className="w-4 h-4 text-amber-400" />
+                        <Calendar className="w-4 h-4 text-[#00ffb2]" />
                         {client.visit_count}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="text-sm font-medium text-amber-400 flex items-center gap-1">
+                      <span className="text-sm font-medium text-[#00ffb2] flex items-center gap-1">
                         <DollarSign className="w-4 h-4" />
                         {formatCurrency(client.total_spent * 100)}
                       </span>
@@ -316,7 +316,7 @@ export default function ClientsPage() {
                       <div className="flex items-center justify-end gap-2">
                         <button
                           onClick={() => setSelectedClient(client)}
-                          className="text-amber-400 hover:text-amber-300 text-sm font-medium flex items-center gap-1"
+                          className="text-[#00ffb2] hover:text-[#00ffb2] text-sm font-medium flex items-center gap-1"
                         >
                           <Eye className="w-4 h-4" />
                           View
@@ -348,8 +348,8 @@ export default function ClientsPage() {
 
       {/* Import Modal */}
       {showImportModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-xl w-full max-w-md p-6 shadow-xl">
+        <div className="fixed inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-card border border-border rounded-xl w-full max-w-md p-6 shadow-xl">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-playfair font-semibold text-white">Import Clients</h2>
               <button
@@ -375,10 +375,10 @@ export default function ClientsPage() {
                 </p>
 
                 <label className="block">
-                  <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-amber-400/50 transition-colors cursor-pointer">
+                  <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-[#00ffb2]/50 transition-colors cursor-pointer">
                     {importing ? (
                       <div className="flex flex-col items-center gap-2">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]" />
                         <p className="text-white/60">Importing...</p>
                       </div>
                     ) : (
@@ -400,8 +400,8 @@ export default function ClientsPage() {
                   />
                 </label>
 
-                <div className="mt-4 p-3 bg-amber-400/10 border border-amber-400/30 rounded-xl">
-                  <p className="text-sm text-amber-200">
+                <div className="mt-4 p-3 bg-[#00ffb2]/10 border border-[#00ffb2]/30 rounded-xl">
+                  <p className="text-sm text-[#00ffb2]">
                     <strong>Tip:</strong> Existing clients (matched by email or phone) will be skipped.
                   </p>
                 </div>
@@ -413,7 +413,7 @@ export default function ClientsPage() {
                     <p className="text-2xl font-bold text-green-400">{importResult.imported}</p>
                     <p className="text-sm text-green-400/70">Imported</p>
                   </div>
-                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-center">
+                  <div className="bg-white/5 border border-border rounded-xl p-4 text-center">
                     <p className="text-2xl font-bold text-white">{importResult.skipped}</p>
                     <p className="text-sm text-white/50">Skipped</p>
                   </div>
@@ -439,7 +439,7 @@ export default function ClientsPage() {
                     setShowImportModal(false);
                     setImportResult(null);
                   }}
-                  className="w-full py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                  className="w-full py-2 bg-[#00ffb2] text-black rounded-xl font-semibold  transition-all"
                 >
                   Done
                 </button>
@@ -478,12 +478,12 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-900 border border-white/10 rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+    <div className="fixed inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-card border border-border rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-border flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-14 h-14 bg-amber-400/10 rounded-full flex items-center justify-center">
-              <span className="text-amber-400 font-semibold text-lg">
+            <div className="w-14 h-14 bg-[#00ffb2]/10 rounded-full flex items-center justify-center">
+              <span className="text-[#00ffb2] font-semibold text-lg">
                 {client.first_name[0]}
                 {client.last_name[0]}
               </span>
@@ -505,19 +505,19 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
         <div className="p-6">
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
+            <div className="bg-white/5 rounded-xl p-4 text-center border border-border">
               <p className="text-2xl font-bold text-white">
                 {client.visit_count}
               </p>
               <p className="text-sm text-white/50">Total Visits</p>
             </div>
-            <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
-              <p className="text-2xl font-bold text-amber-400">
+            <div className="bg-white/5 rounded-xl p-4 text-center border border-border">
+              <p className="text-2xl font-bold text-[#00ffb2]">
                 {formatCurrency(client.total_spent * 100)}
               </p>
               <p className="text-sm text-white/50">Total Spent</p>
             </div>
-            <div className="bg-white/5 rounded-xl p-4 text-center border border-white/10">
+            <div className="bg-white/5 rounded-xl p-4 text-center border border-border">
               <p className="text-2xl font-bold text-white">
                 {client.visit_count > 0
                   ? formatCurrency((client.total_spent / client.visit_count) * 100)
@@ -561,7 +561,7 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
             <h3 className="font-medium text-white mb-2">Recent Visits</h3>
             {loading ? (
               <div className="flex items-center justify-center py-4">
-                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400" />
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#00ffb2]" />
               </div>
             ) : appointments.length === 0 ? (
               <p className="text-sm text-white/50">No visit history</p>
@@ -570,7 +570,7 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
                 {appointments.slice(0, 5).map((apt) => (
                   <div
                     key={apt.id}
-                    className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/10"
+                    className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-border"
                   >
                     <div>
                       <p className="font-medium text-white">
@@ -581,7 +581,7 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
                         {apt.stylist_name}
                       </p>
                     </div>
-                    <p className="font-medium text-amber-400">
+                    <p className="font-medium text-[#00ffb2]">
                       {formatCurrency(apt.total_paid * 100)}
                     </p>
                   </div>
@@ -591,16 +591,16 @@ function ClientDetailModal({ client, onClose }: ClientDetailModalProps) {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3 mt-6 pt-6 border-t border-white/10">
+          <div className="flex gap-3 mt-6 pt-6 border-t border-border">
             <Link
               href={`/admin/appointments/new?client=${client.id}`}
-              className="flex-1 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black text-center rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+              className="flex-1 py-2 bg-[#00ffb2] text-black text-center rounded-xl font-semibold  transition-all"
             >
               Book Appointment
             </Link>
             <Link
               href={`/admin/clients/${client.id}`}
-              className="flex-1 py-2 bg-white/5 border border-white/10 text-white text-center rounded-xl hover:bg-white/10 transition-colors"
+              className="flex-1 py-2 bg-white/5 border border-border text-white text-center rounded-xl hover:bg-white/10 transition-colors"
             >
               Edit Profile
             </Link>

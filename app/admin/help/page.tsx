@@ -196,8 +196,8 @@ export default function HelpPage() {
             onClick={() => setActiveSection(section.id)}
             className={`px-4 py-2 rounded-xl font-medium transition-all flex items-center gap-2 ${
               activeSection === section.id
-                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black'
-                : 'bg-zinc-900 text-white/70 hover:bg-zinc-800 border border-white/10'
+                ? 'bg-[#00ffb2] text-black'
+                : 'bg-card text-white/70 hover:bg-muted border border-border'
             }`}
           >
             <span>{section.icon}</span>
@@ -207,9 +207,9 @@ export default function HelpPage() {
       </div>
 
       {/* Content */}
-      <div className="bg-zinc-900 rounded-xl border border-white/10 overflow-hidden">
+      <div className="bg-card rounded-xl border border-border overflow-hidden">
         {/* Section Header */}
-        <div className="px-6 py-4 border-b border-white/10 bg-zinc-800">
+        <div className="px-6 py-4 border-b border-border bg-muted">
           <h2 className="text-xl font-bold text-white flex items-center gap-3">
             <span className="text-2xl">{currentSection.icon}</span>
             {currentSection.title}
@@ -220,14 +220,14 @@ export default function HelpPage() {
         <div className="p-6 space-y-6">
           {currentSection.steps.map((step, idx) => (
             <div key={idx} className="flex gap-4">
-              <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 text-amber-400 font-bold text-sm">
+              <div className="w-8 h-8 rounded-full bg-[#00ffb2]/20 flex items-center justify-center flex-shrink-0 text-[#00ffb2] font-bold text-sm">
                 {idx + 1}
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-white mb-1">{step.title}</h3>
                 <p className="text-white/60">{step.description}</p>
                 {step.tip && (
-                  <div className="mt-2 px-3 py-2 bg-amber-500/10 border border-amber-500/20 rounded-lg text-sm text-amber-300">
+                  <div className="mt-2 px-3 py-2 bg-[#00ffb2]/10 border border-[#00ffb2]/20 rounded-lg text-sm text-[#00ffb2]">
                     💡 <strong>Tip:</strong> {step.tip}
                   </div>
                 )}
@@ -241,28 +241,28 @@ export default function HelpPage() {
       <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
         <Link
           href="/admin/pos"
-          className="bg-zinc-900 border border-white/10 rounded-xl p-4 text-center hover:bg-zinc-800 transition-colors"
+          className="bg-card border border-border rounded-xl p-4 text-center hover:bg-muted transition-colors"
         >
           <div className="text-2xl mb-2">💳</div>
           <div className="text-sm font-medium text-white">Go to POS</div>
         </Link>
         <Link
           href="/admin/appointments"
-          className="bg-zinc-900 border border-white/10 rounded-xl p-4 text-center hover:bg-zinc-800 transition-colors"
+          className="bg-card border border-border rounded-xl p-4 text-center hover:bg-muted transition-colors"
         >
           <div className="text-2xl mb-2">📅</div>
           <div className="text-sm font-medium text-white">Appointments</div>
         </Link>
         <Link
           href="/admin/services"
-          className="bg-zinc-900 border border-white/10 rounded-xl p-4 text-center hover:bg-zinc-800 transition-colors"
+          className="bg-card border border-border rounded-xl p-4 text-center hover:bg-muted transition-colors"
         >
           <div className="text-2xl mb-2">✂️</div>
           <div className="text-sm font-medium text-white">Services</div>
         </Link>
         <Link
           href="/admin/clients"
-          className="bg-zinc-900 border border-white/10 rounded-xl p-4 text-center hover:bg-zinc-800 transition-colors"
+          className="bg-card border border-border rounded-xl p-4 text-center hover:bg-muted transition-colors"
         >
           <div className="text-2xl mb-2">👥</div>
           <div className="text-sm font-medium text-white">Clients</div>
@@ -270,14 +270,14 @@ export default function HelpPage() {
       </div>
 
       {/* Need More Help */}
-      <div className="mt-8 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-500/30 rounded-xl p-6 text-center">
-        <h3 className="font-bold text-amber-400 mb-2">Still need help?</h3>
+      <div className="mt-8 bg-gradient-to-r from-[#00ffb2]/10 to-[#00ffb2]/20 border border-[#00ffb2]/30 rounded-xl p-6 text-center">
+        <h3 className="font-bold text-[#00ffb2] mb-2">Still need help?</h3>
         <p className="text-white/60 mb-4">
           Contact Shawn for technical support
         </p>
         <a
           href="tel:+17134854000"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#00ffb2] text-black rounded-xl font-medium  transition-all"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />

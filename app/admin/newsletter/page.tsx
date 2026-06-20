@@ -207,7 +207,7 @@ export default function NewsletterPage() {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-white flex items-center gap-3">
-          <Mail className="w-7 h-7 text-amber-400" />
+          <Mail className="w-7 h-7 text-[#00ffb2]" />
           Newsletter Manager
         </h1>
         <p className="text-white/50 mt-1">
@@ -217,9 +217,9 @@ export default function NewsletterPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
+        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-border">
           <div className="flex items-center gap-3">
-            <Users className="w-8 h-8 text-amber-400" />
+            <Users className="w-8 h-8 text-[#00ffb2]" />
             <div>
               <div className="text-2xl font-bold text-white">
                 {loading ? '...' : stats?.totalSubscribers || 0}
@@ -228,7 +228,7 @@ export default function NewsletterPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
+        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-border">
           <div className="flex items-center gap-3">
             <TrendingUp className="w-8 h-8 text-green-400" />
             <div>
@@ -239,7 +239,7 @@ export default function NewsletterPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
+        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-border">
           <div className="flex items-center gap-3">
             <Clock className="w-8 h-8 text-blue-400" />
             <div>
@@ -250,7 +250,7 @@ export default function NewsletterPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-white/10">
+        <div className="bg-white/5 backdrop-blur rounded-xl p-6 border border-border">
           <div className="flex items-center gap-3">
             <AlertCircle className="w-8 h-8 text-red-400" />
             <div>
@@ -265,10 +265,10 @@ export default function NewsletterPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Newsletter Composer */}
-        <div className="lg:col-span-2 bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6 space-y-6">
+        <div className="lg:col-span-2 bg-white/5 backdrop-blur rounded-xl border border-border p-6 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-              <Send className="w-5 h-5 text-amber-400" />
+              <Send className="w-5 h-5 text-[#00ffb2]" />
               Compose Newsletter
             </h2>
             <button
@@ -291,7 +291,7 @@ export default function NewsletterPage() {
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
               placeholder="e.g., New Year, New Locs: January Specials"
-              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+              className="w-full px-4 py-3 bg-background/50 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50 transition-all"
             />
           </div>
 
@@ -305,7 +305,7 @@ export default function NewsletterPage() {
               value={previewText}
               onChange={(e) => setPreviewText(e.target.value)}
               placeholder="e.g., Book your January loc retwist and save 15%"
-              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+              className="w-full px-4 py-3 bg-background/50 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50 transition-all"
             />
           </div>
 
@@ -319,7 +319,7 @@ export default function NewsletterPage() {
               value={headline}
               onChange={(e) => setHeadline(e.target.value)}
               placeholder="e.g., Start 2025 Fresh"
-              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+              className="w-full px-4 py-3 bg-background/50 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50 transition-all"
             />
           </div>
 
@@ -333,7 +333,7 @@ export default function NewsletterPage() {
               onChange={(e) => setContent(e.target.value)}
               placeholder="<p>Hey Loc Fam!</p><p>New year, new vibes! Book your January appointment and treat your locs to some TLC.</p>"
               rows={8}
-              className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all resize-none font-mono text-sm"
+              className="w-full px-4 py-3 bg-background/50 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50 transition-all resize-none font-mono text-sm"
             />
             <p className="text-white/40 text-xs mt-1">Use HTML tags like &lt;p&gt;, &lt;strong&gt;, &lt;ul&gt;, &lt;li&gt; for formatting</p>
           </div>
@@ -349,7 +349,7 @@ export default function NewsletterPage() {
                 value={ctaText}
                 onChange={(e) => setCtaText(e.target.value)}
                 placeholder="Book Now"
-                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+                className="w-full px-4 py-3 bg-background/50 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50 transition-all"
               />
             </div>
             <div>
@@ -361,7 +361,7 @@ export default function NewsletterPage() {
                 value={ctaUrl}
                 onChange={(e) => setCtaUrl(e.target.value)}
                 placeholder="https://kelatic.com/book"
-                className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+                className="w-full px-4 py-3 bg-background/50 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50 transition-all"
               />
             </div>
           </div>
@@ -383,19 +383,19 @@ export default function NewsletterPage() {
           )}
 
           {/* Send Actions */}
-          <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-white/10">
+          <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-border">
             <div className="flex-1 flex gap-2">
               <input
                 type="email"
                 value={testEmail}
                 onChange={(e) => setTestEmail(e.target.value)}
                 placeholder="Test email address"
-                className="flex-1 px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/50 transition-all"
+                className="flex-1 px-4 py-3 bg-background/50 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50 focus:ring-1 focus:ring-[#00ffb2]/50 transition-all"
               />
               <button
                 onClick={handleSendTest}
                 disabled={sending}
-                className="px-6 py-3 bg-white/10 border border-white/10 text-white rounded-xl font-medium hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                className="px-6 py-3 bg-white/10 border border-border text-white rounded-xl font-medium hover:bg-white/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
                 Send Test
               </button>
@@ -403,7 +403,7 @@ export default function NewsletterPage() {
             <button
               onClick={handleSendAll}
               disabled={sending || !stats?.totalSubscribers}
-              className="px-8 py-3 bg-gradient-to-r from-amber-500 to-amber-600 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="px-8 py-3 bg-gradient-to-r from-[#00ffb2] to-[#00ffb2] text-black rounded-xl font-bold  transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {sending ? (
                 <>
@@ -424,9 +424,9 @@ export default function NewsletterPage() {
         </div>
 
         {/* Recent Subscribers */}
-        <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6">
+        <div className="bg-white/5 backdrop-blur rounded-xl border border-border p-6">
           <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-            <Users className="w-5 h-5 text-amber-400" />
+            <Users className="w-5 h-5 text-[#00ffb2]" />
             Recent Subscribers
           </h2>
 
@@ -441,7 +441,7 @@ export default function NewsletterPage() {
               {recentSubscribers.map((sub) => (
                 <div
                   key={sub.id}
-                  className="p-3 bg-black/30 rounded-lg border border-white/5"
+                  className="p-3 bg-background/30 rounded-lg border border-white/5"
                 >
                   <div className="text-white text-sm font-medium truncate">
                     {sub.email}
@@ -463,7 +463,7 @@ export default function NewsletterPage() {
           )}
 
           {/* Quick Template Ideas */}
-          <div className="mt-6 pt-6 border-t border-white/10">
+          <div className="mt-6 pt-6 border-t border-border">
             <h3 className="text-sm font-medium text-white/70 mb-3">Newsletter Ideas</h3>
             <div className="space-y-2 text-sm text-white/50">
               <p>- Monthly appointment reminders</p>
@@ -478,10 +478,10 @@ export default function NewsletterPage() {
 
       {/* Trinity AI Generation Modal */}
       {showTrinityModal && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-lg overflow-hidden">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-lg overflow-hidden">
             {/* Modal Header */}
-            <div className="p-6 border-b border-white/10 flex items-center justify-between">
+            <div className="p-6 border-b border-border flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-purple-500/20 rounded-xl flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-purple-400" />
@@ -516,7 +516,7 @@ export default function NewsletterPage() {
                   onChange={(e) => setTrinityTopic(e.target.value)}
                   placeholder="e.g., New year promotion offering 15% off all retwist services in January, targeting existing clients who haven't booked in 30+ days"
                   rows={4}
-                  className="w-full px-4 py-3 bg-black/50 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all resize-none"
+                  className="w-full px-4 py-3 bg-background/50 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 transition-all resize-none"
                 />
               </div>
 
@@ -533,7 +533,7 @@ export default function NewsletterPage() {
                       className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                         trinityTone === t
                           ? 'bg-purple-500 text-white'
-                          : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                          : 'bg-white/5 text-white/70 hover:bg-white/10 border border-border'
                       }`}
                     >
                       {t.charAt(0).toUpperCase() + t.slice(1)}
@@ -572,7 +572,7 @@ export default function NewsletterPage() {
             </div>
 
             {/* Modal Footer */}
-            <div className="p-6 border-t border-white/10 flex gap-3">
+            <div className="p-6 border-t border-border flex gap-3">
               <button
                 type="button"
                 onClick={() => {

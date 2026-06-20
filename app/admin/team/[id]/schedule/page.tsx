@@ -260,7 +260,7 @@ export default function StylistSchedulePage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]" />
       </div>
     );
   }
@@ -272,7 +272,7 @@ export default function StylistSchedulePage() {
         <div className="flex items-center gap-4">
           <Link
             href="/admin/stylists"
-            className="p-2 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors"
+            className="p-2 bg-white/5 border border-border rounded-xl hover:bg-white/10 transition-colors"
           >
             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -289,7 +289,7 @@ export default function StylistSchedulePage() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50 flex items-center gap-2"
+          className="px-4 py-2 bg-[#00ffb2] text-black rounded-xl font-semibold  transition-all disabled:opacity-50 flex items-center gap-2"
         >
           {saving ? (
             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-black" />
@@ -307,13 +307,13 @@ export default function StylistSchedulePage() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-white/10">
+      <div className="border-b border-border">
         <nav className="flex gap-6">
           <button
             onClick={() => setActiveTab('weekly')}
             className={`flex items-center gap-2 pb-3 border-b-2 transition-colors ${
               activeTab === 'weekly'
-                ? 'border-amber-400 text-amber-400'
+                ? 'border-[#00ffb2] text-[#00ffb2]'
                 : 'border-transparent text-white/50 hover:text-white/70'
             }`}
           >
@@ -326,7 +326,7 @@ export default function StylistSchedulePage() {
             onClick={() => setActiveTab('blocked')}
             className={`flex items-center gap-2 pb-3 border-b-2 transition-colors ${
               activeTab === 'blocked'
-                ? 'border-amber-400 text-amber-400'
+                ? 'border-[#00ffb2] text-[#00ffb2]'
                 : 'border-transparent text-white/50 hover:text-white/70'
             }`}
           >
@@ -346,17 +346,17 @@ export default function StylistSchedulePage() {
       {/* Weekly Hours Tab */}
       {activeTab === 'weekly' && (
         <div className="space-y-4">
-          <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl p-4 flex items-start gap-3">
-            <svg className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-[#00ffb2]/10 border border-[#00ffb2]/30 rounded-xl p-4 flex items-start gap-3">
+            <svg className="w-5 h-5 text-[#00ffb2] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <div className="text-sm text-amber-200">
+            <div className="text-sm text-[#00ffb2]">
               <p className="font-medium">Set recurring weekly availability</p>
-              <p className="mt-1 text-amber-200/70">These hours will repeat every week. Use "Time Off" tab for specific dates.</p>
+              <p className="mt-1 text-[#00ffb2]/70">These hours will repeat every week. Use "Time Off" tab for specific dates.</p>
             </div>
           </div>
 
-          <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 divide-y divide-white/10">
+          <div className="bg-white/5 backdrop-blur rounded-xl border border-border divide-y divide-white/10">
             {DAYS.map((day) => (
               <div key={day} className="p-4">
                 <div className="flex items-center justify-between mb-3">
@@ -364,11 +364,11 @@ export default function StylistSchedulePage() {
                     <button
                       onClick={() => toggleDay(day)}
                       className={`relative w-12 h-6 rounded-full transition-colors ${
-                        schedule[day].enabled ? 'bg-amber-400' : 'bg-white/20'
+                        schedule[day].enabled ? 'bg-[#00ffb2]' : 'bg-white/20'
                       }`}
                     >
                       <div
-                        className={`absolute top-1 w-4 h-4 bg-black rounded-full transition-transform ${
+                        className={`absolute top-1 w-4 h-4 bg-background rounded-full transition-transform ${
                           schedule[day].enabled ? 'left-7' : 'left-1'
                         }`}
                       />
@@ -381,7 +381,7 @@ export default function StylistSchedulePage() {
                   {schedule[day].enabled && (
                     <button
                       onClick={() => copyToAllDays(day)}
-                      className="flex items-center gap-1 text-sm text-amber-400 hover:text-amber-300"
+                      className="flex items-center gap-1 text-sm text-[#00ffb2] hover:text-[#00ffb2]"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -398,7 +398,7 @@ export default function StylistSchedulePage() {
                         <select
                           value={block.start}
                           onChange={(e) => updateTimeBlock(day, block.id, 'start', e.target.value)}
-                          className="px-3 py-2 bg-white/5 border border-white/20 rounded-xl text-white text-sm focus:outline-none focus:border-amber-400/50"
+                          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-white text-sm focus:outline-none focus:border-[#00ffb2]/50"
                         >
                           {generateTimeOptions().map(time => (
                             <option key={time} value={time}>{formatTime(time)}</option>
@@ -408,7 +408,7 @@ export default function StylistSchedulePage() {
                         <select
                           value={block.end}
                           onChange={(e) => updateTimeBlock(day, block.id, 'end', e.target.value)}
-                          className="px-3 py-2 bg-white/5 border border-white/20 rounded-xl text-white text-sm focus:outline-none focus:border-amber-400/50"
+                          className="px-3 py-2 bg-white/5 border border-border rounded-xl text-white text-sm focus:outline-none focus:border-[#00ffb2]/50"
                         >
                           {generateTimeOptions().map(time => (
                             <option key={time} value={time}>{formatTime(time)}</option>
@@ -429,7 +429,7 @@ export default function StylistSchedulePage() {
                         {idx === schedule[day].blocks.length - 1 && (
                           <button
                             onClick={() => addTimeBlock(day)}
-                            className="p-2 text-amber-400 hover:bg-amber-400/10 rounded-xl transition-colors"
+                            className="p-2 text-[#00ffb2] hover:bg-[#00ffb2]/10 rounded-xl transition-colors"
                           >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -453,7 +453,7 @@ export default function StylistSchedulePage() {
         <div className="space-y-6">
           <div className="flex flex-col lg:flex-row gap-6">
             {/* Calendar View */}
-            <div className="flex-1 bg-white/5 backdrop-blur rounded-xl border border-white/10 p-4">
+            <div className="flex-1 bg-white/5 backdrop-blur rounded-xl border border-border p-4">
               <div className="flex items-center justify-between mb-4">
                 <button
                   onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1))}
@@ -508,7 +508,7 @@ export default function StylistSchedulePage() {
                         isBlocked
                           ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                           : isToday
-                          ? 'bg-amber-400/20 text-amber-400'
+                          ? 'bg-[#00ffb2]/20 text-[#00ffb2]'
                           : isPast
                           ? 'text-white/20 cursor-not-allowed'
                           : 'hover:bg-white/10 text-white'
@@ -520,13 +520,13 @@ export default function StylistSchedulePage() {
                 })}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-center gap-4 text-sm">
+              <div className="mt-4 pt-4 border-t border-border flex items-center justify-center gap-4 text-sm">
                 <div className="flex items-center gap-2">
                   <div className="w-4 h-4 bg-red-500/20 rounded" />
                   <span className="text-white/60">Time Off</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-amber-400/20 rounded" />
+                  <div className="w-4 h-4 bg-[#00ffb2]/20 rounded" />
                   <span className="text-white/60">Today</span>
                 </div>
               </div>
@@ -534,12 +534,12 @@ export default function StylistSchedulePage() {
 
             {/* Blocked Dates List */}
             <div className="w-full lg:w-80">
-              <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10">
-                <div className="p-4 border-b border-white/10 flex items-center justify-between">
+              <div className="bg-white/5 backdrop-blur rounded-xl border border-border">
+                <div className="p-4 border-b border-border flex items-center justify-between">
                   <h3 className="font-semibold text-white">Upcoming Time Off</h3>
                   <button
                     onClick={() => setShowBlockModal(true)}
-                    className="p-2 bg-amber-400/10 text-amber-400 rounded-xl hover:bg-amber-400/20 transition-colors"
+                    className="p-2 bg-[#00ffb2]/10 text-[#00ffb2] rounded-xl hover:bg-[#00ffb2]/20 transition-colors"
                   >
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -555,7 +555,7 @@ export default function StylistSchedulePage() {
                     <p className="text-white/50 text-sm">No time off scheduled</p>
                     <button
                       onClick={() => setShowBlockModal(true)}
-                      className="mt-2 text-sm text-amber-400 hover:text-amber-300"
+                      className="mt-2 text-sm text-[#00ffb2] hover:text-[#00ffb2]"
                     >
                       + Add time off
                     </button>
@@ -597,8 +597,8 @@ export default function StylistSchedulePage() {
 
       {/* Add Block Modal */}
       {showBlockModal && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-xl max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-card border border-border rounded-xl max-w-md w-full p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-white">Block Time Off</h3>
               <button
@@ -619,7 +619,7 @@ export default function StylistSchedulePage() {
                   value={newBlock.date}
                   onChange={(e) => setNewBlock(prev => ({ ...prev, date: e.target.value }))}
                   min={new Date().toISOString().split('T')[0]}
-                  className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50"
+                  className="w-full px-4 py-2 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50"
                 />
               </div>
 
@@ -630,7 +630,7 @@ export default function StylistSchedulePage() {
                   value={newBlock.reason}
                   onChange={(e) => setNewBlock(prev => ({ ...prev, reason: e.target.value }))}
                   placeholder="e.g., Vacation, Training, Personal"
-                  className="w-full px-4 py-2 bg-white/5 border border-white/20 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-amber-400/50"
+                  className="w-full px-4 py-2 bg-white/5 border border-border rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-[#00ffb2]/50"
                 />
               </div>
 
@@ -640,7 +640,7 @@ export default function StylistSchedulePage() {
                     type="checkbox"
                     checked={newBlock.allDay}
                     onChange={(e) => setNewBlock(prev => ({ ...prev, allDay: e.target.checked }))}
-                    className="w-4 h-4 text-amber-400 rounded focus:ring-amber-400/50 bg-white/10 border-white/20"
+                    className="w-4 h-4 text-[#00ffb2] rounded focus:ring-[#00ffb2]/50 bg-white/10 border-border"
                   />
                   <span className="text-sm text-white">All day</span>
                 </label>
@@ -653,7 +653,7 @@ export default function StylistSchedulePage() {
                     <select
                       value={newBlock.startTime}
                       onChange={(e) => setNewBlock(prev => ({ ...prev, startTime: e.target.value }))}
-                      className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50"
+                      className="w-full px-3 py-2 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50"
                     >
                       {generateTimeOptions().map(time => (
                         <option key={time} value={time}>{formatTime(time)}</option>
@@ -665,7 +665,7 @@ export default function StylistSchedulePage() {
                     <select
                       value={newBlock.endTime}
                       onChange={(e) => setNewBlock(prev => ({ ...prev, endTime: e.target.value }))}
-                      className="w-full px-3 py-2 bg-white/5 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400/50"
+                      className="w-full px-3 py-2 bg-white/5 border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2]/50"
                     >
                       {generateTimeOptions().map(time => (
                         <option key={time} value={time}>{formatTime(time)}</option>
@@ -679,14 +679,14 @@ export default function StylistSchedulePage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowBlockModal(false)}
-                className="flex-1 px-4 py-2 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+                className="flex-1 px-4 py-2 bg-white/5 border border-border text-white rounded-xl hover:bg-white/10 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={addBlockedDate}
                 disabled={!newBlock.date}
-                className="flex-1 px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-[#00ffb2] text-black rounded-xl font-semibold  transition-all disabled:opacity-50"
               >
                 Block Date
               </button>

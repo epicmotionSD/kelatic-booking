@@ -23,21 +23,21 @@ export default function PromoGraphicsGenerator() {
       <div className="bg-purple-50 rounded-xl p-6 mt-6">
         <h3 className="font-semibold text-purple-900 mb-3">What You'll Get</h3>
         <div className="text-sm text-purple-800 space-y-3">
-          <div className="bg-white rounded-lg p-4">
+          <div className="bg-card rounded-lg p-4">
             <p className="font-medium">Headline</p>
-            <p className="text-gray-600">Bold, attention-grabbing (3-7 words)</p>
+            <p className="text-muted-foreground">Bold, attention-grabbing (3-7 words)</p>
           </div>
-          <div className="bg-white rounded-lg p-4">
+          <div className="bg-card rounded-lg p-4">
             <p className="font-medium">Subheadline</p>
-            <p className="text-gray-600">Supporting message (1 line)</p>
+            <p className="text-muted-foreground">Supporting message (1 line)</p>
           </div>
-          <div className="bg-white rounded-lg p-4">
+          <div className="bg-card rounded-lg p-4">
             <p className="font-medium">Bullet Points</p>
-            <p className="text-gray-600">2-3 key benefits or details</p>
+            <p className="text-muted-foreground">2-3 key benefits or details</p>
           </div>
-          <div className="bg-white rounded-lg p-4">
+          <div className="bg-card rounded-lg p-4">
             <p className="font-medium">CTA Text</p>
-            <p className="text-gray-600">Button or action text</p>
+            <p className="text-muted-foreground">Button or action text</p>
           </div>
         </div>
       </div>

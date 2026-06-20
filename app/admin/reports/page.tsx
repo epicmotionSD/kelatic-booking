@@ -45,7 +45,7 @@ export default function ReportsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]" />
       </div>
     );
   }
@@ -56,7 +56,7 @@ export default function ReportsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
-            <BarChart3 className="w-8 h-8 text-amber-400" />
+            <BarChart3 className="w-8 h-8 text-[#00ffb2]" />
             Reports
           </h1>
           <p className="text-white/60">Track your business performance</p>
@@ -68,8 +68,8 @@ export default function ReportsPage() {
               onClick={() => setPeriod(p)}
               className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                 period === p
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg'
-                  : 'bg-zinc-900 text-white/70 hover:bg-zinc-800 border border-white/10'
+                  ? 'bg-[#00ffb2] text-black shadow-lg'
+                  : 'bg-card text-white/70 hover:bg-muted border border-border'
               }`}
             >
               {p.charAt(0).toUpperCase() + p.slice(1)}
@@ -80,19 +80,19 @@ export default function ReportsPage() {
 
       {/* Key Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-white/60">Total Revenue</span>
             <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
               <DollarSign className="w-4 h-4 text-green-400" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-amber-400">
+          <p className="text-3xl font-bold text-[#00ffb2]">
             {formatCurrency((data?.revenue || 0) * 100)}
           </p>
         </div>
 
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-white/60">Appointments</span>
             <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
@@ -104,11 +104,11 @@ export default function ReportsPage() {
           </p>
         </div>
 
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-white/60">New Clients</span>
-            <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
-              <UserPlus className="w-4 h-4 text-amber-400" />
+            <div className="w-8 h-8 bg-[#00ffb2]/20 rounded-lg flex items-center justify-center">
+              <UserPlus className="w-4 h-4 text-[#00ffb2]" />
             </div>
           </div>
           <p className="text-3xl font-bold text-white">
@@ -116,11 +116,11 @@ export default function ReportsPage() {
           </p>
         </div>
 
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-white/60">Avg. Ticket</span>
-            <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-amber-400" />
+            <div className="w-8 h-8 bg-[#00ffb2]/20 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-4 h-4 text-[#00ffb2]" />
             </div>
           </div>
           <p className="text-3xl font-bold text-white">
@@ -131,7 +131,7 @@ export default function ReportsPage() {
 
       <div className="grid lg:grid-cols-2 gap-8">
         {/* Revenue Chart Placeholder */}
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6">
           <h3 className="font-playfair font-semibold text-white mb-4">Revenue Trend</h3>
           <div className="h-64 flex items-end justify-between gap-2">
             {data?.dailyRevenue?.slice(-14).map((day, index) => {
@@ -146,7 +146,7 @@ export default function ReportsPage() {
                   className="flex-1 flex flex-col items-center gap-2"
                 >
                   <div
-                    className="w-full bg-gradient-to-t from-amber-400 to-yellow-500 rounded-t transition-all hover:from-amber-300 hover:to-yellow-400"
+                    className="w-full bg-gradient-to-t  rounded-t transition-all hover:from-[#00ffb2] hover:to-[#00ffb2]"
                     style={{ height: `${Math.max(height, 4)}%` }}
                     title={`${day.date}: ${formatCurrency(day.revenue * 100)}`}
                   />
@@ -163,7 +163,7 @@ export default function ReportsPage() {
         </div>
 
         {/* Payment Methods */}
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6">
           <h3 className="font-playfair font-semibold text-white mb-4">Payment Methods</h3>
           <div className="space-y-4">
             {data?.paymentBreakdown?.map((method) => {
@@ -191,7 +191,7 @@ export default function ReportsPage() {
                   </div>
                   <div className="w-full bg-white/10 rounded-full h-2">
                     <div
-                      className="bg-gradient-to-r from-amber-400 to-yellow-500 h-2 rounded-full"
+                      className="bg-[#00ffb2] h-2 rounded-full"
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -205,12 +205,12 @@ export default function ReportsPage() {
         </div>
 
         {/* Top Services */}
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6">
           <h3 className="font-playfair font-semibold text-white mb-4">Top Services</h3>
           <div className="space-y-4">
             {data?.topServices?.slice(0, 5).map((service, index) => (
               <div key={service.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center text-amber-400 font-semibold text-sm">
+                <div className="w-8 h-8 bg-[#00ffb2]/20 rounded-lg flex items-center justify-center text-[#00ffb2] font-semibold text-sm">
                   {index + 1}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -221,7 +221,7 @@ export default function ReportsPage() {
                     {service.count} appointments
                   </p>
                 </div>
-                <p className="font-semibold text-amber-400">
+                <p className="font-semibold text-[#00ffb2]">
                   {formatCurrency(service.revenue * 100)}
                 </p>
               </div>
@@ -233,12 +233,12 @@ export default function ReportsPage() {
         </div>
 
         {/* Top Stylists */}
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6">
           <h3 className="font-playfair font-semibold text-white mb-4">Stylist Performance</h3>
           <div className="space-y-4">
             {data?.topStylists?.map((stylist, index) => (
               <div key={stylist.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-400 font-medium text-sm">
+                <div className="w-8 h-8 bg-[#00ffb2]/20 rounded-full flex items-center justify-center text-[#00ffb2] font-medium text-sm">
                   {stylist.name
                     .split(' ')
                     .map((n) => n[0])
@@ -252,7 +252,7 @@ export default function ReportsPage() {
                     {stylist.appointments} appointments
                   </p>
                 </div>
-                <p className="font-semibold text-amber-400">
+                <p className="font-semibold text-[#00ffb2]">
                   {formatCurrency(stylist.revenue * 100)}
                 </p>
               </div>
@@ -265,11 +265,11 @@ export default function ReportsPage() {
       </div>
 
       {/* Export */}
-      <div className="mt-8 bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+      <div className="mt-8 bg-card rounded-xl border border-border shadow-lg p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-amber-500/20 rounded-lg flex items-center justify-center">
-              <Users className="w-4 h-4 text-amber-400" />
+            <div className="w-8 h-8 bg-[#00ffb2]/20 rounded-lg flex items-center justify-center">
+              <Users className="w-4 h-4 text-[#00ffb2]" />
             </div>
             <div>
               <h3 className="font-playfair font-semibold text-white">Export Data</h3>
@@ -279,10 +279,10 @@ export default function ReportsPage() {
             </div>
           </div>
           <div className="flex gap-2">
-            <button className="px-4 py-2 bg-zinc-800 text-white/70 rounded-xl hover:bg-zinc-700 transition-colors text-sm border border-white/10">
+            <button className="px-4 py-2 bg-muted text-white/70 rounded-xl hover:bg-muted transition-colors text-sm border border-border">
               Export CSV
             </button>
-            <button className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl hover:shadow-lg hover:shadow-amber-500/30 transition-all text-sm font-semibold">
+            <button className="px-4 py-2 bg-[#00ffb2] text-black rounded-xl  transition-all text-sm font-semibold">
               Export PDF
             </button>
           </div>

@@ -110,14 +110,14 @@ export default function StylistsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
-            <Users className="w-8 h-8 text-amber-400" />
+            <Users className="w-8 h-8 text-[#00ffb2]" />
             Stylists
           </h1>
           <p className="text-white/60">Manage your talented team</p>
         </div>
         <button
           onClick={() => openModal()}
-          className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 w-fit"
+          className="px-6 py-3 bg-[#00ffb2] text-black rounded-xl font-semibold  transition-all flex items-center gap-2 w-fit"
         >
           <Plus className="w-5 h-5" />
           Add Stylist
@@ -127,15 +127,15 @@ export default function StylistsPage() {
       {/* Stylists Grid */}
       {loading ? (
         <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]" />
         </div>
       ) : stylists.length === 0 ? (
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-12 text-center">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-12 text-center">
           <Users className="w-12 h-12 mx-auto text-white/30 mb-4" />
           <p className="text-white/60 mb-4">No stylists yet</p>
           <button
             onClick={() => openModal()}
-            className="text-amber-400 hover:text-amber-300"
+            className="text-[#00ffb2] hover:text-[#00ffb2]"
           >
             Add your first stylist →
           </button>
@@ -145,12 +145,12 @@ export default function StylistsPage() {
           {stylists.map((stylist) => (
             <div
               key={stylist.id}
-              className={`bg-zinc-900 rounded-xl border border-white/10 shadow-lg overflow-hidden ${
+              className={`bg-card rounded-xl border border-border shadow-lg overflow-hidden ${
                 !stylist.is_active ? 'opacity-60' : ''
               }`}
             >
               {/* Header */}
-              <div className="p-6 border-b border-white/10">
+              <div className="p-6 border-b border-border">
                 <div className="flex items-start gap-4">
                   {stylist.avatar_url ? (
                     <img
@@ -159,8 +159,8 @@ export default function StylistsPage() {
                       className="w-16 h-16 rounded-full object-cover"
                     />
                   ) : (
-                    <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center">
-                      <span className="text-amber-400 font-semibold text-xl">
+                    <div className="w-16 h-16 bg-[#00ffb2]/20 rounded-full flex items-center justify-center">
+                      <span className="text-[#00ffb2] font-semibold text-xl">
                         {stylist.first_name[0]}
                         {stylist.last_name[0]}
                       </span>
@@ -178,7 +178,7 @@ export default function StylistsPage() {
                       )}
                     </div>
                     {stylist.instagram_handle && (
-                      <p className="text-sm text-amber-400">
+                      <p className="text-sm text-[#00ffb2]">
                         @{stylist.instagram_handle}
                       </p>
                     )}
@@ -199,7 +199,7 @@ export default function StylistsPage() {
               </div>
 
               {/* Stats */}
-              <div className="grid grid-cols-2 divide-x divide-white/10 border-b border-white/10">
+              <div className="grid grid-cols-2 divide-x divide-white/10 border-b border-border">
                 <div className="p-4 text-center">
                   <p className="text-2xl font-bold text-white">
                     {stylist.services_count}
@@ -231,14 +231,14 @@ export default function StylistsPage() {
               <div className="p-4 flex flex-wrap gap-2">
                 <button
                   onClick={() => openModal(stylist)}
-                  className="flex-1 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10"
+                  className="flex-1 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-border"
                 >
                   Edit
                 </button>
                 <button
                   onClick={() => handleInvite(stylist)}
                   disabled={inviting === stylist.id}
-                  className="flex-1 py-2 bg-amber-500/10 text-amber-400 rounded-xl hover:bg-amber-500/20 transition-colors text-sm border border-amber-500/30 disabled:opacity-50"
+                  className="flex-1 py-2 bg-[#00ffb2]/10 text-[#00ffb2] rounded-xl hover:bg-[#00ffb2]/20 transition-colors text-sm border border-[#00ffb2]/30 disabled:opacity-50"
                 >
                   {inviting === stylist.id ? 'Sending...' : 'Invite'}
                 </button>
@@ -419,9 +419,9 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-900 border border-white/10 rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-        <div className="p-6 border-b border-white/10 flex items-center justify-between">
+    <div className="fixed inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-card border border-border rounded-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="p-6 border-b border-border flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">
             {stylist ? 'Edit Stylist' : 'Add Stylist'}
           </h2>
@@ -442,7 +442,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, first_name: e.target.value })
                 }
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 required
               />
             </div>
@@ -456,7 +456,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, last_name: e.target.value })
                 }
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 required
               />
             </div>
@@ -472,7 +472,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, email: e.target.value })
               }
-              className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               required
             />
           </div>
@@ -487,7 +487,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, phone: e.target.value })
               }
-              className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
             />
           </div>
 
@@ -505,7 +505,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                 onChange={(e) =>
                   setFormData({ ...formData, instagram_handle: e.target.value })
                 }
-                className="w-full pl-8 pr-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full pl-8 pr-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 placeholder="username"
               />
             </div>
@@ -519,7 +519,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               value={formData.bio}
               onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               placeholder="Brief description..."
             />
           </div>
@@ -534,7 +534,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, specialties: e.target.value })
               }
-              className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               placeholder="Locs, Braids, Color (comma-separated)"
             />
           </div>
@@ -551,7 +551,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               onChange={(e) =>
                 setFormData({ ...formData, commission_rate: e.target.value })
               }
-              className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+              className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
             />
           </div>
 
@@ -566,15 +566,15 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
               </span>
             </div>
             {servicesLoading ? (
-              <div className="text-sm text-white/40 py-3 text-center bg-zinc-800/50 rounded-xl border border-white/10">
+              <div className="text-sm text-white/40 py-3 text-center bg-muted/50 rounded-xl border border-border">
                 Loading services…
               </div>
             ) : allServices.length === 0 ? (
-              <div className="text-sm text-white/40 py-3 text-center bg-zinc-800/50 rounded-xl border border-white/10">
+              <div className="text-sm text-white/40 py-3 text-center bg-muted/50 rounded-xl border border-border">
                 No active services to assign.
               </div>
             ) : (
-              <div className="bg-zinc-800/50 border border-white/10 rounded-xl max-h-64 overflow-y-auto">
+              <div className="bg-muted/50 border border-border rounded-xl max-h-64 overflow-y-auto">
                 {Object.entries(servicesByCategory)
                   .sort(([a], [b]) => a.localeCompare(b))
                   .map(([category, services]) => {
@@ -595,7 +595,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                             onClick={() =>
                               toggleAllInCategory(category, !allSelected)
                             }
-                            className="text-xs text-amber-400 hover:text-amber-300"
+                            className="text-xs text-[#00ffb2] hover:text-[#00ffb2]"
                           >
                             {allSelected ? 'Clear' : 'Select all'}
                           </button>
@@ -610,7 +610,7 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
                                     type="checkbox"
                                     checked={selectedServiceIds.has(s.id)}
                                     onChange={() => toggleService(s.id)}
-                                    className="w-4 h-4 rounded border-white/30 bg-zinc-900 text-amber-500 focus:ring-amber-500"
+                                    className="w-4 h-4 rounded border-white/30 bg-card text-[#00ffb2] focus:ring-[#00ffb2]"
                                   />
                                   <span className="flex-1 text-sm text-white">
                                     {s.name}
@@ -639,14 +639,14 @@ function StylistModal({ stylist, onClose, onSave }: StylistModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-colors"
+              className="flex-1 py-2 bg-white/5 border border-border text-white rounded-xl hover:bg-white/10 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
+              className="flex-1 py-2 bg-[#00ffb2] text-black rounded-xl font-semibold  transition-all disabled:opacity-50"
             >
               {loading ? 'Saving...' : 'Save Stylist'}
             </button>

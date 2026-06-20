@@ -137,7 +137,7 @@ export default function SettingsPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
         <div>
           <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
-            <Settings className="w-8 h-8 text-amber-400" />
+            <Settings className="w-8 h-8 text-[#00ffb2]" />
             Settings
           </h1>
           <p className="text-white/60">Manage your business settings and preferences</p>
@@ -145,7 +145,7 @@ export default function SettingsPage() {
         <button
           onClick={handleSave}
           disabled={loading}
-          className="px-6 py-3 bg-amber-500 text-stone-900 rounded-xl font-semibold hover:bg-amber-600 transition-all flex items-center gap-2 w-fit disabled:opacity-50 shadow-lg"
+          className="px-6 py-3 bg-[#00ffb2] text-stone-900 rounded-xl font-semibold hover:bg-[#00ffb2] transition-all flex items-center gap-2 w-fit disabled:opacity-50 shadow-lg"
         >
           {loading ? (
             <>
@@ -167,15 +167,15 @@ export default function SettingsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-white/10 mb-6">
+      <div className="flex gap-2 border-b border-border mb-6">
         {(['general', 'hours', 'booking', 'integrations'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`px-4 py-2 font-medium transition-colors border-b-2 -mb-px flex items-center gap-2 ${
               activeTab === tab
-                ? 'text-amber-400 border-amber-400'
-                : 'text-white/60 border-transparent hover:text-amber-400'
+                ? 'text-[#00ffb2] border-[#00ffb2]'
+                : 'text-white/60 border-transparent hover:text-[#00ffb2]'
             }`}
           >
             {tab === 'general' && <Settings className="w-4 h-4" />}
@@ -189,7 +189,7 @@ export default function SettingsPage() {
 
       {/* General Settings */}
       {activeTab === 'general' && (
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 space-y-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6 space-y-6">
           <h2 className="font-playfair font-semibold text-white">Business Information</h2>
 
           <div className="grid md:grid-cols-2 gap-6">
@@ -201,7 +201,7 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.name}
                 onChange={(e) => setSettings({ ...settings, name: e.target.value })}
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               />
             </div>
 
@@ -213,7 +213,7 @@ export default function SettingsPage() {
                 type="email"
                 value={settings.email}
                 onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 placeholder="info@kelatic.com"
               />
             </div>
@@ -226,7 +226,7 @@ export default function SettingsPage() {
                 type="tel"
                 value={settings.phone}
                 onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 placeholder="(713) 485-4000"
               />
             </div>
@@ -238,7 +238,7 @@ export default function SettingsPage() {
               <select
                 value={settings.timezone}
                 onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               >
                 <option value="America/New_York">Eastern Time</option>
                 <option value="America/Chicago">Central Time</option>
@@ -255,7 +255,7 @@ export default function SettingsPage() {
                 type="text"
                 value={settings.address}
                 onChange={(e) => setSettings({ ...settings, address: e.target.value })}
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 placeholder="9430 Richmond Ave, Houston, TX 77063"
               />
             </div>
@@ -265,7 +265,7 @@ export default function SettingsPage() {
 
       {/* Business Hours */}
       {activeTab === 'hours' && (
-        <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 space-y-6">
+        <div className="bg-card rounded-xl border border-border shadow-lg p-6 space-y-6">
           <h2 className="font-playfair font-semibold text-white">Business Hours</h2>
 
           <div className="space-y-4">
@@ -276,7 +276,7 @@ export default function SettingsPage() {
               return (
                 <div
                   key={day}
-                  className="flex items-center gap-4 py-3 border-b border-white/10 last:border-0"
+                  className="flex items-center gap-4 py-3 border-b border-border last:border-0"
                 >
                   <div className="w-28 font-medium text-white">{day}</div>
 
@@ -285,7 +285,7 @@ export default function SettingsPage() {
                       type="checkbox"
                       checked={!isClosed}
                       onChange={() => toggleClosedDay(index)}
-                      className="w-4 h-4 rounded border-white/30 bg-transparent text-amber-400 focus:ring-amber-400/50"
+                      className="w-4 h-4 rounded border-white/30 bg-transparent text-[#00ffb2] focus:ring-[#00ffb2]/50"
                     />
                     <span className="text-sm text-white/60">Open</span>
                   </label>
@@ -304,7 +304,7 @@ export default function SettingsPage() {
                             },
                           })
                         }
-                        className="px-3 py-1 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                        className="px-3 py-1 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                       />
                       <span className="text-white/60">to</span>
                       <input
@@ -319,7 +319,7 @@ export default function SettingsPage() {
                             },
                           })
                         }
-                        className="px-3 py-1 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                        className="px-3 py-1 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                       />
                     </div>
                   )}
@@ -337,7 +337,7 @@ export default function SettingsPage() {
       {/* Booking Settings */}
       {activeTab === 'booking' && (
         <div className="space-y-6">
-          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 space-y-6">
+          <div className="bg-card rounded-xl border border-border shadow-lg p-6 space-y-6">
             <h2 className="font-playfair font-semibold text-white">Booking Rules</h2>
 
             <div className="grid md:grid-cols-2 gap-6">
@@ -352,7 +352,7 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setSettings({ ...settings, bookingLeadTime: parseInt(e.target.value) })
                   }
-                  className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                  className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 />
                 <p className="text-sm text-white/40 mt-1">
                   How far in advance clients must book
@@ -370,7 +370,7 @@ export default function SettingsPage() {
                   onChange={(e) =>
                     setSettings({ ...settings, bookingWindowDays: parseInt(e.target.value) })
                   }
-                  className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                  className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
                 />
                 <p className="text-sm text-white/40 mt-1">
                   How far ahead clients can book
@@ -379,7 +379,7 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 space-y-6">
+          <div className="bg-card rounded-xl border border-border shadow-lg p-6 space-y-6">
             <h2 className="font-playfair font-semibold text-white">Policies</h2>
 
             <div>
@@ -392,7 +392,7 @@ export default function SettingsPage() {
                   setSettings({ ...settings, cancellationPolicy: e.target.value })
                 }
                 rows={3}
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               />
             </div>
 
@@ -406,7 +406,7 @@ export default function SettingsPage() {
                   setSettings({ ...settings, depositPolicy: e.target.value })
                 }
                 rows={3}
-                className="w-full px-4 py-2 bg-zinc-800 border border-white/20 rounded-xl text-white focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400"
+                className="w-full px-4 py-2 bg-muted border border-border rounded-xl text-white focus:outline-none focus:border-[#00ffb2] focus:ring-1 focus:ring-[#00ffb2]"
               />
             </div>
           </div>
@@ -417,7 +417,7 @@ export default function SettingsPage() {
       {activeTab === 'integrations' && (
         <div className="space-y-6">
           {/* Stripe */}
-          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+          <div className="bg-card rounded-xl border border-border shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-[#635BFF] rounded-xl flex items-center justify-center">
@@ -439,18 +439,18 @@ export default function SettingsPage() {
                 href="https://dashboard.stripe.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10"
+                className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-border"
               >
                 Open Dashboard
               </a>
-              <button className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-white/10">
+              <button className="px-4 py-2 bg-white/5 text-white rounded-xl hover:bg-white/10 transition-colors text-sm border border-border">
                 Manage Terminal
               </button>
             </div>
           </div>
 
           {/* SMS/Email */}
-          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6">
+          <div className="bg-card rounded-xl border border-border shadow-lg p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center border border-green-500/30">
@@ -473,10 +473,10 @@ export default function SettingsPage() {
           </div>
 
           {/* Google Calendar */}
-          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 opacity-60">
+          <div className="bg-card rounded-xl border border-border shadow-lg p-6 opacity-60">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
+                <div className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center border border-border">
                   <svg className="w-6 h-6 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
@@ -486,7 +486,7 @@ export default function SettingsPage() {
                   <p className="text-sm text-white/60">Sync appointments with Google</p>
                 </div>
               </div>
-              <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-sm rounded-full">
+              <span className="px-3 py-1 bg-[#00ffb2]/20 text-[#00ffb2] text-sm rounded-full">
                 Coming Soon
               </span>
             </div>
@@ -496,7 +496,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Instagram */}
-          <div className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg p-6 opacity-60">
+          <div className="bg-card rounded-xl border border-border shadow-lg p-6 opacity-60">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 rounded-xl flex items-center justify-center">
@@ -509,11 +509,11 @@ export default function SettingsPage() {
                   <p className="text-sm text-white/60">@kelatic_</p>
                 </div>
               </div>
-              <span className="px-3 py-1 bg-amber-500/20 text-amber-400 text-sm rounded-full">
+              <span className="px-3 py-1 bg-[#00ffb2]/20 text-[#00ffb2] text-sm rounded-full">
                 Coming Soon
               </span>
             </div>
-            <button disabled className="px-4 py-2 bg-white/5 text-stone-900/30 rounded-xl cursor-not-allowed text-sm border border-white/10">
+            <button disabled className="px-4 py-2 bg-white/5 text-stone-900/30 rounded-xl cursor-not-allowed text-sm border border-border">
               Connect Instagram
             </button>
           </div>

@@ -128,18 +128,18 @@ ${result.content}
           >
             ← Back to AI Marketing
           </Link>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
             <Sparkles className="w-6 h-6 text-purple-600" />
             Blog Article Generator
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-muted-foreground mt-1">
             Create SEO-optimized blog posts about loc care and styling
           </p>
         </div>
         <Link
           href="/blog"
           target="_blank"
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-purple-600 border border-gray-200 px-3 py-2 rounded-lg"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-purple-600 border border-border px-3 py-2 rounded-lg"
         >
           <FileText className="w-4 h-4" />
           View Blog ({blogPosts.length} posts)
@@ -149,9 +149,9 @@ ${result.content}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Input Form */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
+        <div className="bg-card rounded-xl border border-border p-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground/90 mb-1">
               Blog Topic *
             </label>
             <input
@@ -159,12 +159,12 @@ ${result.content}
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="e.g., How to care for starter locs in Houston's humidity"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground/90 mb-1">
               Target SEO Keywords
             </label>
             <input
@@ -172,19 +172,19 @@ ${result.content}
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
               placeholder="e.g., locs Houston, loc retwist, starter locs maintenance"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-foreground/90 mb-1">
               Tone
             </label>
             <select
               value={tone}
               onChange={(e) => setTone(e.target.value as typeof tone)}
               title="Select tone"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
             >
               <option value="professional">Professional & Authoritative</option>
               <option value="casual">Casual & Friendly</option>
@@ -222,7 +222,7 @@ ${result.content}
         </div>
 
         {/* Output */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-card rounded-xl border border-border p-6">
           {result ? (
             <div className="space-y-4">
               <div className="flex items-start justify-between">
@@ -230,9 +230,9 @@ ${result.content}
                   <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full mb-2">
                     {result.category}
                   </span>
-                  <h2 className="text-xl font-bold text-gray-900">{result.title}</h2>
-                  <p className="text-gray-600 text-sm mt-1">{result.excerpt}</p>
-                  <p className="text-gray-400 text-xs mt-2">
+                  <h2 className="text-xl font-bold text-foreground">{result.title}</h2>
+                  <p className="text-muted-foreground text-sm mt-1">{result.excerpt}</p>
+                  <p className="text-muted-foreground text-xs mt-2">
                     ~{result.readTime} min read | Slug: {result.slug}
                   </p>
                 </div>
@@ -240,7 +240,7 @@ ${result.content}
 
               <div className="border-t pt-4">
                 <div className="prose prose-sm max-w-none max-h-96 overflow-y-auto">
-                  <pre className="whitespace-pre-wrap font-sans text-gray-700 bg-gray-50 p-4 rounded-lg text-sm">
+                  <pre className="whitespace-pre-wrap font-sans text-foreground/90 bg-background p-4 rounded-lg text-sm">
                     {result.content}
                   </pre>
                 </div>
@@ -265,13 +265,13 @@ ${result.content}
                   )}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 text-center">
+              <p className="text-xs text-muted-foreground text-center">
                 Paste into lib/blog-posts.ts to add to the blog
               </p>
             </div>
           ) : (
-            <div className="text-gray-500 text-center py-16">
-              <Sparkles className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <div className="text-muted-foreground text-center py-16">
+              <Sparkles className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
               <p>Enter a topic and generate your blog post</p>
               <p className="text-sm mt-1">AI will create SEO-optimized content</p>
             </div>
@@ -280,8 +280,8 @@ ${result.content}
       </div>
 
       {/* Existing Posts */}
-      <div className="bg-gray-50 rounded-xl p-6">
-        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+      <div className="bg-background rounded-xl p-6">
+        <h3 className="font-semibold text-foreground mb-4 flex items-center gap-2">
           <FileText className="w-5 h-5 text-purple-600" />
           Existing Blog Posts ({blogPosts.length})
         </h3>
@@ -289,20 +289,20 @@ ${result.content}
           {blogPosts.slice(0, 6).map((post) => (
             <div
               key={post.slug}
-              className="bg-white p-4 rounded-lg border border-gray-200"
+              className="bg-card p-4 rounded-lg border border-border"
             >
               <span className="inline-block px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full mb-2">
                 {post.category}
               </span>
-              <h4 className="font-medium text-sm text-gray-900 line-clamp-2">
+              <h4 className="font-medium text-sm text-foreground line-clamp-2">
                 {post.title}
               </h4>
-              <p className="text-xs text-gray-500 mt-1">{post.readTime} min read</p>
+              <p className="text-xs text-muted-foreground mt-1">{post.readTime} min read</p>
             </div>
           ))}
         </div>
         {blogPosts.length > 6 && (
-          <p className="text-sm text-gray-500 mt-4 text-center">
+          <p className="text-sm text-muted-foreground mt-4 text-center">
             +{blogPosts.length - 6} more posts
           </p>
         )}

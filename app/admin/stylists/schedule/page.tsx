@@ -41,10 +41,10 @@ export default function StylistsSchedulePage() {
 
       {loading ? (
         <div className="flex items-center justify-center py-10">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]" />
         </div>
       ) : stylists.length === 0 ? (
-        <div className="bg-zinc-900 rounded-xl border border-white/10 p-8 text-center text-white/60">
+        <div className="bg-card rounded-xl border border-border p-8 text-center text-white/60">
           No stylists found.
         </div>
       ) : (
@@ -52,7 +52,7 @@ export default function StylistsSchedulePage() {
           {stylists.map((stylist) => (
             <div
               key={stylist.id}
-              className={`bg-zinc-900 rounded-xl border border-white/10 p-5 ${!stylist.is_active ? 'opacity-60' : ''}`}
+              className={`bg-card rounded-xl border border-border p-5 ${!stylist.is_active ? 'opacity-60' : ''}`}
             >
               <div className="mb-4">
                 <p className="text-white font-semibold text-lg">
@@ -63,7 +63,7 @@ export default function StylistsSchedulePage() {
 
               <Link
                 href={`/admin/team/${stylist.id}/schedule`}
-                className="inline-flex items-center justify-center w-full px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                className="inline-flex items-center justify-center w-full px-4 py-2 rounded-xl bg-[#00ffb2] text-black font-semibold  transition-all"
               >
                 Edit Schedule
               </Link>

@@ -103,10 +103,10 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
   const balanceDue = totalPrice - totalPaid;
 
   const statusConfig: Record<string, { bg: string; label: string }> = {
-    pending: { bg: 'bg-amber-500/20 text-amber-400 border-amber-500/30', label: 'Pending' },
+    pending: { bg: 'bg-[#00ffb2]/20 text-[#00ffb2] border-[#00ffb2]/30', label: 'Pending' },
     confirmed: { bg: 'bg-green-500/20 text-green-400 border-green-500/30', label: 'Confirmed' },
     in_progress: { bg: 'bg-blue-500/20 text-blue-400 border-blue-500/30', label: 'In Progress' },
-    completed: { bg: 'bg-white/10 text-white/60 border-white/20', label: 'Completed' },
+    completed: { bg: 'bg-white/10 text-white/60 border-border', label: 'Completed' },
     cancelled: { bg: 'bg-red-500/20 text-red-400 border-red-500/30', label: 'Cancelled' },
     no_show: { bg: 'bg-red-500/20 text-red-400 border-red-500/30', label: 'No Show' },
   };
@@ -114,7 +114,7 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
   const status = statusConfig[appointment.status] || statusConfig.pending;
 
   return (
-    <div className="min-h-screen bg-black p-6">
+    <div className="min-h-screen bg-background p-6">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
@@ -143,9 +143,9 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
           {/* Main Info */}
           <div className="lg:col-span-2 space-y-6">
             {/* Date & Time */}
-            <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6">
+            <div className="bg-card/50 border border-border rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#00ffb2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
                 Date & Time
@@ -189,9 +189,9 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
             </div>
 
             {/* Service */}
-            <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6">
+            <div className="bg-card/50 border border-border rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#00ffb2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
                 </svg>
                 Service
@@ -206,7 +206,7 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
                     {formatCurrency((appointment.quoted_price || 0) * 100)}
                   </p>
                 </div>
-                <div className="border-t border-white/10 pt-3 flex justify-between">
+                <div className="border-t border-border pt-3 flex justify-between">
                   <p className="text-white font-semibold">Total</p>
                   <p className="text-white font-semibold">{formatCurrency(totalPrice * 100)}</p>
                 </div>
@@ -215,9 +215,9 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
 
             {/* Notes */}
             {(appointment.client_notes || appointment.internal_notes) && (
-              <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6">
+              <div className="bg-card/50 border border-border rounded-2xl p-6">
                 <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 text-[#00ffb2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                   Notes
@@ -241,9 +241,9 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Client */}
-            <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6">
+            <div className="bg-card/50 border border-border rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#00ffb2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
                 Client
@@ -279,9 +279,9 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
             </div>
 
             {/* Stylist */}
-            <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6">
+            <div className="bg-card/50 border border-border rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#00ffb2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z" />
                 </svg>
                 Stylist
@@ -290,9 +290,9 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
             </div>
 
             {/* Payment */}
-            <div className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6">
+            <div className="bg-card/50 border border-border rounded-2xl p-6">
               <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                <svg className="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-[#00ffb2]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Payment
@@ -308,9 +308,9 @@ export default async function AppointmentDetailPage({ params }: PageProps) {
                     <span className="text-green-400">{formatCurrency(depositPaid * 100)}</span>
                   </div>
                 )}
-                <div className="flex justify-between border-t border-white/10 pt-2">
+                <div className="flex justify-between border-t border-border pt-2">
                   <span className="text-white font-medium">Balance Due</span>
-                  <span className={`font-medium ${balanceDue > 0 ? 'text-amber-400' : 'text-green-400'}`}>
+                  <span className={`font-medium ${balanceDue > 0 ? 'text-[#00ffb2]' : 'text-green-400'}`}>
                     {formatCurrency(balanceDue * 100)}
                   </span>
                 </div>

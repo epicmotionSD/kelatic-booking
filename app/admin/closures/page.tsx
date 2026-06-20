@@ -84,7 +84,7 @@ export default function ClosuresPage() {
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
           <h1 className="text-2xl font-bold text-white flex items-center gap-2">
-            <CalendarOff className="w-6 h-6 text-amber-400" />
+            <CalendarOff className="w-6 h-6 text-[#00ffb2]" />
             Shop Closures
           </h1>
           <p className="text-white/50 text-sm mt-1">
@@ -95,7 +95,7 @@ export default function ClosuresPage() {
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold flex items-center gap-2 hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+          className="px-4 py-2 bg-[#00ffb2] text-black rounded-xl font-semibold flex items-center gap-2  transition-all"
         >
           <Plus className="w-4 h-4" />
           Add Closure
@@ -108,7 +108,7 @@ export default function ClosuresPage() {
         </div>
       )}
 
-      <div className="rounded-2xl border border-white/10 bg-zinc-900">
+      <div className="rounded-2xl border border-border bg-card">
         {loading ? (
           <div className="p-6 text-sm text-white/40">Loading…</div>
         ) : closures.length === 0 ? (
@@ -205,9 +205,9 @@ function ClosureModal({ timezone, onClose, onSave }: ModalProps) {
   }
 
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-zinc-900 border border-white/10 rounded-2xl w-full max-w-md">
-        <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+    <div className="fixed inset-0 bg-background/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-card border border-border rounded-2xl w-full max-w-md">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <h2 className="text-lg font-semibold text-white">Add Closure</h2>
           <button type="button" onClick={onClose} className="text-white/40 hover:text-white">
             <X className="w-5 h-5" />
@@ -234,7 +234,7 @@ function ClosureModal({ timezone, onClose, onSave }: ModalProps) {
                   setStartDate(e.target.value);
                   if (endDate < e.target.value) setEndDate(e.target.value);
                 }}
-                className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
+                className="w-full px-3 py-2 rounded-xl bg-background/40 border border-border text-white focus:outline-none focus:border-[#00ffb2]"
                 required
               />
             </div>
@@ -248,7 +248,7 @@ function ClosureModal({ timezone, onClose, onSave }: ModalProps) {
                 value={endDate}
                 min={startDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
+                className="w-full px-3 py-2 rounded-xl bg-background/40 border border-border text-white focus:outline-none focus:border-[#00ffb2]"
                 required
               />
             </div>
@@ -264,7 +264,7 @@ function ClosureModal({ timezone, onClose, onSave }: ModalProps) {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. Christmas Day, Stylist meeting, Maintenance"
-              className="w-full px-3 py-2 rounded-xl bg-black/40 border border-white/10 text-white focus:outline-none focus:border-amber-400"
+              className="w-full px-3 py-2 rounded-xl bg-background/40 border border-border text-white focus:outline-none focus:border-[#00ffb2]"
               required
             />
           </div>
@@ -278,14 +278,14 @@ function ClosureModal({ timezone, onClose, onSave }: ModalProps) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors"
+              className="flex-1 py-2 rounded-xl bg-white/5 border border-border text-white hover:bg-white/10 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="flex-1 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-yellow-500 text-black font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all disabled:opacity-50"
+              className="flex-1 py-2 rounded-xl bg-[#00ffb2] text-black font-semibold  transition-all disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save Closure'}
             </button>

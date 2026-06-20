@@ -146,7 +146,7 @@ export default function POSPage() {
   const getStatusBadge = (status: string) => {
     const styles: Record<string, string> = {
       confirmed: 'bg-blue-100 text-blue-700 border-blue-200',
-      in_progress: 'bg-amber-100 text-amber-700 border-amber-200',
+      in_progress: 'bg-[#00ffb2] text-[#00ffb2] border-[#00ffb2]',
       completed: 'bg-green-100 text-green-700 border-green-200',
       cancelled: 'bg-red-100 text-red-700 border-red-200',
       no_show: 'bg-stone-100 text-stone-600 border-stone-200',
@@ -157,11 +157,11 @@ export default function POSPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-zinc-900 rounded-2xl border border-white/10 shadow-lg px-6 py-4">
+      <div className="bg-card rounded-2xl border border-border shadow-lg px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-playfair font-bold text-white flex items-center gap-3">
-              <CreditCard className="w-8 h-8 text-amber-400" />
+              <CreditCard className="w-8 h-8 text-[#00ffb2]" />
               Point of Sale
             </h1>
             <p className="text-white/60 mt-1">
@@ -178,7 +178,7 @@ export default function POSPage() {
 
       <main className="space-y-6">
         {/* Walk-in Requests */}
-        <div className="bg-zinc-900 rounded-2xl border border-white/10 shadow-lg px-6 py-4">
+        <div className="bg-card rounded-2xl border border-border shadow-lg px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h2 className="text-lg font-semibold text-white">Walk-in Check-ins</h2>
@@ -202,7 +202,7 @@ export default function POSPage() {
               {walkInRequests.map((req) => (
                 <div
                   key={req.id}
-                  className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 rounded-xl border border-white/10 bg-black/40 px-4 py-3"
+                  className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 rounded-xl border border-border bg-background/40 px-4 py-3"
                 >
                   <div>
                     <p className="text-white font-medium">{req.name}</p>
@@ -226,7 +226,7 @@ export default function POSPage() {
                     <button
                       type="button"
                       onClick={() => handleConvertWalkInRequest(req)}
-                      className="px-3 py-2 rounded-lg text-sm font-medium bg-amber-400 text-black hover:bg-amber-300"
+                      className="px-3 py-2 rounded-lg text-sm font-medium bg-[#00ffb2] text-black hover:bg-[#00ffb2]"
                     >
                       Start Checkout
                     </button>
@@ -252,8 +252,8 @@ export default function POSPage() {
               onClick={() => setDateRange(opt.key as typeof dateRange)}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                 dateRange === opt.key
-                  ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
-                  : 'bg-white/3 text-white/60 hover:text-white border border-white/10'
+                  ? 'bg-[#00ffb2]/20 text-[#00ffb2] border border-[#00ffb2]/40'
+                  : 'bg-white/3 text-white/60 hover:text-white border border-border'
               }`}
             >
               {opt.label}
@@ -274,8 +274,8 @@ export default function POSPage() {
               onClick={() => setFilter(tab.key as typeof filter)}
               className={`px-4 py-2 rounded-xl font-medium transition-all ${
                 filter === tab.key
-                  ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg'
-                  : 'bg-zinc-900 text-white/70 hover:bg-zinc-800 border border-white/10'
+                  ? 'bg-[#00ffb2] text-black shadow-lg'
+                  : 'bg-card text-white/70 hover:bg-muted border border-border'
               }`}
             >
               {tab.label}
@@ -286,10 +286,10 @@ export default function POSPage() {
         {/* Appointments Grid */}
         {loading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#00ffb2]" />
           </div>
         ) : filteredAppointments.length === 0 ? (
-          <div className="text-center py-12 bg-zinc-900 rounded-xl border border-white/10 shadow-sm">
+          <div className="text-center py-12 bg-card rounded-xl border border-border shadow-sm">
             <p className="text-white/60">No appointments found</p>
           </div>
         ) : (
@@ -297,20 +297,20 @@ export default function POSPage() {
             {filteredAppointments.map((apt) => (
               <div
                 key={apt.id}
-                className="bg-zinc-900 rounded-xl border border-white/10 shadow-lg hover:shadow-xl transition-all overflow-hidden"
+                className="bg-card rounded-xl border border-border shadow-lg hover:shadow-xl transition-all overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                <div className="px-4 py-3 border-b border-border flex items-center justify-between">
                   <span className="font-medium text-white flex items-center gap-2">
-                    <Clock className="w-4 h-4 text-amber-400" />
+                    <Clock className="w-4 h-4 text-[#00ffb2]" />
                     {formatTime(apt.start_time)}
                   </span>
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium border ${
                       apt.status === 'confirmed' ? 'bg-green-500/20 text-green-400 border-green-500/30' :
-                      apt.status === 'in_progress' ? 'bg-amber-500/20 text-amber-400 border-amber-500/30' :
+                      apt.status === 'in_progress' ? 'bg-[#00ffb2]/20 text-[#00ffb2] border-[#00ffb2]/30' :
                       apt.status === 'completed' ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' :
-                      'bg-white/10 text-white/60 border-white/20'
+                      'bg-white/10 text-white/60 border-border'
                     }`}
                   >
                     {apt.status.replace('_', ' ')}
@@ -322,7 +322,7 @@ export default function POSPage() {
                   {/* Client Info */}
                   <div className="mb-3">
                     <p className="font-semibold text-white flex items-center gap-2">
-                      <Users className="w-4 h-4 text-amber-400" />
+                      <Users className="w-4 h-4 text-[#00ffb2]" />
                       {apt.is_walk_in
                         ? apt.walk_in_name || 'Walk-in'
                         : `${apt.client?.first_name} ${apt.client?.last_name}`}
@@ -370,7 +370,7 @@ export default function POSPage() {
                                 <CheckCircle className="w-3 h-3 shrink-0" />
                                 {formatCurrency(depositPaid * 100)} deposit paid
                               </p>
-                              <p className="text-xl font-bold text-amber-400 mt-0.5">
+                              <p className="text-xl font-bold text-[#00ffb2] mt-0.5">
                                 {formatCurrency(balanceDue * 100)}{' '}
                                 <span className="text-xs font-medium text-white/50">
                                   due at checkout
@@ -378,7 +378,7 @@ export default function POSPage() {
                               </p>
                             </>
                           ) : (
-                            <p className="text-lg font-bold text-amber-400">
+                            <p className="text-lg font-bold text-[#00ffb2]">
                               {formatCurrency(serviceTotal * 100)}
                             </p>
                           )}
@@ -388,7 +388,7 @@ export default function POSPage() {
                           <button
                             type="button"
                             onClick={() => handleCheckout(apt)}
-                            className="px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-medium hover:shadow-lg hover:shadow-amber-500/30 transition-all flex items-center gap-2 shrink-0"
+                            className="px-4 py-2 bg-[#00ffb2] text-black rounded-xl font-medium  transition-all flex items-center gap-2 shrink-0"
                           >
                             <CreditCard className="w-4 h-4" />
                             {hasDeposit ? `Collect ${formatCurrency(balanceDue * 100)}` : 'Checkout'}
@@ -412,7 +412,7 @@ export default function POSPage() {
               setWalkInPrefill(null);
               setIsWalkInOpen(true);
             }}
-            className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-semibold shadow-lg hover:shadow-xl hover:shadow-amber-500/30 transition-all flex items-center gap-2"
+            className="px-6 py-3 bg-[#00ffb2] text-black rounded-full font-semibold shadow-lg hover:shadow-xl hover: transition-all flex items-center gap-2"
           >
             <UserPlus className="w-5 h-5" />
             Walk-in

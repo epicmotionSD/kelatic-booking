@@ -96,9 +96,9 @@ function ToolCard({ href, icon, title, desc, accent }: { href: string; icon: str
   const card =
     accent === 'red'
       ? 'bg-red-500/5 border-red-500/15 hover:border-red-500/35 hover:bg-red-500/10'
-      : 'bg-white/3 border-white/8 hover:border-amber-500/30 hover:bg-white/6';
+      : 'bg-white/3 border-white/8 hover:border-[#00ffb2]/30 hover:bg-white/6';
   const heading =
-    accent === 'red' ? 'group-hover:text-red-300' : 'group-hover:text-amber-400';
+    accent === 'red' ? 'group-hover:text-red-300' : 'group-hover:text-[#00ffb2]';
 
   return (
     <Link href={href} className={`border rounded-xl p-5 transition-all group ${card}`}>
@@ -121,7 +121,7 @@ export default function TrinityPage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-amber-400 to-yellow-500 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold text-[#00ffb2]">
             Trinity Content Hub
           </h1>
           <p className="text-white/50 mt-1 text-sm">
@@ -142,7 +142,7 @@ export default function TrinityPage() {
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-sm font-medium transition-all whitespace-nowrap min-w-fit ${
               activeTab === tab.id
-                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
+                ? 'bg-[#00ffb2] text-black '
                 : 'text-white/50 hover:text-white/80 hover:bg-white/5'
             }`}
           >
@@ -173,7 +173,7 @@ export default function TrinityPage() {
                     b.id === brandId
                       ? b.accent === 'red'
                         ? 'bg-red-500/20 text-red-300 border border-red-500/30'
-                        : 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                        : 'bg-[#00ffb2]/20 text-[#00ffb2] border border-[#00ffb2]/30'
                       : 'text-white/50 hover:text-white/80 hover:bg-white/5 border border-transparent'
                   }`}
                 >
