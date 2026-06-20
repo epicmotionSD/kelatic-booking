@@ -105,6 +105,7 @@ const NAV_ITEMS: NavItem[] = [
 // Hides all salon-specific links — only Dashboard, POS, Orders, Products.
 const COMMERCE_NAV: NavItem[] = [
   { label: 'Dashboard', href: '/admin', icon: <Home className="w-5 h-5" /> },
+  { label: 'Agents', href: '/admin/agents', icon: <Layers className="w-5 h-5" /> },
   { label: 'Point of Sale', href: '/admin/register', icon: <CreditCard className="w-5 h-5" /> },
   { label: 'Orders', href: '/admin/orders', icon: <ShoppingBag className="w-5 h-5" /> },
   { label: 'Products', href: '/admin/products', icon: <Package className="w-5 h-5" /> },
@@ -113,7 +114,6 @@ const COMMERCE_NAV: NavItem[] = [
     label: 'Booking',
     icon: <Calendar className="w-5 h-5" />,
     children: [
-      { label: 'Agents', href: '/admin/agents', icon: <Layers className="w-4 h-4" /> },
       { label: 'Appointments', href: '/admin/appointments', icon: <Calendar className="w-4 h-4" /> },
       { label: 'Appointments POS', href: '/admin/pos', icon: <CreditCard className="w-4 h-4" /> },
       { label: 'Services', href: '/admin/services', icon: <Briefcase className="w-4 h-4" /> },

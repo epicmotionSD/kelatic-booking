@@ -243,7 +243,57 @@ export default function ClientsPage() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          {/* Mobile cards */}
+          <div className="lg:hidden divide-y divide-white/10">
+            {filteredClients.map((client) => (
+              <div key={client.id} className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 shrink-0 bg-[#00ffb2]/20 rounded-full flex items-center justify-center">
+                    <span className="text-[#00ffb2] font-medium">
+                      {client.first_name[0]}{client.last_name[0]}
+                    </span>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-white truncate">{client.first_name} {client.last_name}</p>
+                    {client.email && <p className="text-xs text-white/60 truncate">{client.email}</p>}
+                    {client.phone && <p className="text-xs text-white/60">{client.phone}</p>}
+                  </div>
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                  <div className="bg-white/5 border border-border rounded-lg py-2">
+                    <p className="text-sm font-semibold text-white">{client.visit_count}</p>
+                    <p className="text-[11px] text-white/50">Visits</p>
+                  </div>
+                  <div className="bg-white/5 border border-border rounded-lg py-2">
+                    <p className="text-sm font-semibold text-[#00ffb2]">{formatCurrency(client.total_spent * 100)}</p>
+                    <p className="text-[11px] text-white/50">Spent</p>
+                  </div>
+                  <div className="bg-white/5 border border-border rounded-lg py-2">
+                    <p className="text-sm font-semibold text-white">{formatDate(client.last_visit_at)}</p>
+                    <p className="text-[11px] text-white/50">Last visit</p>
+                  </div>
+                </div>
+                <div className="mt-3 flex items-center gap-2">
+                  <button
+                    onClick={() => setSelectedClient(client)}
+                    className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium bg-[#00ffb2] text-black"
+                  >
+                    <Eye className="w-4 h-4" /> View
+                  </button>
+                  <Link
+                    href={`/admin/appointments/new?client=${client.id}`}
+                    className="flex-1 inline-flex items-center justify-center gap-1 px-3 py-2 rounded-lg text-sm font-medium bg-white/5 border border-border text-white"
+                  >
+                    <Calendar className="w-4 h-4" /> Book
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop table */}
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="bg-white/5 border-b border-border">
@@ -335,6 +385,7 @@ export default function ClientsPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
 
