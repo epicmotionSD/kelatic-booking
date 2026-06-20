@@ -137,14 +137,14 @@ export default function RegisterPage() {
   const visible = activeCat === 'all' ? products : products.filter((p) => p.category_id === activeCat);
 
   return (
-    <div className="bg-gray-50 rounded-2xl p-4 lg:p-6 min-h-[calc(100vh-8rem)]">
+    <div className="">
       <div className="grid lg:grid-cols-3 gap-5">
         {/* Catalog */}
         <div className="lg:col-span-2">
-          <h1 className="text-2xl font-bold text-gray-900 mb-1 flex items-center gap-2">
-            <CreditCard className="w-6 h-6 text-emerald-600" /> Register
+          <h1 className="text-2xl font-bold text-foreground mb-1 flex items-center gap-2">
+            <CreditCard className="w-6 h-6 text-[#00ffb2]" /> Register
           </h1>
-          <p className="text-sm text-gray-500 mb-4">Tap items to build an order.</p>
+          <p className="text-sm text-muted-foreground mb-4">Tap items to build an order.</p>
 
           <div className="flex flex-wrap gap-2 mb-4">
             <Chip on={activeCat === 'all'} onClick={() => setActiveCat('all')}>
@@ -158,19 +158,19 @@ export default function RegisterPage() {
           </div>
 
           {loading ? (
-            <p className="text-gray-400">Loading…</p>
+            <p className="text-muted-foreground">Loading…</p>
           ) : visible.length === 0 ? (
-            <p className="text-gray-400 text-sm">No active products. Add some under Products.</p>
+            <p className="text-muted-foreground text-sm">No active products. Add some under Products.</p>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {visible.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => add(p)}
-                  className="text-left bg-white border border-gray-200 hover:border-emerald-400 rounded-xl p-3 transition-colors"
+                  className="text-left bg-card border border-border hover:border-[#00ffb2]/40 rounded-xl p-3 transition-colors"
                 >
-                  <div className="font-medium text-gray-900 text-sm leading-tight">{p.name}</div>
-                  <div className="text-emerald-700 font-semibold mt-1">{formatCurrency(p.price_cents)}</div>
+                  <div className="font-medium text-foreground text-sm leading-tight">{p.name}</div>
+                  <div className="text-[#00ffb2] font-semibold mt-1">{formatCurrency(p.price_cents)}</div>
                 </button>
               ))}
             </div>
@@ -178,28 +178,28 @@ export default function RegisterPage() {
         </div>
 
         {/* Cart */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 h-fit lg:sticky lg:top-4">
-          <h2 className="font-semibold text-gray-900 mb-3">Current Order</h2>
+        <div className="bg-card border border-border rounded-2xl p-4 h-fit lg:sticky lg:top-4">
+          <h2 className="font-semibold text-foreground mb-3">Current Order</h2>
 
           {cartLines.length === 0 ? (
-            <p className="text-gray-400 text-sm py-8 text-center">Cart is empty</p>
+            <p className="text-muted-foreground text-sm py-8 text-center">Cart is empty</p>
           ) : (
             <div className="space-y-2 mb-3">
               {cartLines.map((l) => (
                 <div key={l.product.id} className="flex items-center justify-between gap-2">
                   <div className="min-w-0 flex-1">
-                    <div className="text-sm font-medium text-gray-900 truncate">{l.product.name}</div>
-                    <div className="text-xs text-gray-400">{formatCurrency(l.product.price_cents)}</div>
+                    <div className="text-sm font-medium text-foreground truncate">{l.product.name}</div>
+                    <div className="text-xs text-muted-foreground">{formatCurrency(l.product.price_cents)}</div>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button onClick={() => dec(l.product.id)} className="p-1 text-gray-400 hover:text-gray-700">
+                    <button onClick={() => dec(l.product.id)} className="p-1 text-muted-foreground hover:text-foreground">
                       <Minus className="w-4 h-4" />
                     </button>
                     <span className="w-6 text-center text-sm">{l.quantity}</span>
-                    <button onClick={() => add(l.product)} className="p-1 text-gray-400 hover:text-gray-700">
+                    <button onClick={() => add(l.product)} className="p-1 text-muted-foreground hover:text-foreground">
                       <Plus className="w-4 h-4" />
                     </button>
-                    <button onClick={() => removeLine(l.product.id)} className="p-1 text-gray-300 hover:text-red-600">
+                    <button onClick={() => removeLine(l.product.id)} className="p-1 text-muted-foreground/60 hover:text-[#ef4444]">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -208,18 +208,18 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <div className="border-t border-gray-100 pt-3 space-y-1 text-sm">
+          <div className="border-t border-border pt-3 space-y-1 text-sm">
             <Row label="Subtotal" value={formatCurrency(subtotal)} />
             <div className="flex items-center justify-between">
-              <span className="text-gray-500">Tip</span>
+              <span className="text-muted-foreground">Tip</span>
               <div className="flex items-center gap-1">
-                <span className="text-gray-400 text-xs">$</span>
+                <span className="text-muted-foreground text-xs">$</span>
                 <input
                   value={tip}
                   onChange={(e) => setTip(e.target.value)}
                   inputMode="decimal"
                   placeholder="0.00"
-                  className="w-16 border border-gray-200 rounded px-2 py-1 text-sm text-right"
+                  className="w-16 border border-border bg-background rounded px-2 py-1 text-sm text-right"
                 />
               </div>
             </div>
@@ -227,10 +227,10 @@ export default function RegisterPage() {
           </div>
 
           {status && (
-            <div className="mt-3 text-sm text-gray-600 flex items-center gap-2">
+            <div className="mt-3 text-sm text-muted-foreground flex items-center gap-2">
               {processing && <Loader2 className="w-4 h-4 animate-spin" />} {status}
               {processing === 'card' && (
-                <button onClick={() => setProcessing(null)} className="ml-auto text-gray-400">
+                <button onClick={() => setProcessing(null)} className="ml-auto text-muted-foreground">
                   <X className="w-4 h-4" />
                 </button>
               )}
@@ -238,7 +238,7 @@ export default function RegisterPage() {
           )}
 
           {done && (
-            <div className="mt-3 text-sm text-emerald-700 flex items-center gap-2">
+            <div className="mt-3 text-sm text-[#00ffb2] flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4" /> Payment complete
             </div>
           )}
@@ -247,20 +247,20 @@ export default function RegisterPage() {
             <button
               onClick={() => charge('cash')}
               disabled={cartLines.length === 0 || !!processing}
-              className="flex items-center justify-center gap-2 bg-gray-900 hover:bg-black disabled:opacity-40 text-white py-2.5 rounded-lg text-sm font-medium"
+              className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/15 disabled:opacity-40 text-foreground py-2.5 rounded-lg text-sm font-medium"
             >
               <Banknote className="w-4 h-4" /> Cash
             </button>
             <button
               onClick={() => charge('card_terminal')}
               disabled={cartLines.length === 0 || !!processing}
-              className="flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-40 text-white py-2.5 rounded-lg text-sm font-medium"
+              className="flex items-center justify-center gap-2 bg-[#00ffb2] hover:brightness-95 disabled:opacity-40 text-black py-2.5 rounded-lg text-sm font-medium"
             >
               <CreditCard className="w-4 h-4" /> Card
             </button>
           </div>
           {cartLines.length > 0 && !processing && (
-            <button onClick={clear} className="w-full text-xs text-gray-400 mt-2 hover:text-gray-600">
+            <button onClick={clear} className="w-full text-xs text-muted-foreground mt-2 hover:text-foreground">
               Clear order
             </button>
           )}
@@ -274,7 +274,7 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-full text-sm ${on ? 'bg-emerald-600 text-white' : 'bg-white border border-gray-200 text-gray-700'}`}
+      className={`px-3 py-1.5 rounded-full text-sm ${on ? 'bg-[#00ffb2] text-black' : 'bg-card border border-border text-foreground/90'}`}
     >
       {children}
     </button>
@@ -284,8 +284,8 @@ function Chip({ on, onClick, children }: { on: boolean; onClick: () => void; chi
 function Row({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
   return (
     <div className="flex items-center justify-between">
-      <span className={bold ? 'font-semibold text-gray-900' : 'text-gray-500'}>{label}</span>
-      <span className={bold ? 'font-bold text-gray-900' : 'text-gray-700'}>{value}</span>
+      <span className={bold ? 'font-semibold text-foreground' : 'text-muted-foreground'}>{label}</span>
+      <span className={bold ? 'font-bold text-foreground' : 'text-foreground/90'}>{value}</span>
     </div>
   );
 }

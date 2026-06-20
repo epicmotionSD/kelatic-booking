@@ -245,17 +245,17 @@ export default function ProductsPage() {
     activeCat === 'all' ? products : products.filter((p) => p.category_id === activeCat);
 
   return (
-    <div className="bg-gray-50 rounded-2xl p-6 max-w-6xl mx-auto min-h-[calc(100vh-8rem)]">
+    <div className="max-w-6xl mx-auto">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
-            <Package className="w-6 h-6 text-emerald-600" /> Products
+          <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
+            <Package className="w-6 h-6 text-[#00ffb2]" /> Products
           </h1>
-          <p className="text-sm text-gray-500">Manage your menu items and pricing.</p>
+          <p className="text-sm text-muted-foreground">Manage your menu items and pricing.</p>
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+          className="inline-flex items-center gap-2 bg-[#00ffb2] hover:brightness-95 text-black px-4 py-2 rounded-lg text-sm font-medium"
         >
           <Plus className="w-4 h-4" /> New Product
         </button>
@@ -265,7 +265,7 @@ export default function ProductsPage() {
         <button
           onClick={() => setActiveCat('all')}
           className={`px-3 py-1.5 rounded-full text-sm ${
-            activeCat === 'all' ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700'
+            activeCat === 'all' ? 'bg-[#00ffb2] text-black' : 'bg-white/5 text-muted-foreground'
           }`}
         >
           All ({products.length})
@@ -275,7 +275,7 @@ export default function ProductsPage() {
             key={c.id}
             onClick={() => setActiveCat(c.id)}
             className={`px-3 py-1.5 rounded-full text-sm ${
-              activeCat === c.id ? 'bg-emerald-600 text-white' : 'bg-gray-100 text-gray-700'
+              activeCat === c.id ? 'bg-[#00ffb2] text-black' : 'bg-white/5 text-muted-foreground'
             }`}
           >
             {c.name} ({products.filter((p) => p.category_id === c.id).length})
@@ -284,50 +284,50 @@ export default function ProductsPage() {
       </div>
 
       {loading ? (
-        <p className="text-gray-500">Loading…</p>
+        <p className="text-muted-foreground">Loading…</p>
       ) : filtered.length === 0 ? (
-        <div className="text-center py-16 border-2 border-dashed border-gray-200 rounded-xl">
-          <Package className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-          <p className="text-gray-500">No products yet. Add your first menu item.</p>
+        <div className="text-center py-16 border-2 border-dashed border-border rounded-xl">
+          <Package className="w-10 h-10 text-muted-foreground/60 mx-auto mb-3" />
+          <p className="text-muted-foreground">No products yet. Add your first menu item.</p>
         </div>
       ) : (
         <div className="grid gap-3">
           {filtered.map((p) => (
             <div
               key={p.id}
-              className={`flex items-center justify-between bg-white border rounded-xl p-4 ${
-                p.is_active ? 'border-gray-200' : 'border-gray-200 opacity-60'
+              className={`flex items-center justify-between bg-card border rounded-xl p-4 ${
+                p.is_active ? 'border-border' : 'border-border opacity-60'
               }`}
             >
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold text-gray-900 truncate">{p.name}</span>
+                  <span className="font-semibold text-foreground truncate">{p.name}</span>
                   {p.is_featured && <Star className="w-4 h-4 text-amber-500 fill-amber-400" />}
                   {!p.is_active && (
-                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">Hidden</span>
+                    <span className="text-xs bg-white/5 text-muted-foreground px-2 py-0.5 rounded">Hidden</span>
                   )}
                 </div>
-                <div className="text-sm text-gray-500 flex items-center gap-2 mt-0.5">
+                <div className="text-sm text-muted-foreground flex items-center gap-2 mt-0.5">
                   <span>{catName(p.category_id)}</span>
                   {p.track_inventory && (
-                    <span className="text-xs text-gray-400">· {p.stock_quantity ?? 0} in stock</span>
+                    <span className="text-xs text-muted-foreground">· {p.stock_quantity ?? 0} in stock</span>
                   )}
                   {p.tags?.length > 0 && (
-                    <span className="text-xs text-emerald-700 flex items-center gap-1">
+                    <span className="text-xs text-[#00ffb2] flex items-center gap-1">
                       <Tag className="w-3 h-3" /> {p.tags.join(', ')}
                     </span>
                   )}
                 </div>
               </div>
               <div className="flex items-center gap-3 shrink-0">
-                <span className="font-semibold text-gray-900">{formatCurrency(p.price_cents)}</span>
-                <button onClick={() => openEdit(p)} className="p-2 text-gray-400 hover:text-emerald-600" title="Edit">
+                <span className="font-semibold text-foreground">{formatCurrency(p.price_cents)}</span>
+                <button onClick={() => openEdit(p)} className="p-2 text-muted-foreground hover:text-[#00ffb2]" title="Edit">
                   <Edit className="w-4 h-4" />
                 </button>
-                <button onClick={() => toggleActive(p)} className="p-2 text-gray-400 hover:text-amber-600" title="Toggle visibility">
+                <button onClick={() => toggleActive(p)} className="p-2 text-muted-foreground hover:text-[#f59e0b]" title="Toggle visibility">
                   <Power className="w-4 h-4" />
                 </button>
-                <button onClick={() => remove(p)} className="p-2 text-gray-400 hover:text-red-600" title="Remove">
+                <button onClick={() => remove(p)} className="p-2 text-muted-foreground hover:text-[#ef4444]" title="Remove">
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -338,42 +338,42 @@ export default function ProductsPage() {
 
       {modalOpen && (
         <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 overflow-y-auto p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg my-8 shadow-xl">
+          <div className="bg-card border border-border rounded-2xl w-full max-w-lg my-8 shadow-xl">
             <div className="flex items-center justify-between p-5 border-b">
               <h2 className="text-lg font-semibold">{form.id ? 'Edit Product' : 'New Product'}</h2>
-              <button onClick={() => setModalOpen(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setModalOpen(false)} className="text-muted-foreground hover:text-foreground">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             <div className="p-5 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+                <label className="block text-sm font-medium text-foreground/90 mb-1">Name *</label>
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm"
                   placeholder="Sea Moss Smoothie"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Price (USD) *</label>
+                  <label className="block text-sm font-medium text-foreground/90 mb-1">Price (USD) *</label>
                   <input
                     value={form.price}
                     onChange={(e) => setForm({ ...form, price: e.target.value })}
                     inputMode="decimal"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                    className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm"
                     placeholder="9.50"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <label className="block text-sm font-medium text-foreground/90 mb-1">Category</label>
                   <select
                     value={form.category_id}
                     onChange={(e) => setForm({ ...form, category_id: e.target.value })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
+                    className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm bg-card"
                   >
                     <option value="">Uncategorized</option>
                     {categories.map((c) => (
@@ -390,32 +390,32 @@ export default function ProductsPage() {
                   value={newCategory}
                   onChange={(e) => setNewCategory(e.target.value)}
                   placeholder="+ Add a new category"
-                  className="flex-1 border border-gray-200 rounded-lg px-3 py-1.5 text-sm"
+                  className="flex-1 border border-border bg-background rounded-lg px-3 py-1.5 text-sm"
                 />
-                <button onClick={addCategory} className="text-sm text-emerald-700 font-medium px-3">
+                <button onClick={addCategory} className="text-sm text-[#00ffb2] font-medium px-3">
                   Add
                 </button>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-foreground/90 mb-1">Description</label>
                 <textarea
                   value={form.description}
                   onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={2}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm"
                   placeholder="Blended sea moss, mango, pineapple…"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Tags <span className="text-gray-400 font-normal">(comma separated)</span>
+                <label className="block text-sm font-medium text-foreground/90 mb-1">
+                  Tags <span className="text-muted-foreground font-normal">(comma separated)</span>
                 </label>
                 <input
                   value={form.tags}
                   onChange={(e) => setForm({ ...form, tags: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"
+                  className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm"
                   placeholder="dairy-free, no-refined-sugar, vegan"
                 />
               </div>
@@ -454,28 +454,28 @@ export default function ProductsPage() {
                     onChange={(e) => setForm({ ...form, stock_quantity: e.target.value })}
                     inputMode="numeric"
                     placeholder="Qty"
-                    className="w-24 border border-gray-300 rounded-lg px-3 py-1.5 text-sm"
+                    className="w-24 border border-border bg-background rounded-lg px-3 py-1.5 text-sm"
                   />
                 )}
               </div>
 
               <div className="border-t pt-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-700">Modifiers (size, temp, add-ins)</span>
-                  <button onClick={addGroup} className="text-sm text-emerald-700 font-medium">
+                  <span className="text-sm font-medium text-foreground/90">Modifiers (size, temp, add-ins)</span>
+                  <button onClick={addGroup} className="text-sm text-[#00ffb2] font-medium">
                     + Group
                   </button>
                 </div>
                 {form.option_groups.map((g, gi) => (
-                  <div key={gi} className="border border-gray-200 rounded-lg p-3 mb-2">
+                  <div key={gi} className="border border-border bg-background rounded-lg p-3 mb-2">
                     <div className="flex items-center gap-2 mb-2">
                       <input
                         value={g.name}
                         onChange={(e) => updateGroup(gi, { name: e.target.value })}
                         placeholder="Group name (e.g. Size)"
-                        className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm"
+                        className="flex-1 border border-border bg-background rounded px-2 py-1 text-sm"
                       />
-                      <button onClick={() => removeGroup(gi)} className="text-gray-400 hover:text-red-600">
+                      <button onClick={() => removeGroup(gi)} className="text-muted-foreground hover:text-[#ef4444]">
                         <X className="w-4 h-4" />
                       </button>
                     </div>
@@ -485,21 +485,21 @@ export default function ProductsPage() {
                           value={o.name}
                           onChange={(e) => updateOption(gi, oi, { name: e.target.value })}
                           placeholder="Option (e.g. Large)"
-                          className="flex-1 border border-gray-200 rounded px-2 py-1 text-sm"
+                          className="flex-1 border border-border bg-background rounded px-2 py-1 text-sm"
                         />
-                        <span className="text-xs text-gray-400">+$</span>
+                        <span className="text-xs text-muted-foreground">+$</span>
                         <input
                           value={o.price_delta}
                           onChange={(e) => updateOption(gi, oi, { price_delta: e.target.value })}
                           inputMode="decimal"
-                          className="w-16 border border-gray-200 rounded px-2 py-1 text-sm"
+                          className="w-16 border border-border bg-background rounded px-2 py-1 text-sm"
                         />
-                        <button onClick={() => removeOption(gi, oi)} className="text-gray-400 hover:text-red-600">
+                        <button onClick={() => removeOption(gi, oi)} className="text-muted-foreground hover:text-[#ef4444]">
                           <X className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     ))}
-                    <button onClick={() => addOption(gi)} className="text-xs text-emerald-700 mt-1 pl-2">
+                    <button onClick={() => addOption(gi)} className="text-xs text-[#00ffb2] mt-1 pl-2">
                       + Option
                     </button>
                   </div>
@@ -508,13 +508,13 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex justify-end gap-3 p-5 border-t">
-              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-sm text-gray-600">
+              <button onClick={() => setModalOpen(false)} className="px-4 py-2 text-sm text-muted-foreground">
                 Cancel
               </button>
               <button
                 onClick={save}
                 disabled={saving}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg text-sm font-medium"
+                className="px-4 py-2 bg-[#00ffb2] hover:brightness-95 disabled:opacity-50 text-black rounded-lg text-sm font-medium"
               >
                 {saving ? 'Saving…' : form.id ? 'Save Changes' : 'Create Product'}
               </button>
