@@ -79,30 +79,33 @@ export default function ServicesPage() {
     return acc;
   }, {} as Record<ServiceCategory, Service[]>);
 
+  // Warm salon palette — refined gold on ivory/espresso, elegant serif headings.
+  const btnGold = 'bg-[#b08344] text-white hover:bg-[#9a6f33] shadow-sm hover:shadow-md hover:shadow-[#b08344]/20';
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-[#faf7f2] text-stone-800">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+      <header className="bg-[#faf7f2]/85 backdrop-blur-xl border-b border-[#e7ddcd] sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <span className="text-black font-black">K</span>
+              <div className="w-10 h-10 bg-[#b08344] rounded-xl flex items-center justify-center shadow-sm">
+                <span className="text-white font-playfair font-medium">K</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-sm">KELATIC</span>
-                <span className="text-[9px] tracking-widest text-amber-400">SERVICES</span>
+                <span className="font-bold text-sm text-stone-800">KELATIC</span>
+                <span className="text-[9px] tracking-widest text-[#8a5a2b]">SERVICES</span>
               </div>
             </Link>
             <div className="flex items-center gap-4">
               <PublicAuthLinks />
-              <Link 
+              <Link
                 href="/book"
-                className="px-6 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                className={`px-6 py-2 rounded-full font-semibold transition-all hover:scale-[1.03] ${btnGold}`}
               >
                 Book Now
               </Link>
-              <Link href="/" className="text-sm text-white/50 hover:text-amber-400 transition-colors">
+              <Link href="/" className="text-sm text-stone-500 hover:text-[#8a5a2b] transition-colors">
                 ← Back to site
               </Link>
             </div>
@@ -111,17 +114,17 @@ export default function ServicesPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-b from-black/30 to-transparent py-16">
+      <section className="bg-gradient-to-b from-[#faf7f2] to-[#f3ede3] py-16">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-playfair font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-playfair font-medium text-stone-900 mb-4">
             Our Services
           </h1>
-          <p className="text-xl text-white/70 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-stone-600 mb-8 max-w-2xl mx-auto">
             Professional loc care, natural hair styling, and specialized treatments by Houston's premier locticians
           </p>
-          <Link 
+          <Link
             href="/book"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+            className={`inline-flex items-center gap-2 px-8 py-3 rounded-full font-bold transition-all hover:scale-[1.03] ${btnGold}`}
           >
             Book Your Appointment
             <ArrowRight className="w-5 h-5" />
@@ -134,10 +137,10 @@ export default function ServicesPage() {
         <div className="flex gap-2 overflow-x-auto pb-4 mb-8">
           <button
             onClick={() => setActiveCategory('all')}
-            className={`px-6 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
+            className={`px-6 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeCategory === 'all'
-                ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-                : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                ? 'bg-[#b08344] text-white shadow-sm'
+                : 'bg-white text-stone-600 hover:bg-[#f3ede3] border border-[#e7ddcd]'
             }`}
           >
             All Services ({services.length})
@@ -148,10 +151,10 @@ export default function ServicesPage() {
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
-                className={`px-6 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 ${
+                className={`px-6 py-3 rounded-full text-sm font-medium whitespace-nowrap transition-all flex items-center gap-2 ${
                   activeCategory === category
-                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/20'
-                    : 'bg-white/5 text-white/70 hover:bg-white/10 border border-white/10'
+                    ? 'bg-[#b08344] text-white shadow-sm'
+                    : 'bg-white text-stone-600 hover:bg-[#f3ede3] border border-[#e7ddcd]'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -164,7 +167,7 @@ export default function ServicesPage() {
         {/* Services Display */}
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-400" />
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#b08344]" />
           </div>
         ) : activeCategory === 'all' ? (
           /* Show by category sections */
@@ -176,12 +179,12 @@ export default function ServicesPage() {
               return (
                 <section key={category}>
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 bg-gradient-to-br from-amber-400/20 to-transparent rounded-xl flex items-center justify-center border border-white/10">
-                      <Icon className="w-6 h-6 text-amber-400" />
+                    <div className="w-12 h-12 bg-[#f4e9d6] rounded-xl flex items-center justify-center border border-[#e7ddcd]">
+                      <Icon className="w-6 h-6 text-[#b08344]" />
                     </div>
                     <div>
-                      <h2 className="text-2xl font-playfair font-bold text-white">{CATEGORY_LABELS[category]}</h2>
-                      <p className="text-white/50">{CATEGORY_DESCRIPTIONS[category]}</p>
+                      <h2 className="text-2xl font-playfair font-medium text-stone-900">{CATEGORY_LABELS[category]}</h2>
+                      <p className="text-stone-500">{CATEGORY_DESCRIPTIONS[category]}</p>
                     </div>
                   </div>
                   
@@ -199,12 +202,12 @@ export default function ServicesPage() {
           <div>
             {filteredServices.length > 0 && (
               <div className="flex items-center gap-3 mb-8">
-                <div className="w-12 h-12 bg-gradient-to-br from-amber-400/20 to-transparent rounded-xl flex items-center justify-center border border-white/10">
-                  {React.createElement(CATEGORY_ICONS[activeCategory as ServiceCategory], { className: "w-6 h-6 text-amber-400" })}
+                <div className="w-12 h-12 bg-[#f4e9d6] rounded-xl flex items-center justify-center border border-[#e7ddcd]">
+                  {React.createElement(CATEGORY_ICONS[activeCategory as ServiceCategory], { className: "w-6 h-6 text-[#b08344]" })}
                 </div>
                 <div>
-                  <h2 className="text-2xl font-playfair font-bold text-white">{CATEGORY_LABELS[activeCategory as ServiceCategory]}</h2>
-                  <p className="text-white/50">{CATEGORY_DESCRIPTIONS[activeCategory as ServiceCategory]}</p>
+                  <h2 className="text-2xl font-playfair font-medium text-stone-900">{CATEGORY_LABELS[activeCategory as ServiceCategory]}</h2>
+                  <p className="text-stone-500">{CATEGORY_DESCRIPTIONS[activeCategory as ServiceCategory]}</p>
                 </div>
               </div>
             )}
@@ -219,32 +222,32 @@ export default function ServicesPage() {
 
         {filteredServices.length === 0 && !loading && (
           <div className="text-center py-16">
-            <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-8 h-8 text-white/20" />
+            <div className="w-16 h-16 bg-white border border-[#e7ddcd] rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
+              <Sparkles className="w-8 h-8 text-stone-400" />
             </div>
-            <h3 className="text-xl font-semibold text-white/70 mb-2">No services found</h3>
-            <p className="text-white/40">Try selecting a different category</p>
+            <h3 className="text-xl font-semibold text-stone-600 mb-2">No services found</h3>
+            <p className="text-stone-400">Try selecting a different category</p>
           </div>
         )}
       </main>
 
       {/* Instagram Portfolio Gallery */}
-      <section className="bg-black/30 border-t border-white/5 py-16">
+      <section className="bg-[#f3ede3] border-t border-[#e7ddcd] py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <Instagram className="w-8 h-8 text-amber-400" />
-              <h2 className="text-3xl font-playfair font-bold text-white">Our Work</h2>
-              <Instagram className="w-8 h-8 text-amber-400" />
+              <Instagram className="w-8 h-8 text-[#b08344]" />
+              <h2 className="text-3xl font-playfair font-medium text-stone-900">Our Work</h2>
+              <Instagram className="w-8 h-8 text-[#b08344]" />
             </div>
-            <p className="text-xl text-white/70 mb-4">
+            <p className="text-xl text-stone-600 mb-4">
               See the latest transformations from our talented locticians
             </p>
             <a
               href="https://instagram.com/kelatichairlounge_"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-amber-400 hover:text-amber-300 transition-colors"
+              className="inline-flex items-center gap-2 text-[#8a5a2b] hover:text-[#b08344] transition-colors"
             >
               <span>@kelatichairlounge_</span>
               <ArrowRight className="w-4 h-4" />
@@ -262,7 +265,7 @@ export default function ServicesPage() {
               href="https://instagram.com/kelatichairlounge_"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:border-amber-400/50 hover:bg-white/10 transition-all"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-[#e0d4c0] text-stone-700 rounded-full hover:border-[#b08344]/40 hover:text-[#8a5a2b] transition-all shadow-sm"
             >
               <Instagram className="w-5 h-5" />
               View More on Instagram
@@ -273,15 +276,15 @@ export default function ServicesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-gradient-to-r from-amber-400/10 to-yellow-500/10 border-t border-white/10 py-16">
+      <section className="bg-[#f3ede3] border-t border-[#e7ddcd] py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-playfair font-bold text-white mb-4">Ready to Book?</h2>
-          <p className="text-xl text-white/70 mb-8">
+          <h2 className="text-3xl font-playfair font-medium text-stone-900 mb-4">Ready to Book?</h2>
+          <p className="text-xl text-stone-600 mb-8">
             Experience Houston's premier loc and natural hair care
           </p>
           <Link
             href="/book"
-            className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-bold text-lg hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+            className={`inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-[1.03] ${btnGold}`}
           >
             <Users className="w-6 h-6" />
             Book Your Appointment
@@ -302,22 +305,22 @@ interface ServiceCardProps {
 
 function ServiceCard({ service }: ServiceCardProps) {
   return (
-    <div className="bg-white/5 backdrop-blur rounded-xl border border-white/10 p-6 hover:border-amber-400/30 hover:bg-white/10 transition-all group">
+    <div className="bg-white border border-[#e7ddcd] shadow-sm rounded-2xl p-6 hover:border-[#b08344]/40 hover:shadow-lg hover:shadow-stone-900/5 transition-all group">
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
-          <h3 className="font-bold text-white text-lg mb-1 group-hover:text-amber-400 transition-colors">
+          <h3 className="font-playfair font-medium text-stone-900 text-lg mb-1 group-hover:text-[#8a5a2b] transition-colors">
             {service.name}
           </h3>
-          <span className="text-xs font-medium text-amber-400 uppercase tracking-wide">
+          <span className="text-xs font-medium text-[#8a5a2b] uppercase tracking-wide">
             {CATEGORY_LABELS[service.category]}
           </span>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-amber-400">
+          <div className="font-playfair text-2xl font-medium text-[#8a5a2b]">
             {formatCurrency(service.base_price * 100)}
           </div>
           {service.deposit_required && (
-            <div className="text-xs text-white/50 mt-1">
+            <div className="text-xs text-stone-500 mt-1">
               ${service.deposit_amount} deposit
             </div>
           )}
@@ -325,20 +328,20 @@ function ServiceCard({ service }: ServiceCardProps) {
       </div>
 
       {service.description && (
-        <p className="text-white/60 text-sm mb-4 line-clamp-3">
+        <p className="text-stone-500 text-sm mb-4 line-clamp-3 leading-relaxed">
           {service.description}
         </p>
       )}
 
       <div className="flex items-center justify-between text-sm">
-        <div className="flex items-center gap-2 text-white/50">
+        <div className="flex items-center gap-2 text-stone-500">
           <Clock className="w-4 h-4" />
           <span>{service.duration} minutes</span>
         </div>
-        
-        <Link 
+
+        <Link
           href={`/book?service=${service.id}`}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-amber-400/20 to-yellow-500/20 text-amber-400 rounded-lg hover:from-amber-400 hover:to-yellow-500 hover:text-black transition-all font-medium"
+          className="inline-flex items-center gap-2 px-4 py-2 bg-[#f4e9d6] text-[#8a5a2b] rounded-full hover:bg-[#b08344] hover:text-white transition-all font-medium"
         >
           <span>Book Now</span>
           <ArrowRight className="w-4 h-4" />

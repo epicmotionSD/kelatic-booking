@@ -1,12 +1,8 @@
-<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="x3oGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#8B5CF6"/>
-      <stop offset="100%" style="stop-color:#D946EF"/>
-    </linearGradient>
-  </defs>
-  <!-- x3o text -->
-  <text x="0" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="800" fill="url(#x3oGradient)">x3o</text>
+<svg width="186" height="56" viewBox="0 0 186 56" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="x3o.ai">
+  <!-- terminal-green wordmark -->
+  <text x="10" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="40" font-weight="700" letter-spacing="-1" fill="#00ffb2">x3o</text>
+  <!-- prompt cursor -->
+  <rect x="86" y="15" width="13" height="31" rx="1" fill="#00ffb2"/>
   <!-- .ai suffix -->
-  <text x="75" y="32" font-family="system-ui, -apple-system, sans-serif" font-size="36" font-weight="800" fill="#ffffff">.ai</text>
+  <text x="104" y="44" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="40" font-weight="700" letter-spacing="-1" fill="#5eead4">.ai</text>
 </svg>

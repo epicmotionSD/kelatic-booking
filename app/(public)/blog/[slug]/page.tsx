@@ -16,11 +16,11 @@ const CATEGORY_LABELS: Record<BlogPost['category'], string> = {
 };
 
 const CATEGORY_COLORS: Record<BlogPost['category'], string> = {
-  care: 'bg-green-500/20 text-green-400 border-green-500/30',
-  style: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-  history: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
-  tips: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  lifestyle: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
+  care: 'bg-[#e6efe2] text-[#5b7a52] border-[#cfe0c5]',
+  style: 'bg-[#efe7f3] text-[#7a5b86] border-[#e0d0e8]',
+  history: 'bg-[#f4e9d6] text-[#8a5a2b] border-[#e7d6b8]',
+  tips: 'bg-[#e3edf3] text-[#4f6f86] border-[#d0dfe8]',
+  lifestyle: 'bg-[#f6e6ec] text-[#9a4b34] border-[#ecd0d8]',
 };
 
 function formatDate(dateString: string): string {
@@ -56,9 +56,9 @@ export default function BlogPostPage() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-[#faf7f2] text-stone-800">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+      <header className="bg-[#faf7f2]/85 backdrop-blur-xl border-b border-[#e7ddcd] sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -69,7 +69,7 @@ export default function BlogPostPage() {
                   className="h-10 w-auto"
                 />
               </Link>
-              <Link href="/blog" className="flex items-center gap-2 text-white/70 hover:text-amber-400 transition-colors">
+              <Link href="/blog" className="flex items-center gap-2 text-stone-600 hover:text-[#8a5a2b] transition-colors">
                 <ArrowLeft className="w-4 h-4" />
                 <span className="text-sm font-medium">Back to Blog</span>
               </Link>
@@ -78,7 +78,7 @@ export default function BlogPostPage() {
               <PublicAuthLinks />
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 text-sm text-white/50 hover:text-amber-400 transition-colors"
+                className="flex items-center gap-2 text-sm text-stone-500 hover:text-[#8a5a2b] transition-colors"
               >
                 <Share2 className="w-4 h-4" />
                 Share
@@ -99,22 +99,22 @@ export default function BlogPostPage() {
             >
               {CATEGORY_LABELS[post.category]}
             </span>
-            <span className="text-white/40 text-sm flex items-center gap-1">
+            <span className="text-stone-400 text-sm flex items-center gap-1">
               <Clock className="w-3 h-3" />
               {post.readTime} min read
             </span>
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-black mb-6 leading-tight">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-playfair font-medium mb-6 leading-tight text-stone-900">
             {post.title}
           </h1>
-          <p className="text-lg text-white/60 mb-8">{post.excerpt}</p>
-          <div className="flex items-center gap-4 pb-8 border-b border-white/10">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center">
-              <span className="text-black font-bold">TLG</span>
+          <p className="text-lg text-stone-600 mb-8 leading-relaxed">{post.excerpt}</p>
+          <div className="flex items-center gap-4 pb-8 border-b border-[#e7ddcd]">
+            <div className="w-12 h-12 rounded-full bg-[#b08344] flex items-center justify-center">
+              <span className="text-white font-bold">TLG</span>
             </div>
             <div>
-              <p className="font-medium">{post.author}</p>
-              <p className="text-white/40 text-sm flex items-center gap-1">
+              <p className="font-medium text-stone-700">{post.author}</p>
+              <p className="text-stone-400 text-sm flex items-center gap-1">
                 <Calendar className="w-3 h-3" />
                 {formatDate(post.publishedAt)}
               </p>
@@ -123,19 +123,19 @@ export default function BlogPostPage() {
         </header>
 
         {/* Article Content */}
-        <article className="prose prose-invert prose-lg max-w-none prose-headings:font-bold prose-headings:text-white prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-white/70 prose-p:leading-relaxed prose-strong:text-amber-400 prose-li:text-white/70 prose-a:text-amber-400 prose-a:no-underline hover:prose-a:underline">
+        <article className="prose prose-lg max-w-none prose-headings:font-playfair prose-headings:font-medium prose-headings:text-stone-900 prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3 prose-p:text-stone-700 prose-p:leading-relaxed prose-strong:text-[#8a5a2b] prose-li:text-stone-700 prose-a:text-[#8a5a2b] prose-a:no-underline hover:prose-a:underline">
           {post.content.split('\n').map((paragraph, index) => {
             // Handle headings
             if (paragraph.startsWith('## ')) {
               return (
-                <h2 key={index} className="text-2xl font-bold text-white mt-10 mb-4">
+                <h2 key={index} className="text-2xl font-playfair font-medium text-stone-900 mt-10 mb-4">
                   {paragraph.replace('## ', '')}
                 </h2>
               );
             }
             if (paragraph.startsWith('### ')) {
               return (
-                <h3 key={index} className="text-xl font-bold text-white mt-8 mb-3">
+                <h3 key={index} className="text-xl font-playfair font-medium text-stone-900 mt-8 mb-3">
                   {paragraph.replace('### ', '')}
                 </h3>
               );
@@ -143,14 +143,14 @@ export default function BlogPostPage() {
             // Handle bold text and lists
             if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
               return (
-                <p key={index} className="font-bold text-amber-400 mt-4 mb-2">
+                <p key={index} className="font-semibold text-[#8a5a2b] mt-4 mb-2">
                   {paragraph.replace(/\*\*/g, '')}
                 </p>
               );
             }
             if (paragraph.startsWith('- ') || paragraph.startsWith('1. ')) {
               return (
-                <p key={index} className="text-white/70 ml-4 my-1">
+                <p key={index} className="text-stone-700 ml-4 my-1">
                   {paragraph}
                 </p>
               );
@@ -158,7 +158,7 @@ export default function BlogPostPage() {
             // Regular paragraphs
             if (paragraph.trim()) {
               return (
-                <p key={index} className="text-white/70 leading-relaxed my-4">
+                <p key={index} className="text-stone-700 leading-relaxed my-4">
                   {paragraph}
                 </p>
               );
@@ -168,14 +168,14 @@ export default function BlogPostPage() {
         </article>
 
         {/* CTA */}
-        <section className="mt-16 bg-gradient-to-r from-amber-500/10 to-yellow-500/10 rounded-2xl border border-amber-500/20 p-8 text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready for Your Loc Journey?</h2>
-          <p className="text-white/60 mb-6 max-w-xl mx-auto">
+        <section className="mt-16 bg-gradient-to-br from-[#f7edda] to-[#f1e2c6] rounded-2xl border border-[#e3cda8] p-8 text-center">
+          <h2 className="text-2xl font-playfair font-medium mb-4 text-stone-900">Ready for Your Loc Journey?</h2>
+          <p className="text-stone-600 mb-6 max-w-xl mx-auto leading-relaxed">
             Book a consultation with The Loc Gawd and experience the difference professional expertise makes.
           </p>
           <Link
             href="/book"
-            className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-[#b08344] text-white rounded-full font-semibold hover:bg-[#9a6f33] shadow-sm hover:shadow-md hover:shadow-[#b08344]/20 transition-all hover:scale-[1.03]"
           >
             Book Your Appointment
           </Link>
@@ -184,7 +184,7 @@ export default function BlogPostPage() {
         {/* Related Posts */}
         {recentPosts.length > 0 && (
           <section className="mt-16">
-            <h2 className="text-xl font-bold mb-6">More from the Loc Chop</h2>
+            <h2 className="text-xl font-playfair font-medium mb-6 text-stone-900">More from the Loc Chop</h2>
             <div className="grid md:grid-cols-2 gap-6">
               {recentPosts.slice(0, 2).map((relatedPost) => (
                 <Link
@@ -192,7 +192,7 @@ export default function BlogPostPage() {
                   href={`/blog/${relatedPost.slug}`}
                   className="block group"
                 >
-                  <article className="bg-zinc-900/50 rounded-xl border border-white/10 p-6 hover:border-amber-400/50 transition-all">
+                  <article className="bg-white rounded-xl border border-[#e7ddcd] shadow-sm p-6 hover:border-[#b08344]/40 hover:shadow-lg hover:shadow-stone-900/5 transition-all">
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium border mb-3 ${
                         CATEGORY_COLORS[relatedPost.category]
@@ -200,10 +200,10 @@ export default function BlogPostPage() {
                     >
                       {CATEGORY_LABELS[relatedPost.category]}
                     </span>
-                    <h3 className="font-bold mb-2 group-hover:text-amber-400 transition-colors line-clamp-2">
+                    <h3 className="font-playfair font-medium text-lg mb-2 text-stone-900 group-hover:text-[#8a5a2b] transition-colors line-clamp-2">
                       {relatedPost.title}
                     </h3>
-                    <p className="text-white/50 text-sm line-clamp-2">{relatedPost.excerpt}</p>
+                    <p className="text-stone-600 text-sm line-clamp-2 leading-relaxed">{relatedPost.excerpt}</p>
                   </article>
                 </Link>
               ))}
@@ -213,14 +213,14 @@ export default function BlogPostPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-black/30 border-t border-white/5 mt-12">
+      <footer className="bg-[#f3ede3] border-t border-[#e7ddcd] mt-12">
         <div className="max-w-4xl mx-auto px-4 py-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-white/40">
-            <Link href="/blog" className="hover:text-amber-400 transition-colors">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-stone-500">
+            <Link href="/blog" className="hover:text-[#8a5a2b] transition-colors">
               ← Back to all articles
             </Link>
             <p>
-              <a href="tel:+17134854000" className="text-amber-400 hover:text-amber-300">
+              <a href="tel:+17134854000" className="text-[#8a5a2b] hover:text-[#b08344]">
                 (713) 485-4000
               </a>{' '}
               | 9430 Richmond Ave, Houston, TX 77063

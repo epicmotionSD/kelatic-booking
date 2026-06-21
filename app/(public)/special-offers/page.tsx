@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Footer } from '@/components/layout/footer';
 import { PublicAuthLinks } from '@/components/layout/public-auth-links';
-import { 
-  Calendar, 
-  Clock, 
-  Star, 
-  ArrowRight, 
-  CheckCircle, 
+import {
+  Calendar,
+  Clock,
+  Star,
+  ArrowRight,
+  CheckCircle,
   Sparkles,
   Timer,
   Users,
@@ -19,13 +19,13 @@ import {
 
 export default function SpecialOffersPage() {
   const [timeLeft, setTimeLeft] = useState('');
-  
+
   // Calculate time until next Wednesday
   useEffect(() => {
     function updateTimer() {
       const now = new Date();
       const nextWednesday = new Date();
-      
+
       // Find next Wednesday
       const daysUntilWednesday = (3 - now.getDay() + 7) % 7;
       if (daysUntilWednesday === 0 && now.getHours() >= 18) {
@@ -54,29 +54,29 @@ export default function SpecialOffersPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className="min-h-screen bg-[#faf7f2] text-stone-800">
       {/* Header */}
-      <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+      <header className="bg-[#faf7f2]/85 backdrop-blur-xl border-b border-[#e7ddcd] sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-yellow-500 rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/20">
-                <span className="text-black font-black">K</span>
+              <div className="w-10 h-10 bg-[#b08344] rounded-xl flex items-center justify-center shadow-sm">
+                <span className="text-white font-playfair font-medium">K</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-sm">KELATIC</span>
-                <span className="text-[9px] tracking-widest text-amber-400">SPECIAL OFFERS</span>
+                <span className="font-bold text-sm text-stone-800">KELATIC</span>
+                <span className="text-[9px] tracking-widest text-[#8a5a2b]">SPECIAL OFFERS</span>
               </div>
             </Link>
             <div className="flex items-center gap-4">
               <PublicAuthLinks />
               <Link
                 href="/book?special=wednesday75"
-                className="px-6 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                className="px-6 py-2 bg-[#b08344] text-white rounded-full font-semibold hover:bg-[#9a6f33] shadow-sm hover:shadow-md transition-all hover:scale-[1.03]"
               >
                 Book $75 Special
               </Link>
-              <Link href="/" className="text-sm text-white/50 hover:text-amber-400 transition-colors">
+              <Link href="/" className="text-sm text-stone-500 hover:text-[#8a5a2b] transition-colors">
                 ← Back to site
               </Link>
             </div>
@@ -85,47 +85,46 @@ export default function SpecialOffersPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-20 overflow-hidden bg-gradient-to-b from-[#faf7f2] to-[#f3ede3]">
         {/* Background elements */}
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-transparent to-transparent" />
-        <div className="absolute top-0 right-0 w-1/3 h-full bg-gradient-to-l from-yellow-500/5 to-transparent" />
-        
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#e9d7bd]/40 blur-3xl" />
+
         <div className="relative max-w-6xl mx-auto px-4 text-center">
           {/* Limited Time Badge */}
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-red-500/20 border border-red-500/30 rounded-full text-red-400 font-medium mb-6 animate-pulse">
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-[#e7ddcd] rounded-full text-[#9a4b34] font-medium mb-6 shadow-sm">
             <Timer className="w-5 h-5" />
             <span>Limited Time Offer</span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-black mb-6 leading-tight">
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500">
+          <h1 className="font-playfair text-5xl md:text-7xl font-medium mb-6 leading-tight text-stone-900">
+            <span className="italic text-[#b08344]">
               $75
             </span>
             <br />
             WEDNESDAY SPECIAL
           </h1>
-          
-          <p className="text-2xl text-white/80 mb-4 max-w-3xl mx-auto">
-            Shampoo & Retwist for just <span className="text-amber-400 font-bold">$75</span>
+
+          <p className="text-2xl text-stone-600 mb-4 max-w-3xl mx-auto">
+            Shampoo & Retwist for just <span className="text-[#8a5a2b] font-bold">$75</span>
           </p>
-          
-          <p className="text-lg text-white/60 mb-8 max-w-2xl mx-auto">
+
+          <p className="text-lg text-stone-500 mb-8 max-w-2xl mx-auto">
             Every Wednesday, get professional loc maintenance at an unbeatable price. Limited slots available—our most popular deal!
           </p>
 
           {/* Countdown Timer */}
-          <div className="inline-flex items-center gap-4 px-8 py-4 bg-black/50 backdrop-blur border border-white/10 rounded-2xl mb-8">
-            <Clock className="w-6 h-6 text-amber-400" />
+          <div className="inline-flex items-center gap-4 px-8 py-4 bg-white border border-[#e7ddcd] rounded-2xl mb-8 shadow-sm">
+            <Clock className="w-6 h-6 text-[#b08344]" />
             <div>
-              <div className="text-sm text-white/50">Next Wednesday Special in:</div>
-              <div className="text-2xl font-bold text-amber-400">{timeLeft}</div>
+              <div className="text-sm text-stone-500">Next Wednesday Special in:</div>
+              <div className="text-2xl font-bold text-[#8a5a2b]">{timeLeft}</div>
             </div>
           </div>
 
           {/* CTA Button */}
           <Link
             href="/book?special=wednesday75"
-            className="inline-flex items-center gap-3 px-12 py-5 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-black text-xl hover:shadow-2xl hover:shadow-amber-500/40 transition-all hover:scale-105 mb-12"
+            className="inline-flex items-center gap-3 px-12 py-5 bg-[#b08344] text-white rounded-full font-semibold text-xl hover:bg-[#9a6f33] shadow-sm hover:shadow-md transition-all hover:scale-[1.03] mb-12"
           >
             <Calendar className="w-6 h-6" />
             Book Your $75 Special
@@ -133,17 +132,17 @@ export default function SpecialOffersPage() {
           </Link>
 
           {/* Trust indicators */}
-          <div className="flex items-center justify-center gap-8 text-sm text-white/40">
+          <div className="flex items-center justify-center gap-8 text-sm text-stone-400">
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-green-400" />
+              <CheckCircle className="w-4 h-4 text-[#5b7a52]" />
               <span>Instant Confirmation</span>
             </div>
             <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-amber-400" />
+              <Star className="w-4 h-4 text-[#b08344]" />
               <span>4.9/5 Rating</span>
             </div>
             <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-blue-400" />
+              <Users className="w-4 h-4 text-[#8a5a2b]" />
               <span>5000+ Happy Clients</span>
             </div>
           </div>
@@ -151,34 +150,34 @@ export default function SpecialOffersPage() {
       </section>
 
       {/* What's Included */}
-      <section className="py-16 bg-black/30">
+      <section className="py-16 bg-[#f3ede3]">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">What's Included in Your $75 Special</h2>
-          
+          <h2 className="font-playfair text-3xl font-medium text-center mb-12 text-stone-900">What's Included in Your $75 Special</h2>
+
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-amber-400/30 transition-colors">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-400/20 to-transparent rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Sparkles className="w-8 h-8 text-blue-400" />
+            <div className="bg-white border border-[#e7ddcd] rounded-2xl p-8 text-center hover:border-[#b08344]/40 hover:shadow-lg hover:shadow-stone-900/5 transition-all shadow-sm">
+              <div className="w-16 h-16 bg-[#f4e9d6] rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Sparkles className="w-8 h-8 text-[#b08344]" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Professional Shampoo</h3>
-              <p className="text-white/60">
+              <h3 className="font-playfair text-xl font-medium mb-3 text-stone-900">Professional Shampoo</h3>
+              <p className="text-stone-500">
                 Deep cleansing with premium products to remove buildup and refresh your scalp
               </p>
             </div>
-            
-            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center hover:border-amber-400/30 transition-colors">
-              <div className="w-16 h-16 bg-gradient-to-br from-amber-400/20 to-transparent rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Heart className="w-8 h-8 text-amber-400" />
+
+            <div className="bg-white border border-[#e7ddcd] rounded-2xl p-8 text-center hover:border-[#b08344]/40 hover:shadow-lg hover:shadow-stone-900/5 transition-all shadow-sm">
+              <div className="w-16 h-16 bg-[#f4e9d6] rounded-2xl flex items-center justify-center mx-auto mb-6">
+                <Heart className="w-8 h-8 text-[#b08344]" />
               </div>
-              <h3 className="text-xl font-bold mb-3">Expert Retwist</h3>
-              <p className="text-white/60">
+              <h3 className="font-playfair text-xl font-medium mb-3 text-stone-900">Expert Retwist</h3>
+              <p className="text-stone-500">
                 Precision retwisting by our master locticians to maintain your loc health and appearance
               </p>
             </div>
           </div>
 
           <div className="mt-12 text-center">
-            <div className="inline-flex items-center gap-2 px-6 py-3 bg-green-500/20 border border-green-500/30 rounded-full text-green-400 font-medium">
+            <div className="inline-flex items-center gap-2 px-6 py-3 bg-white border border-[#e7ddcd] rounded-full text-[#5b7a52] font-medium shadow-sm">
               <Gift className="w-5 h-5" />
               <span>Regular Price: $85 - You Save $10!</span>
             </div>
@@ -187,10 +186,10 @@ export default function SpecialOffersPage() {
       </section>
 
       {/* Social Proof */}
-      <section className="py-16">
+      <section className="py-16 bg-[#faf7f2]">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Why Clients Love Our Wednesday Special</h2>
-          
+          <h2 className="font-playfair text-3xl font-medium text-center mb-12 text-stone-900">Why Clients Love Our Wednesday Special</h2>
+
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
@@ -199,7 +198,7 @@ export default function SpecialOffersPage() {
                 rating: 5
               },
               {
-                name: "Aisha M.", 
+                name: "Aisha M.",
                 text: "The Wednesday special is perfect for my maintenance routine. Professional service at an amazing price.",
                 rating: 5
               },
@@ -209,14 +208,14 @@ export default function SpecialOffersPage() {
                 rating: 5
               }
             ].map((testimonial, idx) => (
-              <div key={idx} className="bg-zinc-900/50 border border-white/10 rounded-2xl p-6">
+              <div key={idx} className="bg-white border border-[#e7ddcd] rounded-2xl p-6 shadow-sm">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    <Star key={i} className="w-4 h-4 fill-[#b08344] text-[#b08344]" />
                   ))}
                 </div>
-                <p className="text-white/70 mb-4 italic">"{testimonial.text}"</p>
-                <div className="font-semibold text-amber-400">{testimonial.name}</div>
+                <p className="text-stone-600 mb-4 italic">"{testimonial.text}"</p>
+                <div className="font-semibold text-[#8a5a2b]">{testimonial.name}</div>
               </div>
             ))}
           </div>
@@ -224,42 +223,42 @@ export default function SpecialOffersPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border-y border-amber-500/20">
+      <section className="py-20 bg-gradient-to-br from-[#f7edda] to-[#f1e2c6] border-y border-[#e3cda8]">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">Don't Miss Out - Book Your Wednesday Special</h2>
-          <p className="text-xl text-white/70 mb-8">
+          <h2 className="font-playfair text-4xl font-medium mb-6 text-stone-900">Don't Miss Out - Book Your Wednesday Special</h2>
+          <p className="text-xl text-stone-600 mb-8">
             Limited slots available every Wednesday. Book now to secure your spot!
           </p>
-          
+
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
             <Link
               href="/book?special=wednesday75"
-              className="inline-flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-black text-lg hover:shadow-2xl hover:shadow-amber-500/40 transition-all hover:scale-105"
+              className="inline-flex items-center gap-3 px-10 py-4 bg-[#b08344] text-white rounded-full font-semibold text-lg hover:bg-[#9a6f33] shadow-sm hover:shadow-md transition-all hover:scale-[1.03]"
             >
               <Calendar className="w-6 h-6" />
               Book $75 Wednesday Special
               <ArrowRight className="w-6 h-6" />
             </Link>
-            
-            <a 
+
+            <a
               href="tel:+17134854000"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-white/5 border border-white/20 rounded-full font-semibold hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-3 bg-white border border-[#e0d4c0] rounded-full font-semibold text-stone-700 hover:text-[#8a5a2b] hover:border-[#b08344]/40 transition-colors shadow-sm"
             >
               <span>Or call (713) 485-4000</span>
             </a>
           </div>
 
-          <div className="text-sm text-white/40">
+          <div className="text-sm text-stone-500">
             <p>✨ Available every Wednesday • ⏰ 9AM - 6PM • 📍 9430 Richmond Ave, Houston</p>
           </div>
         </div>
       </section>
 
       {/* Terms */}
-      <section className="py-12 bg-black/30">
+      <section className="py-12 bg-[#f3ede3]">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h3 className="text-lg font-semibold mb-4">Terms & Conditions</h3>
-          <div className="text-sm text-white/50 space-y-2">
+          <h3 className="font-playfair text-lg font-medium mb-4 text-stone-900">Terms & Conditions</h3>
+          <div className="text-sm text-stone-500 space-y-2">
             <p>• $75 Wednesday Special valid every Wednesday only</p>
             <p>• Includes shampoo and standard retwist service</p>
             <p>• Limited slots available - advance booking required</p>

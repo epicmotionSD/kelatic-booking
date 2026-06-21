@@ -26,4 +26,12 @@ export async function GET(request: NextRequest) {
     } = { generations };
 
     if (includeStats) {
-      resp
+      response.stats = await getContentStats(businessId);
+    }
+
+    return NextResponse.json(response);
+  } catch (error) {
+    console.error('Trinity history error:', error);
+    return NextResponse.json({ error: 'Failed to fetch history' }, { status: 500 });
+  }
+}

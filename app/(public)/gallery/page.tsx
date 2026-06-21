@@ -7,8 +7,8 @@ import { Footer } from '@/components/layout/footer';
 
 export default function GalleryPage() {
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <header className="bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+    <div className="min-h-screen bg-[#faf7f2] text-stone-800">
+      <header className="bg-[#faf7f2]/85 backdrop-blur-xl border-b border-[#e7ddcd] sticky top-0 z-50">
         <div className="max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href="/" className="flex items-center gap-3">
@@ -18,7 +18,7 @@ export default function GalleryPage() {
               <PublicAuthLinks />
               <Link
                 href="/"
-                className="flex items-center gap-2 text-sm text-white/50 hover:text-amber-400 transition-colors"
+                className="flex items-center gap-2 text-sm text-stone-500 hover:text-[#8a5a2b] transition-colors"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to site
@@ -30,12 +30,12 @@ export default function GalleryPage() {
 
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-amber-400">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#e7ddcd] text-xs uppercase tracking-widest text-[#8a5a2b]">
             <Camera className="w-4 h-4" />
             Gallery
           </div>
-          <h1 className="text-4xl md:text-5xl font-playfair font-bold mt-6">Kelatic Gallery</h1>
-          <p className="text-lg text-white/60 mt-4 max-w-2xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-playfair font-medium mt-6 text-stone-900">Kelatic Gallery</h1>
+          <p className="text-lg text-stone-600 mt-4 max-w-2xl mx-auto">
             A curated look at our loc artistry, transformations, and signature styles.
           </p>
         </div>
@@ -46,14 +46,14 @@ export default function GalleryPage() {
           {[1, 2, 3, 4, 1, 2, 3, 4].map((num, idx) => (
             <div
               key={`${num}-${idx}`}
-              className="group relative aspect-square rounded-2xl overflow-hidden bg-zinc-900 border border-white/5 hover:border-amber-400/30 transition-all duration-300"
+              className="group relative aspect-square rounded-2xl overflow-hidden bg-[#e7ddcd] border border-[#e0d4c0] hover:border-[#b08344]/40 transition-all duration-300 shadow-sm"
             >
               <img
                 src={`/gallery/image${num}.jpg`}
                 alt={`Kelatic gallery ${num}`}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
           ))}
         </div>
@@ -61,7 +61,7 @@ export default function GalleryPage() {
         <div className="text-center mt-12">
           <Link
             href="/book"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-[#b08344] text-white rounded-full font-semibold hover:bg-[#9a6f33] transition-all hover:scale-[1.03] shadow-sm hover:shadow-md hover:shadow-[#b08344]/20"
           >
             Book Your Appointment
           </Link>

@@ -12,6 +12,9 @@ Since this roadmap was approved, the platform expanded well beyond booking:
 **Shipped**
 - **Commerce** — Kelatic Vitality House (café) launched as a `vitality` tenant: products, orders, in-person POS, public storefront + Stripe checkout, order fulfillment via webhook (migration `050`).
 - **Three primary agents** — Attract / Retain / Serve now wrap the marketing/retention/scheduling/support/content capabilities, with a registry-driven admin UI (`/admin/agents`) and inline live actions.
+- **Primary orchestrator** — `PrimaryOrchestrator` coordinates the three agents (intent routing, tool dispatch, readiness snapshot) at `GET/POST /api/agents/orchestrator`; the dashboard shows live wired/runnable readiness per agent.
+- **Loyalty** — loyalty & referrals surfaced as Serve tools with inline run-actions (balance, rewards, program, members, referrals).
+- **x3o terminal-green rebrand** — new favicon, wordmark, maskable PWA icons, and OG image; `manifest.json` + OpenGraph/Twitter + JSON-LD updated for x3o.
 - **x3o.ai marketing site** redesigned (openconductor-style) to showcase the three agents.
 - **Multi-tenant nav** adapts per tenant (commerce vs salon).
 

@@ -95,10 +95,13 @@ export default function KelaticLanding() {
 
   const stylistMenu = featuredStylists;
 
+  // Warm salon palette — refined gold on ivory/espresso, elegant serif headings.
+  const btnGold = 'bg-[#b08344] text-white hover:bg-[#9a6f33] shadow-sm hover:shadow-md hover:shadow-[#b08344]/20';
+
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[#faf7f2] text-stone-800">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#faf7f2]/85 backdrop-blur-xl border-b border-[#e7ddcd]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo */}
@@ -112,37 +115,37 @@ export default function KelaticLanding() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center gap-10">
-              <Link href="/services" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Services</Link>
+              <Link href="/services" className="text-sm font-medium text-stone-600 hover:text-[#8a5a2b] transition-colors">Services</Link>
               <div className="relative group">
                 <button
                   type="button"
-                  className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors inline-flex items-center gap-1"
+                  className="text-sm font-medium text-stone-600 hover:text-[#8a5a2b] transition-colors inline-flex items-center gap-1"
                 >
                   Book a Stylist
                   <ChevronRight className="w-4 h-4 rotate-90" />
                 </button>
-                <div className="absolute left-0 mt-3 w-56 rounded-2xl border border-white/10 bg-zinc-950/95 backdrop-blur shadow-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
+                <div className="absolute left-0 mt-3 w-56 rounded-2xl border border-[#e7ddcd] bg-white/95 backdrop-blur shadow-xl overflow-hidden opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50">
                   {stylistMenu.map((stylist) => (
                     <Link
                       key={stylist.id}
                       href={`/book?stylist=${stylist.id}`}
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                     >
                       {stylist.first_name} {stylist.last_name}
                     </Link>
                   ))}
                 </div>
               </div>
-              <Link href="/special-offers" className="text-sm font-medium text-amber-400 hover:text-yellow-400 transition-colors animate-pulse">$75 Wednesday Special</Link>
-              <Link href="/gallery" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Gallery</Link>
-              <Link href="/loc-academy" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Loc Academy</Link>
-              <Link href="/blog" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Blog</Link>
-              <Link href="/barber-block" className="text-sm font-medium text-white/70 hover:text-red-400 transition-colors">Barber Block</Link>
-              <a href="#contact" className="text-sm font-medium text-white/70 hover:text-amber-400 transition-colors">Contact</a>
+              <Link href="/special-offers" className="text-sm font-medium text-[#8a5a2b] hover:text-[#b08344] transition-colors">$75 Wednesday Special</Link>
+              <Link href="/gallery" className="text-sm font-medium text-stone-600 hover:text-[#8a5a2b] transition-colors">Gallery</Link>
+              <Link href="/loc-academy" className="text-sm font-medium text-stone-600 hover:text-[#8a5a2b] transition-colors">Loc Academy</Link>
+              <Link href="/blog" className="text-sm font-medium text-stone-600 hover:text-[#8a5a2b] transition-colors">Blog</Link>
+              <Link href="/barber-block" className="text-sm font-medium text-stone-600 hover:text-[#9a4b34] transition-colors">Barber Block</Link>
+              <a href="#contact" className="text-sm font-medium text-stone-600 hover:text-[#8a5a2b] transition-colors">Contact</a>
               <PublicAuthLinks />
               <Link
                 href="/book"
-                className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
+                className={`px-6 py-3 rounded-full font-semibold text-sm transition-all hover:scale-[1.03] ${btnGold}`}
               >
                 Book Now
               </Link>
@@ -153,106 +156,106 @@ export default function KelaticLanding() {
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen((prev) => !prev)}
-                className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-white/10 text-white/80 hover:text-amber-400 hover:border-amber-400/40 transition-colors"
+                className="inline-flex items-center justify-center w-10 h-10 rounded-full border border-[#e7ddcd] text-stone-600 hover:text-[#8a5a2b] hover:border-[#b08344]/40 transition-colors"
                 aria-expanded={mobileMenuOpen}
                 aria-label="Toggle menu"
               >
                 {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
               {mobileMenuOpen && (
-                <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-white/10 bg-zinc-950/95 backdrop-blur shadow-xl overflow-hidden z-50">
+                <div className="absolute right-0 mt-3 w-64 rounded-2xl border border-[#e7ddcd] bg-white/97 backdrop-blur shadow-xl overflow-hidden z-50">
                   <div className="py-2">
                     <Link
                       href="/services"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Services
                     </Link>
                     <Link
                       href="/special-offers"
-                      className="block px-4 py-2 text-sm text-amber-400 hover:text-yellow-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-[#8a5a2b] hover:text-[#b08344] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       $75 Wednesday Special
                     </Link>
                     <Link
                       href="/gallery"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Gallery
                     </Link>
                     <Link
                       href="/loc-academy"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Loc Academy
                     </Link>
                     <Link
                       href="/blog"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Blog
                     </Link>
                     <Link
                       href="/barber-block"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-red-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#9a4b34] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Barber Block
                     </Link>
                     <a
                       href="#contact"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Contact
                     </a>
                   </div>
-                  <div className="border-t border-white/10 py-2">
-                    <div className="px-4 py-1 text-[10px] uppercase tracking-widest text-white/40">Book a Stylist</div>
+                  <div className="border-t border-[#e7ddcd] py-2">
+                    <div className="px-4 py-1 text-[10px] uppercase tracking-widest text-stone-400">Book a Stylist</div>
                     {stylistMenu.map((stylist) => (
                       <Link
                         key={stylist.id}
                         href={`/book?stylist=${stylist.id}`}
-                        className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                        className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         {stylist.first_name} {stylist.last_name}
                       </Link>
                     ))}
                   </div>
-                  <div className="border-t border-white/10 py-2">
-                    <div className="px-4 py-1 text-[10px] uppercase tracking-widest text-white/40">Login</div>
+                  <div className="border-t border-[#e7ddcd] py-2">
+                    <div className="px-4 py-1 text-[10px] uppercase tracking-widest text-stone-400">Login</div>
                     <Link
                       href="/login?type=client&redirect=/account"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Client Login
                     </Link>
                     <Link
                       href="/login?type=stylist&redirect=/stylist"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Stylist Login
                     </Link>
                     <Link
                       href="/login?type=admin&redirect=/admin"
-                      className="block px-4 py-2 text-sm text-white/80 hover:text-amber-300 hover:bg-white/5 transition-colors"
+                      className="block px-4 py-2 text-sm text-stone-600 hover:text-[#8a5a2b] hover:bg-[#f3ede3] transition-colors"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Admin Login
                     </Link>
                   </div>
-                  <div className="border-t border-white/10 p-3">
+                  <div className="border-t border-[#e7ddcd] p-3">
                     <Link
                       href="/book"
-                      className="block w-full text-center px-4 py-2 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                      className={`block w-full text-center px-4 py-2 rounded-full font-semibold text-sm transition-all ${btnGold}`}
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Book Now
@@ -266,33 +269,34 @@ export default function KelaticLanding() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-24 bg-black relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="pt-32 pb-24 bg-gradient-to-b from-[#faf7f2] to-[#f3ede3] relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-[#e9d7bd]/40 blur-3xl" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-16 items-center">
             {/* Left - Hero Content */}
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs uppercase tracking-widest text-amber-400">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[#e7ddcd] text-xs uppercase tracking-widest text-[#8a5a2b]">
                 Houston&apos;s Premier Loc Lounge
               </div>
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mt-6">
+              <h1 className="font-playfair text-5xl sm:text-6xl lg:text-7xl font-medium leading-[1.05] tracking-tight mt-6 text-stone-900">
                 Your Crown Deserves
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-yellow-500">
+                <span className="block italic text-[#b08344]">
                   Expert Loc Care
                 </span>
               </h1>
-              <p className="text-lg text-white/60 mt-6 max-w-xl">
+              <p className="text-lg text-stone-600 mt-6 max-w-xl leading-relaxed">
                 From starter locs to precision retwists, Kelatic Hair Lounge delivers master-level loc artistry in Houston.
               </p>
               <div className="flex flex-wrap items-center gap-4 mt-8">
                 <Link
                   href="/book"
-                  className="px-6 py-3 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold text-sm hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+                  className={`px-7 py-3.5 rounded-full font-semibold text-sm transition-all hover:scale-[1.03] ${btnGold}`}
                 >
                   Book Your Appointment
                 </Link>
                 <a
                   href="/gallery"
-                  className="inline-flex items-center gap-2 px-6 py-3 border border-white/20 rounded-full text-sm font-semibold text-white/80 hover:text-amber-400 hover:border-amber-400/40 transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-3.5 border border-[#d8cbb6] rounded-full text-sm font-semibold text-stone-700 hover:text-[#8a5a2b] hover:border-[#b08344]/50 hover:bg-white transition-all"
                 >
                   <Play className="w-4 h-4" />
                   Watch Our Work
@@ -300,22 +304,22 @@ export default function KelaticLanding() {
               </div>
 
               {/* Stats */}
-              <div className="flex items-center gap-8 pt-8">
-                <div className="text-center">
-                  <div className="text-4xl font-black text-amber-400">15+</div>
-                  <div className="text-sm text-white/50">Years</div>
+              <div className="flex items-center gap-8 pt-10">
+                <div>
+                  <div className="font-playfair text-4xl font-medium text-stone-900">15+</div>
+                  <div className="text-sm text-stone-500 mt-1">Years</div>
                 </div>
-                <div className="w-px h-12 bg-white/20" />
-                <div className="text-center">
-                  <div className="text-4xl font-black text-amber-400">5K+</div>
-                  <div className="text-sm text-white/50">Clients</div>
+                <div className="w-px h-12 bg-[#e0d4c0]" />
+                <div>
+                  <div className="font-playfair text-4xl font-medium text-stone-900">5K+</div>
+                  <div className="text-sm text-stone-500 mt-1">Clients</div>
                 </div>
-                <div className="w-px h-12 bg-white/20" />
-                <div className="text-center">
-                  <div className="flex items-center gap-1 text-4xl font-black text-amber-400">
-                    4.9 <Star className="w-7 h-7 fill-amber-400" />
+                <div className="w-px h-12 bg-[#e0d4c0]" />
+                <div>
+                  <div className="flex items-center gap-1 font-playfair text-4xl font-medium text-stone-900">
+                    4.9 <Star className="w-6 h-6 fill-[#b08344] text-[#b08344]" />
                   </div>
-                  <div className="text-sm text-white/50">Rating</div>
+                  <div className="text-sm text-stone-500 mt-1">Rating</div>
                 </div>
               </div>
             </div>
@@ -324,44 +328,44 @@ export default function KelaticLanding() {
             <div className="relative hidden lg:block">
               <div className="relative">
                 {/* Main image placeholder */}
-                <div className="aspect-[3/4] rounded-3xl bg-gradient-to-br from-zinc-800 to-zinc-900 border border-white/10 overflow-hidden relative">
+                <div className="aspect-[3/4] rounded-[2rem] bg-gradient-to-br from-[#efe1cc] to-[#e3cda8] border border-[#e7ddcd] overflow-hidden relative shadow-xl shadow-stone-900/5">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-40 h-40 rounded-full bg-gradient-to-br from-amber-400/20 to-yellow-500/20 flex items-center justify-center backdrop-blur-sm border border-amber-400/30">
-                      <span className="text-6xl font-black text-amber-400">K</span>
+                    <div className="w-40 h-40 rounded-full bg-white/40 flex items-center justify-center backdrop-blur-sm border border-white/60">
+                      <span className="font-playfair text-6xl font-medium text-[#8a5a2b]">K</span>
                     </div>
                   </div>
-                  {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  {/* Soft warm overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#8a5a2b]/15 via-transparent to-transparent" />
                 </div>
 
                 {/* Floating elements */}
-                <div className="absolute -left-8 top-1/4 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl animate-float">
+                <div className="absolute -left-8 top-1/4 bg-white/90 backdrop-blur-xl border border-[#e7ddcd] rounded-2xl p-4 shadow-xl shadow-stone-900/10 animate-float">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
-                      <Clock className="w-6 h-6 text-green-400" />
+                    <div className="w-12 h-12 bg-[#e6efe2] rounded-xl flex items-center justify-center">
+                      <Clock className="w-6 h-6 text-[#5b7a52]" />
                     </div>
                     <div>
-                      <div className="font-bold">Open Today</div>
-                      <div className="text-sm text-white/50">9AM - 7PM</div>
+                      <div className="font-semibold text-stone-800">Open Today</div>
+                      <div className="text-sm text-stone-500">9AM - 7PM</div>
                     </div>
                   </div>
                 </div>
 
-                <div className="absolute -right-8 top-1/2 bg-black/80 backdrop-blur-xl border border-white/10 rounded-2xl p-4 shadow-2xl animate-[float_3s_ease-in-out_infinite_0.5s]">
+                <div className="absolute -right-8 top-1/2 bg-white/90 backdrop-blur-xl border border-[#e7ddcd] rounded-2xl p-4 shadow-xl shadow-stone-900/10 animate-[float_3s_ease-in-out_infinite_0.5s]">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-amber-500/20 rounded-xl flex items-center justify-center">
-                      <Star className="w-6 h-6 text-amber-400" />
+                    <div className="w-12 h-12 bg-[#f4e9d6] rounded-xl flex items-center justify-center">
+                      <Star className="w-6 h-6 text-[#b08344]" />
                     </div>
                     <div>
-                      <div className="font-bold">Top Rated</div>
-                      <div className="text-sm text-white/50">500+ Reviews</div>
+                      <div className="font-semibold text-stone-800">Top Rated</div>
+                      <div className="text-sm text-stone-500">500+ Reviews</div>
                     </div>
                   </div>
                 </div>
 
                 {/* Wednesday special */}
-                <div className="absolute -right-4 top-8 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full px-5 py-2.5 shadow-xl shadow-amber-500/30 animate-[float_3s_ease-in-out_infinite_1s]">
-                  <div className="flex items-center gap-2 font-bold">
+                <div className="absolute -right-4 top-8 bg-[#b08344] text-white rounded-full px-5 py-2.5 shadow-lg shadow-[#b08344]/30 animate-[float_3s_ease-in-out_infinite_1s]">
+                  <div className="flex items-center gap-2 font-semibold">
                     <Sparkles className="w-4 h-4" />
                     $75 Wednesdays!
                   </div>
@@ -376,23 +380,23 @@ export default function KelaticLanding() {
       <StylistCarousel />
 
       {/* Gallery Section */}
-      <section id="gallery" className="py-24 bg-zinc-950">
+      <section id="gallery" className="py-24 bg-[#f3ede3]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Our Work</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-2">The Craft</h2>
-            <p className="text-white/50 mt-4 max-w-2xl mx-auto">Every loc tells a story. Here's a glimpse of the artistry and care we put into every client's crown.</p>
+            <span className="text-[#8a5a2b] font-medium tracking-[0.2em] uppercase text-xs">Our Work</span>
+            <h2 className="font-playfair text-4xl md:text-5xl font-medium mt-3 text-stone-900">The Craft</h2>
+            <p className="text-stone-500 mt-4 max-w-2xl mx-auto leading-relaxed">Every loc tells a story. Here&apos;s a glimpse of the artistry and care we put into every client&apos;s crown.</p>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {[1, 2, 3, 4].map((num) => (
-              <div key={num} className="group relative aspect-square rounded-2xl overflow-hidden bg-zinc-900 border border-white/5 hover:border-amber-400/30 transition-all duration-300">
+              <div key={num} className="group relative aspect-square rounded-2xl overflow-hidden bg-[#e7ddcd] border border-[#e0d4c0] hover:border-[#b08344]/40 transition-all duration-300 shadow-sm">
                 <img
                   src={`/gallery/image${num}.jpg`}
                   alt={`Loc styling work ${num}`}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-stone-900/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute bottom-4 left-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <span className="text-white font-medium">Loc Artistry</span>
                 </div>
@@ -405,7 +409,7 @@ export default function KelaticLanding() {
               href="https://instagram.com/kelatichairlounge_"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-white/5 backdrop-blur border border-white/20 rounded-full font-semibold hover:bg-white/10 hover:border-amber-400/30 transition-all"
+              className="inline-flex items-center gap-3 px-8 py-4 bg-white border border-[#e0d4c0] rounded-full font-semibold text-stone-700 hover:border-[#b08344]/40 hover:text-[#8a5a2b] transition-all shadow-sm"
             >
               <Instagram className="w-5 h-5" />
               See More on Instagram
@@ -415,16 +419,16 @@ export default function KelaticLanding() {
       </section>
 
       {/* Services Section */}
-      <section id="services" className="py-24 bg-zinc-950">
+      <section id="services" className="py-24 bg-[#faf7f2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-16">
             <div>
-              <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">What We Offer</span>
-              <h2 className="text-4xl md:text-5xl font-black mt-2">Our Services</h2>
+              <span className="text-[#8a5a2b] font-medium tracking-[0.2em] uppercase text-xs">What We Offer</span>
+              <h2 className="font-playfair text-4xl md:text-5xl font-medium mt-3 text-stone-900">Our Services</h2>
             </div>
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 text-amber-400 font-semibold hover:gap-3 transition-all"
+              className="inline-flex items-center gap-2 text-[#8a5a2b] font-semibold hover:gap-3 transition-all"
             >
               View All Services <ChevronRight className="w-5 h-5" />
             </Link>
@@ -432,15 +436,15 @@ export default function KelaticLanding() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {featuredServices.map((service) => (
-              <div key={service.id} className="group bg-zinc-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-400/30 transition-colors">
-                <div className="w-14 h-14 bg-amber-400/10 rounded-xl flex items-center justify-center mb-5 group-hover:bg-amber-400/20 transition-colors">
-                  <Sparkles className="w-7 h-7 text-amber-400" />
+              <div key={service.id} className="group bg-white border border-[#e7ddcd] rounded-2xl p-7 hover:border-[#b08344]/40 hover:shadow-lg hover:shadow-stone-900/5 transition-all">
+                <div className="w-14 h-14 bg-[#f4e9d6] rounded-xl flex items-center justify-center mb-5 group-hover:bg-[#eaddc3] transition-colors">
+                  <Sparkles className="w-7 h-7 text-[#b08344]" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">{service.name}</h3>
-                <p className="text-white/50 mb-5 line-clamp-2">{service.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-black text-amber-400">${service.base_price}</span>
-                  <span className="text-sm text-white/40 flex items-center gap-1">
+                <h3 className="font-playfair text-xl font-medium mb-2 text-stone-900">{service.name}</h3>
+                <p className="text-stone-500 mb-5 line-clamp-2 leading-relaxed">{service.description}</p>
+                <div className="flex items-center justify-between pt-1 border-t border-[#f0e8da]">
+                  <span className="font-playfair text-2xl font-medium text-[#8a5a2b] mt-3">${service.base_price}</span>
+                  <span className="text-sm text-stone-400 flex items-center gap-1 mt-3">
                     <Clock className="w-4 h-4" />
                     {Math.floor(service.duration / 60)}h {service.duration % 60 > 0 ? `${service.duration % 60}m` : ''}
                   </span>
@@ -452,7 +456,7 @@ export default function KelaticLanding() {
           <div className="text-center mt-12">
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all hover:scale-105"
+              className={`inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all hover:scale-[1.03] ${btnGold}`}
             >
               Book Your Service
               <ChevronRight className="w-5 h-5" />
@@ -462,11 +466,11 @@ export default function KelaticLanding() {
       </section>
 
       {/* Why Choose Us */}
-      <section className="py-24 bg-zinc-950 border-y border-white/5">
+      <section className="py-24 bg-[#f3ede3] border-y border-[#e7ddcd]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Why Kelatic</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-2">The Difference</h2>
+            <span className="text-[#8a5a2b] font-medium tracking-[0.2em] uppercase text-xs">Why Kelatic</span>
+            <h2 className="font-playfair text-4xl md:text-5xl font-medium mt-3 text-stone-900">The Difference</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -477,19 +481,19 @@ export default function KelaticLanding() {
               { icon: Calendar, title: 'Easy Booking', desc: 'Book online 24/7, instant confirmation' },
             ].map((item, idx) => (
               <div key={idx} className="text-center group">
-                <div className="w-20 h-20 mx-auto bg-gradient-to-br from-amber-400/10 to-transparent rounded-2xl flex items-center justify-center mb-6 group-hover:from-amber-400/20 transition-colors">
-                  <item.icon className="w-10 h-10 text-amber-400" />
+                <div className="w-20 h-20 mx-auto bg-white border border-[#e7ddcd] rounded-2xl flex items-center justify-center mb-6 group-hover:border-[#b08344]/40 group-hover:shadow-md group-hover:shadow-stone-900/5 transition-all">
+                  <item.icon className="w-9 h-9 text-[#b08344]" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-white/50">{item.desc}</p>
+                <h3 className="font-playfair text-xl font-medium mb-2 text-stone-900">{item.title}</h3>
+                <p className="text-stone-500 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
 
-          <div className="text-center mt-10">
+          <div className="text-center mt-12">
             <Link
               href="/gallery"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 border border-white/20 rounded-full font-semibold text-white/80 hover:text-amber-400 hover:border-amber-400/40 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white border border-[#e0d4c0] rounded-full font-semibold text-stone-700 hover:text-[#8a5a2b] hover:border-[#b08344]/40 transition-colors shadow-sm"
             >
               View Full Gallery
               <ChevronRight className="w-5 h-5" />
@@ -499,41 +503,41 @@ export default function KelaticLanding() {
       </section>
 
       {/* Referral Section */}
-      <section className="py-16 bg-black">
+      <section className="py-16 bg-[#faf7f2]">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl border border-amber-400/30 bg-gradient-to-r from-amber-400/10 to-yellow-500/10 p-10 text-center">
-            <h3 className="text-2xl md:text-3xl font-black mb-3">Refer a Friend, Get $10 Off</h3>
-            <p className="text-white/60 mb-6 max-w-2xl mx-auto">
+          <div className="rounded-[2rem] border border-[#e3cda8] bg-gradient-to-br from-[#f7edda] to-[#f1e2c6] p-10 text-center">
+            <h3 className="font-playfair text-3xl md:text-4xl font-medium mb-3 text-stone-900">Refer a Friend, Get $10 Off</h3>
+            <p className="text-stone-600 mb-6 max-w-2xl mx-auto leading-relaxed">
               Bring a friend to Kelatic and you both save $10 on your next visit. Share the love and keep your locs thriving.
             </p>
             <Link
               href="/book"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+              className={`inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all hover:scale-[1.03] ${btnGold}`}
             >
-              Book & Refer
+              Book &amp; Refer
             </Link>
           </div>
         </div>
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 bg-zinc-950">
+      <section className="py-24 bg-[#faf7f2]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Reviews</span>
-            <h2 className="text-4xl md:text-5xl font-black mt-2">Client Love</h2>
+            <span className="text-[#8a5a2b] font-medium tracking-[0.2em] uppercase text-xs">Reviews</span>
+            <h2 className="font-playfair text-4xl md:text-5xl font-medium mt-3 text-stone-900">Client Love</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {testimonials.map((testimonial, idx) => (
-              <div key={idx} className="bg-zinc-900/50 border border-white/5 rounded-2xl p-6 hover:border-amber-400/30 transition-colors">
+              <div key={idx} className="bg-white border border-[#e7ddcd] rounded-2xl p-7 hover:border-[#b08344]/40 hover:shadow-lg hover:shadow-stone-900/5 transition-all">
                 <div className="flex items-center gap-1 mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                    <Star key={i} className="w-5 h-5 fill-[#b08344] text-[#b08344]" />
                   ))}
                 </div>
-                <p className="text-white/70 mb-5 line-clamp-4">&ldquo;{testimonial.text}&rdquo;</p>
-                <div className="font-bold text-amber-400">{testimonial.name}</div>
+                <p className="text-stone-600 mb-5 line-clamp-4 leading-relaxed italic">&ldquo;{testimonial.text}&rdquo;</p>
+                <div className="font-semibold text-[#8a5a2b]">{testimonial.name}</div>
               </div>
             ))}
           </div>
@@ -542,17 +546,17 @@ export default function KelaticLanding() {
 
       {/* CTA Section */}
       <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-yellow-500" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#c79a5b] to-[#b08344]" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxwYXRoIGQ9Ik0zNiAxOGMtNi42MjcgMC0xMiA1LjM3My0xMiAxMnM1LjM3MyAxMiAxMiAxMiAxMi01LjM3MyAxMi0xMi01LjM3My0xMi0xMi0xMnptMCAxOGMtMy4zMTQgMC02LTIuNjg2LTYtNnMyLjY4Ni02IDYtNiA2IDIuNjg2IDYgNi0yLjY4NiA2LTYgNnoiIGZpbGw9IiMwMDAiIGZpbGwtb3BhY2l0eT0iLjAzIi8+PC9nPjwvc3ZnPg==')] opacity-30" />
 
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-6xl font-black text-black mb-6">Ready to Level Up?</h2>
-          <p className="text-xl text-black/70 mb-10 max-w-2xl mx-auto">
+          <h2 className="font-playfair text-4xl md:text-6xl font-medium text-white mb-6">Ready for Your Best Locs Yet?</h2>
+          <p className="text-xl text-white/85 mb-10 max-w-2xl mx-auto leading-relaxed">
             Book your appointment today and experience why Houston trusts Kelatic with their crown.
           </p>
           <Link
             href="/book"
-            className="inline-flex items-center gap-3 px-10 py-5 bg-black text-white rounded-full font-bold text-lg hover:bg-zinc-900 transition-all hover:scale-105 shadow-2xl"
+            className="inline-flex items-center gap-3 px-10 py-5 bg-[#2a211c] text-white rounded-full font-semibold text-lg hover:bg-[#1c1612] transition-all hover:scale-[1.03] shadow-xl"
           >
             <Calendar className="w-6 h-6" />
             Book Your Appointment
@@ -561,18 +565,18 @@ export default function KelaticLanding() {
       </section>
 
       {/* Loc Academy Teaser */}
-      <section className="py-24 bg-black relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 via-transparent to-transparent" />
+      <section className="py-24 bg-[#211a16] relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#b08344]/10 via-transparent to-transparent" />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Loc Academy</span>
-          <h2 className="text-4xl md:text-5xl font-black mt-3 mb-4">Train with The Loc Gawd</h2>
-          <p className="text-xl text-white/60 mb-8 max-w-2xl mx-auto">
+          <span className="text-[#d6a85f] font-medium tracking-[0.2em] uppercase text-xs">Loc Academy</span>
+          <h2 className="font-playfair text-4xl md:text-5xl font-medium mt-3 mb-4 text-[#f7efe2]">Train with The Loc Gawd</h2>
+          <p className="text-xl text-[#d8cbb6] mb-8 max-w-2xl mx-auto leading-relaxed">
             Learn starter to advanced loc techniques, business guidance, and hands-on training with real clients.
           </p>
           <Link
             href="/loc-academy"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-amber-400 to-yellow-500 text-black rounded-full font-bold hover:shadow-lg hover:shadow-amber-500/30 transition-all"
+            className={`inline-flex items-center gap-2 px-8 py-4 rounded-full font-semibold transition-all hover:scale-[1.03] ${btnGold}`}
           >
             Explore Loc Academy
           </Link>
@@ -580,12 +584,12 @@ export default function KelaticLanding() {
       </section>
 
       {/* Contact Section */}
-      <section id="contact" className="py-24 bg-zinc-950">
+      <section id="contact" className="py-24 bg-[#f3ede3]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16">
             <div>
-              <span className="text-amber-400 font-medium tracking-wider uppercase text-sm">Location</span>
-              <h2 className="text-4xl md:text-5xl font-black mt-2 mb-10">Visit Us</h2>
+              <span className="text-[#8a5a2b] font-medium tracking-[0.2em] uppercase text-xs">Location</span>
+              <h2 className="font-playfair text-4xl md:text-5xl font-medium mt-3 mb-10 text-stone-900">Visit Us</h2>
 
               <div className="space-y-6">
                 {[
@@ -595,31 +599,31 @@ export default function KelaticLanding() {
                   { icon: Instagram, label: 'Instagram', value: '@kelatichairlounge_', href: 'https://instagram.com/kelatichairlounge_' },
                 ].map((item, idx) => (
                   <a key={idx} href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined} className="flex items-center gap-4 group">
-                    <div className="w-14 h-14 bg-amber-400/10 rounded-xl flex items-center justify-center group-hover:bg-amber-400/20 transition-colors">
-                      <item.icon className="w-6 h-6 text-amber-400" />
+                    <div className="w-14 h-14 bg-white border border-[#e7ddcd] rounded-xl flex items-center justify-center group-hover:border-[#b08344]/40 transition-colors">
+                      <item.icon className="w-6 h-6 text-[#b08344]" />
                     </div>
                     <div>
-                      <div className="text-sm text-white/40">{item.label}</div>
-                      <div className="font-medium group-hover:text-amber-400 transition-colors">{item.value}</div>
+                      <div className="text-sm text-stone-400">{item.label}</div>
+                      <div className="font-medium text-stone-700 group-hover:text-[#8a5a2b] transition-colors">{item.value}</div>
                     </div>
                   </a>
                 ))}
               </div>
 
-              <div className="mt-10 pt-10 border-t border-white/10">
-                <h3 className="font-bold mb-4">Hours</h3>
-                <div className="space-y-2 text-white/60">
-                  <div className="flex justify-between"><span>Monday - Friday</span><span className="text-white">9AM - 7PM</span></div>
-                  <div className="flex justify-between"><span>Saturday</span><span className="text-white">8AM - 6PM</span></div>
-                  <div className="flex justify-between"><span>Sunday</span><span className="text-white">10AM - 5PM</span></div>
+              <div className="mt-10 pt-10 border-t border-[#e0d4c0]">
+                <h3 className="font-playfair text-lg font-medium mb-4 text-stone-900">Hours</h3>
+                <div className="space-y-2 text-stone-500">
+                  <div className="flex justify-between"><span>Monday - Friday</span><span className="text-stone-800">9AM - 7PM</span></div>
+                  <div className="flex justify-between"><span>Saturday</span><span className="text-stone-800">8AM - 6PM</span></div>
+                  <div className="flex justify-between"><span>Sunday</span><span className="text-stone-800">10AM - 5PM</span></div>
                 </div>
               </div>
             </div>
 
-            <div className="rounded-2xl overflow-hidden border border-white/10 h-96 lg:h-auto">
+            <div className="rounded-2xl overflow-hidden border border-[#e0d4c0] h-96 lg:h-auto shadow-sm">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3464.4891234567!2d-95.5264!3d29.7294!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8640c3c0c0c0c0c0%3A0x0!2s9430%20Richmond%20Ave%2C%20Houston%2C%20TX%2077063!5e0!3m2!1sen!2sus!4v1704000000000"
-                className="w-full h-full min-h-96 border-0 grayscale"
+                className="w-full h-full min-h-96 border-0"
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"

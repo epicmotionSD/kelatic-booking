@@ -81,7 +81,7 @@ export default function ShopPage() {
           <div className="flex items-center gap-2 text-white/80 text-sm">
             <Leaf className="w-4 h-4" /> {biz.name}
           </div>
-          <h1 className="text-3xl font-bold mt-1">Order Online</h1>
+          <h1 className="text-3xl font-playfair font-medium mt-1">Order Online</h1>
           {biz.tagline && <p className="text-white/80 mt-1">{biz.tagline}</p>}
         </div>
       </header>

@@ -103,7 +103,7 @@ export default function VitalityLanding() {
           <span className="inline-flex items-center gap-2 text-xs uppercase tracking-widest text-[#3f7d4f] bg-white px-4 py-2 rounded-full border border-[#3f7d4f]/20">
             <Leaf className="w-4 h-4" /> Plant-Based Wellness Café
           </span>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black leading-tight mt-6">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-playfair font-medium leading-tight mt-6">
             Welcome to Kelatic Vitality House
           </h1>
           <p className="text-lg sm:text-xl text-[#1f3d2b]/70 mt-5">
@@ -135,7 +135,7 @@ export default function VitalityLanding() {
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-12">
             <span className="text-[#3f7d4f] font-semibold uppercase tracking-wider text-sm">What We Offer</span>
-            <h2 className="text-3xl sm:text-4xl font-black mt-2">Made With Intention</h2>
+            <h2 className="text-3xl sm:text-4xl font-playfair font-medium mt-2">Made With Intention</h2>
             <p className="text-[#1f3d2b]/60 mt-3 max-w-2xl mx-auto">
               Every drink and every meal is crafted with ingredients chosen to nourish, support, and inspire healthier habits.
             </p>
@@ -161,7 +161,7 @@ export default function VitalityLanding() {
             <div className="flex items-end justify-between mb-8">
               <div>
                 <span className="text-[#3f7d4f] font-semibold uppercase tracking-wider text-sm">From the Menu</span>
-                <h2 className="text-3xl sm:text-4xl font-black mt-2">Customer Favorites</h2>
+                <h2 className="text-3xl sm:text-4xl font-playfair font-medium mt-2">Customer Favorites</h2>
               </div>
               <Link href="/shop" className="hidden sm:inline-flex items-center gap-1 text-[#3f7d4f] font-semibold">
                 See full menu <ArrowRight className="w-4 h-4" />
@@ -192,7 +192,7 @@ export default function VitalityLanding() {
         <div className="max-w-3xl mx-auto px-5 text-center">
           <Heart className="w-10 h-10 mx-auto mb-4 text-[#cfe3c4]" />
           <span className="uppercase tracking-widest text-sm text-[#cfe3c4]">Our Philosophy</span>
-          <h2 className="text-3xl sm:text-4xl font-black mt-2">Healing Together</h2>
+          <h2 className="text-3xl sm:text-4xl font-playfair font-medium mt-2">Healing Together</h2>
           <p className="text-white/85 mt-5 text-lg">
             We believe that what we put into our bodies matters. While we do not diagnose, treat, or cure
             disease, we are passionate about educating our community on natural wellness and helping people

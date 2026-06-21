@@ -196,9 +196,9 @@ function BookingContent() {
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-[#faf7f2] text-stone-800">
       {/* Header */}
-      <header className="bg-black/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
+      <header className="bg-[#faf7f2]/85 backdrop-blur-xl border-b border-[#e7ddcd] sticky top-0 z-50">
         <div className="max-w-3xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <Link href={brand.homeUrl} className="flex items-center gap-3">
@@ -206,13 +206,13 @@ function BookingContent() {
                 <span className={`${brand.isBarber ? 'text-white' : 'text-black'} font-black text-xs`}>{brand.logoLetter}</span>
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-sm text-white">{brand.name}</span>
-                <span className={`text-[9px] tracking-widest ${brand.isBarber ? 'text-red-400' : 'text-amber-400'}`}>{brand.tagline}</span>
+                <span className="font-bold text-sm text-stone-900">{brand.name}</span>
+                <span className={`text-[9px] tracking-widest ${brand.isBarber ? 'text-[#9a4b34]' : 'text-[#8a5a2b]'}`}>{brand.tagline}</span>
               </div>
             </Link>
             <div className="flex items-center gap-4">
               <PublicAuthLinks />
-              <Link href={brand.homeUrl} className={`text-sm text-white/60 hover:${brand.isBarber ? 'text-red-400' : 'text-amber-400'} transition-colors`}>
+              <Link href={brand.homeUrl} className={`text-sm text-stone-500 hover:${brand.isBarber ? 'text-[#9a4b34]' : 'text-[#8a5a2b]'} transition-colors`}>
                 {brand.backLabel}
               </Link>
             </div>
@@ -222,7 +222,7 @@ function BookingContent() {
 
       {/* Progress Bar */}
       {currentStep !== 'confirmation' && (
-        <div className="bg-zinc-900/80 border-b border-white/10">
+        <div className="bg-[#f3ede3] border-b border-[#e7ddcd]">
           <div className="max-w-3xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               {STEPS.slice(0, -1).map((step, index) => {
@@ -244,10 +244,10 @@ function BookingContent() {
                           isActive
                             ? brand.isBarber
                               ? 'bg-gradient-to-r from-red-500 to-red-700 text-white shadow-lg shadow-red-500/30'
-                              : 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black shadow-lg shadow-amber-500/30'
+                              : 'bg-[#b08344] text-white shadow-lg shadow-[#b08344]/30'
                             : isCompleted
-                            ? 'bg-green-500 text-white'
-                            : 'bg-zinc-800 text-zinc-500'
+                            ? 'bg-[#5b7a52] text-white'
+                            : 'bg-[#e7ddcd] text-stone-400'
                         }`}
                       >
                         {isCompleted ? (
@@ -260,7 +260,7 @@ function BookingContent() {
                       </div>
                       <span
                         className={`hidden sm:block text-sm font-medium ${
-                          isActive ? (brand.isBarber ? 'text-red-400' : 'text-amber-400') : isCompleted ? 'text-green-400' : 'text-zinc-500'
+                          isActive ? (brand.isBarber ? 'text-[#9a4b34]' : 'text-[#8a5a2b]') : isCompleted ? 'text-[#5b7a52]' : 'text-stone-400'
                         }`}
                       >
                         {step.label}
@@ -269,7 +269,7 @@ function BookingContent() {
                     {index < STEPS.length - 2 && (
                       <div
                         className={`w-8 sm:w-16 h-0.5 mx-2 rounded-full ${
-                          index < currentStepIndex ? 'bg-green-500' : 'bg-zinc-700'
+                          index < currentStepIndex ? 'bg-[#5b7a52]' : 'bg-[#e0d4c0]'
                         }`}
                       />
                     )}
@@ -409,9 +409,9 @@ function BookingContent() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-black/30 border-t border-white/5 mt-auto">
-        <div className="max-w-3xl mx-auto px-4 py-6 text-center text-sm text-white/40">
-          <p>Questions? Call us at <a href="tel:+17134854000" className={`${brand.isBarber ? 'text-red-400 hover:text-red-300' : 'text-amber-400 hover:text-amber-300'}`}>(713) 485-4000</a></p>
+      <footer className="bg-[#f3ede3] border-t border-[#e7ddcd] mt-auto">
+        <div className="max-w-3xl mx-auto px-4 py-6 text-center text-sm text-stone-500">
+          <p>Questions? Call us at <a href="tel:+17134854000" className={`${brand.isBarber ? 'text-[#9a4b34] hover:text-[#7d3a28]' : 'text-[#8a5a2b] hover:text-[#b08344]'}`}>(713) 485-4000</a></p>
           <p className="mt-1">9430 Richmond Ave, Houston, TX 77063</p>
         </div>
       </footer>
@@ -423,12 +423,12 @@ function BookingLoading() {
   // Check barber domain for loading state too
   const loadingBrand = getBrand();
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
+    <div className="min-h-screen bg-[#faf7f2] flex items-center justify-center">
       <div className="flex flex-col items-center gap-4">
         <div className={`w-10 h-10 bg-gradient-to-br ${loadingBrand.gradientFrom} ${loadingBrand.gradientTo} rounded-xl flex items-center justify-center shadow-lg ${loadingBrand.shadowColor} animate-pulse`}>
           <span className={`${loadingBrand.isBarber ? 'text-white' : 'text-black'} font-black text-xs`}>{loadingBrand.logoLetter}</span>
         </div>
-        <div className={`animate-spin rounded-full h-6 w-6 border-b-2 ${loadingBrand.isBarber ? 'border-red-400' : 'border-amber-400'}`} />
+        <div className={`animate-spin rounded-full h-6 w-6 border-b-2 ${loadingBrand.isBarber ? 'border-red-500' : 'border-[#b08344]'}`} />
       </div>
     </div>
   );

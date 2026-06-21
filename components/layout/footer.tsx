@@ -9,7 +9,7 @@ export function Footer() {
       <ChatWidget />
 
       {/* Footer */}
-      <footer className="py-16 bg-black border-t border-white/5">
+      <footer className="py-16 bg-[#211a16] border-t border-[#3a2f27]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-4 gap-12">
             <div className="md:col-span-2">
@@ -20,16 +20,16 @@ export function Footer() {
                   className="h-16 w-auto"
                 />
               </div>
-              <p className="text-white/50 max-w-sm mb-6">
+              <p className="text-[#d8cbb6] max-w-sm mb-6">
                 Houston&apos;s premier loc specialists. Expert loc installation, maintenance, and styling.
               </p>
-              <div className="text-xs text-white/30">
+              <div className="text-xs text-[#d8cbb6]/60">
                 Powered by{' '}
-                <a 
-                  href="https://x3o.ai" 
-                  target="_blank" 
+                <a
+                  href="https://x3o.ai"
+                  target="_blank"
                   rel="noopener noreferrer"
-                  className="text-amber-400/60 hover:text-amber-400 transition-colors"
+                  className="text-[#d6a85f]/80 hover:text-[#d6a85f] transition-colors"
                 >
                   x3o.ai
                 </a>{' '}
@@ -38,52 +38,52 @@ export function Footer() {
             </div>
 
             <div>
-              <h4 className="font-bold mb-6">Quick Links</h4>
+              <h4 className="font-playfair font-medium mb-6 text-[#f7efe2]">Quick Links</h4>
               <div className="space-y-3">
-                <Link href="/services" className="block text-white/50 hover:text-amber-400 transition-colors">Services</Link>
-                <Link href="/special-offers" className="block text-amber-400 hover:text-yellow-400 transition-colors">$75 Wednesday Special</Link>
-                <Link href="/gallery" className="block text-white/50 hover:text-amber-400 transition-colors">Gallery</Link>
-                <Link href="/blog" className="block text-white/50 hover:text-amber-400 transition-colors">Blog</Link>
-                <Link href="/barber-block" className="block text-white/50 hover:text-red-400 transition-colors">Barber Block</Link>
-                <Link href="/loc-academy" className="block text-white/50 hover:text-amber-400 transition-colors">Loc Academy</Link>
-                <Link href="/book" className="block text-white/50 hover:text-amber-400 transition-colors">Book Now</Link>
-                <Link href="/privacy-policy" className="block text-white/50 hover:text-amber-400 transition-colors">Privacy Policy</Link>
+                <Link href="/services" className="block text-[#d8cbb6] hover:text-[#d6a85f] transition-colors">Services</Link>
+                <Link href="/special-offers" className="block text-[#d6a85f] hover:text-[#e6c188] transition-colors">$75 Wednesday Special</Link>
+                <Link href="/gallery" className="block text-[#d8cbb6] hover:text-[#d6a85f] transition-colors">Gallery</Link>
+                <Link href="/blog" className="block text-[#d8cbb6] hover:text-[#d6a85f] transition-colors">Blog</Link>
+                <Link href="/barber-block" className="block text-[#d8cbb6] hover:text-[#c2785f] transition-colors">Barber Block</Link>
+                <Link href="/loc-academy" className="block text-[#d8cbb6] hover:text-[#d6a85f] transition-colors">Loc Academy</Link>
+                <Link href="/book" className="block text-[#d8cbb6] hover:text-[#d6a85f] transition-colors">Book Now</Link>
+                <Link href="/privacy-policy" className="block text-[#d8cbb6] hover:text-[#d6a85f] transition-colors">Privacy Policy</Link>
               </div>
             </div>
 
             <div>
-              <h4 className="font-bold mb-6">Connect</h4>
+              <h4 className="font-playfair font-medium mb-6 text-[#f7efe2]">Connect</h4>
               <div className="space-y-4 mb-6">
-                <div className="text-white/50 text-sm">
+                <div className="text-[#d8cbb6] text-sm">
                   <div>9430 Richmond Ave</div>
                   <div>Houston, TX 77063</div>
                 </div>
-                <div className="text-white/50 text-sm">
+                <div className="text-[#d8cbb6] text-sm">
                   <div>(713) 485-4000</div>
                   <div>info@kelatic.com</div>
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <a 
-                  href="https://instagram.com/kelatichairlounge_" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  aria-label="Follow us on Instagram" 
-                  className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors"
+                <a
+                  href="https://instagram.com/kelatichairlounge_"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Follow us on Instagram"
+                  className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#f7efe2] hover:bg-[#b08344] hover:text-white transition-colors"
                 >
                   <Instagram className="w-5 h-5" />
                 </a>
-                <a 
-                  href="tel:+17134854000" 
-                  aria-label="Call us" 
-                  className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors"
+                <a
+                  href="tel:+17134854000"
+                  aria-label="Call us"
+                  className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#f7efe2] hover:bg-[#b08344] hover:text-white transition-colors"
                 >
                   <Phone className="w-5 h-5" />
                 </a>
-                <a 
-                  href="mailto:info@kelatic.com" 
-                  aria-label="Email us" 
-                  className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center hover:bg-amber-400 hover:text-black transition-colors"
+                <a
+                  href="mailto:info@kelatic.com"
+                  aria-label="Email us"
+                  className="w-12 h-12 bg-white/5 rounded-xl flex items-center justify-center text-[#f7efe2] hover:bg-[#b08344] hover:text-white transition-colors"
                 >
                   <Mail className="w-5 h-5" />
                 </a>
@@ -91,7 +91,7 @@ export function Footer() {
             </div>
           </div>
 
-          <div className="border-t border-white/5 mt-12 pt-8 text-center text-white/30 text-sm">
+          <div className="border-t border-[#3a2f27] mt-12 pt-8 text-center text-[#d8cbb6]/60 text-sm">
             <p>© {new Date().getFullYear()} Kelatic Hair Lounge. All rights reserved.</p>
           </div>
         </div>

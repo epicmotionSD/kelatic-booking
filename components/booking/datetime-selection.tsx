@@ -151,26 +151,26 @@ export function DateTimeSelection({
 
   return (
     <div>
-      <h2 className="text-xl font-bold text-white mb-2">Pick a Date & Time</h2>
-      <p className="text-white/50 mb-6">Choose when you&apos;d like to come in</p>
+      <h2 className="font-playfair text-xl font-medium text-stone-900 mb-2">Pick a Date & Time</h2>
+      <p className="text-stone-500 mb-6">Choose when you&apos;d like to come in</p>
 
       {/* Wednesday-only notice for special offers */}
       {wednesdayOnly && (
-        <div className="mb-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl">
+        <div className="mb-4 p-4 bg-[#f4e9d6] border border-[#e0d4c0] rounded-xl">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-amber-500/20 rounded-full flex items-center justify-center">
+            <div className="w-10 h-10 bg-[#eaddc3] rounded-full flex items-center justify-center">
               <span className="text-lg">🌟</span>
             </div>
             <div>
-              <p className="font-semibold text-amber-400">Wednesday Special</p>
-              <p className="text-sm text-white/60">This special offer is only available on Wednesdays</p>
+              <p className="font-semibold text-[#8a5a2b]">Wednesday Special</p>
+              <p className="text-sm text-stone-600">This special offer is only available on Wednesdays</p>
             </div>
           </div>
         </div>
       )}
 
       {/* Calendar */}
-      <div className="bg-zinc-900 backdrop-blur rounded-xl border border-white/20 p-4 mb-6">
+      <div className="bg-white rounded-xl border border-[#e7ddcd] shadow-sm p-4 mb-6">
         {/* Month Navigation */}
         <div className="flex items-center justify-between mb-4">
           <button
@@ -179,18 +179,18 @@ export function DateTimeSelection({
               currentMonth.getMonth() === today.getMonth() &&
               currentMonth.getFullYear() === today.getFullYear()
             }
-            className="p-2 hover:bg-white/10 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="p-2 hover:bg-[#f3ede3] rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h3 className="font-semibold text-white">{monthName}</h3>
+          <h3 className="font-semibold text-stone-800">{monthName}</h3>
           <button
             onClick={nextMonth}
-            className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="p-2 hover:bg-[#f3ede3] rounded-lg transition-colors"
           >
-            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-stone-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
@@ -202,9 +202,9 @@ export function DateTimeSelection({
             <div
               key={day}
               className={`text-center text-xs font-medium py-2 ${
-                wednesdayOnly && index === 3 
-                  ? 'text-amber-400 font-semibold' 
-                  : 'text-white/40'
+                wednesdayOnly && index === 3
+                  ? 'text-[#8a5a2b] font-semibold'
+                  : 'text-stone-400'
               }`}
             >
               {day}
@@ -237,11 +237,11 @@ export function DateTimeSelection({
                 disabled={!isSelectable}
                 className={`p-2 text-center rounded-lg transition-all ${
                   isSelected
-                    ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:opacity-90 font-bold'
+                    ? 'bg-[#b08344] text-white border border-[#b08344] hover:bg-[#9a6f33] font-bold'
                     : isSelectable
-                    ? 'hover:bg-white/10 text-white'
-                    : 'text-white/20 cursor-not-allowed'
-                } ${isToday && !isSelected ? 'ring-2 ring-amber-400 ring-inset' : ''}`}
+                    ? 'hover:bg-[#f3ede3] text-stone-700'
+                    : 'text-stone-300 cursor-not-allowed'
+                } ${isToday && !isSelected ? 'ring-2 ring-[#b08344] ring-inset' : ''}`}
               >
                 {day}
               </button>
@@ -250,13 +250,13 @@ export function DateTimeSelection({
         </div>
 
         {/* Legend */}
-        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/10 text-xs text-white/40">
+        <div className="flex items-center gap-4 mt-4 pt-4 border-t border-[#e7ddcd] text-xs text-stone-400">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded ring-2 ring-amber-400 ring-inset" />
+            <div className="w-3 h-3 rounded ring-2 ring-[#b08344] ring-inset" />
             <span>Today</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded bg-white/10" />
+            <div className="w-3 h-3 rounded bg-[#f3ede3]" />
             <span>Closed / Unavailable</span>
           </div>
         </div>
@@ -265,7 +265,7 @@ export function DateTimeSelection({
       {/* Time Slots */}
       {date && (
         <div>
-          <h3 className="font-semibold text-white mb-3">
+          <h3 className="font-semibold text-stone-800 mb-3">
             Available Times for{' '}
             {new Date(date + 'T00:00:00').toLocaleDateString('en-US', {
               weekday: 'long',
@@ -276,12 +276,12 @@ export function DateTimeSelection({
 
           {loadingSlots ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-amber-400" />
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#b08344]" />
             </div>
           ) : availableSlots.length === 0 ? (
-            <div className="text-center py-8 bg-zinc-900 rounded-xl border border-white/20">
-              <p className="text-white/50">No available times on this date</p>
-              <p className="text-sm text-white/30 mt-1">Try selecting a different day</p>
+            <div className="text-center py-8 bg-white rounded-xl border border-[#e7ddcd] shadow-sm">
+              <p className="text-stone-500">No available times on this date</p>
+              <p className="text-sm text-stone-400 mt-1">Try selecting a different day</p>
             </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -296,13 +296,13 @@ export function DateTimeSelection({
                     onClick={() => setSlot(s)}
                     className={`py-3 px-2 rounded-lg text-center transition-all ${
                       isSelected
-                        ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:opacity-90 font-bold'
-                        : 'bg-zinc-900 border border-white/20 text-white hover:border-amber-500/50'
+                        ? 'bg-[#b08344] text-white border border-[#b08344] hover:bg-[#9a6f33] font-bold'
+                        : 'bg-white border border-[#e0d4c0] text-stone-700 hover:border-[#b08344]/50'
                     }`}
                   >
                     <p className="font-medium">{formatTime(s.start_time)}</p>
                     {!stylistId && (
-                      <p className={`text-xs mt-0.5 ${isSelected ? 'text-black/60' : 'text-white/50'}`}>
+                      <p className={`text-xs mt-0.5 ${isSelected ? 'text-white/70' : 'text-stone-500'}`}>
                         {s.stylist_name.split(' ')[0]}
                       </p>
                     )}
@@ -318,17 +318,17 @@ export function DateTimeSelection({
       <div className="flex gap-3 mt-8">
         <button
           onClick={onBack}
-          className="flex-1 py-3 bg-zinc-900 border border-white/20 text-white rounded-xl font-semibold hover:bg-zinc-800 transition-colors"
+          className="flex-1 py-3 bg-white border border-[#e0d4c0] text-stone-700 rounded-full font-semibold hover:border-[#b08344]/50 transition-colors"
         >
           Back
         </button>
         <button
           onClick={handleContinue}
           disabled={!date || !slot}
-          className={`flex-1 py-3 rounded-xl font-bold transition-all ${
+          className={`flex-1 py-3 rounded-full font-bold transition-all ${
             date && slot
-              ? 'bg-gradient-to-r from-amber-400 to-yellow-500 text-black hover:shadow-lg hover:shadow-amber-500/30'
-              : 'bg-white/10 text-white/30 cursor-not-allowed'
+              ? 'bg-[#b08344] text-white hover:bg-[#9a6f33] shadow-sm hover:shadow-md hover:shadow-[#b08344]/20'
+              : 'bg-[#f3ede3] text-stone-400 cursor-not-allowed'
           }`}
         >
           Continue

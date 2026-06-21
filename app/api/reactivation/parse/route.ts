@@ -85,4 +85,13 @@ export async function POST(req: NextRequest) {
       leads: segmentedLeads,
       tcpaWarnings: tcpaValidation.warnings,
       filePath, // For reference
-   
+    })
+    
+  } catch (error) {
+    console.error('Parse error:', error)
+    return NextResponse.json(
+      { error: 'Failed to parse contacts', details: String(error) },
+      { status: 500 }
+    )
+  }
+}

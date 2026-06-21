@@ -25,10 +25,11 @@ x3o.ai (root)              → marketing site (Attract / Retain / Serve)
 - **Database**: Supabase (PostgreSQL with Row-Level Security)
 - **Auth**: Supabase Auth (multi-tenant aware)
 - **Payments**: Stripe — online checkout + in-person Terminal POS; product orders for commerce tenants
-- **AI**: Claude (Anthropic) — three primary agents (Attract / Retain / Serve); Trinity content engine
+- **AI**: Claude (Anthropic) — three primary agents (Attract / Retain / Serve) coordinated by a primary orchestrator (intent routing, tool dispatch, and readiness at `/api/agents/orchestrator`); Trinity content engine
 - **Email**: SendGrid (per-tenant configuration)
 - **SMS**: Twilio (per-tenant configuration)
 - **Deployment**: Vercel (wildcard subdomains)
+- **Brand**: terminal-green x3o identity (accent `#00ffb2` on `#010409`) — assets and regeneration notes in [`public/icons-README.md`](public/icons-README.md). KeLatic beauty tenant keeps its own `logo.png`.
 
 ## Multi-Tenant Features
 

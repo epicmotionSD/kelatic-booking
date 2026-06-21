@@ -49,3 +49,6 @@ export interface PrimaryAgent {
   description: string;
   icon: string;
   /** Brand accent color (hex) for UI. */
+  color: string;
+  modules: AgentModule[];
+}

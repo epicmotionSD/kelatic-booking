@@ -62,4 +62,38 @@ export default function AgentsBoard({
                   className="w-10 h-10 rounded flex items-center justify-center"
                   style={{ backgroundColor: `${agent.color}22`, color: agent.color }}
                 >
-                  <AgentIcon name={
+                  <AgentIcon name={agent.icon} className="w-5 h-5" />
+                </div>
+                <span className="inline-flex items-center gap-1.5 term-label text-muted-foreground">
+                  <StatusDot tone={allWired ? 'up' : 'warn'} />
+                  {allWired ? 'ready' : `${wired}/${total} wired`}
+                </span>
+              </div>
+
+              <h2 className="mt-3 font-semibold text-foreground">{agent.name}</h2>
+              <p className="text-xs font-medium" style={{ color: agent.color }}>{agent.tagline}</p>
+              <p className="text-sm text-muted-foreground mt-2 flex-1">{agent.description}</p>
+
+              <div className="flex flex-wrap gap-1 mt-3">
+                {agent.modules.map((m) => (
+                  <span key={m.id} className="term-label text-muted-foreground border border-border rounded px-1.5 py-0.5">
+                    {m.name}
+                  </span>
+                ))}
+              </div>
+
+              <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
+                <span className="data-mono text-[11px] text-muted-foreground">
+                  {agent.modules.length} mod · {total} tools · {runnable} runnable
+                </span>
+                <span className="inline-flex items-center gap-1 text-sm text-foreground group-hover:text-[#00ffb2] group-hover:gap-2 transition-all">
+                  Open <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

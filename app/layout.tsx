@@ -35,6 +35,20 @@ const platformMetadata: Metadata = {
     url: platformUrl,
     siteName: 'x3o Intelligence',
     type: 'website',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'x3o Intelligence — Revenue Recovery AI, Claude-powered',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'x3o Intelligence | Claude-Powered B2B Intelligence Marketplace',
+    description: 'Production-ready AI systems for service businesses, powered by Claude.',
+    images: ['/og-image.png'],
   },
 };
 
@@ -87,7 +101,18 @@ export default async function RootLayout({
         '@type': 'SoftwareApplication',
         name: 'x3o Intelligence',
         applicationCategory: 'BusinessApplication',
-        description: 'Claude-powered vertical intelligence marketplace delivering production-ready AI systems for service businesses',
+        operatingSystem: 'Web',
+        url: platformUrl,
+        description: 'Claude-powered Revenue Recovery AI and vertical intelligence delivering production-ready AI systems for service businesses',
+        offers: {
+          '@type': 'Offer',
+          price: '297',
+          priceCurrency: 'USD',
+        },
+        provider: {
+          '@type': 'Organization',
+          name: 'Sonnier Ventures',
+        },
       };
 
   const siteUrl = business

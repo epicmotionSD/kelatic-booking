@@ -120,14 +120,14 @@ export function ServiceSelection({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-400" />
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#b08344]" />
       </div>
     );
   }
 
   return (
     <div>
-      <h2 className="text-2xl font-playfair font-bold text-stone-900 mb-6">
+      <h2 className="text-2xl font-playfair font-medium text-stone-900 mb-6">
         {categoryFilter ? `Select a ${CATEGORY_LABELS[categoryFilter]} Service` : 'Choose Your Perfect Service'}
       </h2>
 
@@ -138,8 +138,8 @@ export function ServiceSelection({
             onClick={() => setActiveCategory('all')}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
               activeCategory === 'all'
-                ? 'bg-amber-500 text-white shadow-lg'
-                : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
+                ? 'bg-[#b08344] text-white shadow-sm'
+                : 'bg-white text-stone-700 hover:border-[#b08344]/40 border border-[#e7ddcd]'
             }`}
           >
             All Services
@@ -150,8 +150,8 @@ export function ServiceSelection({
               onClick={() => setActiveCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
                 activeCategory === category
-                  ? 'bg-amber-500 text-white shadow-lg'
-                  : 'bg-white text-stone-700 hover:bg-amber-50 border border-stone-200'
+                  ? 'bg-[#b08344] text-white shadow-sm'
+                  : 'bg-white text-stone-700 hover:border-[#b08344]/40 border border-[#e7ddcd]'
               }`}
             >
               {CATEGORY_LABELS[category]}
@@ -166,10 +166,10 @@ export function ServiceSelection({
           <button
             key={service.id}
             onClick={() => handleServiceSelect(service)}
-            className={`w-full text-left p-6 rounded-xl border-2 transition-all hover:shadow-lg ${
+            className={`w-full text-left p-6 rounded-xl border-2 transition-all hover:shadow-sm ${
               selected?.id === service.id
-                ? 'border-amber-500 bg-amber-50 shadow-lg'
-                : 'border-stone-200 bg-white hover:border-amber-300 hover:bg-amber-50'
+                ? 'border-[#b08344] bg-[#f4e9d6] shadow-sm'
+                : 'border-[#e7ddcd] bg-white hover:border-[#b08344]/40'
             }`}
           >
             <div className="flex justify-between items-start">
@@ -177,7 +177,7 @@ export function ServiceSelection({
                 <div className="flex items-center gap-3 mb-2">
                   <h3 className="font-semibold text-stone-900 text-lg">{service.name}</h3>
                   {service.deposit_required && (
-                    <span className="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full border border-amber-200">
+                    <span className="px-2 py-1 bg-[#f4e9d6] text-[#8a5a2b] text-xs rounded-full border border-[#e0d4c0]">
                       Deposit Required
                     </span>
                   )}
@@ -193,7 +193,7 @@ export function ServiceSelection({
                 </div>
               </div>
               <div className="text-right ml-6">
-                <p className="font-bold text-2xl text-amber-600">
+                <p className="font-playfair font-medium text-2xl text-[#8a5a2b]">
                   {formatCurrency(service.base_price * 100)}
                 </p>
                 {service.deposit_required && service.deposit_amount && (
@@ -208,8 +208,8 @@ export function ServiceSelection({
             <div
               className={`mt-4 flex items-center justify-center py-3 rounded-lg transition-all ${
                 selected?.id === service.id
-                  ? 'bg-amber-500 text-white font-semibold shadow-lg'
-                  : 'bg-stone-100 text-stone-600 hover:bg-amber-100'
+                  ? 'bg-[#b08344] text-white font-semibold shadow-sm'
+                  : 'bg-[#f3ede3] text-stone-600 hover:bg-[#f4e9d6]'
               }`}
             >
               {selected?.id === service.id ? (
@@ -230,8 +230,8 @@ export function ServiceSelection({
 
       {/* Add-ons Section */}
       {showAddons && selected && addonServices.length > 0 && (
-        <div className="mt-8 p-6 bg-stone-50 rounded-xl border border-stone-200">
-          <h3 className="text-lg font-playfair font-semibold text-stone-900 mb-4">
+        <div className="mt-8 p-6 bg-[#f3ede3] rounded-xl border border-[#e7ddcd]">
+          <h3 className="text-lg font-playfair font-medium text-stone-900 mb-4">
             Enhance Your Experience (Optional)
           </h3>
           <div className="space-y-3">
@@ -241,18 +241,18 @@ export function ServiceSelection({
                 <button
                   key={addon.id}
                   onClick={() => toggleAddon(addon)}
-                  className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all hover:shadow-md ${
+                  className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition-all hover:shadow-sm ${
                     isSelected
-                      ? 'border-amber-500 bg-amber-50'
-                      : 'border-stone-200 bg-white hover:border-amber-300'
+                      ? 'border-[#b08344] bg-[#f4e9d6]'
+                      : 'border-[#e7ddcd] bg-white hover:border-[#b08344]/40'
                   }`}
                 >
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                         isSelected
-                          ? 'border-amber-500 bg-amber-500'
-                          : 'border-stone-300'
+                          ? 'border-[#b08344] bg-[#b08344]'
+                          : 'border-[#e0d4c0]'
                       }`}
                     >
                       {isSelected && (
@@ -267,7 +267,7 @@ export function ServiceSelection({
                       </p>
                     </div>
                   </div>
-                  <p className="font-semibold text-amber-600">
+                  <p className="font-semibold text-[#8a5a2b]">
                     +{formatCurrency(addon.base_price * 100)}
                   </p>
                 </button>
@@ -279,7 +279,7 @@ export function ServiceSelection({
 
       {/* Summary & Continue */}
       {selected && (
-        <div className="sticky bottom-4 mt-8 bg-white rounded-xl border border-amber-200 shadow-lg p-6">
+        <div className="sticky bottom-4 mt-8 bg-white rounded-xl border border-[#e0d4c0] shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex-1">
               <p className="font-semibold text-stone-900 text-lg">{selected.name}</p>
@@ -294,14 +294,14 @@ export function ServiceSelection({
               </div>
             </div>
             <div className="text-right">
-              <p className="text-2xl font-bold text-amber-600">
+              <p className="text-2xl font-playfair font-medium text-[#8a5a2b]">
                 {formatCurrency(totalPrice * 100)}
               </p>
             </div>
           </div>
           <button
             onClick={handleContinue}
-            className="w-full py-4 bg-amber-500 text-white rounded-xl font-semibold hover:bg-amber-600 transition-all shadow-lg flex items-center justify-center gap-2"
+            className="w-full py-4 bg-[#b08344] text-white rounded-full font-semibold hover:bg-[#9a6f33] transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2"
           >
             Continue to Stylist Selection
             <ArrowRight className="w-5 h-5" />

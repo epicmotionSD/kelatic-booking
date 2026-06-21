@@ -1,12 +1,12 @@
 {
-  "name": "KeLatic - Premium Hair Salon",
-  "short_name": "KeLatic",
+  "name": "x3o Intelligence",
+  "short_name": "x3o",
   "id": "/",
-  "description": "Book appointments at KeLatic premium hair salon",
-  "start_url": "/",
+  "description": "Claude-powered Revenue Recovery AI and vertical intelligence for service businesses.",
+  "start_url": "/admin",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "background_color": "#010409",
+  "theme_color": "#010409",
   "orientation": "portrait",
   "scope": "/",
   "icons": [
@@ -17,7 +17,7 @@
       "purpose": "any maskable"
     },
     {
-      "src": "/icon-512x512.png", 
+      "src": "/icon-512x512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
@@ -25,35 +25,35 @@
   ],
   "shortcuts": [
     {
-      "name": "Book Appointment",
-      "short_name": "Book",
-      "description": "Book a new appointment",
-      "url": "/book",
-      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Point of Sale",
-      "short_name": "POS",
-      "description": "Open point of sale checkout",
-      "url": "/admin/pos",
-      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Walk-in Check-in",
-      "short_name": "Walk-in",
-      "description": "Open walk-in check-in form",
-      "url": "/walk-in",
-      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
-    },
-    {
-      "name": "Admin Dashboard", 
-      "short_name": "Admin",
-      "description": "Access admin dashboard",
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "Open the x3o admin dashboard",
       "url": "/admin",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Agents",
+      "short_name": "Agents",
+      "description": "Attract, Retain, and Serve agents",
+      "url": "/admin/agents",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Campaigns",
+      "short_name": "Campaigns",
+      "description": "Plan and run revenue campaigns",
+      "url": "/admin/trinity/marketing",
+      "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Loyalty",
+      "short_name": "Loyalty",
+      "description": "Loyalty and referrals",
+      "url": "/admin/loyalty",
       "icons": [{ "src": "/icon-192x192.png", "sizes": "192x192" }]
     }
   ],
-  "categories": ["business", "lifestyle"],
+  "categories": ["business", "productivity"],
   "lang": "en-US",
   "dir": "ltr"
 }

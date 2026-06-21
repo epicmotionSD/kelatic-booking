@@ -1,10 +1,5 @@
-<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="favGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#8B5CF6"/>
-      <stop offset="100%" style="stop-color:#D946EF"/>
-    </linearGradient>
-  </defs>
-  <rect width="32" height="32" rx="8" fill="url(#favGradient)"/>
-  <text x="4" y="24" font-family="system-ui, -apple-system, sans-serif" font-size="18" font-weight="800" fill="#ffffff">x3</text>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="x3o">
+  <rect width="32" height="32" rx="7" fill="#010409"/>
+  <rect x="1.5" y="1.5" width="29" height="29" rx="5.5" fill="none" stroke="#00ffb2" stroke-opacity="0.3"/>
+  <text x="16" y="22" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, 'DejaVu Sans Mono', monospace" font-size="15" font-weight="700" letter-spacing="-0.5" fill="#00ffb2">x3o</text>
 </svg>
