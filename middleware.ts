@@ -66,6 +66,11 @@ function extractSubdomain(hostname: string): string | null {
     return 'kelatic';
   }
 
+  // Kelatic Vitality House custom domain → vitality tenant
+  if (host === 'kelaticvitalityhouse.com' || host === 'www.kelaticvitalityhouse.com') {
+    return 'vitality';
+  }
+
   // Barber Block domain → treat as Kelatic tenant (barber branding applied in middleware)
   if (BARBER_DOMAINS.includes(host)) {
     return 'kelatic';
