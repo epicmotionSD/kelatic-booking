@@ -22,6 +22,7 @@ interface FormState {
   name: string;
   category_id: string;
   description: string;
+  image_url: string;
   price: string; // dollars
   tags: string; // comma separated
   is_featured: boolean;
@@ -35,6 +36,7 @@ const EMPTY_FORM: FormState = {
   name: '',
   category_id: '',
   description: '',
+  image_url: '',
   price: '',
   tags: '',
   is_featured: false,
@@ -87,6 +89,7 @@ export default function ProductsPage() {
       name: p.name,
       category_id: p.category_id || '',
       description: p.description || '',
+      image_url: p.image_url || '',
       price: (p.price_cents / 100).toFixed(2),
       tags: (p.tags || []).join(', '),
       is_featured: p.is_featured,
@@ -134,6 +137,7 @@ export default function ProductsPage() {
         name: form.name.trim(),
         category_id: form.category_id || null,
         description: form.description || null,
+        image_url: form.image_url.trim() || null,
         price_cents,
         tags: form.tags
           .split(',')
@@ -299,7 +303,15 @@ export default function ProductsPage() {
                 p.is_active ? 'border-border' : 'border-border opacity-60'
               }`}
             >
-              <div className="min-w-0">
+              <div className="flex items-center gap-3 min-w-0">
+                {p.image_url && (
+                  <img
+                    src={p.image_url}
+                    alt={p.name}
+                    className="w-12 h-12 rounded-lg object-cover border border-border shrink-0"
+                  />
+                )}
+                <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold text-foreground truncate">{p.name}</span>
                   {p.is_featured && <Star className="w-4 h-4 text-amber-500 fill-amber-400" />}
@@ -317,6 +329,7 @@ export default function ProductsPage() {
                       <Tag className="w-3 h-3" /> {p.tags.join(', ')}
                     </span>
                   )}
+                </div>
                 </div>
               </div>
               <div className="flex items-center gap-3 shrink-0">
@@ -406,6 +419,36 @@ export default function ProductsPage() {
                   className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm"
                   placeholder="Blended sea moss, mango, pineapple…"
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-foreground/90 mb-1">
+                  Image <span className="text-muted-foreground font-normal">(path or URL)</span>
+                </label>
+                <div className="flex items-start gap-3">
+                  {form.image_url ? (
+                    <img
+                      src={form.image_url}
+                      alt="Preview"
+                      className="w-16 h-16 rounded-lg object-cover border border-border bg-background shrink-0"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-lg border border-dashed border-border bg-background flex items-center justify-center shrink-0">
+                      <Package className="w-5 h-5 text-muted-foreground/50" />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <input
+                      value={form.image_url}
+                      onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                      className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm"
+                      placeholder="/vitality/products/hibiscus-lemonade.jpg"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Drop the file in <code className="text-[#00ffb2]">public/vitality/products/</code> and reference it as <code>/vitality/products/your-file.jpg</code>, or paste a full image URL.
+                    </p>
+                  </div>
+                </div>
               </div>
 
               <div>

@@ -20,6 +20,7 @@ interface ShopProduct {
   tags: string[];
   category_id: string | null;
   is_featured: boolean;
+  image_url: string | null;
 }
 interface ShopCategory { id: string; name: string }
 
@@ -108,6 +109,14 @@ export default function ShopPage() {
                 const q = qtyOf(p.id);
                 return (
                   <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col">
+                    {p.image_url && (
+                      <img
+                        src={p.image_url}
+                        alt={p.name}
+                        loading="lazy"
+                        className="w-full aspect-[4/3] object-cover rounded-xl mb-3 bg-[#eef4ec]"
+                      />
+                    )}
                     <div className="flex-1">
                       <div className="font-semibold">{p.name}</div>
                       {p.description && (

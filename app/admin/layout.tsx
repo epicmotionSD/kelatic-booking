@@ -22,6 +22,7 @@ import {
   Package,
   ChevronDown,
   Gem,
+  QrCode,
 } from 'lucide-react';
 import { SkipLink, useAriaLiveRegion } from '@/lib/accessibility';
 import { Clock } from '@/components/terminal';
@@ -30,6 +31,7 @@ type NavItem = {
   label: string;
   href?: string;
   icon: React.ReactNode;
+  external?: boolean; // open in a new tab (e.g. public-facing pages)
   children?: { label: string; href: string; icon: React.ReactNode }[];
 };
 
@@ -109,6 +111,7 @@ const COMMERCE_NAV: NavItem[] = [
   { label: 'Point of Sale', href: '/admin/register', icon: <CreditCard className="w-5 h-5" /> },
   { label: 'Orders', href: '/admin/orders', icon: <ShoppingBag className="w-5 h-5" /> },
   { label: 'Products', href: '/admin/products', icon: <Package className="w-5 h-5" /> },
+  { label: 'Order QR', href: '/order', icon: <QrCode className="w-5 h-5" />, external: true },
   { label: 'Loyalty', href: '/admin/loyalty', icon: <Gem className="w-5 h-5" /> },
   {
     label: 'Booking',
@@ -264,6 +267,8 @@ export default function AdminLayout({
               <Link
                 key={item.href}
                 href={item.href!}
+                target={item.external ? '_blank' : undefined}
+                rel={item.external ? 'noopener noreferrer' : undefined}
                 onClick={() => isMobile && setSidebarOpen(false)}
                 aria-current={isActive ? 'page' : undefined}
                 className={`flex items-center gap-2.5 px-3 py-2 rounded text-sm border-l-2 transition-colors focus:outline-none focus:ring-1 focus:ring-[#00ffb2] ${
