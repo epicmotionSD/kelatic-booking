@@ -11,7 +11,9 @@ import {
   X,
   Trash2,
   Tag,
+  Upload,
 } from 'lucide-react';
+import { useRef } from 'react';
 import type { Product, ProductCategory } from '@/types/commerce';
 
 interface OptionDraft { name: string; price_delta: string; is_default: boolean }
@@ -51,6 +53,8 @@ export default function ProductsPage() {
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [modalOpen, setModalOpen] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [activeCat, setActiveCat] = useState<string>('all');
@@ -122,6 +126,25 @@ export default function ProductsPage() {
       setCategories((c) => [...c, category]);
       setForm((f) => ({ ...f, category_id: category.id }));
       setNewCategory('');
+    }
+  }
+
+  async function uploadImage(file: File) {
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/admin/products/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (!res.ok) {
+        alert(data.error || 'Upload failed');
+        return;
+      }
+      setForm((f) => ({ ...f, image_url: data.url }));
+    } catch {
+      alert('Upload failed');
+    } finally {
+      setUploading(false);
     }
   }
 
@@ -438,15 +461,45 @@ export default function ProductsPage() {
                     </div>
                   )}
                   <div className="flex-1">
-                    <input
-                      value={form.image_url}
-                      onChange={(e) => setForm({ ...form, image_url: e.target.value })}
-                      className="w-full border border-border bg-background rounded-lg px-3 py-2 text-sm"
-                      placeholder="/vitality/products/hibiscus-lemonade.jpg"
-                    />
+                    <div className="flex gap-2">
+                      <input
+                        value={form.image_url}
+                        onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+                        className="flex-1 min-w-0 border border-border bg-background rounded-lg px-3 py-2 text-sm"
+                        placeholder="Upload an image or paste a URL"
+                      />
+                      <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/webp,image/gif"
+                        className="hidden"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (f) uploadImage(f);
+                          e.target.value = '';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading}
+                        className="shrink-0 inline-flex items-center gap-1.5 bg-[#00ffb2] hover:brightness-95 disabled:opacity-50 text-black px-3 py-2 rounded-lg text-sm font-medium"
+                      >
+                        <Upload className="w-4 h-4" /> {uploading ? 'Uploading…' : 'Upload'}
+                      </button>
+                    </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      Drop the file in <code className="text-[#00ffb2]">public/vitality/products/</code> and reference it as <code>/vitality/products/your-file.jpg</code>, or paste a full image URL.
+                      Upload a photo (PNG/JPG/WEBP, max 10MB) or paste an image URL.
                     </p>
+                    {form.image_url && (
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, image_url: '' })}
+                        className="text-xs text-[#ef4444] hover:underline mt-1"
+                      >
+                        Remove image
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>

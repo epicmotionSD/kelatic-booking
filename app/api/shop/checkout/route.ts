@@ -8,7 +8,7 @@ import {
 } from '@/lib/agents/modules/loyalty';
 import { buildConnectRouting } from '@/lib/stripe/connect';
 
-interface CartLine { product_id: string; quantity: number }
+interface CartLine { product_id: string; quantity: number; option_ids?: string[] }
 interface LoyaltyApply { rewardId: string }
 
 // POST /api/shop/checkout — create an order + Stripe PaymentIntent (online card)
@@ -36,15 +36,29 @@ export async function POST(request: NextRequest) {
   const supabase = createAdminClient();
   const businessId = business.id;
 
-  // Recompute prices server-side (authoritative)
+  // Recompute prices server-side (authoritative), including selected options.
   const ids = [...new Set(items.map((i) => i.product_id))];
   const { data: products } = await supabase
     .from('products')
-    .select('id, name, price_cents, is_active')
+    .select('id, name, price_cents, is_active, option_groups:product_option_groups(id, name, options:product_options(id, name, price_delta_cents, is_active))')
     .eq('business_id', businessId)
     .in('id', ids);
 
   const priceMap = new Map((products || []).filter((p) => p.is_active).map((p) => [p.id, p]));
+
+  // Map every option id → its price delta + label, but only for options that
+  // actually belong to the given product (prevents client-side price tampering).
+  type OptInfo = { name: string; delta: number };
+  const optionIndex = new Map<string, Map<string, OptInfo>>();
+  for (const p of products || []) {
+    const perProduct = new Map<string, OptInfo>();
+    for (const g of (p as { option_groups?: Array<{ name: string; options?: Array<{ id: string; name: string; price_delta_cents: number; is_active: boolean }> }> }).option_groups || []) {
+      for (const o of g.options || []) {
+        if (o.is_active) perProduct.set(o.id, { name: o.name, delta: o.price_delta_cents });
+      }
+    }
+    optionIndex.set((p as { id: string }).id, perProduct);
+  }
 
   let subtotal = 0;
   const lineItems = items
@@ -52,15 +66,26 @@ export async function POST(request: NextRequest) {
       const p = priceMap.get(i.product_id);
       if (!p) return null;
       const qty = Math.max(1, Math.round(i.quantity || 1));
-      const line = p.price_cents * qty;
+      const perProduct = optionIndex.get(p.id) || new Map<string, OptInfo>();
+      const chosen = Array.isArray(i.option_ids) ? i.option_ids : [];
+      const selected_options: Array<{ id: string; name: string; price_delta_cents: number }> = [];
+      let optionDelta = 0;
+      for (const oid of chosen) {
+        const info = perProduct.get(oid);
+        if (!info) continue; // ignore ids that don't belong to this product
+        optionDelta += info.delta;
+        selected_options.push({ id: oid, name: info.name, price_delta_cents: info.delta });
+      }
+      const unit = p.price_cents + optionDelta;
+      const line = unit * qty;
       subtotal += line;
       return {
         product_id: p.id,
         product_name: p.name,
-        unit_price_cents: p.price_cents,
+        unit_price_cents: unit,
         quantity: qty,
         line_total_cents: line,
-        selected_options: [],
+        selected_options,
       };
     })
     .filter(Boolean) as Array<Record<string, unknown>>;

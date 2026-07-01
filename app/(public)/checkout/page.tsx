@@ -91,7 +91,7 @@ export default function CheckoutPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          items: cart.map((l) => ({ product_id: l.product_id, quantity: l.quantity })),
+          items: cart.map((l) => ({ product_id: l.product_id, quantity: l.quantity, option_ids: l.option_ids || [] })),
           customer: { name: name.trim(), email: email.trim(), phone: phone.trim() },
           tip_cents: tipCents,
           notes: notes.trim() || undefined,
@@ -181,9 +181,12 @@ export default function CheckoutPage() {
             <h2 className="font-semibold mb-3">Order Summary</h2>
             <ul className="space-y-2 mb-3 text-sm">
               {cart.map((l) => (
-                <li key={l.product_id} className="flex justify-between">
-                  <span>{l.quantity}× {l.name}</span>
-                  <span className="text-[#1f3d2b]/70">{formatCurrency(l.price_cents * l.quantity)}</span>
+                <li key={l.key} className="flex justify-between gap-2">
+                  <span className="min-w-0">
+                    {l.quantity}× {l.name}
+                    {l.options_label && <span className="block text-xs text-[#1f3d2b]/50">{l.options_label}</span>}
+                  </span>
+                  <span className="text-[#1f3d2b]/70 shrink-0">{formatCurrency(l.price_cents * l.quantity)}</span>
                 </li>
               ))}
             </ul>

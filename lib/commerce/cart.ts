@@ -2,13 +2,21 @@
 // Used by the public storefront + checkout.
 
 export interface CartLine {
+  key: string;              // unique per product + selected-option combo
   product_id: string;
   name: string;
-  price_cents: number;
+  price_cents: number;      // unit price incl. selected options (server re-verifies)
   quantity: number;
+  option_ids?: string[];    // selected product_option ids
+  options_label?: string;   // e.g. "32 oz · Sea Moss"
 }
 
-const KEY = 'vh_cart_v1';
+// Stable key for a product + a set of chosen option ids.
+export function lineKey(productId: string, optionIds: string[] = []): string {
+  return optionIds.length ? `${productId}::${[...optionIds].sort().join(',')}` : productId;
+}
+
+const KEY = 'vh_cart_v2';
 
 export function readCart(): CartLine[] {
   if (typeof window === 'undefined') return [];
