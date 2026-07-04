@@ -49,6 +49,14 @@ function activeGroups(p: ShopProduct): ShopOptionGroup[] {
     .sort((a, b) => a.sort_order - b.sort_order);
 }
 
+// Split a product's option groups into its single-select "Size" group (if any)
+// and the rest. Used to render size as inline pills on the card.
+function splitSize(groups: ShopOptionGroup[]) {
+  const size = groups.find((g) => g.name.trim().toLowerCase() === 'size' && g.max_select === 1);
+  const others = size ? groups.filter((g) => g !== size) : groups;
+  return { size, others };
+}
+
 export default function ShopPage() {
   const router = useRouter();
   const [products, setProducts] = useState<ShopProduct[]>([]);
@@ -58,6 +66,8 @@ export default function ShopPage() {
   const [activeCat, setActiveCat] = useState('all');
   const [loading, setLoading] = useState(true);
   const [picker, setPicker] = useState<ShopProduct | null>(null);
+  // Per-product inline size selection (product id → chosen size option id).
+  const [sizeSel, setSizeSel] = useState<Record<string, string>>({});
 
   useEffect(() => {
     setCart(readCart());
@@ -129,6 +139,184 @@ export default function ShopPage() {
     return out;
   }, [products, categories, activeCat]);
 
+  // Seed the customize modal with the size the customer already picked inline.
+  function pickerPreselect(p: ShopProduct): Record<string, string[]> | undefined {
+    const { size } = splitSize(activeGroups(p));
+    if (!size) return undefined;
+    const chosen = sizeSel[p.id] || (size.options.find((o) => o.is_default) || size.options[0])?.id;
+    return chosen ? { [size.id]: [chosen] } : undefined;
+  }
+
+  function ProductImage({ p }: { p: ShopProduct }) {
+    return p.image_url ? (
+      <img
+        src={p.image_url}
+        alt={p.name}
+        loading="lazy"
+        className="w-full aspect-[4/3] object-cover rounded-xl mb-3 bg-[#eef4ec]"
+      />
+    ) : (
+      <div className="w-full aspect-[4/3] rounded-xl mb-3 bg-[#eef4ec] flex items-center justify-center">
+        <Leaf className="w-8 h-8 text-[#3f7d4f]/30" />
+      </div>
+    );
+  }
+
+  function renderCard(p: ShopProduct) {
+    const groups = activeGroups(p);
+    const { size, others } = splitSize(groups);
+    const requiredOthers = others.filter((g) => g.min_select >= 1);
+
+    // Inline size flow: single-select Size group and no *required* extra groups.
+    // Optional add-ons (if any) still default in and can be tweaked via "Add-ons".
+    if (size && requiredOthers.length === 0) {
+      const optionsById = new Map(groups.flatMap((g) => g.options.map((o) => [o.id, o] as const)));
+      const defaultSizeId = (size.options.find((o) => o.is_default) || size.options[0])?.id;
+      const selSize = sizeSel[p.id] || defaultSizeId;
+      const otherDefaults = others.flatMap((g) => g.options.filter((o) => o.is_default).map((o) => o.id));
+      const optionIds = [selSize, ...otherDefaults].filter(Boolean) as string[];
+      const delta = optionIds.reduce((s, id) => s + (optionsById.get(id)?.price_delta_cents || 0), 0);
+      const unit = p.price_cents + delta;
+      const key = lineKey(p.id, optionIds);
+      const q = qtyOf(key);
+      const label = optionIds.map((id) => optionsById.get(id)?.name).filter(Boolean).join(' · ');
+      const add = () =>
+        addLine({
+          key,
+          product_id: p.id,
+          name: p.name,
+          price_cents: unit,
+          option_ids: optionIds,
+          options_label: label || undefined,
+        });
+
+      return (
+        <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col">
+          <ProductImage p={p} />
+          <div className="flex-1">
+            <div className="font-semibold">{p.name}</div>
+            {p.description && (
+              <p className="text-sm text-[#1f3d2b]/60 mt-1 line-clamp-2">{p.description}</p>
+            )}
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {size.options.map((o) => {
+                const on = selSize === o.id;
+                return (
+                  <button
+                    key={o.id}
+                    onClick={() => setSizeSel((s) => ({ ...s, [p.id]: o.id }))}
+                    className={`px-2.5 py-1 rounded-full text-xs border transition-colors ${
+                      on
+                        ? 'border-[#3f7d4f] bg-[#eef4ec] text-[#3f7d4f] font-semibold'
+                        : 'border-[#1f3d2b]/15 text-[#1f3d2b]/70 hover:border-[#3f7d4f]/50'
+                    }`}
+                  >
+                    {o.name}
+                    {o.price_delta_cents > 0 && ` +${formatCurrency(o.price_delta_cents)}`}
+                  </button>
+                );
+              })}
+            </div>
+            {p.tags?.length > 0 && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {p.tags.map((t) => (
+                  <span key={t} className="text-[10px] uppercase tracking-wide bg-[#eef4ec] text-[#3f7d4f] px-2 py-0.5 rounded-full">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+          <div className="flex items-center justify-between mt-3">
+            <span className="font-bold">{formatCurrency(unit)}</span>
+            {q === 0 ? (
+              <button
+                onClick={add}
+                className="flex items-center gap-1 bg-[#3f7d4f] hover:bg-[#356b44] text-white text-sm px-3 py-1.5 rounded-full"
+              >
+                <Plus className="w-4 h-4" /> Add
+              </button>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button onClick={() => changeQty(key, -1)} className="p-1.5 bg-[#eef4ec] rounded-full">
+                  <Minus className="w-4 h-4" />
+                </button>
+                <span className="w-5 text-center font-semibold">{q}</span>
+                <button onClick={add} className="p-1.5 bg-[#eef4ec] rounded-full">
+                  <Plus className="w-4 h-4" />
+                </button>
+              </div>
+            )}
+          </div>
+          {others.length > 0 && (
+            <button
+              onClick={() => setPicker(p)}
+              className="text-xs text-[#3f7d4f] mt-2 self-start hover:underline"
+            >
+              + Add-ons
+            </button>
+          )}
+        </div>
+      );
+    }
+
+    // Fallback: products with required option groups use the Choose modal;
+    // simple products get a direct Add/stepper.
+    const hasOptions = groups.length > 0;
+    const q = qtyOf(p.id);
+    return (
+      <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col">
+        <ProductImage p={p} />
+        <div className="flex-1">
+          <div className="font-semibold">{p.name}</div>
+          {p.description && (
+            <p className="text-sm text-[#1f3d2b]/60 mt-1 line-clamp-2">{p.description}</p>
+          )}
+          {p.tags?.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {p.tags.map((t) => (
+                <span key={t} className="text-[10px] uppercase tracking-wide bg-[#eef4ec] text-[#3f7d4f] px-2 py-0.5 rounded-full">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="flex items-center justify-between mt-3">
+          <span className="font-bold">
+            {hasOptions && <span className="text-xs font-normal text-[#1f3d2b]/50 mr-1">from</span>}
+            {formatCurrency(p.price_cents)}
+          </span>
+          {hasOptions ? (
+            <button
+              onClick={() => setPicker(p)}
+              className="flex items-center gap-1 bg-[#3f7d4f] hover:bg-[#356b44] text-white text-sm px-3 py-1.5 rounded-full"
+            >
+              <Plus className="w-4 h-4" /> Choose
+            </button>
+          ) : q === 0 ? (
+            <button
+              onClick={() => addSimple(p, 1)}
+              className="flex items-center gap-1 bg-[#3f7d4f] hover:bg-[#356b44] text-white text-sm px-3 py-1.5 rounded-full"
+            >
+              <Plus className="w-4 h-4" /> Add
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <button onClick={() => addSimple(p, -1)} className="p-1.5 bg-[#eef4ec] rounded-full">
+                <Minus className="w-4 h-4" />
+              </button>
+              <span className="w-5 text-center font-semibold">{q}</span>
+              <button onClick={() => addSimple(p, 1)} className="p-1.5 bg-[#eef4ec] rounded-full">
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#f7f4ec] text-[#1f3d2b]">
       <header className="bg-[#3f7d4f] text-white">
@@ -165,73 +353,7 @@ export default function ShopPage() {
                     {section.name}
                   </h2>
                   <div className="grid sm:grid-cols-2 gap-3">
-                    {section.items.map((p) => {
-                      const groups = activeGroups(p);
-                      const hasOptions = groups.length > 0;
-                      const q = qtyOf(p.id);
-                      return (
-                        <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col">
-                          {p.image_url ? (
-                            <img
-                              src={p.image_url}
-                              alt={p.name}
-                              loading="lazy"
-                              className="w-full aspect-[4/3] object-cover rounded-xl mb-3 bg-[#eef4ec]"
-                            />
-                          ) : (
-                            <div className="w-full aspect-[4/3] rounded-xl mb-3 bg-[#eef4ec] flex items-center justify-center">
-                              <Leaf className="w-8 h-8 text-[#3f7d4f]/30" />
-                            </div>
-                          )}
-                          <div className="flex-1">
-                      <div className="font-semibold">{p.name}</div>
-                      {p.description && (
-                        <p className="text-sm text-[#1f3d2b]/60 mt-1 line-clamp-2">{p.description}</p>
-                      )}
-                      {p.tags?.length > 0 && (
-                        <div className="flex flex-wrap gap-1 mt-2">
-                          {p.tags.map((t) => (
-                            <span key={t} className="text-[10px] uppercase tracking-wide bg-[#eef4ec] text-[#3f7d4f] px-2 py-0.5 rounded-full">
-                              {t}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="font-bold">
-                        {hasOptions && <span className="text-xs font-normal text-[#1f3d2b]/50 mr-1">from</span>}
-                        {formatCurrency(p.price_cents)}
-                      </span>
-                      {hasOptions ? (
-                        <button
-                          onClick={() => setPicker(p)}
-                          className="flex items-center gap-1 bg-[#3f7d4f] hover:bg-[#356b44] text-white text-sm px-3 py-1.5 rounded-full"
-                        >
-                          <Plus className="w-4 h-4" /> Choose
-                        </button>
-                      ) : q === 0 ? (
-                        <button
-                          onClick={() => addSimple(p, 1)}
-                          className="flex items-center gap-1 bg-[#3f7d4f] hover:bg-[#356b44] text-white text-sm px-3 py-1.5 rounded-full"
-                        >
-                          <Plus className="w-4 h-4" /> Add
-                        </button>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => addSimple(p, -1)} className="p-1.5 bg-[#eef4ec] rounded-full">
-                            <Minus className="w-4 h-4" />
-                          </button>
-                          <span className="w-5 text-center font-semibold">{q}</span>
-                          <button onClick={() => addSimple(p, 1)} className="p-1.5 bg-[#eef4ec] rounded-full">
-                            <Plus className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-                          </div>
-                        </div>
-                      );
-                    })}
+                    {section.items.map((p) => renderCard(p))}
                   </div>
                 </section>
               ))}
@@ -282,6 +404,7 @@ export default function ShopPage() {
         <OptionPicker
           product={picker}
           groups={activeGroups(picker)}
+          preselect={pickerPreselect(picker)}
           onClose={() => setPicker(null)}
           onAdd={(line) => {
             addLine(line);
@@ -296,18 +419,25 @@ export default function ShopPage() {
 function OptionPicker({
   product,
   groups,
+  preselect,
   onClose,
   onAdd,
 }: {
   product: ShopProduct;
   groups: ShopOptionGroup[];
+  preselect?: Record<string, string[]>;
   onClose: () => void;
   onAdd: (line: Omit<CartLine, 'quantity'>) => void;
 }) {
   // Initialize: single-select required groups default to their default option (or first).
+  // A `preselect` (e.g. the size chosen inline on the card) overrides the default.
   const [selected, setSelected] = useState<Record<string, string[]>>(() => {
     const init: Record<string, string[]> = {};
     for (const g of groups) {
+      if (preselect?.[g.id]?.length) {
+        init[g.id] = preselect[g.id];
+        continue;
+      }
       if (g.max_select === 1 && g.min_select >= 1) {
         const def = g.options.find((o) => o.is_default) || g.options[0];
         init[g.id] = def ? [def.id] : [];
