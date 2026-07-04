@@ -1160,6 +1160,227 @@ export async function sendConfirmationByAppointmentId(
 }
 
 // ============================================
+// PRODUCT ORDER NOTIFICATIONS (Vitality House storefront)
+// ============================================
+// Fired by the Stripe webhook when an online product order is paid. Sends the
+// customer a branded receipt and notifies the shop owner that a sale came in.
+// Best-effort: any failure is logged but never blocks the webhook ack.
+
+interface OrderRow {
+  id: string;
+  business_id: string;
+  customer_name: string | null;
+  customer_email: string | null;
+  customer_phone: string | null;
+  subtotal_cents: number | null;
+  tip_cents: number | null;
+  discount_cents: number | null;
+  total_cents: number | null;
+  notes: string | null;
+  fulfillment_type: string | null;
+}
+
+interface OrderItemRow {
+  product_name: string | null;
+  quantity: number | null;
+  unit_price_cents: number | null;
+  line_total_cents: number | null;
+  selected_options: Array<{ name?: string }> | null;
+}
+
+function money(cents: number | null | undefined): string {
+  return `$${((cents ?? 0) / 100).toFixed(2)}`;
+}
+
+function orderItemsRowsHtml(items: OrderItemRow[], primaryColor: string): string {
+  return items
+    .map((it) => {
+      const opts = (it.selected_options || [])
+        .map((o) => o?.name)
+        .filter(Boolean)
+        .join(', ');
+      return `
+                <tr>
+                  <td style="padding:10px 0;border-bottom:1px solid #eeeeee;font-size:14px;color:#111111;">
+                    <strong>${it.quantity ?? 1}×</strong> ${it.product_name || 'Item'}
+                    ${opts ? `<span style="display:block;font-size:12px;color:#888888;">${opts}</span>` : ''}
+                  </td>
+                  <td style="padding:10px 0;border-bottom:1px solid #eeeeee;font-size:14px;color:#111111;text-align:right;white-space:nowrap;">${money(it.line_total_cents)}</td>
+                </tr>`;
+    })
+    .join('');
+}
+
+function orderTotalsHtml(order: OrderRow, primaryColor: string): string {
+  const rows: string[] = [
+    `<tr><td style="padding:4px 0;font-size:14px;color:#888888;">Subtotal</td><td style="padding:4px 0;font-size:14px;color:#111111;text-align:right;">${money(order.subtotal_cents)}</td></tr>`,
+  ];
+  if ((order.discount_cents ?? 0) > 0) {
+    rows.push(`<tr><td style="padding:4px 0;font-size:14px;color:${primaryColor};">Reward discount</td><td style="padding:4px 0;font-size:14px;color:${primaryColor};text-align:right;">-${money(order.discount_cents)}</td></tr>`);
+  }
+  if ((order.tip_cents ?? 0) > 0) {
+    rows.push(`<tr><td style="padding:4px 0;font-size:14px;color:#888888;">Tip</td><td style="padding:4px 0;font-size:14px;color:#111111;text-align:right;">${money(order.tip_cents)}</td></tr>`);
+  }
+  rows.push(`<tr><td style="padding:10px 0 0;font-size:16px;font-weight:700;color:#111111;">Total</td><td style="padding:10px 0 0;font-size:18px;font-weight:700;color:${primaryColor};text-align:right;">${money(order.total_cents)}</td></tr>`);
+  return rows.join('');
+}
+
+function getOrderReceiptHtml(order: OrderRow, items: OrderItemRow[], business: Business): string {
+  const primaryColor = business.primary_color || '#3f7d4f';
+  const firstName = (order.customer_name || 'there').split(' ')[0];
+  const bodyHtml = `
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#444444;">Hi ${firstName}, thanks for your order! We've received it and will have it ready for pickup shortly.</p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:8px;margin-bottom:20px;">
+                <tr><td style="padding:16px 20px;">
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    ${orderItemsRowsHtml(items, primaryColor)}
+                    ${orderTotalsHtml(order, primaryColor)}
+                  </table>
+                </td></tr>
+              </table>
+              ${order.notes ? `<p style="margin:0 0 8px;font-size:13px;color:#888888;"><strong>Your notes:</strong> ${order.notes}</p>` : ''}
+              <p style="margin:0;font-size:13px;color:#888888;">Pickup only${business.phone ? ` &middot; Questions? Call ${business.phone}` : ''}.</p>`;
+
+  return buildEmailHtml({
+    business,
+    bannerText: 'ORDER CONFIRMED',
+    bannerSubtext: 'Thanks for supporting us',
+    headline: 'Your order is confirmed',
+    bodyHtml,
+    footerNote: `You're receiving this because you placed an order with ${business.name}.`,
+  });
+}
+
+function getOwnerOrderHtml(order: OrderRow, items: OrderItemRow[], business: Business): string {
+  const primaryColor = business.primary_color || '#3f7d4f';
+  const bodyHtml = `
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#444444;">You just received a new online order.</p>
+
+              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:8px;margin-bottom:20px;">
+                <tr><td style="padding:16px 20px;border-bottom:1px solid #eeeeee;">
+                  <p style="margin:0 0 2px;font-size:12px;font-weight:700;color:#888888;text-transform:uppercase;letter-spacing:0.08em;">Customer</p>
+                  <p style="margin:0;font-size:16px;font-weight:600;color:#111111;">${order.customer_name || 'Guest'}</p>
+                  <p style="margin:2px 0 0;font-size:13px;color:#888888;">${order.customer_email || ''}${order.customer_phone ? ` &middot; ${order.customer_phone}` : ''}</p>
+                </td></tr>
+                <tr><td style="padding:16px 20px;">
+                  <table width="100%" cellpadding="0" cellspacing="0">
+                    ${orderItemsRowsHtml(items, primaryColor)}
+                    ${orderTotalsHtml(order, primaryColor)}
+                  </table>
+                </td></tr>
+              </table>
+              ${order.notes ? `<p style="margin:0 0 8px;font-size:13px;color:#888888;"><strong>Order notes:</strong> ${order.notes}</p>` : ''}`;
+
+  return buildEmailHtml({
+    business,
+    bannerText: 'NEW ORDER',
+    bannerSubtext: `${order.customer_name || 'Guest'} &middot; ${money(order.total_cents)}`,
+    headline: `New order &middot; ${money(order.total_cents)}`,
+    bodyHtml,
+    ctaLabel: 'View in dashboard',
+    ctaUrl: `${getBusinessUrl(business)}/admin/orders`,
+    footerNote: `Internal sale notification from ${business.name}.`,
+  });
+}
+
+// Send the customer receipt + owner sale notification for a paid product order.
+// Idempotency is handled by the caller (only fire on the pending→paid transition).
+export async function sendOrderNotifications(orderId: string): Promise<void> {
+  try {
+    const admin = createAdminClient();
+
+    const { data: order } = await admin
+      .from('orders')
+      .select('id, business_id, customer_name, customer_email, customer_phone, subtotal_cents, tip_cents, discount_cents, total_cents, notes, fulfillment_type')
+      .eq('id', orderId)
+      .single();
+    if (!order) {
+      console.error(`[order-notify] Order not found: ${orderId}`);
+      return;
+    }
+
+    const { data: items } = await admin
+      .from('order_items')
+      .select('product_name, quantity, unit_price_cents, line_total_cents, selected_options')
+      .eq('order_id', orderId);
+
+    const { data: business } = await admin
+      .from('businesses')
+      .select('*')
+      .eq('id', order.business_id)
+      .single();
+    if (!business) {
+      console.error(`[order-notify] Business not found for order ${orderId}`);
+      return;
+    }
+
+    if (!isEmailProviderConfigured()) {
+      console.log('[order-notify] Email provider not configured, skipping');
+      return;
+    }
+
+    const ctx: BusinessContext = { business: business as Business, settings: null };
+    const fromEmail = getFromEmail(ctx);
+    const orderRow = order as OrderRow;
+    const itemRows = (items || []) as OrderItemRow[];
+
+    // Customer receipt
+    if (orderRow.customer_email) {
+      try {
+        const result = await sendEmailMessage({
+          to: orderRow.customer_email,
+          fromEmail,
+          fromName: business.name,
+          subject: `Your ${business.name} order — ${money(orderRow.total_cents)}`,
+          html: getOrderReceiptHtml(orderRow, itemRows, business as Business),
+        });
+        if (!result.success) throw new Error(result.error || 'send failed');
+        console.log(`[order-notify] Receipt sent to ${orderRow.customer_email}`);
+      } catch (err) {
+        console.error('[order-notify] Receipt send failed:', err);
+      }
+    }
+
+    // Owner notification — to the business email plus any internal CC (kelatic).
+    const ownerEmail = business.email;
+    if (ownerEmail) {
+      const cc = getInternalCcRecipients(ctx).filter((e) => e !== ownerEmail);
+      try {
+        const result = await sendEmailMessage({
+          to: ownerEmail,
+          cc: cc.length ? cc : undefined,
+          fromEmail,
+          fromName: business.name,
+          subject: `🛎️ New order — ${money(orderRow.total_cents)} from ${orderRow.customer_name || 'a customer'}`,
+          html: getOwnerOrderHtml(orderRow, itemRows, business as Business),
+        });
+        if (!result.success) throw new Error(result.error || 'send failed');
+        console.log(`[order-notify] Owner notified at ${ownerEmail}`);
+      } catch (err) {
+        console.error('[order-notify] Owner notify send failed:', err);
+      }
+    }
+
+    // Owner SMS (best-effort) if Twilio + a business phone are configured.
+    const fromPhone = process.env.TWILIO_PHONE_NUMBER || '';
+    if (isSmsProviderConfigured() && fromPhone && business.phone) {
+      try {
+        await sendSmsMessage({
+          from: fromPhone,
+          to: business.phone,
+          body: `🛎️ New ${business.name} order: ${money(orderRow.total_cents)} from ${orderRow.customer_name || 'a customer'}. Check your dashboard.`,
+        });
+      } catch (err) {
+        console.error('[order-notify] Owner SMS failed:', err);
+      }
+    }
+  } catch (err) {
+    console.error('[order-notify] Failed:', err);
+  }
+}
+
+// ============================================
 // REFERRAL CONVERSION NOTIFICATIONS
 // ============================================
 // Fired by the loyalty module when a referee's first paid event flips a

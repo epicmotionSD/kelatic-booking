@@ -108,7 +108,26 @@ export default function ShopPage() {
 
   const subtotal = useMemo(() => cartSubtotal(cart), [cart]);
   const count = cartCount(cart);
-  const visible = activeCat === 'all' ? products : products.filter((p) => p.category_id === activeCat);
+
+  // Group the visible products into category sections (in category sort order),
+  // with any uncategorized items collected into a trailing "Other" section.
+  const sections = useMemo(() => {
+    const list = activeCat === 'all' ? products : products.filter((p) => p.category_id === activeCat);
+    const byCat = new Map<string, ShopProduct[]>();
+    for (const p of list) {
+      const key = p.category_id || 'uncategorized';
+      if (!byCat.has(key)) byCat.set(key, []);
+      byCat.get(key)!.push(p);
+    }
+    const out: { id: string; name: string; items: ShopProduct[] }[] = [];
+    for (const c of categories) {
+      const items = byCat.get(c.id);
+      if (items?.length) out.push({ id: c.id, name: c.name, items });
+    }
+    const uncat = byCat.get('uncategorized');
+    if (uncat?.length) out.push({ id: 'uncategorized', name: 'Other', items: uncat });
+    return out;
+  }, [products, categories, activeCat]);
 
   return (
     <div className="min-h-screen bg-[#f7f4ec] text-[#1f3d2b]">
@@ -136,25 +155,35 @@ export default function ShopPage() {
 
           {loading ? (
             <p className="text-[#1f3d2b]/50">Loading menu…</p>
-          ) : visible.length === 0 ? (
+          ) : sections.length === 0 ? (
             <p className="text-[#1f3d2b]/50">No items available yet. Check back soon.</p>
           ) : (
-            <div className="grid sm:grid-cols-2 gap-3">
-              {visible.map((p) => {
-                const groups = activeGroups(p);
-                const hasOptions = groups.length > 0;
-                const q = qtyOf(p.id);
-                return (
-                  <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col">
-                    {p.image_url && (
-                      <img
-                        src={p.image_url}
-                        alt={p.name}
-                        loading="lazy"
-                        className="w-full aspect-[4/3] object-cover rounded-xl mb-3 bg-[#eef4ec]"
-                      />
-                    )}
-                    <div className="flex-1">
+            <div className="space-y-8">
+              {sections.map((section) => (
+                <section key={section.id}>
+                  <h2 className="text-lg font-playfair font-medium mb-3 pb-1.5 border-b border-[#1f3d2b]/10">
+                    {section.name}
+                  </h2>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    {section.items.map((p) => {
+                      const groups = activeGroups(p);
+                      const hasOptions = groups.length > 0;
+                      const q = qtyOf(p.id);
+                      return (
+                        <div key={p.id} className="bg-white rounded-2xl p-4 shadow-sm flex flex-col">
+                          {p.image_url ? (
+                            <img
+                              src={p.image_url}
+                              alt={p.name}
+                              loading="lazy"
+                              className="w-full aspect-[4/3] object-cover rounded-xl mb-3 bg-[#eef4ec]"
+                            />
+                          ) : (
+                            <div className="w-full aspect-[4/3] rounded-xl mb-3 bg-[#eef4ec] flex items-center justify-center">
+                              <Leaf className="w-8 h-8 text-[#3f7d4f]/30" />
+                            </div>
+                          )}
+                          <div className="flex-1">
                       <div className="font-semibold">{p.name}</div>
                       {p.description && (
                         <p className="text-sm text-[#1f3d2b]/60 mt-1 line-clamp-2">{p.description}</p>
@@ -199,10 +228,13 @@ export default function ShopPage() {
                           </button>
                         </div>
                       )}
-                    </div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                </section>
+              ))}
             </div>
           )}
         </div>

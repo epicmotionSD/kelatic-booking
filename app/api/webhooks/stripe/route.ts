@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { after } from 'next/server';
 import { stripe, constructWebhookEvent } from '@/lib/stripe';
 import { createAdminClient } from '@/lib/supabase/client';
-import { sendConfirmationByAppointmentId } from '@/lib/notifications/service';
+import { sendConfirmationByAppointmentId, sendOrderNotifications } from '@/lib/notifications/service';
 import { awardPointsForEvent, redeemReward } from '@/lib/agents/modules/loyalty';
 import { summarizeAccount } from '@/lib/stripe/connect';
 import type Stripe from 'stripe';
@@ -45,7 +45,26 @@ export async function POST(request: NextRequest) {
         // metadata.order_id is set by /api/shop/checkout and /api/admin/pos/order.
         const orderId = paymentIntent.metadata?.order_id;
         if (orderId) {
+          // Read the prior status so we can fire notifications exactly once —
+          // Stripe can retry a webhook, and we only want to email on the real
+          // pending→paid transition, not on a replay of an already-paid order.
+          const { data: priorOrder } = await supabase
+            .from('orders')
+            .select('status')
+            .eq('id', orderId)
+            .maybeSingle();
+          const wasAlreadyPaid = priorOrder?.status === 'paid';
+
           await supabase.from('orders').update({ status: 'paid' }).eq('id', orderId);
+
+          // Sale notifications — customer receipt + owner alert. Only for online
+          // storefront orders (order_type=product); in-store register sales the
+          // owner rings up themselves don't set order_type and are skipped.
+          if (!wasAlreadyPaid && paymentIntent.metadata?.order_type === 'product') {
+            after(async () => {
+              await sendOrderNotifications(orderId);
+            });
+          }
 
           const { data: existingPay } = await supabase
             .from('payments')
