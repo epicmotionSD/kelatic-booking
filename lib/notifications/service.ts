@@ -1256,10 +1256,20 @@ function getOrderReceiptHtml(order: OrderRow, items: OrderItemRow[], business: B
   });
 }
 
-function getOwnerOrderHtml(order: OrderRow, items: OrderItemRow[], business: Business): string {
+type SaleChannel = 'online' | 'in_store';
+
+function getOwnerOrderHtml(
+  order: OrderRow,
+  items: OrderItemRow[],
+  business: Business,
+  channel: SaleChannel = 'online'
+): string {
   const primaryColor = business.primary_color || '#3f7d4f';
+  const intro = channel === 'in_store'
+    ? 'You just recorded a new in-store register sale.'
+    : 'You just received a new online order.';
   const bodyHtml = `
-              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#444444;">You just received a new online order.</p>
+              <p style="margin:0 0 20px;font-size:15px;line-height:1.7;color:#444444;">${intro}</p>
 
               <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #eeeeee;border-radius:8px;margin-bottom:20px;">
                 <tr><td style="padding:16px 20px;border-bottom:1px solid #eeeeee;">
@@ -1278,9 +1288,9 @@ function getOwnerOrderHtml(order: OrderRow, items: OrderItemRow[], business: Bus
 
   return buildEmailHtml({
     business,
-    bannerText: 'NEW ORDER',
+    bannerText: channel === 'in_store' ? 'NEW REGISTER SALE' : 'NEW ORDER',
     bannerSubtext: `${order.customer_name || 'Guest'} &middot; ${money(order.total_cents)}`,
-    headline: `New order &middot; ${money(order.total_cents)}`,
+    headline: `${channel === 'in_store' ? 'New register sale' : 'New order'} &middot; ${money(order.total_cents)}`,
     bodyHtml,
     ctaLabel: 'View in dashboard',
     ctaUrl: `${getBusinessUrl(business)}/admin/orders`,
@@ -1290,7 +1300,11 @@ function getOwnerOrderHtml(order: OrderRow, items: OrderItemRow[], business: Bus
 
 // Send the customer receipt + owner sale notification for a paid product order.
 // Idempotency is handled by the caller (only fire on the pending→paid transition).
-export async function sendOrderNotifications(orderId: string): Promise<void> {
+export async function sendOrderNotifications(
+  orderId: string,
+  opts?: { channel?: SaleChannel }
+): Promise<void> {
+  const channel: SaleChannel = opts?.channel ?? 'online';
   try {
     const admin = createAdminClient();
 
@@ -1359,8 +1373,8 @@ export async function sendOrderNotifications(orderId: string): Promise<void> {
           cc: cc.length ? cc : undefined,
           fromEmail,
           fromName: business.name,
-          subject: `🛎️ New order — ${money(orderRow.total_cents)} from ${orderRow.customer_name || 'a customer'}`,
-          html: getOwnerOrderHtml(orderRow, itemRows, business as Business),
+          subject: `🛎️ ${channel === 'in_store' ? 'New register sale' : 'New order'} — ${money(orderRow.total_cents)} from ${orderRow.customer_name || 'a customer'}`,
+          html: getOwnerOrderHtml(orderRow, itemRows, business as Business, channel),
         });
         if (!result.success) throw new Error(result.error || 'send failed');
         console.log(`[order-notify] Owner notified at ${ownerEmail}`);
@@ -1376,7 +1390,7 @@ export async function sendOrderNotifications(orderId: string): Promise<void> {
         await sendSmsMessage({
           from: fromPhone,
           to: business.phone,
-          body: `🛎️ New ${business.name} order: ${money(orderRow.total_cents)} from ${orderRow.customer_name || 'a customer'}. Check your dashboard.`,
+          body: `🛎️ New ${business.name} ${channel === 'in_store' ? 'register sale' : 'order'}: ${money(orderRow.total_cents)} from ${orderRow.customer_name || 'a customer'}. Check your dashboard.`,
         });
       } catch (err) {
         console.error('[order-notify] Owner SMS failed:', err);

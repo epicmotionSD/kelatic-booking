@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { after } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireAdminBusiness, isGuardErr } from '@/lib/commerce/guard';
 import {
@@ -7,6 +8,7 @@ import {
   processTerminalPayment,
 } from '@/lib/stripe';
 import { computeTaxCents } from '@/lib/commerce/tax';
+import { sendOrderNotifications } from '@/lib/notifications/service';
 
 interface CartLine { product_id: string; quantity: number }
 
@@ -107,6 +109,11 @@ export async function POST(request: NextRequest) {
       total_amount: total / 100,
       status: 'paid',
       method: 'cash',
+    });
+    // Owner sale alert (cash sales never reach the Stripe webhook). No customer
+    // receipt — walk-in register sales don't capture an email.
+    after(async () => {
+      await sendOrderNotifications(order.id, { channel: 'in_store' });
     });
     return NextResponse.json({ order, paid: true, method: 'cash' });
   }

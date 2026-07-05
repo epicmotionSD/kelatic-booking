@@ -57,12 +57,14 @@ export async function POST(request: NextRequest) {
 
           await supabase.from('orders').update({ status: 'paid' }).eq('id', orderId);
 
-          // Sale notifications — customer receipt + owner alert. Only for online
-          // storefront orders (order_type=product); in-store register sales the
-          // owner rings up themselves don't set order_type and are skipped.
-          if (!wasAlreadyPaid && paymentIntent.metadata?.order_type === 'product') {
+          // Sale notifications — customer receipt (online only, needs an email)
+          // + owner alert. Online storefront orders set order_type=product;
+          // in-store register card sales don't, so we treat those as in_store.
+          if (!wasAlreadyPaid) {
+            const channel =
+              paymentIntent.metadata?.order_type === 'product' ? 'online' : 'in_store';
             after(async () => {
-              await sendOrderNotifications(orderId);
+              await sendOrderNotifications(orderId, { channel });
             });
           }
 
