@@ -7,6 +7,7 @@ import {
   getProgramForBusiness,
 } from '@/lib/agents/modules/loyalty';
 import { buildConnectRouting } from '@/lib/stripe/connect';
+import { computeTaxCents } from '@/lib/commerce/tax';
 
 interface CartLine { product_id: string; quantity: number; option_ids?: string[] }
 interface LoyaltyApply { rewardId: string }
@@ -161,7 +162,10 @@ export async function POST(request: NextRequest) {
     }
   }
 
-  const total = Math.max(0, subtotal - discountCents) + tipCents;
+  // Sales tax on the discounted subtotal (tips are never taxed).
+  const taxableBase = Math.max(0, subtotal - discountCents);
+  const taxCents = computeTaxCents(taxableBase, business);
+  const total = taxableBase + taxCents + tipCents;
 
   // Create the order (pending)
   const { data: order, error: orderErr } = await supabase
@@ -172,6 +176,7 @@ export async function POST(request: NextRequest) {
       customer_email: customer.email,
       customer_phone: customer.phone || null,
       subtotal_cents: subtotal,
+      tax_cents: taxCents,
       tip_cents: tipCents,
       discount_cents: discountCents,
       total_cents: total,
@@ -238,6 +243,7 @@ export async function POST(request: NextRequest) {
       clientSecret: pi.client_secret,
       amount: total,
       discountCents,
+      taxCents,
     });
   } catch (err) {
     console.error('Checkout PaymentIntent error:', err);

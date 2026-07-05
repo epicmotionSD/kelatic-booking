@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireBusiness } from '@/lib/tenant/server';
+import { taxRateForBusiness } from '@/lib/commerce/tax';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,7 @@ export async function GET() {
       name: business.name,
       tagline: business.tagline,
       primary_color: business.primary_color,
+      tax_rate: taxRateForBusiness(business),
     },
     categories: categories || [],
     products: products || [],

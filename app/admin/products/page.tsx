@@ -373,7 +373,7 @@ export default function ProductsPage() {
       )}
 
       {modalOpen && (
-        <div className="fixed inset-0 bg-black/40 flex items-start justify-center z-50 overflow-y-auto p-4">
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-start justify-center z-50 overflow-y-auto p-4">
           <div className="bg-card border border-border rounded-2xl w-full max-w-lg my-8 shadow-xl">
             <div className="flex items-center justify-between p-5 border-b">
               <h2 className="text-lg font-semibold">{form.id ? 'Edit Product' : 'New Product'}</h2>

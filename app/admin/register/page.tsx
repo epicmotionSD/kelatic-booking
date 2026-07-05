@@ -12,6 +12,7 @@ interface Reader { id?: string; label?: string; status?: string; device_type?: s
 export default function RegisterPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
+  const [taxRate, setTaxRate] = useState(0);
   const [activeCat, setActiveCat] = useState<string>('all');
   const [cart, setCart] = useState<Record<string, CartItem>>({});
   const [tip, setTip] = useState('');
@@ -36,6 +37,7 @@ export default function RegisterPage() {
         const cData = await c.json();
         setProducts((pData.products || []).filter((x: Product) => x.is_active));
         setCategories(cData.categories || []);
+        if (typeof pData.tax_rate === 'number') setTaxRate(pData.tax_rate);
       } finally {
         setLoading(false);
       }
@@ -69,7 +71,8 @@ export default function RegisterPage() {
     [cartLines]
   );
   const tipCents = Math.max(0, Math.round((parseFloat(tip || '0') || 0) * 100));
-  const total = subtotal + tipCents;
+  const taxCents = Math.round(subtotal * taxRate);
+  const total = subtotal + taxCents + tipCents;
 
   function add(p: Product) {
     setDone(false);
@@ -263,6 +266,9 @@ export default function RegisterPage() {
 
           <div className="border-t border-border pt-3 space-y-1 text-sm">
             <Row label="Subtotal" value={formatCurrency(subtotal)} />
+            {taxCents > 0 && (
+              <Row label={`Tax${taxRate > 0 ? ` (${(taxRate * 100).toFixed(1)}%)` : ''}`} value={formatCurrency(taxCents)} />
+            )}
             <div className="flex items-center justify-between">
               <span className="text-muted-foreground">Tip</span>
               <div className="flex items-center gap-1">

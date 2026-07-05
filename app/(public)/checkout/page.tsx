@@ -31,10 +31,21 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null);
   const [preview, setPreview] = useState<RedemptionPreview | null>(null);
   const [selectedRewardId, setSelectedRewardId] = useState<string | null>(null);
+  const [taxRate, setTaxRate] = useState(0);
   const previewSeq = useRef(0);
 
   useEffect(() => {
     setCart(readCart());
+    // Pull the store's tax rate so the summary matches what we'll charge.
+    (async () => {
+      try {
+        const res = await fetch('/api/shop/products');
+        const data = await res.json();
+        if (typeof data?.business?.tax_rate === 'number') setTaxRate(data.business.tax_rate);
+      } catch {
+        // best-effort; server remains the source of truth at payment time
+      }
+    })();
   }, []);
 
   const subtotal = useMemo(() => cartSubtotal(cart), [cart]);
@@ -43,7 +54,9 @@ export default function CheckoutPage() {
     (r) => r.id === selectedRewardId
   );
   const discountCents = selectedReward?.discountPreviewCents ?? 0;
-  const total = Math.max(0, subtotal - discountCents) + tipCents;
+  const taxableBase = Math.max(0, subtotal - discountCents);
+  const taxCents = Math.round(taxableBase * taxRate);
+  const total = taxableBase + taxCents + tipCents;
 
   // Look up the customer's loyalty balance + eligible rewards once we have
   // an email and a subtotal. Debounced so typing doesn't spam the endpoint.
@@ -199,6 +212,12 @@ export default function CheckoutPage() {
                     {selectedReward?.name ?? 'Reward'}
                   </span>
                   <span>-{formatCurrency(discountCents)}</span>
+                </div>
+              )}
+              {taxCents > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-[#1f3d2b]/60">Tax{taxRate > 0 ? ` (${(taxRate * 100).toFixed(1)}%)` : ''}</span>
+                  <span>{formatCurrency(taxCents)}</span>
                 </div>
               )}
               {tipCents > 0 && <div className="flex justify-between"><span className="text-[#1f3d2b]/60">Tip</span><span>{formatCurrency(tipCents)}</span></div>}

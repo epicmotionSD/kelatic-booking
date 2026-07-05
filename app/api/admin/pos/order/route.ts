@@ -6,6 +6,7 @@ import {
   listTerminalReaders,
   processTerminalPayment,
 } from '@/lib/stripe';
+import { computeTaxCents } from '@/lib/commerce/tax';
 
 interface CartLine { product_id: string; quantity: number }
 
@@ -65,7 +66,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'No valid items' }, { status: 400 });
   }
 
-  const total = subtotal + tipCents;
+  // Sales tax on the subtotal (tips are never taxed).
+  const taxCents = computeTaxCents(subtotal, guard.business);
+  const total = subtotal + taxCents + tipCents;
 
   // Create the order (pending until paid)
   const { data: order, error: orderErr } = await supabase
@@ -74,6 +77,7 @@ export async function POST(request: NextRequest) {
       business_id: businessId,
       customer_name: body.customer_name || 'Walk-in',
       subtotal_cents: subtotal,
+      tax_cents: taxCents,
       tip_cents: tipCents,
       total_cents: total,
       status: method === 'cash' ? 'paid' : 'pending',

@@ -1173,6 +1173,7 @@ interface OrderRow {
   customer_email: string | null;
   customer_phone: string | null;
   subtotal_cents: number | null;
+  tax_cents: number | null;
   tip_cents: number | null;
   discount_cents: number | null;
   total_cents: number | null;
@@ -1217,6 +1218,9 @@ function orderTotalsHtml(order: OrderRow, primaryColor: string): string {
   ];
   if ((order.discount_cents ?? 0) > 0) {
     rows.push(`<tr><td style="padding:4px 0;font-size:14px;color:${primaryColor};">Reward discount</td><td style="padding:4px 0;font-size:14px;color:${primaryColor};text-align:right;">-${money(order.discount_cents)}</td></tr>`);
+  }
+  if ((order.tax_cents ?? 0) > 0) {
+    rows.push(`<tr><td style="padding:4px 0;font-size:14px;color:#888888;">Tax</td><td style="padding:4px 0;font-size:14px;color:#111111;text-align:right;">${money(order.tax_cents)}</td></tr>`);
   }
   if ((order.tip_cents ?? 0) > 0) {
     rows.push(`<tr><td style="padding:4px 0;font-size:14px;color:#888888;">Tip</td><td style="padding:4px 0;font-size:14px;color:#111111;text-align:right;">${money(order.tip_cents)}</td></tr>`);
@@ -1292,7 +1296,7 @@ export async function sendOrderNotifications(orderId: string): Promise<void> {
 
     const { data: order } = await admin
       .from('orders')
-      .select('id, business_id, customer_name, customer_email, customer_phone, subtotal_cents, tip_cents, discount_cents, total_cents, notes, fulfillment_type')
+      .select('id, business_id, customer_name, customer_email, customer_phone, subtotal_cents, tax_cents, tip_cents, discount_cents, total_cents, notes, fulfillment_type')
       .eq('id', orderId)
       .single();
     if (!order) {
@@ -1342,8 +1346,11 @@ export async function sendOrderNotifications(orderId: string): Promise<void> {
       }
     }
 
-    // Owner notification — to the business email plus any internal CC (kelatic).
-    const ownerEmail = business.email;
+    // Owner notification — Kelatic Vitality House routes all sale confirmations
+    // to its dedicated inbox; other tenants use their configured business email.
+    const ownerEmail = business.slug === 'vitality'
+      ? 'business4kelatic@gmail.com'
+      : business.email;
     if (ownerEmail) {
       const cc = getInternalCcRecipients(ctx).filter((e) => e !== ownerEmail);
       try {

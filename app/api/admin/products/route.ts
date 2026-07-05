@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { requireAdminBusiness, isGuardErr, slugify } from '@/lib/commerce/guard';
+import { taxRateForBusiness } from '@/lib/commerce/tax';
 import type { ProductFormPayload } from '@/types/commerce';
 
 // GET /api/admin/products — list this tenant's products (with category)
@@ -23,7 +24,7 @@ export async function GET() {
     return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
   }
 
-  return NextResponse.json({ products });
+  return NextResponse.json({ products, tax_rate: taxRateForBusiness(guard.business) });
 }
 
 // POST /api/admin/products — create a product (+ optional modifier groups)
