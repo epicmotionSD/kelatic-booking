@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { formatCurrency } from '@/lib/currency';
-import { UserCheck, Plus, Upload, Search, Users, Calendar, DollarSign, Eye } from 'lucide-react';
+import { UserCheck, Plus, Upload, Download, Search, Users, Calendar, DollarSign, Eye } from 'lucide-react';
 
 interface Client {
   id: string;
@@ -121,6 +121,73 @@ export default function ClientsPage() {
     return result;
   }
 
+  function csvCell(value: unknown): string {
+    if (value === null || value === undefined) return '';
+    const str = Array.isArray(value) ? value.join('; ') : String(value);
+    // Escape quotes and wrap when the value contains a comma, quote, or newline
+    if (/[",\n\r]/.test(str)) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  }
+
+  function handleExport() {
+    const headers = [
+      'First Name',
+      'Last Name',
+      'Email',
+      'Phone',
+      'Zip',
+      'Birthday',
+      'Visit Count',
+      'Total Spent',
+      'Last Visit',
+      'Hair Type',
+      'Texture',
+      'Allergies',
+      'Preferred Contact',
+      'SMS Opt In',
+      'Marketing Opt In',
+      'Referral Source',
+      'Created At',
+    ];
+
+    const rows = filteredClients.map((c) => [
+      c.first_name,
+      c.last_name,
+      c.email,
+      c.phone,
+      c.zip_code,
+      c.birthday,
+      c.visit_count,
+      c.total_spent,
+      c.last_visit_at,
+      c.hair_type,
+      c.texture,
+      c.allergies,
+      c.preferred_contact,
+      c.sms_opt_in,
+      c.marketing_opt_in,
+      c.referral_source,
+      c.created_at,
+    ]);
+
+    const csv = [headers, ...rows]
+      .map((row) => row.map(csvCell).join(','))
+      .join('\r\n');
+
+    // Prepend BOM so Excel opens UTF-8 correctly
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `clients-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  }
+
   // Filter and sort clients
   const filteredClients = clients
     .filter((client) => {
@@ -181,6 +248,15 @@ export default function ClientsPage() {
             <Calendar className="w-5 h-5" />
             Stylist Schedules
           </Link>
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={filteredClients.length === 0}
+            className="px-4 py-2 bg-card border border-border text-white rounded-xl hover:bg-muted transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download className="w-5 h-5" />
+            Export
+          </button>
           <button
             type="button"
             onClick={() => setShowImportModal(true)}
