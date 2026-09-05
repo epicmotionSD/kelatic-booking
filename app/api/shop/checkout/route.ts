@@ -8,6 +8,10 @@ import {
 } from '@/lib/agents/modules/loyalty';
 import { buildConnectRouting } from '@/lib/stripe/connect';
 import { computeTaxCents } from '@/lib/commerce/tax';
+import {
+  CARD_PAYMENTS_ENABLED,
+  CARD_PAYMENTS_PAUSED_MESSAGE,
+} from '@/lib/config/payments';
 
 interface CartLine { product_id: string; quantity: number; option_ids?: string[] }
 interface LoyaltyApply { rewardId: string }
@@ -15,6 +19,13 @@ interface LoyaltyApply { rewardId: string }
 // POST /api/shop/checkout — create an order + Stripe PaymentIntent (online card)
 // body: { items: CartLine[], customer: {name,email,phone}, tip_cents?, notes? }
 export async function POST(request: NextRequest) {
+  if (!CARD_PAYMENTS_ENABLED) {
+    return NextResponse.json(
+      { error: CARD_PAYMENTS_PAUSED_MESSAGE },
+      { status: 503 }
+    );
+  }
+
   let business;
   try {
     business = await requireBusiness();

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { formatCurrency, toCents } from '@/lib/currency';
 import type { AppointmentWithDetails } from '@/types/database';
+import { CARD_PAYMENTS_ENABLED } from '@/lib/config/payments';
 
 interface CheckoutModalProps {
   appointment: AppointmentWithDetails;
@@ -24,7 +25,9 @@ export function CheckoutModal({
   const [step, setStep] = useState<CheckoutStep>('summary');
   const [tipPercent, setTipPercent] = useState<number | null>(20);
   const [customTip, setCustomTip] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<'terminal' | 'cash'>('terminal');
+  const [paymentMethod, setPaymentMethod] = useState<'terminal' | 'cash'>(
+    CARD_PAYMENTS_ENABLED ? 'terminal' : 'cash'
+  );
   const [error, setError] = useState<string | null>(null);
   const [processingMessage, setProcessingMessage] = useState('');
 
@@ -298,8 +301,12 @@ export function CheckoutModal({
                 <div className="flex gap-2">
                   <button
                     onClick={() => setPaymentMethod('terminal')}
+                    disabled={!CARD_PAYMENTS_ENABLED}
+                    title={!CARD_PAYMENTS_ENABLED ? 'Card payments are paused' : undefined}
                     className={`flex-1 py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 ${
-                      paymentMethod === 'terminal'
+                      !CARD_PAYMENTS_ENABLED
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : paymentMethod === 'terminal'
                         ? 'bg-purple-600 text-white'
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
@@ -323,6 +330,11 @@ export function CheckoutModal({
                     Cash
                   </button>
                 </div>
+                {!CARD_PAYMENTS_ENABLED && (
+                  <p className="text-[11px] text-amber-600 mt-2 text-center">
+                    Card payments paused — cash still works.
+                  </p>
+                )}
               </div>
 
               {/* Total */}

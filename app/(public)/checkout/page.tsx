@@ -8,6 +8,10 @@ import { formatCurrency } from '@/lib/currency';
 import { ArrowLeft, Gem, Loader2 } from 'lucide-react';
 import { readCart, cartSubtotal, type CartLine } from '@/lib/commerce/cart';
 import type { EligibleReward, RedemptionPreview } from '@/lib/agents/modules/loyalty';
+import {
+  CARD_PAYMENTS_ENABLED,
+  CARD_PAYMENTS_PAUSED_MESSAGE,
+} from '@/lib/config/payments';
 
 let stripePromise: Promise<any> | null = null;
 const getStripe = () => {
@@ -141,6 +145,12 @@ export default function CheckoutPage() {
       </Link>
       <h1 className="text-2xl font-playfair font-medium mb-5">Checkout</h1>
 
+      {!CARD_PAYMENTS_ENABLED && (
+        <div className="mb-5 rounded-2xl border border-[#3f7d4f]/30 bg-[#eef4ec] px-4 py-3 text-sm text-[#1f3d2b]">
+          {CARD_PAYMENTS_PAUSED_MESSAGE} Please check back soon.
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-5 gap-6">
         {/* Form / payment */}
         <div className="lg:col-span-3 space-y-4">
@@ -169,11 +179,13 @@ export default function CheckoutPage() {
               {error && <p className="text-sm text-red-600">{error}</p>}
               <button
                 onClick={startPayment}
-                disabled={submitting}
-                className="w-full bg-[#3f7d4f] hover:bg-[#356b44] disabled:opacity-50 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+                disabled={submitting || !CARD_PAYMENTS_ENABLED}
+                className="w-full bg-[#3f7d4f] hover:bg-[#356b44] disabled:opacity-50 disabled:cursor-not-allowed text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
               >
                 {submitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                Continue to payment · {formatCurrency(total)}
+                {CARD_PAYMENTS_ENABLED
+                  ? <>Continue to payment · {formatCurrency(total)}</>
+                  : 'Ordering paused — back soon'}
               </button>
             </div>
           ) : (

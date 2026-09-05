@@ -1,7 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import {
+  CARD_PAYMENTS_ENABLED,
+  CARD_PAYMENTS_PAUSED_MESSAGE,
+} from '@/lib/config/payments';
 
 export async function POST(request: NextRequest) {
+  if (!CARD_PAYMENTS_ENABLED) {
+    return NextResponse.json(
+      { error: CARD_PAYMENTS_PAUSED_MESSAGE },
+      { status: 503 }
+    );
+  }
   try {
     const { paymentIntentId } = await request.json();
 

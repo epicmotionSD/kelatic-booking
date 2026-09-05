@@ -2,8 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createTerminalPaymentIntent } from '@/lib/stripe';
 import { toCents } from '@/lib/currency';
 import { createAdminClient } from '@/lib/supabase/client';
+import {
+  CARD_PAYMENTS_ENABLED,
+  CARD_PAYMENTS_PAUSED_MESSAGE,
+} from '@/lib/config/payments';
 
 export async function POST(request: NextRequest) {
+  if (!CARD_PAYMENTS_ENABLED) {
+    return NextResponse.json(
+      { error: CARD_PAYMENTS_PAUSED_MESSAGE },
+      { status: 503 }
+    );
+  }
   try {
     const { appointmentId, amount, tipAmount } = await request.json();
 

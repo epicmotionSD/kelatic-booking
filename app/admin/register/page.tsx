@@ -5,6 +5,7 @@ import { formatCurrency } from '@/lib/currency';
 import { CreditCard, Banknote, Plus, Minus, Trash2, Loader2, CheckCircle2, X } from 'lucide-react';
 import type { Product, ProductCategory } from '@/types/commerce';
 import { StatusDot } from '@/components/terminal';
+import { CARD_PAYMENTS_ENABLED } from '@/lib/config/payments';
 
 interface CartItem { product: Product; quantity: number }
 interface Reader { id?: string; label?: string; status?: string; device_type?: string; serial_number?: string }
@@ -312,14 +313,25 @@ export default function RegisterPage() {
             </button>
             <button
               onClick={() => charge('card_terminal')}
-              disabled={cartLines.length === 0 || !!processing || !readerOnline}
-              title={!readerOnline ? 'Card reader offline' : undefined}
+              disabled={cartLines.length === 0 || !!processing || !readerOnline || !CARD_PAYMENTS_ENABLED}
+              title={
+                !CARD_PAYMENTS_ENABLED
+                  ? 'Card payments are paused'
+                  : !readerOnline
+                  ? 'Card reader offline'
+                  : undefined
+              }
               className="flex items-center justify-center gap-2 bg-[#00ffb2] hover:brightness-95 disabled:opacity-40 text-black py-2.5 rounded-lg text-sm font-medium"
             >
               <CreditCard className="w-4 h-4" /> Card
             </button>
           </div>
-          {!readerLoading && !readerOnline && (
+          {!CARD_PAYMENTS_ENABLED && (
+            <p className="text-[11px] text-[#f59e0b] mt-2 text-center">
+              Card payments paused — cash still works.
+            </p>
+          )}
+          {CARD_PAYMENTS_ENABLED && !readerLoading && !readerOnline && (
             <p className="text-[11px] text-[#f59e0b] mt-2 text-center">
               Reader offline — card payments unavailable. Cash still works.
             </p>
@@ -349,8 +361,14 @@ export default function RegisterPage() {
           </button>
           <button
             onClick={() => charge('card_terminal')}
-            disabled={!!processing || !readerOnline}
-            title={!readerOnline ? 'Card reader offline' : undefined}
+            disabled={!!processing || !readerOnline || !CARD_PAYMENTS_ENABLED}
+            title={
+              !CARD_PAYMENTS_ENABLED
+                ? 'Card payments are paused'
+                : !readerOnline
+                ? 'Card reader offline'
+                : undefined
+            }
             className="flex items-center gap-1.5 bg-[#00ffb2] hover:brightness-95 disabled:opacity-40 text-black px-4 py-2.5 rounded-lg text-sm font-medium"
           >
             <CreditCard className="w-4 h-4" /> Card

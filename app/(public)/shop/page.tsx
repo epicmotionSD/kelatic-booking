@@ -389,12 +389,14 @@ export default function ShopPage() {
                 <span>{formatCurrency(subtotal)}</span>
               </div>
               <button
-                onClick={() => router.push('/checkout')}
-                className="w-full bg-[#3f7d4f] hover:bg-[#356b44] text-white py-3 rounded-xl font-semibold"
+                disabled
+                className="w-full bg-gray-200 text-gray-500 py-3 rounded-xl font-semibold cursor-not-allowed"
               >
-                Checkout · {count} {count === 1 ? 'item' : 'items'}
+                Ordering paused — back soon
               </button>
-              <p className="text-xs text-[#1f3d2b]/50 text-center mt-2">Pickup only</p>
+              <p className="text-xs text-[#1f3d2b]/50 text-center mt-2">
+                Online payments are temporarily unavailable while we switch providers. Pickup orders will return shortly.
+              </p>
             </>
           )}
         </div>
