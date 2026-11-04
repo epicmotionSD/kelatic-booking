@@ -1,6 +1,6 @@
-# Lotto Duel tenant
+# LottoDuel tenant
 
-Free lottery-league game living inside `kelatic-booking` at `/lotto`, backed by its **own** Supabase project
+Bingo pool manager powered by official lottery drawings, living inside `kelatic-booking` at `/lotto`, backed by its **own** Supabase project
 (`kelatic-booking`, ref `oospqrsutjiiejbikpof`) — separate auth and data from the salon.
 
 ## How it works
@@ -21,15 +21,27 @@ NY Open Data ──► lotto-fetch-draws (Edge Fn) ──► lotto_draws INSERT
 - Draws only count for pools/cards that existed before that draw (10:59pm ET).
 - Roster cap is enforced twice: inside `lotto_join_pool` (row-locked) and by a BEFORE INSERT trigger.
 
+## Game rules
+
+- Every card: 5 white numbers + the special ball (Powerball 1–26 / Mega Ball 1–24), assigned by the database.
+- Hits accumulate across official draws. **BINGO = all 6.** Ties all win.
+- Simulated length (Powerball, 3 draws/wk): 2 players ~9 wks · 10 players ~5 wks · 100 players ~3 wks.
+
+## Network loop
+
+- BINGO → winner gets `win`, every other member gets `bingo` (names the winner). Board turns into a share/rematch screen.
+- Commissioner taps **Run it back** → `lotto_rematch()` opens Season N+1 and sends `rematch` invites to the old roster **and the waitlist**.
+- Arriving after a pool starts (or when it's full) → `lotto_waitlist`. If the next season already exists, `lotto_join_pool` returns `next_season` with its code.
+
 ## Tiers
 
 | | Free | Pro ($4.99/mo · $29/yr) |
 |---|---|---|
-| Players per league | 10 | 100 |
+| Players per pool | 10 | 100 |
 | Games | Powerball | Powerball + Mega Millions |
-| Alerts | Live board | Live board + SMS for whole roster |
+| Alerts | Live board | Live board + SMS for whole roster (hits, BINGO, new seasons) |
 
-11th join attempt → player sees "We've let your Commissioner know", Commissioner gets one upgrade text per hour.
+11th join attempt → player is waitlisted, Commissioner gets one upgrade text per hour.
 
 ## Setup checklist
 

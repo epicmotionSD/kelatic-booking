@@ -2,7 +2,7 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-// Magic-link landing for the Lotto Duel Supabase project.
+// Magic-link landing for the LottoDuel Supabase project.
 // Separate from /auth/callback, which belongs to the salon project.
 export async function GET(request: Request) {
   const url = new URL(request.url);

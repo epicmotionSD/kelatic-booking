@@ -31,7 +31,7 @@ export default function AuthGate({ heading = 'Sign in to play', subheading, chil
   const [error, setError] = useState('');
 
   if (session === undefined) {
-    return <div className="py-20 text-center text-slate-400">Loading…</div>;
+    return <div className="py-20 text-center text-[#A7A9D6]">Loading…</div>;
   }
   if (session) return <>{children(session)}</>;
 
@@ -52,11 +52,11 @@ export default function AuthGate({ heading = 'Sign in to play', subheading, chil
   };
 
   return (
-    <div className="mx-auto max-w-md rounded-2xl border border-white/10 bg-white/5 p-6">
-      <h2 className="text-2xl font-bold text-white">{heading}</h2>
-      {subheading && <p className="mt-1 text-slate-300">{subheading}</p>}
+    <div className="mx-auto max-w-md rounded-2xl border border-[#2A2A5A] bg-[#16163A] p-6">
+      <h2 className="font-[family-name:var(--font-ld-display)] text-2xl font-extrabold">{heading}</h2>
+      {subheading && <p className="mt-1 text-[#A7A9D6]">{subheading}</p>}
       {sent ? (
-        <p className="mt-6 rounded-lg bg-emerald-500/15 p-4 text-emerald-200">
+        <p className="mt-6 rounded-lg bg-[#22D3B6]/15 p-4 text-[#22D3B6]">
           Check <span className="font-semibold">{email}</span> and tap the link to continue. You can close this tab.
         </p>
       ) : (
@@ -66,15 +66,12 @@ export default function AuthGate({ heading = 'Sign in to play', subheading, chil
             type="email"
             autoComplete="email"
             placeholder="you@email.com"
-            className="w-full rounded-lg border border-white/15 bg-slate-900 p-3 text-white placeholder:text-slate-500"
+            className="w-full rounded-lg border border-[#2A2A5A] bg-[#0B0B1E] p-3 text-[#FFF8E7] placeholder:text-[#A7A9D6]/50"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
-          {error && <p className="text-sm text-rose-300">{error}</p>}
-          <button
-            disabled={busy}
-            className="w-full rounded-lg bg-amber-400 py-3 font-bold text-slate-950 disabled:opacity-50"
-          >
+          {error && <p className="text-sm text-[#FF4D6D]">{error}</p>}
+          <button disabled={busy} className="w-full rounded-lg bg-[#FFC93C] py-3 font-bold text-[#0B0B1E] disabled:opacity-50">
             {busy ? 'Sending…' : 'Email me a sign-in link'}
           </button>
         </form>
