@@ -1,4 +1,4 @@
-// Shared helpers for Lotto Duel Edge Functions
+// Shared helpers for LottoDuel Edge Functions
 import { createClient } from "npm:@supabase/supabase-js@2.46.1";
 
 export const admin = createClient(

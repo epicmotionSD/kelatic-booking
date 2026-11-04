@@ -6,7 +6,7 @@ import JoinLeague from '@/components/lotto/JoinLeague';
 
 export default function JoinPage() {
   return (
-    <AuthGate heading="Claim your card" subheading="Enter your email and we'll send a one-tap sign-in link.">
+    <AuthGate heading="Claim your bingo card" subheading="Enter your email and we'll send a one-tap sign-in link.">
       {(session) => (
         <Suspense fallback={null}>
           <JoinLeague session={session} />

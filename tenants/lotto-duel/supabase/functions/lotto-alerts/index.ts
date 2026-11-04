@@ -1,11 +1,11 @@
-// lotto-alerts — drains the lotto_notifications outbox and sends SMS via Twilio.
+// lotto-alerts (LottoDuel) — drains the lotto_notifications outbox and sends SMS via Twilio.
 // Woken asynchronously by pg_net after the draw trigger queues rows, plus a
 // 10-minute pg_cron sweep. Nothing here runs inside a DB transaction.
 //
 // Send rules:
 //   • LOTTO_SMS_ENABLED must be "true" (kill switch — off until A2P is approved)
 //   • recipient has a phone + explicit opt-in and hasn't replied STOP
-//   • hit/win texts only for leagues whose Commissioner is Pro
+//   • hit/win/bingo/rematch texts only for leagues whose Commissioner is Pro
 //   • capacity (upgrade) texts go to the Commissioner
 import { admin, APP_URL, isInternalCaller, json } from "../_shared/lotto.ts";
 
@@ -20,7 +20,7 @@ type Note = {
   id: string;
   user_id: string;
   pool_id: string | null;
-  kind: "hit" | "win" | "capacity";
+  kind: "hit" | "win" | "bingo" | "rematch" | "capacity";
   payload: Record<string, unknown>;
   attempts: number;
 };
@@ -31,13 +31,20 @@ function body(n: Note): string {
   let text: string;
   switch (n.kind) {
     case "hit":
-      text = `Lotto Duel: you hit a number in ${p.pool_name}! ${p.matches}/${p.needed} on your card. ${link}`;
+      text = `LottoDuel: new hit in ${p.pool_name}! You're at ${p.matches}/6 on your card. ${link}`;
       break;
     case "win":
-      text = `Lotto Duel: you completed your card in ${p.pool_name}! You won the league. ${link}`;
+      text = `LottoDuel: BINGO! You filled your whole card in ${p.pool_name}. You won the league! ${link}`;
+      break;
+    case "bingo":
+      text = `LottoDuel: BINGO! ${p.winner_names} filled the card in ${p.pool_name}. See the final board: ${link}`;
+      break;
+    case "rematch":
+      text = `LottoDuel: Season ${p.season} of ${p.pool_name} is open. Get your new card with code ${p.join_code}: ` +
+        `${APP_URL}/lotto/join?code=${p.join_code}`;
       break;
     case "capacity":
-      text = `Lotto Duel: ${p.player_name} tried to join ${p.pool_name}, but it's full at ${p.limit} players. ` +
+      text = `LottoDuel: ${p.player_name} tried to join ${p.pool_name}, but it's full at ${p.limit} players. ` +
         `Upgrade to Pro for 100 slots: ${link}`;
       break;
   }

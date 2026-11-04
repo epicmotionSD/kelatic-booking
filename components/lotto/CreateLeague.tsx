@@ -5,14 +5,15 @@ import Link from 'next/link';
 import type { Session } from '@supabase/supabase-js';
 import { lottoClient } from '@/lib/lotto/supabase';
 import { friendlyError, GAMES, type LottoGame, type LottoPool, type Tier } from '@/lib/lotto/types';
-import ShareInvite from './ShareInvite';
+import { ShareInvite } from './ShareInvite';
+
+const INPUT = 'w-full rounded-lg border border-[#2A2A5A] bg-[#0B0B1E] p-3 text-[#FFF8E7] placeholder:text-[#A7A9D6]/50';
 
 export default function CreateLeague({ session }: { session: Session }) {
   const [tier, setTier] = useState<Tier>('free');
   const [name, setName] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [game, setGame] = useState<LottoGame>('powerball');
-  const [winCondition, setWinCondition] = useState(3);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [created, setCreated] = useState<LottoPool | null>(null);
@@ -36,7 +37,7 @@ export default function CreateLeague({ session }: { session: Session }) {
     const { data, error } = await lottoClient().rpc('lotto_create_pool', {
       p_name: name,
       p_game: game,
-      p_win_condition: winCondition,
+      p_win_condition: 6,
       p_display_name: displayName || null,
     });
     setBusy(false);
@@ -47,46 +48,36 @@ export default function CreateLeague({ session }: { session: Session }) {
   if (created) {
     return (
       <div className="space-y-6 text-center">
-        <h2 className="text-3xl font-black text-white">League created</h2>
-        <p className="text-slate-300">Players join with this code:</p>
-        <div className="font-mono text-6xl font-black tracking-[0.2em] text-amber-400">{created.join_code}</div>
+        <h2 className="font-[family-name:var(--font-ld-display)] text-3xl font-extrabold">Your pool is live</h2>
+        <p className="text-[#A7A9D6]">Players join with this code:</p>
+        <div className="font-mono text-6xl font-black tracking-[0.2em] text-[#FFC93C]">{created.join_code}</div>
         <ShareInvite code={created.join_code} poolName={created.name} />
         <Link
           href={`/lotto/league/${created.id}`}
-          className="block rounded-lg border border-white/15 py-3 font-semibold text-white hover:bg-white/5"
+          className="block rounded-lg border border-[#2A2A5A] py-3 font-semibold hover:border-[#FFC93C]/50"
         >
           Open the live board →
         </Link>
+        <p className="text-xs text-[#A7A9D6]">
+          Cards start counting at the next official {GAMES[created.game].label} drawing. Anyone who shows up after that goes on the waitlist for Season 2.
+        </p>
       </div>
     );
   }
 
   return (
     <form onSubmit={create} className="space-y-6">
-      <h2 className="text-3xl font-black text-white">Start a league</h2>
+      <h2 className="font-[family-name:var(--font-ld-display)] text-3xl font-extrabold">Start a bingo pool</h2>
 
-      <Field label="League name">
-        <input
-          required
-          maxLength={80}
-          placeholder="e.g. KeLatic VIP Pool"
-          className="w-full rounded-lg border border-white/15 bg-slate-900 p-3 text-white placeholder:text-slate-500"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      <Field label="Pool name">
+        <input required maxLength={80} placeholder="e.g. KeLatic VIP Pool" className={INPUT} value={name} onChange={(e) => setName(e.target.value)} />
       </Field>
 
       <Field label="Your name on the board">
-        <input
-          maxLength={40}
-          placeholder="Commissioner"
-          className="w-full rounded-lg border border-white/15 bg-slate-900 p-3 text-white placeholder:text-slate-500"
-          value={displayName}
-          onChange={(e) => setDisplayName(e.target.value)}
-        />
+        <input maxLength={40} placeholder="Commissioner" className={INPUT} value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
       </Field>
 
-      <Field label="Draws from">
+      <Field label="Drawn from">
         <div className="grid grid-cols-2 gap-3">
           {(Object.keys(GAMES) as LottoGame[]).map((g) => {
             const locked = GAMES[g].pro && tier !== 'pro';
@@ -97,37 +88,33 @@ export default function CreateLeague({ session }: { session: Session }) {
                 disabled={locked}
                 onClick={() => setGame(g)}
                 className={`rounded-lg border p-3 text-left ${
-                  game === g ? 'border-amber-400 bg-amber-400/10' : 'border-white/15'
+                  game === g ? 'border-[#FFC93C] bg-[#FFC93C]/10' : 'border-[#2A2A5A] bg-[#16163A]'
                 } disabled:cursor-not-allowed disabled:opacity-50`}
               >
-                <div className="font-bold text-white">
-                  {GAMES[g].label} {locked && <span className="ml-1 rounded bg-white/10 px-1.5 text-xs">PRO</span>}
+                <div className="font-bold">
+                  {GAMES[g].label} {locked && <span className="ml-1 rounded bg-[#FFC93C]/15 px-1.5 text-xs text-[#FFC93C]">PRO</span>}
                 </div>
-                <div className="text-xs text-slate-400">{GAMES[g].drawDays}</div>
+                <div className="text-xs text-[#A7A9D6]">{GAMES[g].drawDays}</div>
               </button>
             );
           })}
         </div>
       </Field>
 
-      <Field label={`Win condition: first to ${winCondition} of 5 numbers`}>
-        <input
-          type="range"
-          min={1}
-          max={5}
-          value={winCondition}
-          onChange={(e) => setWinCondition(Number(e.target.value))}
-          className="w-full accent-amber-400"
-        />
-      </Field>
+      <div className="rounded-xl border border-[#2A2A5A] bg-[#16163A] p-4 text-sm text-[#A7A9D6]">
+        <p className="font-bold text-[#FFF8E7]">The rule</p>
+        Every card has 5 numbers plus the {GAMES[game].special}. Matches add up across official drawings. First one to
+        get all 6 hits <span className="font-black text-[#FF4D6D]">BINGO!</span> Pools usually run 1 to 3 months.
+      </div>
 
-      {error && <p className="text-rose-300">{error}</p>}
+      {error && <p className="text-[#FF4D6D]">{error}</p>}
 
-      <button disabled={busy} className="w-full rounded-lg bg-amber-400 py-4 text-lg font-black text-slate-950 disabled:opacity-50">
-        {busy ? 'Creating…' : 'Create league'}
+      <button disabled={busy} className="w-full rounded-lg bg-[#FFC93C] py-4 text-lg font-black text-[#0B0B1E] disabled:opacity-50">
+        {busy ? 'Creating…' : 'Create pool'}
       </button>
-      <p className="text-center text-xs text-slate-500">
-        Free leagues hold {tier === 'pro' ? 100 : 10} players. Lotto Duel is a free game: no entry fees, no prizes paid through the app.
+      <p className="text-center text-xs text-[#A7A9D6]/70">
+        {tier === 'pro' ? 'Pro pools hold 100 players.' : 'Free pools hold 10 players.'} LottoDuel is a free game: no entry
+        fees, no prizes paid through the app.
       </p>
     </form>
   );
@@ -136,7 +123,7 @@ export default function CreateLeague({ session }: { session: Session }) {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block space-y-2">
-      <span className="text-sm font-semibold text-slate-300">{label}</span>
+      <span className="text-sm font-semibold text-[#A7A9D6]">{label}</span>
       {children}
     </label>
   );
